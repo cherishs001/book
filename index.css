@@ -94,7 +94,7 @@ body.animation-enabled .rect {
 .rect.reading {
   z-index: 1;
 
-  overflow-y: auto;
+  overflow-y: scroll;
 }
 body.animation-enabled .rect>.content {
   transition: background-color 0.3s, color 0.3s, opacity 0.5s;
