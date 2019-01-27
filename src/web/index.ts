@@ -246,7 +246,7 @@ const finalizeChapterLoading = (selection?: [number, number, number, number]) =>
     const prevChapter = data.chapters[chapterIndex - 1];
     const $prevLink = document.createElement('a');
     $prevLink.innerText = '上一章';
-    $prevLink.href = `?chapter=${prevChapter}`;
+    $prevLink.href = `${window.location.pathname}?chapter=${prevChapter}`;
     $prevLink.style.textAlign = 'left';
     $prevLink.style.flex = '1';
     $prevLink.addEventListener('click', event => {
@@ -260,7 +260,7 @@ const finalizeChapterLoading = (selection?: [number, number, number, number]) =>
   }
   const $menuLink = document.createElement('a');
   $menuLink.innerText = '返回菜单';
-  $menuLink.href = '/';
+  $menuLink.href = window.location.pathname;
   $menuLink.style.textAlign = 'center';
   $menuLink.style.flex = '1';
   $menuLink.addEventListener('click', event => {
@@ -273,7 +273,7 @@ const finalizeChapterLoading = (selection?: [number, number, number, number]) =>
     const nextChapter = data.chapters[chapterIndex + 1];
     const $nextLink = document.createElement('a');
     $nextLink.innerText = '下一章';
-    $nextLink.href = `?chapter=${nextChapter}`;
+    $nextLink.href = `${window.location.pathname}?chapter=${nextChapter}`;
     $nextLink.style.textAlign = 'right';
     $nextLink.style.flex = '1';
     $nextLink.addEventListener('click', event => {
@@ -323,7 +323,7 @@ const getTitle = () => {
 
 const updateHistory = (push: boolean) => {
   const method = push ? window.history.pushState : window.history.replaceState;
-  let query = '/';
+  let query = window.location.pathname;
   if (currentChapter !== null) {
     query += '?chapter=' + currentChapter;
     if (chapterSelection !== null) {

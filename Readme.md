@@ -1,8 +1,10 @@
 # 警告
 《可穿戴科技》是一部重口味色情小说。因其中含有大量露骨的非常规性行为描写，本小说可能不适合所有年龄段，亦不宜在工作期间访问。
 
-# 可穿戴科技
+# 可穿戴科技 [![Build Status](https://travis-ci.org/SCLeoX/Wearable-Technology.svg?branch=master)](https://travis-ci.org/SCLeoX/Wearable-Technology)
 《可穿戴科技》是一部关于一名社会恐惧症美少女和某智能贞操带斗智斗勇的色情小说。
+
+## [点此在线阅读](https://scleox.github.io/Wearable-Technology/)
 
 本小说[原先是放在 Google Docs 上](https://docs.google.com/document/d/1Pp5CtO8c77DnWGqbXg-3e7w9Q3t88P35FOl6iIJvMfo/edit?usp=sharing)的，但是由于篇幅变长，Google Docs 越来越卡，因此转移到 GitHub。
 
