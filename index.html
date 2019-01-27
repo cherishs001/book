@@ -1,0 +1,99 @@
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>可穿戴科技</title>
+  <link href="https://fonts.googleapis.com/css?family=Noto+Sans+SC|ZCOOL+QingKe+HuangYou" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="index.css">
+</head>
+<body class="animation-enabled">
+  <div id="warning" class="warning-backdrop">
+    <div class="warning-container">
+      <div class="title">警告</div>
+      <div class="content">
+        《可穿戴科技》是一部重口味色情小说。因其中含有大量露骨的非常规性行为描写，本小说可能不适合所有年龄段，亦不宜在工作期间访问。
+      </div>
+      <div class="disable">
+        点击屏幕以关闭。若要禁用本提示，请转到「设置」。
+      </div>
+    </div>
+  </div>
+  <script>
+    if (window.localStorage.getItem('warning') === 'false') {
+      document.getElementById('warning').remove();
+    }
+  </script>
+  <div id="rect" class="rect style-bright">
+    <div id="content" class="content">
+      我能吞下玻璃而不伤身体。
+    </div>
+  </div>
+  <div class="container">
+    <div class="english-title">Wearable Technology</div>
+    <div class="title">可穿戴科技</div>
+    <div class="author">琳 缇佩斯</div>
+  </div>
+  <div id="btngrp-main" class="button-group">
+    <div id="btn-chapters" class="button">开始阅读</div>
+    <div id="btn-thanks" class="button">鸣谢列表</div>
+    <div id="btn-style" class="button">阅读器样式</div>
+    <div id="btn-contact" class="button">订阅/讨论组</div>
+    <a target="_blank" href="https://github.com/SCLeoX/Wearable-Technology">
+      <div class="button">源代码</div>
+    </a>
+    <div id="btn-settings" class="button">设置</div>
+    <div id="btn-stats" class="button">统计</div>
+  </div>
+  <div id="btngrp-chapters" class="hidden button-group">
+    <div id="btn-chapters-back" class="back button">返回</div>
+  </div>
+  <div id="btngrp-thanks" class="hidden button-group">
+    <div id="btn-thanks-back" class="back button">返回</div>
+    <div class="small">神楽坂 立音</div>
+    <div class="small">lgd_小翅膀</div>
+    <div class="small">青葉</div>
+    <div class="small">kn</div>
+    <a target="_blank" href="https://t.me/F74nk_K">
+      <div class="small button">F74nk</div>
+    </a>
+    <div class="small">杨佳文</div>
+    <div class="small">不知名的N姓人士就好</div>
+    <div class="small">某不愿透露姓名的N性？</div>
+    <div class="small">神楽坂 萌绫</div>
+  </div>
+  <div id="btngrp-style" class="hidden button-group">
+    <div id="btn-style-back" class="back button">返回</div>
+    <div id="btn-style-bright" class="selectable selected small button">亮色</div>
+    <div id="btn-style-dark" class="selectable small button">暗色</div>
+  </div>
+  <div id="btngrp-contact" class="hidden button-group">
+    <div id="btn-contact-back" class="back button">返回</div>
+    <a target="_blank" href="https://t.me/joinchat/AAAAAEpkRVwZ-3s5V3YHjA">
+      <div class="small button">Telegram 更新推送频道</div>
+    </a>
+    <a target="_blank" href="https://t.me/joinchat/Dt8_WlJnmEwYNbjzlnLyNA">
+      <div class="small button">Telegram 讨论组</div>
+    </a>
+    <a target="_blank" href="https://github.com/SCLeoX/Wearable-Technology">
+      <div class="small button">GitHub Repo</div>
+    </a>
+    <a target="_blank" href="https://docs.google.com/document/d/1Pp5CtO8c77DnWGqbXg-3e7w9Q3t88P35FOl6iIJvMfo/edit?usp=sharing">
+      <div class="small button">原始 Google Docs</div>
+    </a>
+  </div>
+  <div id="btngrp-settings" class="hidden button-group">
+    <div id="btn-settings-back" class="back button">返回</div>
+    <div id="btn-settings-warning" class="small button">NSFW 警告设置</div>
+    <div id="btn-settings-animation" class="small button">使用动画设置</div>
+  </div>
+  <div id="btngrp-stats" class="hidden button-group">
+    <div id="btn-stats-back" class="back button">返回</div>
+    <div class="small">统计数据由构建脚本自动生成</div>
+    <div id="txt-stats-chars" class="small">总字数统计</div>
+    <div id="txt-stats-paragraphs" class="small">总段落数统计</div>
+  </div>
+  <script src="./data.js" defer></script>
+  <script src="./bundle.js" defer></script>
+</body>
+</html>
