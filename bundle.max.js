@@ -301,7 +301,7 @@ var finalizeChapterLoading = function (selection) {
         var prevChapter_1 = data.chapters[chapterIndex - 1];
         var $prevLink = document.createElement('a');
         $prevLink.innerText = '上一章';
-        $prevLink.href = "?chapter=" + prevChapter_1;
+        $prevLink.href = window.location.pathname + "?chapter=" + prevChapter_1;
         $prevLink.style.textAlign = 'left';
         $prevLink.style.flex = '1';
         $prevLink.addEventListener('click', function (event) {
@@ -316,7 +316,7 @@ var finalizeChapterLoading = function (selection) {
     }
     var $menuLink = document.createElement('a');
     $menuLink.innerText = '返回菜单';
-    $menuLink.href = '/';
+    $menuLink.href = window.location.pathname;
     $menuLink.style.textAlign = 'center';
     $menuLink.style.flex = '1';
     $menuLink.addEventListener('click', function (event) {
@@ -329,7 +329,7 @@ var finalizeChapterLoading = function (selection) {
         var nextChapter_1 = data.chapters[chapterIndex + 1];
         var $nextLink = document.createElement('a');
         $nextLink.innerText = '下一章';
-        $nextLink.href = "?chapter=" + nextChapter_1;
+        $nextLink.href = window.location.pathname + "?chapter=" + nextChapter_1;
         $nextLink.style.textAlign = 'right';
         $nextLink.style.flex = '1';
         $nextLink.addEventListener('click', function (event) {
@@ -379,7 +379,7 @@ var getTitle = function () {
 };
 var updateHistory = function (push) {
     var method = push ? window.history.pushState : window.history.replaceState;
-    var query = '/';
+    var query = window.location.pathname;
     if (currentChapter !== null) {
         query += '?chapter=' + currentChapter;
         if (chapterSelection !== null) {
