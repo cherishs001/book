@@ -101,8 +101,6 @@ body.animation-enabled .rect>.content {
 }
 .rect>.content {
   opacity: 0;
-
-  font-family: 'Noto Sans SC', sans-serif;
 }
 @media (min-width: 901px) {
   .rect.reading {
