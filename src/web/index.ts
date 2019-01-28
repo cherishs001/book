@@ -39,6 +39,7 @@ const $btnStyleBack = id('btn-style-back');
 const styleSelectionButtons: Map<Style, HTMLDivElement> = new Map();
 styleSelectionButtons.set(Style.BRIGHT, id('btn-style-bright'));
 styleSelectionButtons.set(Style.DARK, id('btn-style-dark'));
+styleSelectionButtons.set(Style.PARCHMENT, id('btn-style-parchment'));
 
 const $btngrpContact = id('btngrp-contact');
 const $btnContactBack = id('btn-contact-back');
