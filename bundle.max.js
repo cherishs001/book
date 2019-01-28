@@ -19,10 +19,12 @@ var Style;
 (function (Style) {
     Style[Style["BRIGHT"] = 0] = "BRIGHT";
     Style[Style["DARK"] = 1] = "DARK";
+    Style[Style["PARCHMENT"] = 2] = "PARCHMENT";
 })(Style = exports.Style || (exports.Style = {}));
 exports.styleClassNames = new Map();
 exports.styleClassNames.set(Style.BRIGHT, 'style-bright');
 exports.styleClassNames.set(Style.DARK, 'style-dark');
+exports.styleClassNames.set(Style.PARCHMENT, 'style-parchment');
 
 },{}],3:[function(require,module,exports){
 "use strict";
@@ -101,6 +103,7 @@ var $btnStyleBack = id('btn-style-back');
 var styleSelectionButtons = new Map();
 styleSelectionButtons.set(Style_1.Style.BRIGHT, id('btn-style-bright'));
 styleSelectionButtons.set(Style_1.Style.DARK, id('btn-style-dark'));
+styleSelectionButtons.set(Style_1.Style.PARCHMENT, id('btn-style-parchment'));
 var $btngrpContact = id('btngrp-contact');
 var $btnContactBack = id('btn-contact-back');
 var $btngrpSettings = id('btngrp-settings');

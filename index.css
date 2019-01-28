@@ -204,6 +204,24 @@ body.animation-enabled .rect>.content {
   color: #33C;
 }
 
+/* STYLE: PARCHMENT */
+.rect.style-parchment.reading {
+  background-color: #D8D4C9;
+}
+.rect.style-parchment>.content {
+  color: #552830;
+  background-color: #F8F4E9;
+}
+.rect.style-parchment>.content a {
+  color: #00E;
+}
+.rect.style-parchment>.content a:visited {
+  color: #00E;
+}
+.rect.style-parchment>.content a:active {
+  color: #00C;
+}
+
 .container {
   position: fixed;
   top: 5vh;
