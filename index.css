@@ -17,7 +17,7 @@ body.animation-enabled .warning-backdrop {
   left: -300px;
 
   width: calc(100vw + 600px);
-  height: 100vh;
+  height: 100%;
 
   cursor: pointer;
 
@@ -106,7 +106,7 @@ body.animation-enabled .rect>.content {
   .rect.reading {
     top: 0;
 
-    height: 100vh;
+    height: 100%;
 
     transform: rotate(0);
   }
@@ -152,7 +152,7 @@ body.animation-enabled .rect>.content {
     left: 0;
 
     width: 100vw;
-    height: 100vh;
+    height: 100%;
 
     transform: none;
   }
@@ -210,8 +210,6 @@ body.animation-enabled .rect>.content {
   left: 5vh;
 
   color: #DDD;
-
-  font-family: 'ZCOOL QingKe HuangYou', cursive;
 }
 @media (max-width: 900px) {
   .container {
@@ -223,9 +221,11 @@ body.animation-enabled .rect>.content {
   }
 }
 .container .english-title {
+  font-family: 'ZCOOL QingKe HuangYou', cursive;
   font-size: 5.2vh;
 }
 .container .title {
+  font-family: 'ZCOOL QingKe HuangYou', cursive;
   font-size: 10vh;
 }
 .container .author {
@@ -276,6 +276,7 @@ body.animation-enabled .button-group {
   transform: scaleX(1.2);
   transform-origin: 0;
 
+  font-family: 'ZCOOL QingKe HuangYou', cursive;
   font-size: 5vh;
 }
 .button-group .small {
