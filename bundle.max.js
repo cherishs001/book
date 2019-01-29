@@ -207,6 +207,8 @@ var id = function (id) {
     return document.getElementById(id);
 };
 var $warning = id('warning');
+var $buildNumber = id('build-number');
+$buildNumber.innerText = "Build " + data.buildNumber;
 var $rect = id('rect');
 var $content = id('content');
 var $btngrpMain = id('btngrp-main');

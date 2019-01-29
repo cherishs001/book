@@ -192,12 +192,27 @@ body.animation-enabled .rect>.content {
   font-family: 'ZCOOL QingKe HuangYou', cursive;
   font-size: 10vh;
 }
-.container .author {
+.container .build-author-container {
+  display: flex;
+
   padding-right: 0.5vh;
+  padding-left: 0.5vh;
+}
+.container .build-author-container .build {
+  flex: 1;
+
+  padding-top: 0.2vh;
+
+  text-align: left;
+
+  font-family: 'ZCOOL QingKe HuangYou', cursive;
+  font-size: 2.6vh;
+}
+.container .build-author-container .author {
+  flex: 1;
 
   text-align: right;
 
-  font-family: 'Noto Sans SC', sans-serif;
   font-size: 2vh;
 }
 
