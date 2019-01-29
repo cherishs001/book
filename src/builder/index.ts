@@ -34,7 +34,12 @@ import { countParagraphs } from './countParagraphs';
     await writeFile(resolve(distChapters, chapter + '.html'), output);
     console.info(`${chapter}.html rendered.`);
   }
-  const data = { chapters, charsCount, paragraphsCount };
+  const data = {
+    chapters,
+    charsCount,
+    paragraphsCount,
+    buildNumber: process.env.TRAVIS_BUILD_NUMBER || 'Unoffical',
+  };
   await writeFile(
     resolve(distDir, 'data.js'),
     `window.DATA=${JSON.stringify(data)};`,

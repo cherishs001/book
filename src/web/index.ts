@@ -8,6 +8,7 @@ interface Data {
   chapters: Array<string>;
   charsCount: number;
   paragraphsCount: number;
+  buildNumber: string;
 }
 const data = (window as any).DATA as Data;
 
@@ -16,6 +17,9 @@ const id = <T extends HTMLElement = HTMLDivElement>(id: string) => {
 };
 
 const $warning = id('warning');
+
+const $buildNumber = id('build-number');
+$buildNumber.innerText = `Build ${data.buildNumber}`;
 
 const $rect = id('rect');
 const $content = id('content');
