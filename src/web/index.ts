@@ -1,7 +1,7 @@
 import { getTextNodes } from './getTextNodes';
 import { loadingText } from './loadingText';
 import { Menu } from './Menu';
-import { Style, styleClassNames } from './Style';
+import { load as loadStyles } from './Style';
 import { stylePreviewArticle } from './stylePreviewArticle';
 
 interface Data {
@@ -36,10 +36,7 @@ const $btnThanksBack = id('btn-thanks-back');
 
 const $btngrpStyle = id('btngrp-style');
 const $btnStyleBack = id('btn-style-back');
-const styleSelectionButtons: Map<Style, HTMLDivElement> = new Map();
-styleSelectionButtons.set(Style.BRIGHT, id('btn-style-bright'));
-styleSelectionButtons.set(Style.DARK, id('btn-style-dark'));
-styleSelectionButtons.set(Style.PARCHMENT, id('btn-style-parchment'));
+loadStyles($btngrpStyle);
 
 const $btngrpContact = id('btngrp-contact');
 const $btnContactBack = id('btn-contact-back');
@@ -98,7 +95,6 @@ const menuGroups = {
   [Menu.SETTINGS]: $btngrpSettings,
   [Menu.STATS]: $btngrpStats,
 };
-let style: Style = Style.BRIGHT;
 
 const attachMenuSwitchEvent = (button: HTMLElement, from: Menu, to: Menu, cb?: () => void) => {
   button.addEventListener('click', () => {
@@ -131,26 +127,6 @@ attachMenuSwitchEvent($btnSettings, Menu.MAIN, Menu.SETTINGS);
 attachMenuSwitchEvent($btnSettingsBack, Menu.SETTINGS, Menu.MAIN);
 attachMenuSwitchEvent($btnStats, Menu.MAIN, Menu.STATS);
 attachMenuSwitchEvent($btnStatsBack, Menu.STATS, Menu.MAIN);
-
-const updateStyle = (newStyle: Style) => {
-  styleSelectionButtons.get(style)!.classList.remove('selected');
-  styleSelectionButtons.get(newStyle)!.classList.add('selected');
-  $rect.classList.remove(styleClassNames.get(style)!);
-  $rect.classList.add(styleClassNames.get(newStyle)!);
-  style = newStyle;
-};
-
-for (const [style, button] of styleSelectionButtons.entries()) {
-  button.addEventListener('click', () => {
-    updateStyle(style);
-    window.localStorage.setItem('style', String(style));
-  });
-}
-
-const storedStyle = +window.localStorage.getItem('style')!;
-if (Style[storedStyle] !== undefined) {
-  updateStyle(storedStyle);
-}
 
 let settingsWarning = window.localStorage.getItem('warning') !== 'false';
 let settingsAnimation = window.localStorage.getItem('animation') !== 'false';
