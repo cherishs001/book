@@ -14,17 +14,139 @@ var Menu;
 
 },{}],2:[function(require,module,exports){
 "use strict";
+// export enum Style {
+//   BRIGHT,
+//   DARK,
+//   PARCHMENT,
+// }
+// export const styleClassNames: Map<Style, string> = new Map();
+// styleClassNames.set(Style.BRIGHT, 'style-bright');
+// styleClassNames.set(Style.DARK, 'style-dark');
+// styleClassNames.set(Style.PARCHMENT, 'style-parchment');
+var __values = (this && this.__values) || function (o) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator], i = 0;
+    if (m) return m.call(o);
+    return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
+        }
+    };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-var Style;
-(function (Style) {
-    Style[Style["BRIGHT"] = 0] = "BRIGHT";
-    Style[Style["DARK"] = 1] = "DARK";
-    Style[Style["PARCHMENT"] = 2] = "PARCHMENT";
-})(Style = exports.Style || (exports.Style = {}));
-exports.styleClassNames = new Map();
-exports.styleClassNames.set(Style.BRIGHT, 'style-bright');
-exports.styleClassNames.set(Style.DARK, 'style-dark');
-exports.styleClassNames.set(Style.PARCHMENT, 'style-parchment');
+var Style = /** @class */ (function () {
+    function Style(name, def) {
+        this.name = name;
+        this.def = def;
+        this.styleSheet = null;
+        var selectionButton = document.createElement('div');
+        selectionButton.classList.add('selectable', 'small', 'button');
+        selectionButton.innerText = name;
+        selectionButton.addEventListener('click', this.active.bind(this));
+        this.selectionButton = selectionButton;
+    }
+    Style.prototype.injectStyleSheet = function () {
+        var $style = document.createElement('style');
+        document.head.appendChild($style);
+        var sheet = $style.sheet;
+        sheet.disabled = true;
+        sheet.insertRule(".rect.reading { background-color: " + this.def.rectBgColor + "; }");
+        sheet.insertRule(".rect.reading>.content { background-color: " + this.def.paperBgColor + "; }");
+        sheet.insertRule(".rect.reading>.content { color: " + this.def.textColor + "; }");
+        sheet.insertRule(".rect.reading>.content a { color: " + this.def.linkColor + "; }");
+        sheet.insertRule(".rect.reading>.content a:visited { color: " + this.def.linkColor + "; }");
+        sheet.insertRule(".rect.reading>.content a:hover { color: " + this.def.linkHoverColor + "; }");
+        sheet.insertRule(".rect.reading>.content a:active { color: " + this.def.linkActiveColor + "; }");
+        this.styleSheet = sheet;
+    };
+    Style.prototype.active = function () {
+        if (Style.currentlyEnabled !== null) {
+            var currentlyEnabled = Style.currentlyEnabled;
+            if (currentlyEnabled.styleSheet !== null) {
+                currentlyEnabled.styleSheet.disabled = true;
+            }
+            currentlyEnabled.selectionButton.classList.remove('selected');
+        }
+        if (this.styleSheet === null) {
+            this.injectStyleSheet();
+        }
+        this.styleSheet.disabled = false;
+        this.selectionButton.classList.add('selected');
+        window.localStorage.setItem('style', this.name);
+        Style.currentlyEnabled = this;
+    };
+    Style.currentlyEnabled = null;
+    return Style;
+}());
+function load(buttonsParent) {
+    var e_1, _a;
+    var styles = [
+        new Style('默认', {
+            rectBgColor: '#EFEFED',
+            paperBgColor: '#FFF',
+            textColor: '#000',
+            linkColor: '#00E',
+            linkHoverColor: '#00E',
+            linkActiveColor: '#00C',
+        }),
+        new Style('夜间', {
+            rectBgColor: '#272B36',
+            paperBgColor: '#38404D',
+            textColor: '#DDD',
+            linkColor: '#55E',
+            linkHoverColor: '#55E',
+            linkActiveColor: '#33C',
+        }),
+        new Style('羊皮纸', {
+            rectBgColor: '#D8D4C9',
+            paperBgColor: '#F8F4E9',
+            textColor: '#552830',
+            linkColor: '#00E',
+            linkHoverColor: '#00E',
+            linkActiveColor: '#00C',
+        }),
+        new Style('可穿戴科技', {
+            rectBgColor: '#444',
+            paperBgColor: '#333',
+            textColor: '#DDD',
+            linkColor: '#66F',
+            linkHoverColor: '#66F',
+            linkActiveColor: '#44D',
+        }),
+        new Style('巧克力', {
+            rectBgColor: '#2C1C11',
+            paperBgColor: '#3E2519',
+            textColor: '#CD9F89',
+            linkColor: '#66F',
+            linkHoverColor: '#66F',
+            linkActiveColor: '#44D',
+        }),
+    ];
+    var usedStyle = window.localStorage.getItem('style');
+    var flag = false;
+    try {
+        for (var styles_1 = __values(styles), styles_1_1 = styles_1.next(); !styles_1_1.done; styles_1_1 = styles_1.next()) {
+            var style = styles_1_1.value;
+            if (usedStyle === style.name) {
+                style.active();
+                flag = true;
+                break;
+            }
+        }
+    }
+    catch (e_1_1) { e_1 = { error: e_1_1 }; }
+    finally {
+        try {
+            if (styles_1_1 && !styles_1_1.done && (_a = styles_1.return)) _a.call(styles_1);
+        }
+        finally { if (e_1) throw e_1.error; }
+    }
+    if (!flag) {
+        styles[0].active();
+    }
+    styles.forEach(function (style) { return buttonsParent.appendChild(style.selectionButton); });
+}
+exports.load = load;
 
 },{}],3:[function(require,module,exports){
 "use strict";
@@ -47,16 +169,6 @@ exports.getTextNodes = getTextNodes;
 
 },{}],4:[function(require,module,exports){
 "use strict";
-var __values = (this && this.__values) || function (o) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator], i = 0;
-    if (m) return m.call(o);
-    return {
-        next: function () {
-            if (o && i >= o.length) o = void 0;
-            return { value: o && o[i++], done: !o };
-        }
-    };
-};
 var __read = (this && this.__read) || function (o, n) {
     var m = typeof Symbol === "function" && o[Symbol.iterator];
     if (!m) return o;
@@ -73,8 +185,18 @@ var __read = (this && this.__read) || function (o, n) {
     }
     return ar;
 };
+var __values = (this && this.__values) || function (o) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator], i = 0;
+    if (m) return m.call(o);
+    return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
+        }
+    };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-var _a, e_1, _b, e_2, _c;
+var _a, e_1, _b;
 var getTextNodes_1 = require("./getTextNodes");
 var loadingText_1 = require("./loadingText");
 var Menu_1 = require("./Menu");
@@ -100,10 +222,7 @@ var $btngrpThanks = id('btngrp-thanks');
 var $btnThanksBack = id('btn-thanks-back');
 var $btngrpStyle = id('btngrp-style');
 var $btnStyleBack = id('btn-style-back');
-var styleSelectionButtons = new Map();
-styleSelectionButtons.set(Style_1.Style.BRIGHT, id('btn-style-bright'));
-styleSelectionButtons.set(Style_1.Style.DARK, id('btn-style-dark'));
-styleSelectionButtons.set(Style_1.Style.PARCHMENT, id('btn-style-parchment'));
+Style_1.load($btngrpStyle);
 var $btngrpContact = id('btngrp-contact');
 var $btnContactBack = id('btn-contact-back');
 var $btngrpSettings = id('btngrp-settings');
@@ -161,7 +280,6 @@ var menuGroups = (_a = {},
     _a[Menu_1.Menu.SETTINGS] = $btngrpSettings,
     _a[Menu_1.Menu.STATS] = $btngrpStats,
     _a);
-var style = Style_1.Style.BRIGHT;
 var attachMenuSwitchEvent = function (button, from, to, cb) {
     button.addEventListener('click', function () {
         if (menu !== from) {
@@ -192,36 +310,6 @@ attachMenuSwitchEvent($btnSettings, Menu_1.Menu.MAIN, Menu_1.Menu.SETTINGS);
 attachMenuSwitchEvent($btnSettingsBack, Menu_1.Menu.SETTINGS, Menu_1.Menu.MAIN);
 attachMenuSwitchEvent($btnStats, Menu_1.Menu.MAIN, Menu_1.Menu.STATS);
 attachMenuSwitchEvent($btnStatsBack, Menu_1.Menu.STATS, Menu_1.Menu.MAIN);
-var updateStyle = function (newStyle) {
-    styleSelectionButtons.get(style).classList.remove('selected');
-    styleSelectionButtons.get(newStyle).classList.add('selected');
-    $rect.classList.remove(Style_1.styleClassNames.get(style));
-    $rect.classList.add(Style_1.styleClassNames.get(newStyle));
-    style = newStyle;
-};
-var _loop_1 = function (style_1, button) {
-    button.addEventListener('click', function () {
-        updateStyle(style_1);
-        window.localStorage.setItem('style', String(style_1));
-    });
-};
-try {
-    for (var _d = __values(styleSelectionButtons.entries()), _e = _d.next(); !_e.done; _e = _d.next()) {
-        var _f = __read(_e.value, 2), style_1 = _f[0], button = _f[1];
-        _loop_1(style_1, button);
-    }
-}
-catch (e_1_1) { e_1 = { error: e_1_1 }; }
-finally {
-    try {
-        if (_e && !_e.done && (_b = _d.return)) _b.call(_d);
-    }
-    finally { if (e_1) throw e_1.error; }
-}
-var storedStyle = +window.localStorage.getItem('style');
-if (Style_1.Style[storedStyle] !== undefined) {
-    updateStyle(storedStyle);
-}
 var settingsWarning = window.localStorage.getItem('warning') !== 'false';
 var settingsAnimation = window.localStorage.getItem('animation') !== 'false';
 var updateSettingsWarning = function () {
@@ -469,7 +557,7 @@ var followQuery = function () {
 window.addEventListener('popstate', function () {
     followQuery();
 });
-var _loop_2 = function (chapter) {
+var _loop_1 = function (chapter) {
     var $button = document.createElement('div');
     $button.classList.add('small', 'button');
     $button.innerText = "\u7AE0\u8282 " + chapter;
@@ -480,17 +568,17 @@ var _loop_2 = function (chapter) {
     $btngrpChapters.appendChild($button);
 };
 try {
-    for (var _g = __values(data.chapters), _h = _g.next(); !_h.done; _h = _g.next()) {
-        var chapter = _h.value;
-        _loop_2(chapter);
+    for (var _c = __values(data.chapters), _d = _c.next(); !_d.done; _d = _c.next()) {
+        var chapter = _d.value;
+        _loop_1(chapter);
     }
 }
-catch (e_2_1) { e_2 = { error: e_2_1 }; }
+catch (e_1_1) { e_1 = { error: e_1_1 }; }
 finally {
     try {
-        if (_h && !_h.done && (_c = _g.return)) _c.call(_g);
+        if (_d && !_d.done && (_b = _c.return)) _b.call(_c);
     }
-    finally { if (e_2) throw e_2.error; }
+    finally { if (e_1) throw e_1.error; }
 }
 followQuery();
 

@@ -168,60 +168,6 @@ body.animation-enabled .rect>.content {
   margin-top: 0;
 }
 
-/* STYLE: BRIGHT */
-.rect.style-bright.reading {
-  background-color: #EFEFED;
-}
-.rect.style-bright>.content {
-  color: #000;
-  background-color: #FFF;
-}
-.rect.style-bright>.content a {
-  color: #00E;
-}
-.rect.style-bright>.content a:visited {
-  color: #00E;
-}
-.rect.style-bright>.content a:active {
-  color: #00C;
-}
-
-/* STYLE: DARK */
-.rect.style-dark.reading {
-  background-color: #272B36;
-}
-.rect.style-dark>.content {
-  color: #DDD;
-  background-color: #38404D;
-}
-.rect.style-dark>.content a {
-  color: #55E;
-}
-.rect.style-dark>.content a:visited {
-  color: #55E;
-}
-.rect.style-dark>.content a:active {
-  color: #33C;
-}
-
-/* STYLE: PARCHMENT */
-.rect.style-parchment.reading {
-  background-color: #D8D4C9;
-}
-.rect.style-parchment>.content {
-  color: #552830;
-  background-color: #F8F4E9;
-}
-.rect.style-parchment>.content a {
-  color: #00E;
-}
-.rect.style-parchment>.content a:visited {
-  color: #00E;
-}
-.rect.style-parchment>.content a:active {
-  color: #00C;
-}
-
 .container {
   position: fixed;
   top: 5vh;
