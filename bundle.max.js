@@ -312,9 +312,10 @@ attachMenuSwitchEvent($btnSettings, Menu_1.Menu.MAIN, Menu_1.Menu.SETTINGS);
 attachMenuSwitchEvent($btnSettingsBack, Menu_1.Menu.SETTINGS, Menu_1.Menu.MAIN);
 attachMenuSwitchEvent($btnStats, Menu_1.Menu.MAIN, Menu_1.Menu.STATS);
 attachMenuSwitchEvent($btnStatsBack, Menu_1.Menu.STATS, Menu_1.Menu.MAIN);
-var settingsWarning = window.localStorage.getItem('warning') !== 'false';
+var settingsWarning = window.localStorage.getItem('warning') === 'true';
 var settingsAnimation = window.localStorage.getItem('animation') !== 'false';
 var updateSettingsWarning = function () {
+    window.localStorage.setItem('warning', String(settingsWarning));
     $btnSettingsWarning.innerText = "NSFW \u8B66\u544A\uFF1A" + (settingsWarning ? '开' : '关');
 };
 updateSettingsWarning();
@@ -326,16 +327,15 @@ var updateSettingsAnimation = function () {
     else {
         document.body.classList.remove('animation-enabled');
     }
+    window.localStorage.setItem('animation', String(settingsAnimation));
 };
 updateSettingsAnimation();
 $btnSettingsWarning.addEventListener('click', function () {
     settingsWarning = !settingsWarning;
-    window.localStorage.setItem('warning', String(settingsWarning));
     updateSettingsWarning();
 });
 $btnSettingsAnimation.addEventListener('click', function () {
     settingsAnimation = !settingsAnimation;
-    window.localStorage.setItem('animation', String(settingsAnimation));
     updateSettingsAnimation();
 });
 if ($warning !== null) {
