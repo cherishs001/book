@@ -330,8 +330,8 @@ document.addEventListener('selectionchange', () => {
       : selection.anchorNode) as Text;
     const anchorNodeIndex = chapterTextNodes.indexOf(anchor);
     const focus = ((selection.focusNode instanceof HTMLElement)
-    ? selection.focusNode.firstChild
-    : selection.focusNode) as Text;
+      ? selection.focusNode.firstChild
+      : selection.focusNode) as Text;
     const focusNodeIndex = chapterTextNodes.indexOf(focus);
     if (
       (anchorNodeIndex === -1) || (focusNodeIndex === -1) ||
