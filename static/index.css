@@ -6,6 +6,11 @@ body {
 div {
   box-sizing: border-box;
 }
+a {
+  text-decoration: none;
+
+  color: inherit;
+}
 
 body.animation-enabled .warning-backdrop {
   transition: opacity 0.3s;
@@ -216,6 +221,37 @@ body.animation-enabled .rect>.content {
   font-size: 2vh;
 }
 
+.button {
+  position: relative;
+
+  float: left;
+  clear: left;
+
+  cursor: pointer;
+  user-select: none;
+}
+body.animation-enabled .button::after {
+  transition: transform 0.2s, transform-origin 0.2s;
+}
+.button::after {
+  position: absolute;
+  top: 105%;
+  left: 0;
+
+  width: 100%;
+  height: 0.06em;
+
+  content: '';
+  transform: scaleX(0);
+  transform-origin: 20%;
+
+  background-color: #DDD;
+}
+.button:hover::after {
+  transform: scaleX(1);
+  transform-origin: 0;
+}
+
 body.animation-enabled .button-group {
   transition: opacity 0.3s, transform 0.3s;
 }
@@ -243,9 +279,6 @@ body.animation-enabled .button-group {
 
   font-family: 'ZCOOL QingKe HuangYou', sans-serif;
 }
-.button-group a {
-  color: inherit;
-}
 .button-group div {
   float: left;
   clear: left;
@@ -262,10 +295,6 @@ body.animation-enabled .button-group {
   margin: 0.3vh 0 0.3vh 0.5vh;
 
   font-size: 3vh;
-}
-.button-group .button {
-  cursor: pointer;
-  user-select: none;
 }
 .button-group .button::before {
   position: absolute;
@@ -296,30 +325,6 @@ body.animation-enabled .button-group .button.selectable::before {
   transform: none;
 
   opacity: 1;
-}
-body.animation-enabled .button-group .button::after {
-  transition: transform 0.2s, transform-origin 0.2s;
-}
-.button-group .button::after {
-  position: absolute;
-  top: 105%;
-  left: 0;
-
-  width: 100%;
-  height: 0.4vh;
-
-  content: '';
-  transform: scaleX(0);
-  transform-origin: 20%;
-
-  background-color: #DDD;
-}
-.button-group .small.button::after {
-  height: 0.25vh;
-}
-.button-group .button:hover::after {
-  transform: scaleX(1);
-  transform-origin: 0;
 }
 .button-group .button:active {
   color: #999;
