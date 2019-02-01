@@ -132,9 +132,10 @@ attachMenuSwitchEvent($btnSettingsBack, Menu.SETTINGS, Menu.MAIN);
 attachMenuSwitchEvent($btnStats, Menu.MAIN, Menu.STATS);
 attachMenuSwitchEvent($btnStatsBack, Menu.STATS, Menu.MAIN);
 
-let settingsWarning = window.localStorage.getItem('warning') !== 'false';
+let settingsWarning = window.localStorage.getItem('warning') === 'true';
 let settingsAnimation = window.localStorage.getItem('animation') !== 'false';
 const updateSettingsWarning = () => {
+  window.localStorage.setItem('warning', String(settingsWarning));
   $btnSettingsWarning.innerText = `NSFW 警告：${settingsWarning ? '开' : '关'}`;
 };
 updateSettingsWarning();
@@ -145,16 +146,15 @@ const updateSettingsAnimation = () => {
   } else {
     document.body.classList.remove('animation-enabled');
   }
+  window.localStorage.setItem('animation', String(settingsAnimation));
 };
 updateSettingsAnimation();
 $btnSettingsWarning.addEventListener('click', () => {
   settingsWarning = !settingsWarning;
-  window.localStorage.setItem('warning', String(settingsWarning));
   updateSettingsWarning();
 });
 $btnSettingsAnimation.addEventListener('click', () => {
   settingsAnimation = !settingsAnimation;
-  window.localStorage.setItem('animation', String(settingsAnimation));
   updateSettingsAnimation();
 });
 if ($warning !== null) {
