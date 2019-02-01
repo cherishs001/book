@@ -64,6 +64,7 @@ body.animation-enabled .warning-backdrop {
   color: yellow;
 
   font-size: 7vh;
+  line-height: 7vh;
 }
 .warning-container .content {
   margin-bottom: 2vh;
@@ -73,6 +74,7 @@ body.animation-enabled .warning-backdrop {
   color: white;
 
   font-size: 4vh;
+  line-height: 4vh;
 }
 .warning-container .disable {
   text-align: center;
@@ -80,6 +82,7 @@ body.animation-enabled .warning-backdrop {
   color: #BBB;
 
   font-size: 3vh;
+  line-height: 3vh;
 }
 body.animation-enabled .rect {
   transition: background-color 0.3s, width 0.5s, height 0.5s, top 0.5s, left 0.5s, transform 0.5s;
@@ -192,10 +195,12 @@ body.animation-enabled .rect>.content {
 .container .english-title {
   font-family: 'ZCOOL QingKe HuangYou', cursive;
   font-size: 5.2vh;
+  line-height: 5.2vh;
 }
 .container .title {
   font-family: 'ZCOOL QingKe HuangYou', cursive;
   font-size: 10vh;
+  line-height: 10vh;
 }
 .container .build-author-container {
   display: flex;
@@ -290,11 +295,13 @@ body.animation-enabled .button-group {
 
   font-family: 'ZCOOL QingKe HuangYou', cursive;
   font-size: 5vh;
+  line-height: 5vh;
 }
 .button-group .small {
   margin: 0.3vh 0 0.3vh 0.5vh;
 
   font-size: 3vh;
+  line-height: 3vh;
 }
 .button-group .button::before {
   position: absolute;
@@ -302,12 +309,14 @@ body.animation-enabled .button-group {
   right: calc(100% + 0.8vh);
 
   font-size: 3vh;
+  line-height: 3vh;
 }
 .button-group .small.button::before {
   position: absolute;
   top: 0.5vh;
 
   font-size: 2vh;
+  line-height: 2vh;
 }
 .button-group .button.back::before {
   content: '◀';
