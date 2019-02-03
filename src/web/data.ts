@@ -1,5 +1,6 @@
 interface Data {
   chapters: Array<string>;
+  earlyAccessChapters: Array<string>;
   charsCount: number;
   paragraphsCount: number;
   buildNumber: string;

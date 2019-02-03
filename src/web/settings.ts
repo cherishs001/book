@@ -36,3 +36,6 @@ export const animation = new BooleanSetting('animation', true, value => {
   document.body.classList.toggle('animation-enabled', value);
 });
 export const warning = new BooleanSetting('warning', false);
+export const earlyAccess = new BooleanSetting('earlyAccess', false, value => {
+  document.body.classList.toggle('early-access-disabled', !value);
+});

@@ -1,11 +1,12 @@
 import { Menu } from './Menu';
-import { animation, BooleanSetting, warning } from './settings';
+import { animation, BooleanSetting, earlyAccess, warning } from './settings';
 
 export class SettingsMenu extends Menu {
   public constructor(parent: Menu) {
     super('设置', parent);
     this.addBooleanSetting('NSFW 警告', warning);
     this.addBooleanSetting('使用动画', animation);
+    this.addBooleanSetting('显示编写中章节', earlyAccess);
   }
   public addBooleanSetting(label: string, setting: BooleanSetting) {
     const getText = () => `${label}：${setting.getValue() ? '开' : '关'}`;

@@ -4,6 +4,8 @@ import { resolve } from 'path';
 import { countChars } from './countChars';
 import { countParagraphs } from './countParagraphs';
 
+const earlyAccessFlag = '# 编写中';
+
 (async () => {
   const rootDir = resolve(__dirname, '../..');
   const staticDir = resolve(rootDir, 'static');
@@ -23,11 +25,16 @@ import { countParagraphs } from './countParagraphs';
     .filter(name => name.endsWith('.md'))
     .map(name => name.substr(0, name.length - 3))
     .sort((a, b) => +a - +b);
+  const earlyAccessChapters: Array<string> = [];
   let charsCount = 0;
   let paragraphsCount = 0;
   for (const chapter of chapters) {
     const path = resolve(chaptersDir, chapter + '.md');
-    const content = (await readFile(path)).toString();
+    let content = (await readFile(path)).toString();
+    if (content.startsWith(earlyAccessFlag)) {
+      earlyAccessChapters.push(chapter);
+      content = content.substr(earlyAccessFlag.length);
+    }
     charsCount += countChars(content);
     const output = mdi.render(content);
     paragraphsCount += countParagraphs(output);
@@ -36,6 +43,7 @@ import { countParagraphs } from './countParagraphs';
   }
   const data = {
     chapters,
+    earlyAccessChapters,
     charsCount,
     paragraphsCount,
     buildNumber: process.env.TRAVIS_BUILD_NUMBER || 'Unoffical',

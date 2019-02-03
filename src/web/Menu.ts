@@ -45,6 +45,10 @@ export class ItemHandle {
     this.element.innerText = innerText;
     return this;
   }
+  public addClass(className: string) {
+    this.element.classList.add(className);
+    return this;
+  }
 }
 
 export class Menu {
