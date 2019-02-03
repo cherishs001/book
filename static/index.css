@@ -257,10 +257,10 @@ body.animation-enabled .button::after {
   transform-origin: 0;
 }
 
-body.animation-enabled .button-group {
+body.animation-enabled .menu {
   transition: opacity 0.3s, transform 0.3s;
 }
-.button-group {
+.menu {
   position: fixed;
   top: 28vh;
   left: 0;
@@ -275,7 +275,7 @@ body.animation-enabled .button-group {
 
   font-family: 'ZCOOL QingKe HuangYou', sans-serif;
 }
-.button-group.hidden {
+.menu.hidden {
   transform: none;
   transform: translateX(-5vh);
   pointer-events: none;
@@ -284,7 +284,8 @@ body.animation-enabled .button-group {
 
   font-family: 'ZCOOL QingKe HuangYou', sans-serif;
 }
-.button-group div {
+.menu div, .menu a {
+  display: block;
   float: left;
   clear: left;
 
@@ -297,13 +298,13 @@ body.animation-enabled .button-group {
   font-size: 5vh;
   line-height: 5vh;
 }
-.button-group .small {
+.menu .small {
   margin: 0.3vh 0 0.3vh 0.5vh;
 
   font-size: 3vh;
   line-height: 3vh;
 }
-.button-group .button::before {
+.menu .button::before {
   position: absolute;
   top: 1vh;
   right: calc(100% + 0.8vh);
@@ -311,33 +312,33 @@ body.animation-enabled .button-group {
   font-size: 3vh;
   line-height: 3vh;
 }
-.button-group .small.button::before {
+.menu .small.button::before {
   position: absolute;
   top: 0.5vh;
 
   font-size: 2vh;
   line-height: 2vh;
 }
-.button-group .button.back::before {
+.menu .button.back::before {
   content: '◀';
 }
-body.animation-enabled .button-group .button.selectable::before {
+body.animation-enabled .menu .button.selectable::before {
   transition: opacity 0.3s, transform 0.3s;
 }
-.button-group .button.selectable::before {
+.menu .button.selectable::before {
   content: '>';
   transform: translateX(-50%);
 
   opacity: 0;
 }
-.button-group .button.selectable.selected::before {
+.menu .button.selectable.selected::before {
   transform: none;
 
   opacity: 1;
 }
-.button-group .button:active {
+.menu .button:active {
   color: #999;
 }
-.button-group .button:active::after {
+.menu .button:active::after {
   background-color: #999;
 }
