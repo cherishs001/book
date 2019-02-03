@@ -34,11 +34,15 @@ var ChaptersMenu = /** @class */ (function (_super) {
         var e_1, _a;
         var _this = _super.call(this, '章节选择', parent) || this;
         var _loop_1 = function (chapter) {
-            this_1.addItem("\u7AE0\u8282 " + chapter, { small: true, button: true })
+            var handle = this_1.addItem("\u7AE0\u8282 " + chapter, { small: true, button: true })
                 .onClick(function () {
                 chapterControl_1.loadChapter(chapter);
                 history_1.updateHistory(true);
             });
+            if (data_1.data.earlyAccessChapters.includes(chapter)) {
+                handle.setInnerText("[\u7F16\u5199\u4E2D] \u7AE0\u8282 " + chapter);
+                handle.addClass('early-access');
+            }
         };
         var this_1 = this;
         try {
@@ -211,6 +215,10 @@ var ItemHandle = /** @class */ (function () {
         this.element.innerText = innerText;
         return this;
     };
+    ItemHandle.prototype.addClass = function (className) {
+        this.element.classList.add(className);
+        return this;
+    };
     return ItemHandle;
 }());
 exports.ItemHandle = ItemHandle;
@@ -338,6 +346,7 @@ var SettingsMenu = /** @class */ (function (_super) {
         var _this = _super.call(this, '设置', parent) || this;
         _this.addBooleanSetting('NSFW 警告', settings_1.warning);
         _this.addBooleanSetting('使用动画', settings_1.animation);
+        _this.addBooleanSetting('显示编写中章节', settings_1.earlyAccess);
         return _this;
     }
     SettingsMenu.prototype.addBooleanSetting = function (label, setting) {
@@ -889,6 +898,9 @@ exports.animation = new BooleanSetting('animation', true, function (value) {
     document.body.classList.toggle('animation-enabled', value);
 });
 exports.warning = new BooleanSetting('warning', false);
+exports.earlyAccess = new BooleanSetting('earlyAccess', false, function (value) {
+    document.body.classList.toggle('early-access-disabled', !value);
+});
 
 },{}],18:[function(require,module,exports){
 "use strict";

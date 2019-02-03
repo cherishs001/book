@@ -298,6 +298,9 @@ body.animation-enabled .menu {
   font-size: 5vh;
   line-height: 5vh;
 }
+.early-access-disabled .early-access {
+  display: none;
+}
 .menu .small {
   margin: 0.3vh 0 0.3vh 0.5vh;
 
