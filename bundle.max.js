@@ -161,6 +161,7 @@ var MainMenu = /** @class */ (function (_super) {
         _this.addLink(new ThanksMenu_1.ThanksMenu(_this));
         _this.addLink(new StyleMenu_1.StyleMenu(_this));
         _this.addLink(new ContactMenu_1.ContactMenu(_this));
+        _this.addItem('源代码', { button: true, link: 'https://github.com/SCLeoX/Wearable-Technology' });
         _this.addLink(new SettingsMenu_1.SettingsMenu(_this));
         _this.addLink(new StatsMenu_1.StatsMenu(_this));
         return _this;
