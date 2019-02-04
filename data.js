@@ -1,1 +1,1 @@
-window.DATA={"chapters":["0","1","2","3","4","5","6","7","8","9","10","11","12"],"earlyAccessChapters":["12"],"charsCount":56827,"paragraphsCount":1288,"buildNumber":"19"};
+window.DATA={"chapters":["0","1","2","3","4","5","6","7","8","9","10","11","12"],"earlyAccessChapters":["12"],"charsCount":58217,"paragraphsCount":1326,"buildNumber":"20"};
