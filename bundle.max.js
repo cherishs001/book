@@ -507,7 +507,7 @@ var StyleMenu = /** @class */ (function (_super) {
     __extends(StyleMenu, _super);
     function StyleMenu(parent) {
         var e_1, _a, e_2, _b;
-        var _this = _super.call(this, '编辑器样式', parent, RectMode_1.RectMode.SIDE) || this;
+        var _this = _super.call(this, '阅读器样式', parent, RectMode_1.RectMode.SIDE) || this;
         var _loop_1 = function (style) {
             style.itemHandle = this_1.addItem(style.name, { small: true, button: true, decoration: Menu_1.ItemDecoration.SELECTABLE })
                 .onClick(function () {
