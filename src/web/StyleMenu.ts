@@ -97,7 +97,7 @@ const styles = [
 
 export class StyleMenu extends Menu {
   public constructor(parent: Menu) {
-    super('编辑器样式', parent, RectMode.SIDE);
+    super('阅读器样式', parent, RectMode.SIDE);
     for (const style of styles) {
       style.itemHandle = this.addItem(style.name, { small: true, button: true, decoration: ItemDecoration.SELECTABLE })
         .onClick(() => {
