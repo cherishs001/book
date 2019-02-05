@@ -933,6 +933,7 @@ exports.thanks = [
     { name: '友人♪B' },
     { name: 'NekoCaffeine' },
     { name: 'RainSlide' },
+    { name: 'czp', link: 'https://www.hiczp.com' },
 ].sort(function () { return Math.random() - 0.5; });
 
 },{}],21:[function(require,module,exports){
