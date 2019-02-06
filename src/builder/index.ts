@@ -21,28 +21,36 @@ const earlyAccessFlag = '# 编写中';
 
   // Render chapters
   const mdi = new MDI();
+  const splitStr = ' - ';
+  const nameSplitter = (fileName: string) => {
+    if (fileName.includes(splitStr)) {
+      return [fileName, fileName.split(splitStr) as [string, string]];
+    }
+    return [fileName, [fileName, '章节 ' + fileName]];
+  };
   const chapters = (await readdir(chaptersDir))
     .filter(name => name.endsWith('.md'))
     .map(name => name.substr(0, name.length - 3))
-    .sort((a, b) => +a - +b);
+    .map(nameSplitter)
+    .sort((a, b) => +a[1][0] - +b[1][0]);
   const earlyAccessChapters: Array<string> = [];
   let charsCount = 0;
   let paragraphsCount = 0;
   for (const chapter of chapters) {
-    const path = resolve(chaptersDir, chapter + '.md');
+    const path = resolve(chaptersDir, chapter[0] + '.md');
     let content = (await readFile(path)).toString();
     if (content.startsWith(earlyAccessFlag)) {
-      earlyAccessChapters.push(chapter);
+      earlyAccessChapters.push(chapter[1][1]);
       content = content.substr(earlyAccessFlag.length);
     }
     charsCount += countChars(content);
     const output = mdi.render(content);
     paragraphsCount += countParagraphs(output);
-    await writeFile(resolve(distChapters, chapter + '.html'), output);
-    console.info(`${chapter}.html rendered.`);
+    await writeFile(resolve(distChapters, chapter[1][1] + '.html'), output);
+    console.info(`${chapter[1][1]}.html rendered.`);
   }
   const data = {
-    chapters,
+    chapters: chapters.map(info => info[1][1]),
     earlyAccessChapters,
     charsCount,
     paragraphsCount,

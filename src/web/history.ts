@@ -4,7 +4,7 @@ import { state } from './state';
 export function getTitle() {
   let title = '可穿戴科技';
   if (state.currentChapter !== null) {
-    title += ' - 章节 ' + state.currentChapter;
+    title += ' - ' + state.currentChapter;
   }
   return title;
 }
