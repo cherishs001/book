@@ -103,6 +103,7 @@ body.animation-enabled .rect {
   z-index: 1;
 
   overflow-y: scroll;
+  -webkit-overflow-scrolling: touch;
 }
 body.animation-enabled .rect>.content {
   transition: background-color 0.3s, color 0.3s, opacity 0.5s;
