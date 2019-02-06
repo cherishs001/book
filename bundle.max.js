@@ -637,8 +637,8 @@ var DOM_1 = require("./DOM");
 var history_1 = require("./history");
 var loadingText_1 = require("./loadingText");
 var RectMode_1 = require("./RectMode");
-var state_1 = require("./state");
 var settings_1 = require("./settings");
+var state_1 = require("./state");
 var $content = DOM_1.id('content');
 var chaptersCache = new Map();
 function closeChapter() {
