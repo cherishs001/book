@@ -4,6 +4,7 @@ import { updateHistory } from './history';
 import { loadingText } from './loadingText';
 import { RectMode, setRectMode } from './RectMode';
 import { Selection, state } from './state';
+import { earlyAccess } from './settings';
 
 const $content = id('content');
 const chaptersCache = new Map<string, string | null>();
@@ -47,6 +48,9 @@ const getFlexOneSpan = () => {
   return $span;
 };
 
+const canChapterShown = (chapterIndex: number) =>
+  earlyAccess.getValue() || !data.earlyAccessChapters.includes(data.chapters[chapterIndex]);
+
 const finalizeChapterLoading = (selection?: Selection) => {
   state.chapterTextNodes = getTextNodes($content);
   if (selection !== undefined) {
@@ -56,7 +60,7 @@ const finalizeChapterLoading = (selection?: Selection) => {
 
   const $div = document.createElement('div');
   $div.style.display = 'flex';
-  if (chapterIndex !== -1 && (chapterIndex !== 0)) {
+  if (chapterIndex >= 1 && canChapterShown(chapterIndex - 1)) {
     const prevChapter = data.chapters[chapterIndex - 1];
     const $prevLink = document.createElement('a');
     $prevLink.innerText = '上一章';
@@ -83,7 +87,7 @@ const finalizeChapterLoading = (selection?: Selection) => {
     updateHistory(true);
   });
   $div.appendChild($menuLink);
-  if (chapterIndex !== -1 && (chapterIndex < data.chapters.length - 1)) {
+  if (chapterIndex !== -1 && (chapterIndex < data.chapters.length - 1) && canChapterShown(chapterIndex + 1)) {
     const nextChapter = data.chapters[chapterIndex + 1];
     const $nextLink = document.createElement('a');
     $nextLink.innerText = '下一章';
