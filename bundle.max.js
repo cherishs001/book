@@ -638,6 +638,7 @@ var history_1 = require("./history");
 var loadingText_1 = require("./loadingText");
 var RectMode_1 = require("./RectMode");
 var state_1 = require("./state");
+var settings_1 = require("./settings");
 var $content = DOM_1.id('content');
 var chaptersCache = new Map();
 function closeChapter() {
@@ -668,6 +669,9 @@ var getFlexOneSpan = function () {
     $span.style.flex = '1';
     return $span;
 };
+var canChapterShown = function (chapterIndex) {
+    return settings_1.earlyAccess.getValue() || !data_1.data.earlyAccessChapters.includes(data_1.data.chapters[chapterIndex]);
+};
 var finalizeChapterLoading = function (selection) {
     state_1.state.chapterTextNodes = DOM_1.getTextNodes($content);
     if (selection !== undefined) {
@@ -676,7 +680,7 @@ var finalizeChapterLoading = function (selection) {
     var chapterIndex = data_1.data.chapters.indexOf(state_1.state.currentChapter);
     var $div = document.createElement('div');
     $div.style.display = 'flex';
-    if (chapterIndex !== -1 && (chapterIndex !== 0)) {
+    if (chapterIndex >= 1 && canChapterShown(chapterIndex - 1)) {
         var prevChapter_1 = data_1.data.chapters[chapterIndex - 1];
         var $prevLink = document.createElement('a');
         $prevLink.innerText = '上一章';
@@ -704,7 +708,7 @@ var finalizeChapterLoading = function (selection) {
         history_1.updateHistory(true);
     });
     $div.appendChild($menuLink);
-    if (chapterIndex !== -1 && (chapterIndex < data_1.data.chapters.length - 1)) {
+    if (chapterIndex !== -1 && (chapterIndex < data_1.data.chapters.length - 1) && canChapterShown(chapterIndex + 1)) {
         var nextChapter_1 = data_1.data.chapters[chapterIndex + 1];
         var $nextLink = document.createElement('a');
         $nextLink.innerText = '下一章';
@@ -751,7 +755,7 @@ function loadChapter(chapter, selection) {
 }
 exports.loadChapter = loadChapter;
 
-},{"./DOM":3,"./RectMode":6,"./data":12,"./history":14,"./loadingText":16,"./state":18}],12:[function(require,module,exports){
+},{"./DOM":3,"./RectMode":6,"./data":12,"./history":14,"./loadingText":16,"./settings":17,"./state":18}],12:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.data = window.DATA;
