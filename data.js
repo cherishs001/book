@@ -1,1 +1,1 @@
-window.DATA={"chapters":["0","1","2","3","4","5","6","7","8","9","10","11","12"],"earlyAccessChapters":["12"],"charsCount":59555,"paragraphsCount":1348,"buildNumber":"30"};
+window.DATA={"chapters":["章节 0","章节 1","章节 2","章节 3","章节 4","章节 5","章节 6","章节 7","章节 8","章节 9","章节 10","章节 11","章节 12","出场人员名单"],"earlyAccessChapters":["章节 12","出场人员名单"],"charsCount":59588,"paragraphsCount":1349,"buildNumber":"31"};

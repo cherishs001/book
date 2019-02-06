@@ -34,13 +34,13 @@ var ChaptersMenu = /** @class */ (function (_super) {
         var e_1, _a;
         var _this = _super.call(this, '章节选择', parent) || this;
         var _loop_1 = function (chapter) {
-            var handle = this_1.addItem("\u7AE0\u8282 " + chapter, { small: true, button: true })
+            var handle = this_1.addItem(chapter, { small: true, button: true })
                 .onClick(function () {
                 chapterControl_1.loadChapter(chapter);
                 history_1.updateHistory(true);
             });
             if (data_1.data.earlyAccessChapters.includes(chapter)) {
-                handle.setInnerText("[\u7F16\u5199\u4E2D] \u7AE0\u8282 " + chapter);
+                handle.setInnerText("[\u7F16\u5199\u4E2D] " + chapter);
                 handle.addClass('early-access');
             }
         };
@@ -802,7 +802,7 @@ var state_1 = require("./state");
 function getTitle() {
     var title = '可穿戴科技';
     if (state_1.state.currentChapter !== null) {
-        title += ' - 章节 ' + state_1.state.currentChapter;
+        title += ' - ' + state_1.state.currentChapter;
     }
     return title;
 }
