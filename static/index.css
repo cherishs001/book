@@ -269,7 +269,7 @@ body.animation-enabled .menu {
   overflow-y: scroll;
 
   width: 300vw;
-  height: 66vh;
+  height: calc(100% - 34vh);
   padding-left: 5vh;
 
   opacity: 1;
