@@ -176,6 +176,16 @@ body.animation-enabled .rect>.content {
 .rect>.content h1 {
   margin-top: 0;
 }
+.rect>.content blockquote {
+  margin: 0;
+
+  opacity: 0.6;
+
+  font-style: italic;
+}
+.rect>.content blockquote>p {
+  margin-top: 0;
+}
 
 .container {
   position: fixed;
