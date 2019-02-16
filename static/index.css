@@ -18,6 +18,8 @@ body.animation-enabled .warning {
 .warning {
   position: fixed;
   z-index: 2;
+
+  cursor: pointer;
 }
 
 body.animation-enabled .warning-backdrop {
@@ -29,8 +31,6 @@ body.animation-enabled .warning-backdrop {
 
   width: calc(100vw + 600px);
   height: 100%;
-
-  cursor: pointer;
 
   background: repeating-linear-gradient(
   45deg,
