@@ -104,6 +104,11 @@ const finalizeChapterLoading = (selection?: Selection) => {
     $div.appendChild(getFlexOneSpan());
   }
   $content.appendChild($div);
+  id('rect').style.display = 'none';
+  setTimeout(() => {
+    id('rect').style.display = null;
+    id('rect').scrollTo(0, 0);
+  }, 1);
 };
 
 export function loadChapter(chapter: string, selection?: Selection) {
