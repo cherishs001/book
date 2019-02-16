@@ -726,6 +726,11 @@ var finalizeChapterLoading = function (selection) {
         $div.appendChild(getFlexOneSpan());
     }
     $content.appendChild($div);
+    DOM_1.id('rect').style.display = 'none';
+    setTimeout(function () {
+        DOM_1.id('rect').style.display = null;
+        DOM_1.id('rect').scrollTo(0, 0);
+    }, 1);
 };
 function loadChapter(chapter, selection) {
     RectMode_1.setRectMode(RectMode_1.RectMode.MAIN);

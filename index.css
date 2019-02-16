@@ -341,7 +341,7 @@ body.animation-enabled .menu {
   line-height: 2vh;
 }
 .menu .button.back::before {
-  content: '◀';
+  content: '\25C0\FE0E';
 }
 body.animation-enabled .menu .button.selectable::before {
   transition: opacity 0.3s, transform 0.3s;
