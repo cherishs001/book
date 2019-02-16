@@ -12,13 +12,19 @@ a {
   color: inherit;
 }
 
-body.animation-enabled .warning-backdrop {
+body.animation-enabled .warning {
   transition: opacity 0.3s;
+}
+.warning {
+  position: fixed;
+  z-index: 2;
+}
+
+body.animation-enabled .warning-backdrop {
   animation: moving-strips 4s linear infinite;
 }
 .warning-backdrop {
   position: fixed;
-  z-index: 2;
   left: -300px;
 
   width: calc(100vw + 600px);
@@ -36,15 +42,15 @@ body.animation-enabled .warning-backdrop {
 }
 @keyframes moving-strips {
   0% {
-    background-position-x: -283px;
+    transform: translateX(-283px);
   }
   100% {
-    background-position-x: 283px;
+    transform: translateX(283px);
   }
 }
 
 .warning-container {
-  position: absolute;
+  position: fixed;
   top: 50%;
   left: 50%;
 
@@ -357,3 +363,4 @@ body.animation-enabled .menu .button.selectable::before {
 .menu .button:active::after {
   background-color: #999;
 }
+
