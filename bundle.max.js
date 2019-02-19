@@ -726,9 +726,10 @@ var finalizeChapterLoading = function (selection) {
         $div.appendChild(getFlexOneSpan());
     }
     $content.appendChild($div);
-    DOM_1.id('rect').style.display = 'none';
+    // fix for stupid scrolling issues under iOS
+    DOM_1.id('rect').style.overflow = 'hidden';
     setTimeout(function () {
-        DOM_1.id('rect').style.display = null;
+        DOM_1.id('rect').style.overflow = null;
         DOM_1.id('rect').scrollTo(0, 0);
     }, 1);
 };
