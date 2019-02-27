@@ -269,6 +269,7 @@ body.animation-enabled .button::after {
   transform: scaleX(0);
   transform-origin: 20%;
 
+  border-radius: 0.03em;
   background-color: #DDD;
 }
 .button:hover::after {

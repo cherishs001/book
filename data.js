@@ -1,1 +1,1 @@
-window.DATA={"chapters":["章节 0","章节 1","章节 2","章节 3","章节 4","章节 5","章节 6","章节 7","章节 8","章节 9","章节 10","章节 11","章节 12","出场人员名单","特别篇 公主殿下","新能源"],"earlyAccessChapters":["出场人员名单","新能源"],"charsCount":74425,"paragraphsCount":1615,"buildNumber":"48"};
+window.DATA={"chapters":["章节 0","章节 1","章节 2","章节 3","章节 4","章节 5","章节 6","章节 7","章节 8","章节 9","章节 10","章节 11","章节 12","出场人员名单","特别篇 公主殿下","新能源"],"earlyAccessChapters":["出场人员名单","新能源"],"charsCount":74425,"paragraphsCount":1615,"buildNumber":"49"};
