@@ -675,7 +675,14 @@ var canChapterShown = function (chapterIndex) {
 var finalizeChapterLoading = function (selection) {
     state_1.state.chapterTextNodes = DOM_1.getTextNodes($content);
     if (selection !== undefined) {
-        select(selection);
+        if (DOM_1.id('warning') === null) {
+            select(selection);
+        }
+        else {
+            DOM_1.id('warning').addEventListener('click', function () {
+                select(selection);
+            });
+        }
     }
     var chapterIndex = data_1.data.chapters.indexOf(state_1.state.currentChapter);
     var $div = document.createElement('div');
@@ -730,7 +737,9 @@ var finalizeChapterLoading = function (selection) {
     DOM_1.id('rect').style.overflow = 'hidden';
     setTimeout(function () {
         DOM_1.id('rect').style.overflow = null;
-        DOM_1.id('rect').scrollTo(0, 0);
+        if (selection === undefined) {
+            DOM_1.id('rect').scrollTo(0, 0);
+        }
     }, 1);
 };
 function loadChapter(chapter, selection) {
