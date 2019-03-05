@@ -54,7 +54,13 @@ const canChapterShown = (chapterIndex: number) =>
 const finalizeChapterLoading = (selection?: Selection) => {
   state.chapterTextNodes = getTextNodes($content);
   if (selection !== undefined) {
-    select(selection);
+    if (id('warning') === null) {
+      select(selection);
+    } else {
+      id('warning').addEventListener('click', () => {
+        select(selection);
+      });
+    }
   }
   const chapterIndex = data.chapters.indexOf(state.currentChapter!);
 
@@ -109,7 +115,9 @@ const finalizeChapterLoading = (selection?: Selection) => {
   id('rect').style.overflow = 'hidden';
   setTimeout(() => {
     id('rect').style.overflow = null;
-    id('rect').scrollTo(0, 0);
+    if (selection === undefined) {
+      id('rect').scrollTo(0, 0);
+    }
   }, 1);
 };
 
