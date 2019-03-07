@@ -11,4 +11,8 @@ export const keywords: Array<string> = [
   '陈绅士',
   '陈色狼',
   '陈骗子',
+
+  '高潮',
+  '按摩棒',
+  '按摩器',
 ];
