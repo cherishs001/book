@@ -3,7 +3,7 @@ import * as MDI from 'markdown-it';
 import { resolve } from 'path';
 import { countChars } from './countChars';
 import { countParagraphs } from './countParagraphs';
-import { keywords } from './keyWords';
+import { keywords } from './keywords';
 import { countCertainWord } from './countCertainWord';
 
 const earlyAccessFlag = '# 编写中';
