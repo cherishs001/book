@@ -402,7 +402,7 @@ var StatsKeywordsCountMenu = /** @class */ (function (_super) {
         _this.addItem('添加其他关键词', {
             small: true,
             button: true,
-            link: 'https://github.com/SCLeoX/Wearable-Technology/blob/master/src/builder/keywords.ts',
+            link: 'https://github.com/SCLeoX/Wearable-Technology/edit/master/src/builder/keywords.ts',
         });
         data_1.data.keywordsCount.forEach(function (_a) {
             var _b = __read(_a, 2), keyword = _b[0], count = _b[1];
