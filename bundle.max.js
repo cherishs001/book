@@ -438,9 +438,9 @@ var StatsMenu = /** @class */ (function (_super) {
     function StatsMenu(parent) {
         var _this = _super.call(this, '统计', parent) || this;
         _this.addItem('统计数据由构建脚本自动生成', { small: true });
+        _this.addLink(new StatsKeywordsCountMenu_1.StatsKeywordsCountMenu(_this), true);
         _this.addItem("\u603B\u5B57\u6570\uFF1A" + data_1.data.charsCount, { small: true });
         _this.addItem("\u603B\u6BB5\u843D\u6570\uFF1A" + data_1.data.paragraphsCount, { small: true });
-        _this.addLink(new StatsKeywordsCountMenu_1.StatsKeywordsCountMenu(_this), true);
         return _this;
     }
     return StatsMenu;
