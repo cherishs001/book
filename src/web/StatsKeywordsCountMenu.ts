@@ -7,7 +7,7 @@ export class StatsKeywordsCountMenu extends Menu {
     this.addItem('添加其他关键词', {
       small: true,
       button: true,
-      link: 'https://github.com/SCLeoX/Wearable-Technology/blob/master/src/builder/keywords.ts',
+      link: 'https://github.com/SCLeoX/Wearable-Technology/edit/master/src/builder/keywords.ts',
     });
     data.keywordsCount.forEach(([keyword, count]) => {
       this.addItem(`${keyword}：${count}`, { small: true });
