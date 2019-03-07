@@ -3,6 +3,8 @@ import * as MDI from 'markdown-it';
 import { resolve } from 'path';
 import { countChars } from './countChars';
 import { countParagraphs } from './countParagraphs';
+import { keywords } from './keyWords';
+import { countCertainWord } from './countCertainWord';
 
 const earlyAccessFlag = '# 编写中';
 
@@ -36,15 +38,29 @@ const earlyAccessFlag = '# 编写中';
   const earlyAccessChapters: Array<string> = [];
   let charsCount = 0;
   let paragraphsCount = 0;
+
+  const keywordsCount: Map<string, number> = new Map();
+  keywords.forEach(keyword => {
+    keywordsCount.set(keyword, 0);
+  });
+
   for (const chapter of chapters) {
     const path = resolve(chaptersDir, chapter[0] + '.md');
-    let content = (await readFile(path)).toString();
-    if (content.startsWith(earlyAccessFlag)) {
+    let markdown = (await readFile(path)).toString();
+    if (markdown.startsWith(earlyAccessFlag)) {
       earlyAccessChapters.push(chapter[1][1]);
-      content = content.substr(earlyAccessFlag.length);
+      markdown = markdown.substr(earlyAccessFlag.length);
     }
-    charsCount += countChars(content);
-    const output = mdi.render(content);
+    charsCount += countChars(markdown);
+
+    keywords.forEach(keyword => {
+      const count = countCertainWord(markdown, keyword);
+      if (count !== 0) {
+        keywordsCount.set(keyword, keywordsCount.get(keyword)! + count);
+      }
+    });
+
+    const output = mdi.render(markdown);
     paragraphsCount += countParagraphs(output);
     await writeFile(resolve(distChapters, chapter[1][1] + '.html'), output);
     console.info(`${chapter[1][1]}.html rendered.`);
@@ -54,6 +70,7 @@ const earlyAccessFlag = '# 编写中';
     earlyAccessChapters,
     charsCount,
     paragraphsCount,
+    keywordsCount: [...keywordsCount].sort((a, b) => b[1] - a[1]),
     buildNumber: process.env.TRAVIS_BUILD_NUMBER || 'Unoffical',
   };
   await writeFile(
