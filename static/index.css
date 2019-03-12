@@ -207,6 +207,7 @@ body.animation-enabled .rect>.content {
     width: 38.3vh;
 
     transform: translateX(-50%);
+    white-space: nowrap;
   }
 }
 .container .english-title {
