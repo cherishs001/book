@@ -1010,6 +1010,7 @@ exports.thanks = [
     { name: 'czp', link: 'https://www.hiczp.com' },
     { name: 'kookxiang' },
     { name: '櫻川 紗良' },
+    { name: '星野 湊' },
 ].sort(function () { return Math.random() - 0.5; });
 
 },{}],22:[function(require,module,exports){
