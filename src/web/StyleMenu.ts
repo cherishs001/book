@@ -10,6 +10,8 @@ interface StyleDef {
   readonly linkColor: string;
   readonly linkHoverColor: string;
   readonly linkActiveColor: string;
+
+  readonly contentBlockEarlyAccessColor: string;
 }
 
 class Style {
@@ -32,6 +34,7 @@ class Style {
     sheet.insertRule(`.rect.reading>.content a:visited { color: ${this.def.linkColor}; }`);
     sheet.insertRule(`.rect.reading>.content a:hover { color: ${this.def.linkHoverColor}; }`);
     sheet.insertRule(`.rect.reading>.content a:active { color: ${this.def.linkActiveColor}; }`);
+    sheet.insertRule(`.rect.reading>.content>.earlyAccess.block { background-color: ${this.def.contentBlockEarlyAccessColor}; }`);
     this.styleSheet = sheet;
   }
   public active() {
@@ -60,6 +63,7 @@ const styles = [
     linkColor: '#00E',
     linkHoverColor: '#00E',
     linkActiveColor: '#00C',
+    contentBlockEarlyAccessColor: '#FFE082',
   }),
   new Style('夜间', {
     rectBgColor: '#272B36',
@@ -68,6 +72,7 @@ const styles = [
     linkColor: '#55E',
     linkHoverColor: '#55E',
     linkActiveColor: '#33C',
+    contentBlockEarlyAccessColor: '#FFE082',
   }),
   new Style('羊皮纸', {
     rectBgColor: '#D8D4C9',
@@ -76,6 +81,7 @@ const styles = [
     linkColor: '#00E',
     linkHoverColor: '#00E',
     linkActiveColor: '#00C',
+    contentBlockEarlyAccessColor: '#FFE082',
   }),
   new Style('可穿戴科技', {
     rectBgColor: '#444',
@@ -84,6 +90,7 @@ const styles = [
     linkColor: '#66F',
     linkHoverColor: '#66F',
     linkActiveColor: '#44D',
+    contentBlockEarlyAccessColor: '#FFE082',
   }),
   new Style('巧克力', {
     rectBgColor: '#2C1C11',
@@ -92,6 +99,7 @@ const styles = [
     linkColor: '#66F',
     linkHoverColor: '#66F',
     linkActiveColor: '#44D',
+    contentBlockEarlyAccessColor: '#FFE082',
   }),
 ];
 

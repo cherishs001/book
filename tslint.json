@@ -19,7 +19,8 @@
     "object-literal-sort-keys": false,
     "interface-name": false,
     "no-shadowed-variable": false,
-    "no-conditional-assignment": false
+    "no-conditional-assignment": false,
+    "max-line-length": false,
   },
   "rulesDirectory": []
 }

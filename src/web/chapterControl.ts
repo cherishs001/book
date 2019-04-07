@@ -1,3 +1,4 @@
+import { ContentBlockType } from './ContentBlockType';
 import { data } from './data';
 import { getTextNodes, id } from './DOM';
 import { updateHistory } from './history';
@@ -51,6 +52,18 @@ const getFlexOneSpan = () => {
 const canChapterShown = (chapterIndex: number) =>
   earlyAccess.getValue() || !data.earlyAccessChapters.includes(data.chapters[chapterIndex]);
 
+const createContentBlock = (type: ContentBlockType, title: string, text: string) => {
+  const $block = document.createElement('div');
+  $block.classList.add('block', type);
+  const $title = document.createElement('h1');
+  $title.innerText = title;
+  $block.appendChild($title);
+  const $text = document.createElement('p');
+  $text.innerText = text;
+  $block.appendChild($text);
+  return $block;
+}
+
 const finalizeChapterLoading = (selection?: Selection) => {
   state.chapterTextNodes = getTextNodes($content);
   if (selection !== undefined) {
@@ -63,6 +76,11 @@ const finalizeChapterLoading = (selection?: Selection) => {
     }
   }
   const chapterIndex = data.chapters.indexOf(state.currentChapter!);
+
+  if (data.earlyAccessChapters.includes(state.currentChapter!)) {
+    const $block = createContentBlock('earlyAccess', '编写中章节', '请注意，本文正在编写中，因此可能会含有未完成的句子或是尚未更新的信息。');
+    $content.prepend($block);
+  }
 
   const $div = document.createElement('div');
   $div.style.display = 'flex';

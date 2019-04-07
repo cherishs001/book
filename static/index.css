@@ -115,7 +115,32 @@ body.animation-enabled .rect>.content {
   transition: background-color 0.3s, color 0.3s, opacity 0.5s;
 }
 .rect>.content {
+  overflow: hidden;
+
   opacity: 0;
+}
+@media (min-width: 901px) {
+  .rect>.content>.block {
+    width: 800px;
+    padding: 5vh;
+
+    transform: translate(-5vh, -5vh);
+  }
+}
+@media (max-width: 900px) {
+  .rect>.content>.block {
+    width: 100vw;
+    padding: 1em;
+
+    transform: translate(-1em, -1em);
+
+    box-shadow: rgba(0,0,0,0.24) 0 1.01372px 2.32903px;
+  }
+}
+
+
+.rect>.content>.block>p {
+  margin-bottom: 0;
 }
 @media (min-width: 901px) {
   .rect.reading {
