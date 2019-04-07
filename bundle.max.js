@@ -495,6 +495,7 @@ var Style = /** @class */ (function () {
         sheet.insertRule(".rect.reading>.content a:visited { color: " + this.def.linkColor + "; }");
         sheet.insertRule(".rect.reading>.content a:hover { color: " + this.def.linkHoverColor + "; }");
         sheet.insertRule(".rect.reading>.content a:active { color: " + this.def.linkActiveColor + "; }");
+        sheet.insertRule(".rect.reading>.content>.earlyAccess.block { background-color: " + this.def.contentBlockEarlyAccessColor + "; }");
         this.styleSheet = sheet;
     };
     Style.prototype.active = function () {
@@ -524,6 +525,7 @@ var styles = [
         linkColor: '#00E',
         linkHoverColor: '#00E',
         linkActiveColor: '#00C',
+        contentBlockEarlyAccessColor: '#FFE082',
     }),
     new Style('夜间', {
         rectBgColor: '#272B36',
@@ -532,6 +534,7 @@ var styles = [
         linkColor: '#55E',
         linkHoverColor: '#55E',
         linkActiveColor: '#33C',
+        contentBlockEarlyAccessColor: '#FFE082',
     }),
     new Style('羊皮纸', {
         rectBgColor: '#D8D4C9',
@@ -540,6 +543,7 @@ var styles = [
         linkColor: '#00E',
         linkHoverColor: '#00E',
         linkActiveColor: '#00C',
+        contentBlockEarlyAccessColor: '#FFE082',
     }),
     new Style('可穿戴科技', {
         rectBgColor: '#444',
@@ -548,6 +552,7 @@ var styles = [
         linkColor: '#66F',
         linkHoverColor: '#66F',
         linkActiveColor: '#44D',
+        contentBlockEarlyAccessColor: '#FFE082',
     }),
     new Style('巧克力', {
         rectBgColor: '#2C1C11',
@@ -556,6 +561,7 @@ var styles = [
         linkColor: '#66F',
         linkHoverColor: '#66F',
         linkActiveColor: '#44D',
+        contentBlockEarlyAccessColor: '#FFE082',
     }),
 ];
 var StyleMenu = /** @class */ (function (_super) {
@@ -727,6 +733,17 @@ var getFlexOneSpan = function () {
 var canChapterShown = function (chapterIndex) {
     return settings_1.earlyAccess.getValue() || !data_1.data.earlyAccessChapters.includes(data_1.data.chapters[chapterIndex]);
 };
+var createContentBlock = function (type, title, text) {
+    var $block = document.createElement('div');
+    $block.classList.add('block', type);
+    var $title = document.createElement('h1');
+    $title.innerText = title;
+    $block.appendChild($title);
+    var $text = document.createElement('p');
+    $text.innerText = text;
+    $block.appendChild($text);
+    return $block;
+};
 var finalizeChapterLoading = function (selection) {
     state_1.state.chapterTextNodes = DOM_1.getTextNodes($content);
     if (selection !== undefined) {
@@ -740,6 +757,10 @@ var finalizeChapterLoading = function (selection) {
         }
     }
     var chapterIndex = data_1.data.chapters.indexOf(state_1.state.currentChapter);
+    if (data_1.data.earlyAccessChapters.includes(state_1.state.currentChapter)) {
+        var $block = createContentBlock('earlyAccess', '编写中章节', '请注意，本文正在编写中，因此可能会含有未完成的句子或是尚未更新的信息。');
+        $content.prepend($block);
+    }
     var $div = document.createElement('div');
     $div.style.display = 'flex';
     if (chapterIndex >= 1 && canChapterShown(chapterIndex - 1)) {
