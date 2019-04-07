@@ -534,7 +534,7 @@ var styles = [
         linkColor: '#55E',
         linkHoverColor: '#55E',
         linkActiveColor: '#33C',
-        contentBlockEarlyAccessColor: '#FFE082',
+        contentBlockEarlyAccessColor: '#E65100',
     }),
     new Style('羊皮纸', {
         rectBgColor: '#D8D4C9',
@@ -552,7 +552,7 @@ var styles = [
         linkColor: '#66F',
         linkHoverColor: '#66F',
         linkActiveColor: '#44D',
-        contentBlockEarlyAccessColor: '#FFE082',
+        contentBlockEarlyAccessColor: '#E65100',
     }),
     new Style('巧克力', {
         rectBgColor: '#2C1C11',
@@ -561,7 +561,7 @@ var styles = [
         linkColor: '#66F',
         linkHoverColor: '#66F',
         linkActiveColor: '#44D',
-        contentBlockEarlyAccessColor: '#FFE082',
+        contentBlockEarlyAccessColor: '#E65100',
     }),
 ];
 var StyleMenu = /** @class */ (function (_super) {
