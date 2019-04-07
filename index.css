@@ -20,6 +20,9 @@ body.animation-enabled .warning {
   z-index: 2;
 
   cursor: pointer;
+
+  -webkit-backdrop-filter: blur(10px);
+          backdrop-filter: blur(10px);
 }
 
 body.animation-enabled .warning-backdrop {
