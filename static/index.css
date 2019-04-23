@@ -351,6 +351,12 @@ body.animation-enabled .menu {
 .early-access-disabled .early-access {
   display: none;
 }
+.menu .path {
+  color: #999;
+
+  font-size: 2vh;
+  line-height: 2vh;
+}
 .menu .small {
   margin: 0.3vh 0 0.3vh 0.5vh;
 

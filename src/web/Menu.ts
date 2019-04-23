@@ -54,13 +54,24 @@ export class ItemHandle {
 export class Menu {
   private container: HTMLDivElement;
   private active: boolean;
+  private fullPath: Array<string>;
   public constructor(
     public readonly name: string,
     parent: Menu | null,
     public readonly rectMode: RectMode = RectMode.OFF,
   ) {
+    this.fullPath = parent === null ? [] : parent.fullPath.slice();
+    if (name !== '') {
+      this.fullPath.push(name);
+    }
     this.container = document.createElement('div');
     this.container.classList.add('menu', 'hidden');
+    if (this.fullPath.length >= 1) {
+      const path = document.createElement('div');
+      path.classList.add('path');
+      path.innerText = this.fullPath.join(' > ');
+      this.container.appendChild(path);
+    }
     if (parent !== null) {
       this.addItem('返回', { button: true, decoration: ItemDecoration.BACK })
         .linkTo(parent);
