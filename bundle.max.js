@@ -245,8 +245,18 @@ var Menu = /** @class */ (function () {
         if (rectMode === void 0) { rectMode = RectMode_1.RectMode.OFF; }
         this.name = name;
         this.rectMode = rectMode;
+        this.fullPath = parent === null ? [] : parent.fullPath.slice();
+        if (name !== '') {
+            this.fullPath.push(name);
+        }
         this.container = document.createElement('div');
         this.container.classList.add('menu', 'hidden');
+        if (this.fullPath.length >= 1) {
+            var path = document.createElement('div');
+            path.classList.add('path');
+            path.innerText = this.fullPath.join(' > ');
+            this.container.appendChild(path);
+        }
         if (parent !== null) {
             this.addItem('返回', { button: true, decoration: ItemDecoration.BACK })
                 .linkTo(parent);
