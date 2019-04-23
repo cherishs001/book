@@ -1,32 +1,35 @@
 import { closeChapter, loadChapter } from './chapterControl';
+import { relativePathLookUpMap } from './data';
 import { getTitle } from './history';
 import { state } from './state';
 
 export function followQuery() {
-  if (typeof URLSearchParams !== 'function') {
-    return;
-  }
-  const query = new URLSearchParams(window.location.search);
-  const chapter = query.get('chapter');
-  if (chapter === null) {
+  const chapterRelativePath = decodeURIComponent(window.location.hash.substr(1)); // Ignore the # in the result
+  const chapterCtx = relativePathLookUpMap.get(chapterRelativePath);
+  if (chapterCtx === undefined) {
     if (state.currentChapter !== null) {
       closeChapter();
       document.title = getTitle();
     }
     return;
   }
-  if (state.currentChapter !== chapter) {
-    const selectionQuery = query.get('selection');
-    const selection: Array<number> = selectionQuery !== null
-      ? selectionQuery.split(',').map(str => +str)
-      : [];
-    if (selection.length !== 4 || !selection.every(
-      num => (num >= 0) && (num % 1 === 0) && (!Number.isNaN(num)) && (Number.isFinite(num)),
-    )) {
-      loadChapter(chapter);
+  if (state.currentChapter !== chapterCtx) {
+    if (typeof URLSearchParams !== 'function') {
+      loadChapter(chapterRelativePath);
     } else {
-      loadChapter(chapter, selection as [number, number, number, number]);
+      const query = new URLSearchParams(window.location.search);
+      const selectionQuery = query.get('selection');
+      const selection: Array<number> = selectionQuery !== null
+        ? selectionQuery.split(',').map(str => +str)
+        : [];
+      if (selection.length !== 4 || !selection.every(
+        num => (num >= 0) && (num % 1 === 0) && (!Number.isNaN(num)) && (Number.isFinite(num)),
+      )) {
+        loadChapter(chapterRelativePath);
+      } else {
+        loadChapter(chapterRelativePath, selection as [number, number, number, number]);
+      }
+      document.title = getTitle();
     }
-    document.title = getTitle();
   }
 }

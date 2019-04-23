@@ -102,8 +102,8 @@ export class Menu {
     this.container.appendChild($element);
     return new ItemHandle(this, $element);
   }
-  protected addLink(menu: Menu, smallButton?: true) {
-    this.addItem(menu.name, { small: smallButton, button: true })
+  protected addLink(menu: Menu, smallButton?: true): ItemHandle {
+    return this.addItem(menu.name, { small: smallButton, button: true })
       .linkTo(menu);
   }
 }

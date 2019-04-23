@@ -1,5 +1,6 @@
+import { Chapter } from '../Data';
 import { ContentBlockType } from './ContentBlockType';
-import { data } from './data';
+import { relativePathLookUpMap } from './data';
 import { getTextNodes, id } from './DOM';
 import { updateHistory } from './history';
 import { loadingText } from './loadingText';
@@ -49,8 +50,8 @@ const getFlexOneSpan = () => {
   return $span;
 };
 
-const canChapterShown = (chapterIndex: number) =>
-  earlyAccess.getValue() || !data.earlyAccessChapters.includes(data.chapters[chapterIndex]);
+const canChapterShown = (chapter: Chapter) =>
+  earlyAccess.getValue() || !chapter.isEarlyAccess;
 
 const createContentBlock = (type: ContentBlockType, title: string, text: string) => {
   const $block = document.createElement('div');
@@ -62,7 +63,7 @@ const createContentBlock = (type: ContentBlockType, title: string, text: string)
   $text.innerText = text;
   $block.appendChild($text);
   return $block;
-}
+};
 
 const finalizeChapterLoading = (selection?: Selection) => {
   state.chapterTextNodes = getTextNodes($content);
@@ -75,17 +76,19 @@ const finalizeChapterLoading = (selection?: Selection) => {
       });
     }
   }
-  const chapterIndex = data.chapters.indexOf(state.currentChapter!);
 
-  if (data.earlyAccessChapters.includes(state.currentChapter!)) {
+  const chapterCtx = state.currentChapter!;
+  const chapterIndex = chapterCtx.inFolderIndex;
+
+  if (chapterCtx.chapter.isEarlyAccess) {
     const $block = createContentBlock('earlyAccess', '编写中章节', '请注意，本文正在编写中，因此可能会含有未完成的句子或是尚未更新的信息。');
     $content.prepend($block);
   }
 
   const $div = document.createElement('div');
   $div.style.display = 'flex';
-  if (chapterIndex >= 1 && canChapterShown(chapterIndex - 1)) {
-    const prevChapter = data.chapters[chapterIndex - 1];
+  if (chapterIndex >= 1 && canChapterShown(chapterCtx.folder.chapters[chapterIndex - 1])) {
+    const prevChapter = chapterCtx.folder.chapters[chapterIndex - 1].htmlRelativePath;
     const $prevLink = document.createElement('a');
     $prevLink.innerText = '上一章';
     $prevLink.href = `${window.location.pathname}?chapter=${prevChapter}`;
@@ -111,8 +114,8 @@ const finalizeChapterLoading = (selection?: Selection) => {
     updateHistory(true);
   });
   $div.appendChild($menuLink);
-  if (chapterIndex !== -1 && (chapterIndex < data.chapters.length - 1) && canChapterShown(chapterIndex + 1)) {
-    const nextChapter = data.chapters[chapterIndex + 1];
+  if (chapterIndex < chapterCtx.folder.chapters.length - 1 && canChapterShown(chapterCtx.folder.chapters[chapterIndex + 1])) {
+    const nextChapter = chapterCtx.folder.chapters[chapterIndex + 1].htmlRelativePath;
     const $nextLink = document.createElement('a');
     $nextLink.innerText = '下一章';
     $nextLink.href = `${window.location.pathname}?chapter=${nextChapter}`;
@@ -139,23 +142,24 @@ const finalizeChapterLoading = (selection?: Selection) => {
   }, 1);
 };
 
-export function loadChapter(chapter: string, selection?: Selection) {
+export function loadChapter(chapterRelativePath: string, selection?: Selection) {
   setRectMode(RectMode.MAIN);
-  state.currentChapter = chapter;
-  if (chaptersCache.has(chapter)) {
-    if (chaptersCache.get(chapter) === null) {
+  const chapterCtx = relativePathLookUpMap.get(chapterRelativePath)!;
+  state.currentChapter = chapterCtx;
+  if (chaptersCache.has(chapterRelativePath)) {
+    if (chaptersCache.get(chapterRelativePath) === null) {
       $content.innerText = loadingText;
     } else {
-      $content.innerHTML = chaptersCache.get(chapter)!;
+      $content.innerHTML = chaptersCache.get(chapterRelativePath)!;
       finalizeChapterLoading(selection);
     }
   } else {
     $content.innerText = loadingText;
-    fetch(`./chapters/${chapter}.html`)
+    fetch(`./chapters/${chapterRelativePath}`)
       .then(response => response.text())
       .then(text => {
-        chaptersCache.set(chapter, text);
-        if (chapter === state.currentChapter) {
+        chaptersCache.set(chapterRelativePath, text);
+        if (chapterCtx === state.currentChapter) {
           $content.innerHTML = text;
           finalizeChapterLoading(selection);
         }
