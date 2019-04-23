@@ -30,33 +30,51 @@ var history_1 = require("./history");
 var Menu_1 = require("./Menu");
 var ChaptersMenu = /** @class */ (function (_super) {
     __extends(ChaptersMenu, _super);
-    function ChaptersMenu(parent) {
-        var e_1, _a;
-        var _this = _super.call(this, '章节选择', parent) || this;
-        var _loop_1 = function (chapter) {
-            var handle = this_1.addItem(chapter, { small: true, button: true })
-                .onClick(function () {
-                chapterControl_1.loadChapter(chapter);
-                history_1.updateHistory(true);
-            });
-            if (data_1.data.earlyAccessChapters.includes(chapter)) {
-                handle.setInnerText("[\u7F16\u5199\u4E2D] " + chapter);
-                handle.addClass('early-access');
-            }
-        };
-        var this_1 = this;
+    function ChaptersMenu(parent, folder) {
+        var e_1, _a, e_2, _b;
+        var _this = this;
+        if (folder === undefined) {
+            folder = data_1.data.chapterTree;
+        }
+        _this = _super.call(this, folder.isRoot ? '章节选择' : folder.displayName, parent) || this;
         try {
-            for (var _b = __values(data_1.data.chapters), _c = _b.next(); !_c.done; _c = _b.next()) {
-                var chapter = _c.value;
-                _loop_1(chapter);
+            for (var _c = __values(folder.subfolders), _d = _c.next(); !_d.done; _d = _c.next()) {
+                var subfolder = _d.value;
+                var handle = _this.addLink(new ChaptersMenu(_this, subfolder), true);
+                handle.addClass('folder');
             }
         }
         catch (e_1_1) { e_1 = { error: e_1_1 }; }
         finally {
             try {
-                if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+                if (_d && !_d.done && (_a = _c.return)) _a.call(_c);
             }
             finally { if (e_1) throw e_1.error; }
+        }
+        var _loop_1 = function (chapter) {
+            var handle = this_1.addItem(chapter.displayName, { small: true, button: true })
+                .onClick(function () {
+                chapterControl_1.loadChapter(chapter.htmlRelativePath);
+                history_1.updateHistory(true);
+            });
+            if (chapter.isEarlyAccess) {
+                handle.setInnerText("[\u7F16\u5199\u4E2D] " + chapter.displayName);
+                handle.addClass('early-access');
+            }
+        };
+        var this_1 = this;
+        try {
+            for (var _e = __values(folder.chapters), _f = _e.next(); !_f.done; _f = _e.next()) {
+                var chapter = _f.value;
+                _loop_1(chapter);
+            }
+        }
+        catch (e_2_1) { e_2 = { error: e_2_1 }; }
+        finally {
+            try {
+                if (_f && !_f.done && (_b = _e.return)) _b.call(_e);
+            }
+            finally { if (e_2) throw e_2.error; }
         }
         return _this;
     }
@@ -273,7 +291,7 @@ var Menu = /** @class */ (function () {
         return new ItemHandle(this, $element);
     };
     Menu.prototype.addLink = function (menu, smallButton) {
-        this.addItem(menu.name, { small: smallButton, button: true })
+        return this.addItem(menu.name, { small: smallButton, button: true })
             .linkTo(menu);
     };
     return Menu;
@@ -730,8 +748,8 @@ var getFlexOneSpan = function () {
     $span.style.flex = '1';
     return $span;
 };
-var canChapterShown = function (chapterIndex) {
-    return settings_1.earlyAccess.getValue() || !data_1.data.earlyAccessChapters.includes(data_1.data.chapters[chapterIndex]);
+var canChapterShown = function (chapter) {
+    return settings_1.earlyAccess.getValue() || !chapter.isEarlyAccess;
 };
 var createContentBlock = function (type, title, text) {
     var $block = document.createElement('div');
@@ -756,15 +774,16 @@ var finalizeChapterLoading = function (selection) {
             });
         }
     }
-    var chapterIndex = data_1.data.chapters.indexOf(state_1.state.currentChapter);
-    if (data_1.data.earlyAccessChapters.includes(state_1.state.currentChapter)) {
+    var chapterCtx = state_1.state.currentChapter;
+    var chapterIndex = chapterCtx.inFolderIndex;
+    if (chapterCtx.chapter.isEarlyAccess) {
         var $block = createContentBlock('earlyAccess', '编写中章节', '请注意，本文正在编写中，因此可能会含有未完成的句子或是尚未更新的信息。');
         $content.prepend($block);
     }
     var $div = document.createElement('div');
     $div.style.display = 'flex';
-    if (chapterIndex >= 1 && canChapterShown(chapterIndex - 1)) {
-        var prevChapter_1 = data_1.data.chapters[chapterIndex - 1];
+    if (chapterIndex >= 1 && canChapterShown(chapterCtx.folder.chapters[chapterIndex - 1])) {
+        var prevChapter_1 = chapterCtx.folder.chapters[chapterIndex - 1].htmlRelativePath;
         var $prevLink = document.createElement('a');
         $prevLink.innerText = '上一章';
         $prevLink.href = window.location.pathname + "?chapter=" + prevChapter_1;
@@ -791,8 +810,8 @@ var finalizeChapterLoading = function (selection) {
         history_1.updateHistory(true);
     });
     $div.appendChild($menuLink);
-    if (chapterIndex !== -1 && (chapterIndex < data_1.data.chapters.length - 1) && canChapterShown(chapterIndex + 1)) {
-        var nextChapter_1 = data_1.data.chapters[chapterIndex + 1];
+    if (chapterIndex < chapterCtx.folder.chapters.length - 1 && canChapterShown(chapterCtx.folder.chapters[chapterIndex + 1])) {
+        var nextChapter_1 = chapterCtx.folder.chapters[chapterIndex + 1].htmlRelativePath;
         var $nextLink = document.createElement('a');
         $nextLink.innerText = '下一章';
         $nextLink.href = window.location.pathname + "?chapter=" + nextChapter_1;
@@ -818,25 +837,26 @@ var finalizeChapterLoading = function (selection) {
         }
     }, 1);
 };
-function loadChapter(chapter, selection) {
+function loadChapter(chapterRelativePath, selection) {
     RectMode_1.setRectMode(RectMode_1.RectMode.MAIN);
-    state_1.state.currentChapter = chapter;
-    if (chaptersCache.has(chapter)) {
-        if (chaptersCache.get(chapter) === null) {
+    var chapterCtx = data_1.relativePathLookUpMap.get(chapterRelativePath);
+    state_1.state.currentChapter = chapterCtx;
+    if (chaptersCache.has(chapterRelativePath)) {
+        if (chaptersCache.get(chapterRelativePath) === null) {
             $content.innerText = loadingText_1.loadingText;
         }
         else {
-            $content.innerHTML = chaptersCache.get(chapter);
+            $content.innerHTML = chaptersCache.get(chapterRelativePath);
             finalizeChapterLoading(selection);
         }
     }
     else {
         $content.innerText = loadingText_1.loadingText;
-        fetch("./chapters/" + chapter + ".html")
+        fetch("./chapters/" + chapterRelativePath)
             .then(function (response) { return response.text(); })
             .then(function (text) {
-            chaptersCache.set(chapter, text);
-            if (chapter === state_1.state.currentChapter) {
+            chaptersCache.set(chapterRelativePath, text);
+            if (chapterCtx === state_1.state.currentChapter) {
                 $content.innerHTML = text;
                 finalizeChapterLoading(selection);
             }
@@ -850,50 +870,68 @@ exports.loadChapter = loadChapter;
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.data = window.DATA;
+exports.relativePathLookUpMap = new Map();
+function iterateFolder(folder) {
+    folder.subfolders.forEach(function (subFolder) {
+        iterateFolder(subFolder);
+    });
+    folder.chapters.forEach(function (chapter, index) {
+        exports.relativePathLookUpMap.set(chapter.htmlRelativePath, {
+            folder: folder,
+            chapter: chapter,
+            inFolderIndex: index,
+        });
+    });
+}
+iterateFolder(exports.data.chapterTree);
 
 },{}],14:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var chapterControl_1 = require("./chapterControl");
+var data_1 = require("./data");
 var history_1 = require("./history");
 var state_1 = require("./state");
 function followQuery() {
-    if (typeof URLSearchParams !== 'function') {
-        return;
-    }
-    var query = new URLSearchParams(window.location.search);
-    var chapter = query.get('chapter');
-    if (chapter === null) {
+    var chapterRelativePath = decodeURIComponent(window.location.hash.substr(1)); // Ignore the # in the result
+    var chapterCtx = data_1.relativePathLookUpMap.get(chapterRelativePath);
+    if (chapterCtx === undefined) {
         if (state_1.state.currentChapter !== null) {
             chapterControl_1.closeChapter();
             document.title = history_1.getTitle();
         }
         return;
     }
-    if (state_1.state.currentChapter !== chapter) {
-        var selectionQuery = query.get('selection');
-        var selection = selectionQuery !== null
-            ? selectionQuery.split(',').map(function (str) { return +str; })
-            : [];
-        if (selection.length !== 4 || !selection.every(function (num) { return (num >= 0) && (num % 1 === 0) && (!Number.isNaN(num)) && (Number.isFinite(num)); })) {
-            chapterControl_1.loadChapter(chapter);
+    if (state_1.state.currentChapter !== chapterCtx) {
+        if (typeof URLSearchParams !== 'function') {
+            chapterControl_1.loadChapter(chapterRelativePath);
         }
         else {
-            chapterControl_1.loadChapter(chapter, selection);
+            var query = new URLSearchParams(window.location.search);
+            var selectionQuery = query.get('selection');
+            var selection = selectionQuery !== null
+                ? selectionQuery.split(',').map(function (str) { return +str; })
+                : [];
+            if (selection.length !== 4 || !selection.every(function (num) { return (num >= 0) && (num % 1 === 0) && (!Number.isNaN(num)) && (Number.isFinite(num)); })) {
+                chapterControl_1.loadChapter(chapterRelativePath);
+            }
+            else {
+                chapterControl_1.loadChapter(chapterRelativePath, selection);
+            }
+            document.title = history_1.getTitle();
         }
-        document.title = history_1.getTitle();
     }
 }
 exports.followQuery = followQuery;
 
-},{"./chapterControl":12,"./history":15,"./state":19}],15:[function(require,module,exports){
+},{"./chapterControl":12,"./data":13,"./history":15,"./state":19}],15:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var state_1 = require("./state");
 function getTitle() {
     var title = '可穿戴科技';
     if (state_1.state.currentChapter !== null) {
-        title += ' - ' + state_1.state.currentChapter;
+        title += ' - ' + state_1.state.currentChapter.chapter.displayName;
     }
     return title;
 }
@@ -902,10 +940,10 @@ function updateHistory(push) {
     var method = push ? window.history.pushState : window.history.replaceState;
     var query = window.location.pathname;
     if (state_1.state.currentChapter !== null) {
-        query += '?chapter=' + state_1.state.currentChapter;
         if (state_1.state.chapterSelection !== null) {
-            query += "&selection=" + state_1.state.chapterSelection.join(',');
+            query += "?selection=" + state_1.state.chapterSelection.join(',');
         }
+        query += '#' + state_1.state.currentChapter.chapter.htmlRelativePath;
     }
     var title = getTitle();
     document.title = title;
