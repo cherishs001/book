@@ -316,7 +316,7 @@ body.animation-enabled .menu {
 
   overflow-y: scroll;
 
-  width: 300vw;
+  width: calc(100vw + 5vh + 100px);
   height: calc(100% - 34vh);
   padding-left: 5vh;
 
