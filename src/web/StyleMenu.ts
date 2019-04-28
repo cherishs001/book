@@ -10,6 +10,7 @@ interface StyleDef {
   readonly linkColor: string;
   readonly linkHoverColor: string;
   readonly linkActiveColor: string;
+  readonly commentColor: string;
 
   readonly contentBlockEarlyAccessColor: string;
 }
@@ -28,13 +29,15 @@ class Style {
     const sheet = $style.sheet as CSSStyleSheet;
     sheet.disabled = true;
     sheet.insertRule(`.rect.reading { background-color: ${this.def.rectBgColor}; }`);
-    sheet.insertRule(`.rect.reading>.content { background-color: ${this.def.paperBgColor}; }`);
-    sheet.insertRule(`.rect.reading>.content { color: ${this.def.textColor}; }`);
+    sheet.insertRule(`.rect.reading>div { background-color: ${this.def.paperBgColor}; }`);
+    sheet.insertRule(`.rect.reading>div { color: ${this.def.textColor}; }`);
     sheet.insertRule(`.rect.reading>.content a { color: ${this.def.linkColor}; }`);
     sheet.insertRule(`.rect.reading>.content a:visited { color: ${this.def.linkColor}; }`);
     sheet.insertRule(`.rect.reading>.content a:hover { color: ${this.def.linkHoverColor}; }`);
     sheet.insertRule(`.rect.reading>.content a:active { color: ${this.def.linkActiveColor}; }`);
     sheet.insertRule(`.rect.reading>.content>.earlyAccess.block { background-color: ${this.def.contentBlockEarlyAccessColor}; }`);
+    sheet.insertRule(`.rect>.comments>div { background-color: ${this.def.commentColor}; }`);
+
     this.styleSheet = sheet;
   }
   public active() {
@@ -64,6 +67,7 @@ const styles = [
     linkHoverColor: '#00E',
     linkActiveColor: '#00C',
     contentBlockEarlyAccessColor: '#FFE082',
+    commentColor: '#EFEFED',
   }),
   new Style('夜间', {
     rectBgColor: '#272B36',
@@ -73,6 +77,7 @@ const styles = [
     linkHoverColor: '#55E',
     linkActiveColor: '#33C',
     contentBlockEarlyAccessColor: '#E65100',
+    commentColor: '#272B36',
   }),
   new Style('羊皮纸', {
     rectBgColor: '#D8D4C9',
@@ -82,6 +87,7 @@ const styles = [
     linkHoverColor: '#00E',
     linkActiveColor: '#00C',
     contentBlockEarlyAccessColor: '#FFE082',
+    commentColor: '#D8D4C9',
   }),
   new Style('可穿戴科技', {
     rectBgColor: '#444',
@@ -91,6 +97,7 @@ const styles = [
     linkHoverColor: '#66F',
     linkActiveColor: '#44D',
     contentBlockEarlyAccessColor: '#E65100',
+    commentColor: '#444',
   }),
   new Style('巧克力', {
     rectBgColor: '#2C1C11',
@@ -100,6 +107,7 @@ const styles = [
     linkHoverColor: '#66F',
     linkActiveColor: '#44D',
     contentBlockEarlyAccessColor: '#E65100',
+    commentColor: '#2C1C11',
   }),
 ];
 

@@ -7,6 +7,7 @@ export interface Node {
 
 export interface Chapter extends Node {
   isEarlyAccess: boolean;
+  commentsUrl: string | null;
   htmlRelativePath: string;
 }
 

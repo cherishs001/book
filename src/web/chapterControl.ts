@@ -1,4 +1,5 @@
 import { Chapter } from '../Data';
+import { loadComments } from './commentsControl';
 import { ContentBlockType } from './ContentBlockType';
 import { relativePathLookUpMap } from './data';
 import { getTextNodes, id } from './DOM';
@@ -131,6 +132,8 @@ const finalizeChapterLoading = (selection?: Selection) => {
     $div.appendChild(getFlexOneSpan());
   }
   $content.appendChild($div);
+
+  loadComments(chapterCtx.chapter.commentsUrl);
 
   // fix for stupid scrolling issues under iOS
   id('rect').style.overflow = 'hidden';

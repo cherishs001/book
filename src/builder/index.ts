@@ -8,6 +8,8 @@ import { countParagraphs } from './countParagraphs';
 import { keywords } from './keywords';
 
 const earlyAccessFlag = '# 编写中';
+const commentsUrlBegin = '[评论](';
+const commentsUrlEnd = ')';
 
 (async () => {
   const rootDir = resolve(__dirname, '../..');
@@ -65,8 +67,17 @@ const earlyAccessFlag = '# 编写中';
     let isEarlyAccess = false;
     if (markdown.startsWith(earlyAccessFlag)) {
       isEarlyAccess = true;
-      markdown = markdown.substr(earlyAccessFlag.length);
+      markdown = markdown.substr(earlyAccessFlag.length).trimLeft();
     }
+
+    let commentsUrl: string | null = null;
+    if (markdown.startsWith(commentsUrlBegin)) {
+      const commentsUrlBeginIndex = commentsUrlBegin.length;
+      const commentsUrlEndIndex = markdown.indexOf(commentsUrlEnd, commentsUrlBeginIndex);
+      commentsUrl = markdown.substring(commentsUrlBeginIndex, commentsUrlEndIndex);
+      markdown = markdown.substr(commentsUrlEndIndex + 1).trimLeft();
+    }
+
     charsCount += countChars(markdown);
 
     keywords.forEach(keyword => {
@@ -93,6 +104,7 @@ const earlyAccessFlag = '# 编写中';
     return {
       ...node,
       isEarlyAccess,
+      commentsUrl,
       htmlRelativePath,
     };
   }
