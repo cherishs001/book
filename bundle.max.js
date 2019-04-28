@@ -82,7 +82,7 @@ var ChaptersMenu = /** @class */ (function (_super) {
 }(Menu_1.Menu));
 exports.ChaptersMenu = ChaptersMenu;
 
-},{"./Menu":5,"./chapterControl":12,"./data":13,"./history":15}],2:[function(require,module,exports){
+},{"./Menu":5,"./chapterControl":12,"./data":14,"./history":17}],2:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -375,6 +375,7 @@ var SettingsMenu = /** @class */ (function (_super) {
         _this.addBooleanSetting('NSFW 警告', settings_1.warning);
         _this.addBooleanSetting('使用动画', settings_1.animation);
         _this.addBooleanSetting('显示编写中章节', settings_1.earlyAccess);
+        _this.addBooleanSetting('显示评论', settings_1.useComments);
         return _this;
     }
     SettingsMenu.prototype.addBooleanSetting = function (label, setting) {
@@ -389,7 +390,7 @@ var SettingsMenu = /** @class */ (function (_super) {
 }(Menu_1.Menu));
 exports.SettingsMenu = SettingsMenu;
 
-},{"./Menu":5,"./settings":18}],8:[function(require,module,exports){
+},{"./Menu":5,"./settings":21}],8:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -442,7 +443,7 @@ var StatsKeywordsCountMenu = /** @class */ (function (_super) {
 }(Menu_1.Menu));
 exports.StatsKeywordsCountMenu = StatsKeywordsCountMenu;
 
-},{"./Menu":5,"./data":13}],9:[function(require,module,exports){
+},{"./Menu":5,"./data":14}],9:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -475,7 +476,7 @@ var StatsMenu = /** @class */ (function (_super) {
 }(Menu_1.Menu));
 exports.StatsMenu = StatsMenu;
 
-},{"./Menu":5,"./StatsKeywordsCountMenu":8,"./data":13}],10:[function(require,module,exports){
+},{"./Menu":5,"./StatsKeywordsCountMenu":8,"./data":14}],10:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -517,13 +518,14 @@ var Style = /** @class */ (function () {
         var sheet = $style.sheet;
         sheet.disabled = true;
         sheet.insertRule(".rect.reading { background-color: " + this.def.rectBgColor + "; }");
-        sheet.insertRule(".rect.reading>.content { background-color: " + this.def.paperBgColor + "; }");
-        sheet.insertRule(".rect.reading>.content { color: " + this.def.textColor + "; }");
+        sheet.insertRule(".rect.reading>div { background-color: " + this.def.paperBgColor + "; }");
+        sheet.insertRule(".rect.reading>div { color: " + this.def.textColor + "; }");
         sheet.insertRule(".rect.reading>.content a { color: " + this.def.linkColor + "; }");
         sheet.insertRule(".rect.reading>.content a:visited { color: " + this.def.linkColor + "; }");
         sheet.insertRule(".rect.reading>.content a:hover { color: " + this.def.linkHoverColor + "; }");
         sheet.insertRule(".rect.reading>.content a:active { color: " + this.def.linkActiveColor + "; }");
         sheet.insertRule(".rect.reading>.content>.earlyAccess.block { background-color: " + this.def.contentBlockEarlyAccessColor + "; }");
+        sheet.insertRule(".rect>.comments>div { background-color: " + this.def.commentColor + "; }");
         this.styleSheet = sheet;
     };
     Style.prototype.active = function () {
@@ -554,6 +556,7 @@ var styles = [
         linkHoverColor: '#00E',
         linkActiveColor: '#00C',
         contentBlockEarlyAccessColor: '#FFE082',
+        commentColor: '#EFEFED',
     }),
     new Style('夜间', {
         rectBgColor: '#272B36',
@@ -563,6 +566,7 @@ var styles = [
         linkHoverColor: '#55E',
         linkActiveColor: '#33C',
         contentBlockEarlyAccessColor: '#E65100',
+        commentColor: '#272B36',
     }),
     new Style('羊皮纸', {
         rectBgColor: '#D8D4C9',
@@ -572,6 +576,7 @@ var styles = [
         linkHoverColor: '#00E',
         linkActiveColor: '#00C',
         contentBlockEarlyAccessColor: '#FFE082',
+        commentColor: '#D8D4C9',
     }),
     new Style('可穿戴科技', {
         rectBgColor: '#444',
@@ -581,6 +586,7 @@ var styles = [
         linkHoverColor: '#66F',
         linkActiveColor: '#44D',
         contentBlockEarlyAccessColor: '#E65100',
+        commentColor: '#444',
     }),
     new Style('巧克力', {
         rectBgColor: '#2C1C11',
@@ -590,6 +596,7 @@ var styles = [
         linkHoverColor: '#66F',
         linkActiveColor: '#44D',
         contentBlockEarlyAccessColor: '#E65100',
+        commentColor: '#2C1C11',
     }),
 ];
 var StyleMenu = /** @class */ (function (_super) {
@@ -648,7 +655,7 @@ var StyleMenu = /** @class */ (function (_super) {
 }(Menu_1.Menu));
 exports.StyleMenu = StyleMenu;
 
-},{"./DOM":3,"./Menu":5,"./RectMode":6,"./stylePreviewArticle":20}],11:[function(require,module,exports){
+},{"./DOM":3,"./Menu":5,"./RectMode":6,"./stylePreviewArticle":23}],11:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -702,7 +709,7 @@ var ThanksMenu = /** @class */ (function (_super) {
 }(Menu_1.Menu));
 exports.ThanksMenu = ThanksMenu;
 
-},{"./Menu":5,"./thanks":21}],12:[function(require,module,exports){
+},{"./Menu":5,"./thanks":24}],12:[function(require,module,exports){
 "use strict";
 var __read = (this && this.__read) || function (o, n) {
     var m = typeof Symbol === "function" && o[Symbol.iterator];
@@ -721,6 +728,7 @@ var __read = (this && this.__read) || function (o, n) {
     return ar;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+var commentsControl_1 = require("./commentsControl");
 var data_1 = require("./data");
 var DOM_1 = require("./DOM");
 var history_1 = require("./history");
@@ -838,6 +846,7 @@ var finalizeChapterLoading = function (selection) {
         $div.appendChild(getFlexOneSpan());
     }
     $content.appendChild($div);
+    commentsControl_1.loadComments(chapterCtx.chapter.commentsUrl);
     // fix for stupid scrolling issues under iOS
     DOM_1.id('rect').style.overflow = 'hidden';
     setTimeout(function () {
@@ -876,7 +885,96 @@ function loadChapter(chapterRelativePath, selection) {
 }
 exports.loadChapter = loadChapter;
 
-},{"./DOM":3,"./RectMode":6,"./data":13,"./history":15,"./loadingText":17,"./settings":18,"./state":19}],13:[function(require,module,exports){
+},{"./DOM":3,"./RectMode":6,"./commentsControl":13,"./data":14,"./history":17,"./loadingText":19,"./settings":21,"./state":22}],13:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var DOM_1 = require("./DOM");
+var formatTime_1 = require("./formatTime");
+var messages_1 = require("./messages");
+var settings_1 = require("./settings");
+var $comments = DOM_1.id('comments');
+var $commentsStatus = DOM_1.id('comments-status');
+var $createComment = DOM_1.id('create-comment');
+var getApiUrlRegExp = /^https:\/\/github\.com\/([a-zA-Z0-9-_]+)\/([a-zA-Z0-9-_]+)\/issues\/([1-9][0-9]*)$/;
+function getApiUrl(issueUrl) {
+    // Input sample: https://github.com/SCLeoX/Wearable-Technology/issues/1
+    // Output sample: https://api.github.com/repos/SCLeoX/Wearable-Technology/issues/1/comments
+    var result = getApiUrlRegExp.exec(issueUrl);
+    if (result === null) {
+        throw new Error("Bad issue url: " + issueUrl + ".");
+    }
+    return "https://api.github.com/repos/" + result[1] + "/" + result[2] + "/issues/" + result[3] + "/comments";
+}
+var nextRequestId = 1;
+var currentRequestId = 0;
+var currentCreateCommentLinkUrl = '';
+$createComment.addEventListener('click', function () {
+    window.open(currentCreateCommentLinkUrl, '_blank');
+});
+function createCommentElement(userAvatarUrl, userName, userUrl, createTime, updateTime, content) {
+    var $comment = document.createElement('div');
+    $comment.classList.add('comment');
+    var $avatar = document.createElement('img');
+    $avatar.classList.add('avatar');
+    $avatar.src = userAvatarUrl;
+    $comment.appendChild($avatar);
+    var $author = document.createElement('a');
+    $author.classList.add('author');
+    $author.innerText = userName;
+    $author.target = '_blank';
+    $author.href = userUrl;
+    $comment.appendChild($author);
+    var $time = document.createElement('div');
+    $time.classList.add('time');
+    $time.innerText = createTime === updateTime
+        ? formatTime_1.formatTime(new Date(createTime))
+        : formatTime_1.formatTime(new Date(createTime)) + "\uFF08\u6700\u540E\u4FEE\u6539\u4E8E " + formatTime_1.formatTime(new Date(updateTime)) + "\uFF09";
+    $comment.appendChild($time);
+    content.split('\n\n').forEach(function (paragraph) {
+        var $p = document.createElement('p');
+        $p.innerText = paragraph;
+        $comment.appendChild($p);
+    });
+    return $comment;
+}
+// 为了确保 comments 在离场动画中存在，hideComments 和 showComments 应该只在入场动画前使用。
+function hideComments() {
+    $comments.classList.toggle('display-none', true);
+    currentRequestId = 0;
+}
+exports.hideComments = hideComments;
+function loadComments(issueUrl) {
+    if (settings_1.useComments.getValue() === false) {
+        hideComments();
+        return;
+    }
+    Array.from($comments.getElementsByClassName('comment')).forEach(function ($element) { return $element.remove(); });
+    $comments.classList.toggle('display-none', false);
+    if (issueUrl === null) {
+        $commentsStatus.innerText = messages_1.COMMENTS_UNAVAILABLE;
+        $createComment.classList.toggle('display-none', true);
+        return;
+    }
+    $createComment.classList.toggle('display-none', false);
+    currentCreateCommentLinkUrl = issueUrl;
+    var requestId = currentRequestId = nextRequestId++;
+    var apiUrl = getApiUrl(issueUrl);
+    $commentsStatus.innerText = messages_1.COMMENTS_LOADING;
+    fetch(apiUrl)
+        .then(function (response) { return response.json(); })
+        .then(function (data) {
+        if (requestId !== currentRequestId) {
+            return;
+        }
+        $commentsStatus.innerText = messages_1.COMMENTS_LOADED;
+        data.forEach(function (comment) {
+            $comments.appendChild(createCommentElement(comment.user.avatar_url, comment.user.login, comment.user.html_url, comment.created_at, comment.updated_at, comment.body));
+        });
+    });
+}
+exports.loadComments = loadComments;
+
+},{"./DOM":3,"./formatTime":16,"./messages":20,"./settings":21}],14:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.data = window.DATA;
@@ -895,7 +993,7 @@ function iterateFolder(folder) {
 }
 iterateFolder(exports.data.chapterTree);
 
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var chapterControl_1 = require("./chapterControl");
@@ -934,7 +1032,33 @@ function followQuery() {
 }
 exports.followQuery = followQuery;
 
-},{"./chapterControl":12,"./data":13,"./history":15,"./state":19}],15:[function(require,module,exports){
+},{"./chapterControl":12,"./data":14,"./history":17,"./state":22}],16:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var SECOND = 1000;
+var MINUTE = 60 * SECOND;
+var HOUR = 60 * MINUTE;
+var DAY = 24 * HOUR;
+var MAX_RELATIVE_TIME = 7 * DAY;
+function formatTime(time) {
+    var relativeTime = Date.now() - time.getTime();
+    if (relativeTime > MAX_RELATIVE_TIME) {
+        return time.getFullYear() + "/" + (time.getMonth() + 1) + "/" + time.getDate();
+    }
+    if (relativeTime > DAY) {
+        return Math.floor(relativeTime / DAY) + " \u5929\u524D";
+    }
+    if (relativeTime > HOUR) {
+        return Math.floor(relativeTime / HOUR) + " \u5C0F\u65F6\u524D";
+    }
+    if (relativeTime > MINUTE) {
+        return Math.floor(relativeTime / MINUTE) + " \u5206\u949F\u524D";
+    }
+    return Math.floor(relativeTime / SECOND) + " \u79D2\u524D";
+}
+exports.formatTime = formatTime;
+
+},{}],17:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var state_1 = require("./state");
@@ -961,7 +1085,7 @@ function updateHistory(push) {
 }
 exports.updateHistory = updateHistory;
 
-},{"./state":19}],16:[function(require,module,exports){
+},{"./state":22}],18:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var data_1 = require("./data");
@@ -995,12 +1119,19 @@ window.addEventListener('popstate', function () {
 });
 followQuery_1.followQuery();
 
-},{"./DOM":3,"./MainMenu":4,"./data":13,"./followQuery":14,"./settings":18,"./updateSelection":22}],17:[function(require,module,exports){
+},{"./DOM":3,"./MainMenu":4,"./data":14,"./followQuery":15,"./settings":21,"./updateSelection":25}],19:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.loadingText = '加载中...';
 
-},{}],18:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.COMMENTS_UNAVAILABLE = '本文评论不可用。';
+exports.COMMENTS_LOADING = '评论加载中...';
+exports.COMMENTS_LOADED = '以下为本章节的评论区。（您可以在设置中禁用评论）';
+
+},{}],21:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var noop = function () { };
@@ -1044,8 +1175,9 @@ exports.warning = new BooleanSetting('warning', false);
 exports.earlyAccess = new BooleanSetting('earlyAccess', false, function (value) {
     document.body.classList.toggle('early-access-disabled', !value);
 });
+exports.useComments = new BooleanSetting('useComments', true);
 
-},{}],19:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.state = {
@@ -1054,12 +1186,12 @@ exports.state = {
     chapterTextNodes: null,
 };
 
-},{}],20:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.stylePreviewArticle = "<h1>\u5348\u996D</h1>\n<p><em>\u4F5C\u8005\uFF1A\u53CB\u4EBA\u266AB</em></p>\n<p>\u201C\u5348\u996D\uFF0C\u5348\u996D\u266A\u201D</p>\n<p>\u9633\u4F1E\u4E0B\u7684\u7433\uFF0C\u5F88\u662F\u671F\u5F85\u4ECA\u5929\u7684\u5348\u996D\u3002</p>\n<p>\u6216\u8BB8\u662F\u4F53\u8D28\u548C\u522B\u7684\u8840\u65CF\u4E0D\u592A\u4E00\u6837\uFF0C\u7433\u80FD\u591F\u611F\u77E5\u5230\u98DF\u7269\u7684\u5473\u9053\uFF0C\u4F3C\u4E4E\u4E5F\u4FDD\u6709\u7740\u751F\u7269\u5BF9\u98DF\u7269\u7684\u559C\u7231\u3002</p>\n<p>\u867D\u7136\u5979\u5E76\u4E0D\u80FD\u4ECE\u8FD9\u4E9B\u98DF\u7269\u4E2D\u83B7\u53D6\u80FD\u91CF\u5C31\u662F\u3002</p>\n<p>\u5B66\u6821\u98DF\u5802\u7684\u590F\u5B63\u9650\u5B9A\u751C\u70B9\u4ECA\u5929\u4E5F\u5F88\u662F\u62A2\u624B\uFF0C\u8FD9\u70B9\u4ECE\u961F\u4F0D\u7684\u957F\u5EA6\u5C31\u80FD\u770B\u51FA\u6765\u2014\u2014\u961F\u4F0D\u9669\u4E9B\u5C31\u8981\u8D85\u51FA\u98DF\u5802\u7684\u8303\u56F4\u4E86\u3002</p>\n<p>\u201C\u4F60\u8BF4\u6211\u8981\u6709\u94B1\u591A\u597D\u2014\u2014\u201D</p>\n<p>\u5DF2\u7ECF\u4ECE\u9694\u58C1\u7A97\u53E3\u4E70\u4E0B\u4E86\u666E\u901A\uFF0C\u4F46\u662F\u5F88\u4FBF\u5B9C\u7684\u8425\u517B\u9910\u7684\u79CB\u955C\u60AC\uFF0C\u770B\u7740\u961F\u4F0D\u4E2D\u5174\u81F4\u52C3\u52C3\u7684\u7433\u3002</p>\n<p>\u5176\u5B9E\u5979\u5E76\u4E0D\u662F\u7F3A\u94B1\uFF0C\u5927\u7EA6\u662F\u541D\u556C\u3002</p>\n<p>\u8FD9\u5F97\u602A\u5979\u5A18\uFF0C\u7A77\u517B\u79CB\u955C\u60AC\u517B\u4E60\u60EF\u4E86\uFF0C\u73B0\u5728\u5979\u5149\u81EA\u5DF1\u9664\u7075\u9000\u9B54\u6323\u6765\u7684\u5916\u5FEB\u90FD\u591F\u5979\u5962\u4F88\u4E0A\u4E00\u628A\u4E86\uFF0C\u53EF\u5374\u8FD8\u4FDD\u7559\u7740\u80FD\u4E0D\u82B1\u94B1\u7EDD\u5BF9\u4E0D\u82B1\uFF0C\u5FC5\u987B\u82B1\u94B1\u8D8A\u5C11\u8D8A\u597D\u7684\u541D\u556C\u4E60\u60EF\u3002</p>\n<p>\u5C11\u9877\uFF0C\u7433\u5DF2\u7ECF\u5E26\u7740\u5979\u7684\u751C\u54C1\u5EFA\u7B51\u2014\u2014\u6BCF\u5757\u7816\u5934\u90FD\u662F\u4E00\u5757\u86CB\u7CD5\uFF0C\u5806\u6210\u4E00\u4E2A\u8BE1\u5F02\u7684\u706B\u67F4\u76D2\u2014\u2014\u6765\u5230\u4E86\u684C\u524D\u3002</p>\n<p>\u201C\uFF08\u5403\u4E0D\u80D6\u771F\u597D\uFF0C\u6709\u94B1\u771F\u597D\u2026\u2026\u201D</p>\n<p>\u8840\u65CF\u7684\u542C\u89C9\u81EA\u7136\u662F\u6355\u6349\u5230\u4E86\u79CB\u955C\u60AC\u7684\u5600\u5495\uFF0C\u7433\u653E\u4E0B\u76D8\u5B50\uFF0C\u6084\u54AA\u54AA\u5730\u5C06\u7259\u8D34\u4E0A\u4E86\u79CB\u955C\u60AC\u7684\u8116\u9888\u3002</p>\n<p>\u201C\u563B\u563B\u266A\u201D</p>\n<p>\u201C\u545C\u2014\u2014\u201D</p>\n<p>\u76EF\u2014\u2014</p>\n<p>\u79CB\u955C\u60AC\u770B\u4E86\u770B\u76D8\u4E2D\u5269\u4E0B\u7684\u4E00\u5757\u6BDB\u8840\u65FA\uFF0C\u4F3C\u662F\u8054\u7CFB\u5230\u4E86\u4EC0\u4E48\uFF0C\u5C06\u76EE\u5149\u8F6C\u5411\u4E86\u7433\u7684\u7259\u3002</p>\n<p>\u6B63\u5728\u4EAB\u7528\u86CB\u7CD5\u76DB\u5BB4\u7684\u7433\u4EE5\u4F59\u5149\u77A5\u89C1\u4E86\u5979\u7684\u89C6\u7EBF\uFF0C</p>\n<p>\u201C\u76EF\u7740\u672C\u5C0F\u59D0\u662F\u8981\u505A\u4EC0\u4E48\u5462\uFF1F\u201D</p>\n<p>\u201C\u554A\uFF0C\u6CA1\uFF0C\u6CA1\u4EC0\u4E48\u2026\u2026\u201D</p>\n<p>\u79CB\u955C\u60AC\u652F\u652F\u543E\u543E\u7684\u8BF4\u7740\uFF0C</p>\n<p>\u201C\u5C31\u662F\u597D\u5947\u4E00\u4E2A\u95EE\u9898\uFF0C\u8840\u65CF\u4E3A\u4EC0\u4E48\u4E0D\u5403\u6BDB\u8840\u65FA\u2026\u2026\u201D</p>\n<p>\u201C\u5662\u2606\u6BDB\u8840\u65FA\u5C31\u662F\u90A3\u4E2A\u716E\u719F\u7684\u8840\u5757\u662F\u5427\uFF1F\u592A\u6CA1\u6709\u7F8E\u611F\u4E86\u8FD9\u79CD\u8840\uFF01\u800C\u4E14\u5403\u4E86\u4E5F\u6CA1\u6CD5\u513F\u6062\u590D\u80FD\u91CF\uFF0C\u7B80\u76F4\u5C31\u662F\u8840\u6DB2\u7684\u7EDD\u4F73\u6D6A\u8D39\u2606\uFF01\u201D</p>\n<p>\u7433\u53D1\u51FA\u4E86\u5BF9\u8FD9\u6837\u7F8E\u98DF\u7684\u9119\u89C6\uFF0C\u4E0D\u8FC7\u8FD9\u79CD\u9119\u89C6\u5927\u7EA6\u53EA\u6709\u8840\u65CF\u548C\u868A\u5B50\u4F1A\u51FA\u73B0\u5427\u2026\u2026</p>\n<p>\u201C\u8840\u65CF\u9700\u8981\u6444\u5165\u8840\uFF0C\u662F\u56E0\u4E3A\u8840\u6240\u5177\u6709\u7684\u751F\u547D\u80FD\u91CF\uFF0C\u5982\u679C\u716E\u719F\u4E86\u7684\u8BDD\uFF0C\u8D85\u8FC7\u4E5D\u6210\u7684\u80FD\u91CF\u90FD\u88AB\u8F6C\u5316\u6210\u5176\u4ED6\u7684\u4E1C\u897F\u4E86\uFF0C\u5BF9\u6211\u4EEC\u6765\u8BF4\u5B9E\u5728\u662F\u6CA1\u4EC0\u4E48\u7528\u5904\uFF0C\u8FD8\u767D\u767D\u6D6A\u8D39\u4E86\u4F5C\u4E3A\u539F\u6599\u7684\u8840\uFF0C\u8FD9\u79CD\u4E1C\u897F\u672C\u5C0F\u59D0\u624D\u4E0D\u5403\u54A7\u2718\uFF01\u997F\u6B7B\uFF0C\u6B7B\u5916\u8FB9\uFF0C\u4ECE\u8FD9\u8FB9\u8DF3\u4E0B\u53BB\u4E5F\u4E0D\u5403\u2718\uFF01\u201D</p>\n<p>\u201C\u6B38\uFF0C\u522B\u8FD9\u4E48\u8BF4\u561B\uFF0C\u4F60\u80FD\u5C1D\u5F97\u5230\u5473\u9053\u7684\u5427\uFF0C\u5403\u4E00\u5757\u8BD5\u8BD5\u5457\uFF1F\u201D</p>\n<p>\u201C\u771F\u2026\u2026\u771F\u9999\u266A\u201D</p>\n<p>\u5F53\u665A\uFF0C\u56E0\u4E3A\u89E6\u53D1\u4E86\u771F\u9999\u5B9A\u5F8B\u800C\u611F\u5230\u5F88\u706B\u5927\u7684\u7433\uFF0C\u628A\u79CB\u955C\u60AC\u4E22\u8FDB\u4E86\u81EA\u5DF1\u7684\u9AD8\u7EF4\u7A7A\u95F4\u91CC\u5934\u653E\u7F6E\u4E86\u4E00\u665A\u4E0A\uFF08\u9AD8\u7EF4\u65F6\u95F4\u4E09\u5929\uFF09\u6CC4\u6124\u3002</p>";
 
-},{}],21:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.thanks = [
@@ -1082,7 +1214,7 @@ exports.thanks = [
     { name: 'Skimige' },
 ].sort(function () { return Math.random() - 0.5; });
 
-},{}],22:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var history_1 = require("./history");
@@ -1135,4 +1267,4 @@ function updateSelection() {
 }
 exports.updateSelection = updateSelection;
 
-},{"./history":15,"./state":19}]},{},[16]);
+},{"./history":17,"./state":22}]},{},[18]);

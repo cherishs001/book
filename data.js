@@ -12,6 +12,7 @@ window.DATA={
         "name": "99999 - 出场人员名单",
         "sourceRelativePath": "99999 - 出场人员名单.md",
         "isEarlyAccess": true,
+        "commentsUrl": null,
         "htmlRelativePath": "出场人员名单.html"
       },
       {
@@ -20,6 +21,7 @@ window.DATA={
         "name": "200000 - 特别篇 公主殿下",
         "sourceRelativePath": "200000 - 特别篇 公主殿下.md",
         "isEarlyAccess": false,
+        "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/22",
         "htmlRelativePath": "特别篇-公主殿下.html"
       },
       {
@@ -28,6 +30,7 @@ window.DATA={
         "name": "200001 - 新能源",
         "sourceRelativePath": "200001 - 新能源.md",
         "isEarlyAccess": false,
+        "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/21",
         "htmlRelativePath": "新能源.html"
       }
     ],
@@ -45,6 +48,7 @@ window.DATA={
             "name": "0",
             "sourceRelativePath": "1 - 主线/0.md",
             "isEarlyAccess": false,
+            "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/7",
             "htmlRelativePath": "主线/第-0-章.html"
           },
           {
@@ -53,6 +57,7 @@ window.DATA={
             "name": "1",
             "sourceRelativePath": "1 - 主线/1.md",
             "isEarlyAccess": false,
+            "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/8",
             "htmlRelativePath": "主线/第-1-章.html"
           },
           {
@@ -61,6 +66,7 @@ window.DATA={
             "name": "2",
             "sourceRelativePath": "1 - 主线/2.md",
             "isEarlyAccess": false,
+            "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/9",
             "htmlRelativePath": "主线/第-2-章.html"
           },
           {
@@ -69,6 +75,7 @@ window.DATA={
             "name": "3",
             "sourceRelativePath": "1 - 主线/3.md",
             "isEarlyAccess": false,
+            "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/10",
             "htmlRelativePath": "主线/第-3-章.html"
           },
           {
@@ -77,6 +84,7 @@ window.DATA={
             "name": "4",
             "sourceRelativePath": "1 - 主线/4.md",
             "isEarlyAccess": false,
+            "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/11",
             "htmlRelativePath": "主线/第-4-章.html"
           },
           {
@@ -85,6 +93,7 @@ window.DATA={
             "name": "5",
             "sourceRelativePath": "1 - 主线/5.md",
             "isEarlyAccess": false,
+            "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/12",
             "htmlRelativePath": "主线/第-5-章.html"
           },
           {
@@ -93,6 +102,7 @@ window.DATA={
             "name": "6",
             "sourceRelativePath": "1 - 主线/6.md",
             "isEarlyAccess": false,
+            "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/13",
             "htmlRelativePath": "主线/第-6-章.html"
           },
           {
@@ -101,6 +111,7 @@ window.DATA={
             "name": "7",
             "sourceRelativePath": "1 - 主线/7.md",
             "isEarlyAccess": false,
+            "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/14",
             "htmlRelativePath": "主线/第-7-章.html"
           },
           {
@@ -109,6 +120,7 @@ window.DATA={
             "name": "8",
             "sourceRelativePath": "1 - 主线/8.md",
             "isEarlyAccess": false,
+            "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/15",
             "htmlRelativePath": "主线/第-8-章.html"
           },
           {
@@ -117,6 +129,7 @@ window.DATA={
             "name": "9",
             "sourceRelativePath": "1 - 主线/9.md",
             "isEarlyAccess": false,
+            "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/16",
             "htmlRelativePath": "主线/第-9-章.html"
           },
           {
@@ -125,6 +138,7 @@ window.DATA={
             "name": "10",
             "sourceRelativePath": "1 - 主线/10.md",
             "isEarlyAccess": false,
+            "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/17",
             "htmlRelativePath": "主线/第-10-章.html"
           },
           {
@@ -133,6 +147,7 @@ window.DATA={
             "name": "11",
             "sourceRelativePath": "1 - 主线/11.md",
             "isEarlyAccess": false,
+            "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/18",
             "htmlRelativePath": "主线/第-11-章.html"
           },
           {
@@ -141,6 +156,7 @@ window.DATA={
             "name": "12",
             "sourceRelativePath": "1 - 主线/12.md",
             "isEarlyAccess": false,
+            "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/19",
             "htmlRelativePath": "主线/第-12-章.html"
           },
           {
@@ -149,6 +165,7 @@ window.DATA={
             "name": "13",
             "sourceRelativePath": "1 - 主线/13.md",
             "isEarlyAccess": true,
+            "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/20",
             "htmlRelativePath": "主线/第-13-章.html"
           }
         ],
@@ -156,7 +173,7 @@ window.DATA={
       }
     ]
   },
-  "charsCount": 79062,
+  "charsCount": 79061,
   "paragraphsCount": 1762,
   "keywordsCount": [
     [
@@ -220,5 +237,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "82"
+  "buildNumber": "83"
 };
