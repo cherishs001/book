@@ -506,6 +506,7 @@ var DOM_1 = require("./DOM");
 var Menu_1 = require("./Menu");
 var RectMode_1 = require("./RectMode");
 var stylePreviewArticle_1 = require("./stylePreviewArticle");
+var commentsControl_1 = require("./commentsControl");
 var Style = /** @class */ (function () {
     function Style(name, def) {
         this.name = name;
@@ -649,13 +650,14 @@ var StyleMenu = /** @class */ (function (_super) {
         return _this;
     }
     StyleMenu.prototype.onActive = function () {
+        commentsControl_1.hideComments();
         DOM_1.id('content').innerHTML = stylePreviewArticle_1.stylePreviewArticle;
     };
     return StyleMenu;
 }(Menu_1.Menu));
 exports.StyleMenu = StyleMenu;
 
-},{"./DOM":3,"./Menu":5,"./RectMode":6,"./stylePreviewArticle":23}],11:[function(require,module,exports){
+},{"./DOM":3,"./Menu":5,"./RectMode":6,"./commentsControl":13,"./stylePreviewArticle":23}],11:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
