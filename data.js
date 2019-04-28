@@ -142,22 +142,30 @@ window.DATA={
             "sourceRelativePath": "1 - 主线/12.md",
             "isEarlyAccess": false,
             "htmlRelativePath": "主线/第-12-章.html"
+          },
+          {
+            "displayName": "第 13 章",
+            "displayIndex": 13,
+            "name": "13",
+            "sourceRelativePath": "1 - 主线/13.md",
+            "isEarlyAccess": true,
+            "htmlRelativePath": "主线/第-13-章.html"
           }
         ],
         "subfolders": []
       }
     ]
   },
-  "charsCount": 78135,
-  "paragraphsCount": 1737,
+  "charsCount": 79062,
+  "paragraphsCount": 1762,
   "keywordsCount": [
     [
       "高潮",
-      221
+      222
     ],
     [
       "按摩棒",
-      127
+      135
     ],
     [
       "陈变态",
@@ -212,5 +220,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "81"
+  "buildNumber": "82"
 };
