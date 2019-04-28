@@ -2,6 +2,7 @@ import { id } from './DOM';
 import { ItemDecoration, ItemHandle, Menu } from './Menu';
 import { RectMode } from './RectMode';
 import { stylePreviewArticle } from './stylePreviewArticle';
+import { hideComments } from './commentsControl';
 
 interface StyleDef {
   readonly rectBgColor: string;
@@ -134,6 +135,7 @@ export class StyleMenu extends Menu {
     }
   }
   public onActive() {
+    hideComments();
     id('content').innerHTML = stylePreviewArticle;
   }
 }
