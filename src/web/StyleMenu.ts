@@ -1,8 +1,8 @@
+import { hideComments } from './commentsControl';
 import { id } from './DOM';
 import { ItemDecoration, ItemHandle, Menu } from './Menu';
 import { RectMode } from './RectMode';
 import { stylePreviewArticle } from './stylePreviewArticle';
-import { hideComments } from './commentsControl';
 
 interface StyleDef {
   readonly rectBgColor: string;
@@ -12,6 +12,8 @@ interface StyleDef {
   readonly linkHoverColor: string;
   readonly linkActiveColor: string;
   readonly commentColor: string;
+
+  readonly keyIsDark: boolean;
 
   readonly contentBlockEarlyAccessColor: string;
 }
@@ -38,6 +40,9 @@ class Style {
     sheet.insertRule(`.rect.reading>.content a:active { color: ${this.def.linkActiveColor}; }`);
     sheet.insertRule(`.rect.reading>.content>.earlyAccess.block { background-color: ${this.def.contentBlockEarlyAccessColor}; }`);
     sheet.insertRule(`.rect>.comments>div { background-color: ${this.def.commentColor}; }`);
+
+    const key = this.def.keyIsDark ? 'black' : 'white';
+    sheet.insertRule(`.rect>.comments>.create-comment::before { background-color: ${key}; }`);
 
     this.styleSheet = sheet;
   }
@@ -69,6 +74,8 @@ const styles = [
     linkActiveColor: '#00C',
     contentBlockEarlyAccessColor: '#FFE082',
     commentColor: '#EFEFED',
+
+    keyIsDark: true,
   }),
   new Style('夜间', {
     rectBgColor: '#272B36',
@@ -79,6 +86,8 @@ const styles = [
     linkActiveColor: '#33C',
     contentBlockEarlyAccessColor: '#E65100',
     commentColor: '#272B36',
+
+    keyIsDark: false,
   }),
   new Style('羊皮纸', {
     rectBgColor: '#D8D4C9',
@@ -89,6 +98,8 @@ const styles = [
     linkActiveColor: '#00C',
     contentBlockEarlyAccessColor: '#FFE082',
     commentColor: '#D8D4C9',
+
+    keyIsDark: true,
   }),
   new Style('可穿戴科技', {
     rectBgColor: '#444',
@@ -99,6 +110,8 @@ const styles = [
     linkActiveColor: '#44D',
     contentBlockEarlyAccessColor: '#E65100',
     commentColor: '#444',
+
+    keyIsDark: false,
   }),
   new Style('巧克力', {
     rectBgColor: '#2C1C11',
@@ -109,6 +122,8 @@ const styles = [
     linkActiveColor: '#44D',
     contentBlockEarlyAccessColor: '#E65100',
     commentColor: '#2C1C11',
+
+    keyIsDark: false,
   }),
 ];
 
