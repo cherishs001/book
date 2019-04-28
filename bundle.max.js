@@ -502,11 +502,11 @@ var __values = (this && this.__values) || function (o) {
     };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+var commentsControl_1 = require("./commentsControl");
 var DOM_1 = require("./DOM");
 var Menu_1 = require("./Menu");
 var RectMode_1 = require("./RectMode");
 var stylePreviewArticle_1 = require("./stylePreviewArticle");
-var commentsControl_1 = require("./commentsControl");
 var Style = /** @class */ (function () {
     function Style(name, def) {
         this.name = name;
@@ -527,6 +527,8 @@ var Style = /** @class */ (function () {
         sheet.insertRule(".rect.reading>.content a:active { color: " + this.def.linkActiveColor + "; }");
         sheet.insertRule(".rect.reading>.content>.earlyAccess.block { background-color: " + this.def.contentBlockEarlyAccessColor + "; }");
         sheet.insertRule(".rect>.comments>div { background-color: " + this.def.commentColor + "; }");
+        var key = this.def.keyIsDark ? 'black' : 'white';
+        sheet.insertRule(".rect>.comments>.create-comment::before { background-color: " + key + "; }");
         this.styleSheet = sheet;
     };
     Style.prototype.active = function () {
@@ -558,6 +560,7 @@ var styles = [
         linkActiveColor: '#00C',
         contentBlockEarlyAccessColor: '#FFE082',
         commentColor: '#EFEFED',
+        keyIsDark: true,
     }),
     new Style('夜间', {
         rectBgColor: '#272B36',
@@ -568,6 +571,7 @@ var styles = [
         linkActiveColor: '#33C',
         contentBlockEarlyAccessColor: '#E65100',
         commentColor: '#272B36',
+        keyIsDark: false,
     }),
     new Style('羊皮纸', {
         rectBgColor: '#D8D4C9',
@@ -578,6 +582,7 @@ var styles = [
         linkActiveColor: '#00C',
         contentBlockEarlyAccessColor: '#FFE082',
         commentColor: '#D8D4C9',
+        keyIsDark: true,
     }),
     new Style('可穿戴科技', {
         rectBgColor: '#444',
@@ -588,6 +593,7 @@ var styles = [
         linkActiveColor: '#44D',
         contentBlockEarlyAccessColor: '#E65100',
         commentColor: '#444',
+        keyIsDark: false,
     }),
     new Style('巧克力', {
         rectBgColor: '#2C1C11',
@@ -598,6 +604,7 @@ var styles = [
         linkActiveColor: '#44D',
         contentBlockEarlyAccessColor: '#E65100',
         commentColor: '#2C1C11',
+        keyIsDark: false,
     }),
 ];
 var StyleMenu = /** @class */ (function (_super) {
