@@ -559,7 +559,7 @@ var styles = [
         linkHoverColor: '#00E',
         linkActiveColor: '#00C',
         contentBlockEarlyAccessColor: '#FFE082',
-        commentColor: '#EFEFED',
+        commentColor: '#F5F5F5',
         keyIsDark: true,
     }),
     new Style('夜间', {
@@ -581,7 +581,7 @@ var styles = [
         linkHoverColor: '#00E',
         linkActiveColor: '#00C',
         contentBlockEarlyAccessColor: '#FFE082',
-        commentColor: '#D8D4C9',
+        commentColor: '#F9EFD7',
         keyIsDark: true,
     }),
     new Style('可穿戴科技', {
