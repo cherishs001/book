@@ -145,24 +145,24 @@ const finalizeChapterLoading = (selection?: Selection) => {
   }, 1);
 };
 
-export function loadChapter(chapterRelativePath: string, selection?: Selection) {
-  localStorage.setItem('lastRead', chapterRelativePath);
+export function loadChapter(chapterHtmlRelativePath: string, selection?: Selection) {
+  localStorage.setItem('lastRead', chapterHtmlRelativePath);
   setRectMode(RectMode.MAIN);
-  const chapterCtx = relativePathLookUpMap.get(chapterRelativePath)!;
+  const chapterCtx = relativePathLookUpMap.get(chapterHtmlRelativePath)!;
   state.currentChapter = chapterCtx;
-  if (chaptersCache.has(chapterRelativePath)) {
-    if (chaptersCache.get(chapterRelativePath) === null) {
+  if (chaptersCache.has(chapterHtmlRelativePath)) {
+    if (chaptersCache.get(chapterHtmlRelativePath) === null) {
       $content.innerText = loadingText;
     } else {
-      $content.innerHTML = chaptersCache.get(chapterRelativePath)!;
+      $content.innerHTML = chaptersCache.get(chapterHtmlRelativePath)!;
       finalizeChapterLoading(selection);
     }
   } else {
     $content.innerText = loadingText;
-    fetch(`./chapters/${chapterRelativePath}`)
+    fetch(`./chapters/${chapterHtmlRelativePath}`)
       .then(response => response.text())
       .then(text => {
-        chaptersCache.set(chapterRelativePath, text);
+        chaptersCache.set(chapterHtmlRelativePath, text);
         if (chapterCtx === state.currentChapter) {
           $content.innerHTML = text;
           finalizeChapterLoading(selection);
