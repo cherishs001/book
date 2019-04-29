@@ -17,7 +17,7 @@ export class ChaptersMenu extends Menu {
     }
     const lastReading = Cookie.GetCookie("LastReading");
     for (const chapter of folder.chapters) {
-      const handle = this.addItem(chapter.displayName + (lastReading == null || lastReading != chapter.htmlRelativePath ? "" : "<span style='color:yellow;font-size:15px;'>上次阅读</span>"), { small: true, button: true })
+      const handle = this.addItem(chapter.displayName + (lastReading == null || lastReading != chapter.htmlRelativePath ? "" : "<span style='color:yellow;font-size:15px;'>上次阅读</span>"), { small: true, button: true, html: (lastReading == null || lastReading != chapter.htmlRelativePath ? false : true) })
         .onClick(() => {
           loadChapter(chapter.htmlRelativePath);
           updateHistory(true);
