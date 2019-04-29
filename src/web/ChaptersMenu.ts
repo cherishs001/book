@@ -16,7 +16,7 @@ export class ChaptersMenu extends Menu {
     }
     const lastRead = localStorage.lastRead;
     for (const chapter of folder.chapters) {
-      const handle = this.addItem(chapter.displayName + (lastRead == undefined || lastRead != chapter.htmlRelativePath ? '' : '<span class="last-read">上次阅读</span>'), { small: true, button: true, html: (lastRead == undefined || lastRead != chapter.htmlRelativePath ? false : true) })
+      const handle = this.addItem(chapter.displayName, { small: true, button: true, html: (lastRead == undefined || lastRead != chapter.htmlRelativePath ? false : true) })
         .onClick((element: HTMLDivElement | HTMLAnchorElement) => {
           let lastReads = document.querySelectorAll('.last-read');
           for (let el of lastReads as any) {
@@ -29,6 +29,9 @@ export class ChaptersMenu extends Menu {
       if (chapter.isEarlyAccess) {
         handle.setInnerText(`[编写中] ${chapter.displayName}`);
         handle.addClass('early-access');
+      }
+      if (lastRead != undefined && lastRead == chapter.htmlRelativePath) {
+        handle.addClass('last-read');
       }
     }
   }
