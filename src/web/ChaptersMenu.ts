@@ -20,7 +20,7 @@ export class ChaptersMenu extends Menu {
       const handle = this.addItem(chapter.displayName + (lastReading == null || lastReading != chapter.htmlRelativePath ? '' : '<span class="last-read">上次阅读</span>'), { small: true, button: true, html: true })
         .onClick((element: HTMLDivElement | HTMLAnchorElement) => {
           let lastReads = document.querySelectorAll('.last-read');
-          for (let el of lastReads) {
+          for (let el of lastReads as any) {
             el.parentNode.removeChild(el);
           }
           element.innerHTML += '<span class="last-read">上次阅读</span>';
