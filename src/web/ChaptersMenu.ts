@@ -19,8 +19,11 @@ export class ChaptersMenu extends Menu {
     for (const chapter of folder.chapters) {
       const handle = this.addItem(chapter.displayName + (lastReading == null || lastReading != chapter.htmlRelativePath ? '' : '<span class="last-read">上次阅读</span>'), { small: true, button: true, html: true })
         .onClick((element: HTMLDivElement | HTMLAnchorElement) => {
-          $('.last-read').remove();
-          $(element).append('<span class="last-read">上次阅读</span>');
+          let lastReads = document.querySelectorAll('.last-read');
+          for (let el of lastReads) {
+            el.parentNode.removeChild(el);
+          }
+          element.innerHTML += '<span class="last-read">上次阅读</span>';
           loadChapter(chapter.htmlRelativePath);
           updateHistory(true);
         });
