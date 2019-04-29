@@ -1,10 +1,10 @@
-export function SetCookie(n,v,e)
+export function SetCookie(n : string,v : string,e : number)
 {
   const exdate=new Date();
   exdate.setDate(exdate.getDate()+e);
-  document.cookie=n+ "=" +escape(v)+((e==null) ? "" : ";expires="+exdate.toGMTString());
+  document.cookie=n+ "=" +escape(v)+((e==null) ? "" : ";expires="+exdate.toUTCString());
 }
-export function GetCookie(n)
+export function GetCookie(n : string)
 {
   if (document.cookie.length>0)
   {
