@@ -4,8 +4,8 @@ import { getTitle } from './history';
 import { state } from './state';
 
 export function followQuery() {
-  const chapterRelativePath = decodeURIComponent(window.location.hash.substr(1)); // Ignore the # in the result
-  const chapterCtx = relativePathLookUpMap.get(chapterRelativePath);
+  const chapterHtmlRelativePath = decodeURIComponent(window.location.hash.substr(1)); // Ignore the # in the result
+  const chapterCtx = relativePathLookUpMap.get(chapterHtmlRelativePath);
   if (chapterCtx === undefined) {
     if (state.currentChapter !== null) {
       closeChapter();
@@ -15,7 +15,7 @@ export function followQuery() {
   }
   if (state.currentChapter !== chapterCtx) {
     if (typeof URLSearchParams !== 'function') {
-      loadChapter(chapterRelativePath);
+      loadChapter(chapterHtmlRelativePath);
     } else {
       const query = new URLSearchParams(window.location.search);
       const selectionQuery = query.get('selection');
@@ -25,9 +25,9 @@ export function followQuery() {
       if (selection.length !== 4 || !selection.every(
         num => (num >= 0) && (num % 1 === 0) && (!Number.isNaN(num)) && (Number.isFinite(num)),
       )) {
-        loadChapter(chapterRelativePath);
+        loadChapter(chapterHtmlRelativePath);
       } else {
-        loadChapter(chapterRelativePath, selection as [number, number, number, number]);
+        loadChapter(chapterHtmlRelativePath, selection as [number, number, number, number]);
       }
       document.title = getTitle();
     }
