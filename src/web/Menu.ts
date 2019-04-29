@@ -31,7 +31,7 @@ export class ItemHandle {
       if (!this.menu.isActive()) {
         return;
       }
-      handler(this);
+      handler(this.element);
     });
     return this;
   }
