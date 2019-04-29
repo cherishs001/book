@@ -73,7 +73,7 @@ const styles = [
     linkHoverColor: '#00E',
     linkActiveColor: '#00C',
     contentBlockEarlyAccessColor: '#FFE082',
-    commentColor: '#EFEFED',
+    commentColor: '#F5F5F5',
 
     keyIsDark: true,
   }),
@@ -97,7 +97,7 @@ const styles = [
     linkHoverColor: '#00E',
     linkActiveColor: '#00C',
     contentBlockEarlyAccessColor: '#FFE082',
-    commentColor: '#D8D4C9',
+    commentColor: '#F9EFD7',
 
     keyIsDark: true,
   }),
