@@ -8,7 +8,7 @@ export enum ItemDecoration {
 type ItemOptions = {
   small?: true;
 } & {
-  html?: false;
+  html?: boolean;
 } & ({
   button?: false;
 } | {
