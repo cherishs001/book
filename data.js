@@ -237,5 +237,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "95"
+  "buildNumber": "96"
 };

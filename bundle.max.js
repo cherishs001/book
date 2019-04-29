@@ -889,26 +889,26 @@ var finalizeChapterLoading = function (selection) {
         }
     }, 1);
 };
-function loadChapter(chapterRelativePath, selection) {
-    localStorage.setItem('lastRead', chapterRelativePath);
+function loadChapter(chapterHtmlRelativePath, selection) {
+    localStorage.setItem('lastRead', chapterHtmlRelativePath);
     RectMode_1.setRectMode(RectMode_1.RectMode.MAIN);
-    var chapterCtx = data_1.relativePathLookUpMap.get(chapterRelativePath);
+    var chapterCtx = data_1.relativePathLookUpMap.get(chapterHtmlRelativePath);
     state_1.state.currentChapter = chapterCtx;
-    if (chaptersCache.has(chapterRelativePath)) {
-        if (chaptersCache.get(chapterRelativePath) === null) {
+    if (chaptersCache.has(chapterHtmlRelativePath)) {
+        if (chaptersCache.get(chapterHtmlRelativePath) === null) {
             $content.innerText = loadingText_1.loadingText;
         }
         else {
-            $content.innerHTML = chaptersCache.get(chapterRelativePath);
+            $content.innerHTML = chaptersCache.get(chapterHtmlRelativePath);
             finalizeChapterLoading(selection);
         }
     }
     else {
         $content.innerText = loadingText_1.loadingText;
-        fetch("./chapters/" + chapterRelativePath)
+        fetch("./chapters/" + chapterHtmlRelativePath)
             .then(function (response) { return response.text(); })
             .then(function (text) {
-            chaptersCache.set(chapterRelativePath, text);
+            chaptersCache.set(chapterHtmlRelativePath, text);
             if (chapterCtx === state_1.state.currentChapter) {
                 $content.innerHTML = text;
                 finalizeChapterLoading(selection);
@@ -1035,8 +1035,8 @@ var data_1 = require("./data");
 var history_1 = require("./history");
 var state_1 = require("./state");
 function followQuery() {
-    var chapterRelativePath = decodeURIComponent(window.location.hash.substr(1)); // Ignore the # in the result
-    var chapterCtx = data_1.relativePathLookUpMap.get(chapterRelativePath);
+    var chapterHtmlRelativePath = decodeURIComponent(window.location.hash.substr(1)); // Ignore the # in the result
+    var chapterCtx = data_1.relativePathLookUpMap.get(chapterHtmlRelativePath);
     if (chapterCtx === undefined) {
         if (state_1.state.currentChapter !== null) {
             chapterControl_1.closeChapter();
@@ -1046,7 +1046,7 @@ function followQuery() {
     }
     if (state_1.state.currentChapter !== chapterCtx) {
         if (typeof URLSearchParams !== 'function') {
-            chapterControl_1.loadChapter(chapterRelativePath);
+            chapterControl_1.loadChapter(chapterHtmlRelativePath);
         }
         else {
             var query = new URLSearchParams(window.location.search);
@@ -1055,10 +1055,10 @@ function followQuery() {
                 ? selectionQuery.split(',').map(function (str) { return +str; })
                 : [];
             if (selection.length !== 4 || !selection.every(function (num) { return (num >= 0) && (num % 1 === 0) && (!Number.isNaN(num)) && (Number.isFinite(num)); })) {
-                chapterControl_1.loadChapter(chapterRelativePath);
+                chapterControl_1.loadChapter(chapterHtmlRelativePath);
             }
             else {
-                chapterControl_1.loadChapter(chapterRelativePath, selection);
+                chapterControl_1.loadChapter(chapterHtmlRelativePath, selection);
             }
             document.title = history_1.getTitle();
         }
