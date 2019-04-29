@@ -98,7 +98,11 @@ export class Menu {
     } else {
       $element = document.createElement('div');
     }
-    $element.innerText = title;
+    if (options.html) {
+      $element.innerHTML = title;
+    } else {
+      $element.innerText = title;
+    }
     if (options.small) {
       $element.classList.add('small');
     }
