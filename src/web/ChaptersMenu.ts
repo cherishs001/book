@@ -3,6 +3,7 @@ import { loadChapter } from './chapterControl';
 import { data } from './data';
 import { updateHistory } from './history';
 import { Menu } from './Menu';
+import { Cookie } from './Cookie';
 
 export class ChaptersMenu extends Menu {
   public constructor(parent: Menu, folder?: Folder) {
@@ -14,8 +15,9 @@ export class ChaptersMenu extends Menu {
       const handle = this.addLink(new ChaptersMenu(this, subfolder), true);
       handle.addClass('folder');
     }
+    const lastReading = Cookie.GetCookie("LastReading");
     for (const chapter of folder.chapters) {
-      const handle = this.addItem(chapter.displayName, { small: true, button: true })
+      const handle = this.addItem(chapter.displayName + (lastReading == undefined || lastReading != chapter.htmlRelativePath ? "" : "<span style='color:yellow;font-size:15px;'>上次阅读</span>"), { small: true, button: true })
         .onClick(() => {
           loadChapter(chapter.htmlRelativePath);
           updateHistory(true);
