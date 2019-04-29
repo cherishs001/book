@@ -26,7 +26,7 @@ export class ItemHandle {
     this.element.classList.toggle('selected', selected);
     return this;
   }
-  public onClick(handler: (element?: HTMLDivElement | HTMLAnchorElement) => void) {
+  public onClick(handler: (element?: any) => void) {
     this.element.addEventListener('click', () => {
       if (!this.menu.isActive()) {
         return;
