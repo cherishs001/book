@@ -7,6 +7,8 @@ export enum ItemDecoration {
 
 type ItemOptions = {
   small?: true;
+} & {
+  html?: false;
 } & ({
   button?: false;
 } | {
