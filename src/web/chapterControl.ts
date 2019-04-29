@@ -147,7 +147,7 @@ const finalizeChapterLoading = (selection?: Selection) => {
 };
 
 export function loadChapter(chapterRelativePath: string, selection?: Selection) {
-  SetCookie('LastReading',chapterRelativePath,365);
+  Cookie.SetCookie('LastReading',chapterRelativePath,365);
   setRectMode(RectMode.MAIN);
   const chapterCtx = relativePathLookUpMap.get(chapterRelativePath)!;
   state.currentChapter = chapterCtx;
