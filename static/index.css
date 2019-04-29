@@ -492,3 +492,8 @@ body.animation-enabled .menu .button.selectable::before {
 .menu .button:active::after {
   background-color: #999;
 }
+
+.last-read {
+  color:yellow;
+  font-size:15px;
+}
