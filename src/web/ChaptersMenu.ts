@@ -14,13 +14,12 @@ export class ChaptersMenu extends Menu {
       const handle = this.addLink(new ChaptersMenu(this, subfolder), true);
       handle.addClass('folder');
     }
-    const lastRead = localStorage.lastRead;
+    const lastRead = window.localStorage.getItem('lastRead');
     for (const chapter of folder.chapters) {
-      const handle = this.addItem(chapter.displayName, { small: true, button: true, html: (lastRead == undefined || lastRead != chapter.htmlRelativePath ? false : true) })
+      const handle = this.addItem(chapter.displayName, { small: true, button: true })
         .onClick((element: HTMLDivElement | HTMLAnchorElement) => {
-          let lastReads = document.querySelectorAll('.last-read');
-          for (let el of lastReads as any) {
-            el.classList.remove('last-read');
+          for (const $element of Array.from(document.getElementsByClassName('last-read'))) {
+            $element.classList.remove('last-read');
           }
           element.classList.add('last-read');
           loadChapter(chapter.htmlRelativePath);
@@ -30,7 +29,7 @@ export class ChaptersMenu extends Menu {
         handle.setInnerText(`[编写中] ${chapter.displayName}`);
         handle.addClass('early-access');
       }
-      if (lastRead != undefined && lastRead == chapter.htmlRelativePath) {
+      if (lastRead !== undefined && lastRead === chapter.htmlRelativePath) {
         handle.addClass('last-read');
       }
     }

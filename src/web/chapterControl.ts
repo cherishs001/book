@@ -146,7 +146,7 @@ const finalizeChapterLoading = (selection?: Selection) => {
 };
 
 export function loadChapter(chapterRelativePath: string, selection?: Selection) {
-  localStorage.lastRead = chapterRelativePath;
+  localStorage.setItem('lastRead', chapterRelativePath);
   setRectMode(RectMode.MAIN);
   const chapterCtx = relativePathLookUpMap.get(chapterRelativePath)!;
   state.currentChapter = chapterCtx;
