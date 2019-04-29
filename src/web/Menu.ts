@@ -7,6 +7,8 @@ export enum ItemDecoration {
 
 type ItemOptions = {
   small?: true;
+} & {
+  html?: boolean;
 } & ({
   button?: false;
 } | {
@@ -24,12 +26,12 @@ export class ItemHandle {
     this.element.classList.toggle('selected', selected);
     return this;
   }
-  public onClick(handler: () => void) {
+  public onClick(handler: (element?: any) => void) {
     this.element.addEventListener('click', () => {
       if (!this.menu.isActive()) {
         return;
       }
-      handler();
+      handler(this.element);
     });
     return this;
   }
@@ -98,7 +100,11 @@ export class Menu {
     } else {
       $element = document.createElement('div');
     }
-    $element.innerText = title;
+    if (options.html) {
+      $element.innerHTML = title;
+    } else {
+      $element.innerText = title;
+    }
     if (options.small) {
       $element.classList.add('small');
     }

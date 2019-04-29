@@ -492,3 +492,19 @@ body.animation-enabled .menu .button.selectable::before {
 .menu .button:active::after {
   background-color: #999;
 }
+
+.last-read::before {
+  position: absolute;
+  left: 100%;
+
+  display: inline-block;
+
+  width: max-content;
+  height: 0;
+
+  content: '（上次阅读）';
+
+  color: #888;
+
+  font-size: 15px;
+}
