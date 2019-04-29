@@ -26,12 +26,12 @@ export class ItemHandle {
     this.element.classList.toggle('selected', selected);
     return this;
   }
-  public onClick(handler: () => void) {
+  public onClick(handler: (element?: HTMLDivElement | HTMLAnchorElement) => void) {
     this.element.addEventListener('click', () => {
       if (!this.menu.isActive()) {
         return;
       }
-      handler();
+      handler(this);
     });
     return this;
   }
