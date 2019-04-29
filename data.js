@@ -173,7 +173,7 @@ window.DATA={
       }
     ]
   },
-  "charsCount": 79061,
+  "charsCount": 79059,
   "paragraphsCount": 1762,
   "keywordsCount": [
     [
@@ -237,5 +237,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "86"
+  "buildNumber": "95"
 };

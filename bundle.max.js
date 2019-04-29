@@ -51,15 +51,34 @@ var ChaptersMenu = /** @class */ (function (_super) {
             }
             finally { if (e_1) throw e_1.error; }
         }
+        var lastRead = window.localStorage.getItem('lastRead');
         var _loop_1 = function (chapter) {
             var handle = this_1.addItem(chapter.displayName, { small: true, button: true })
-                .onClick(function () {
+                .onClick(function (element) {
+                var e_3, _a;
+                try {
+                    for (var _b = __values(Array.from(document.getElementsByClassName('last-read'))), _c = _b.next(); !_c.done; _c = _b.next()) {
+                        var $element = _c.value;
+                        $element.classList.remove('last-read');
+                    }
+                }
+                catch (e_3_1) { e_3 = { error: e_3_1 }; }
+                finally {
+                    try {
+                        if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+                    }
+                    finally { if (e_3) throw e_3.error; }
+                }
+                element.classList.add('last-read');
                 chapterControl_1.loadChapter(chapter.htmlRelativePath);
                 history_1.updateHistory(true);
             });
             if (chapter.isEarlyAccess) {
                 handle.setInnerText("[\u7F16\u5199\u4E2D] " + chapter.displayName);
                 handle.addClass('early-access');
+            }
+            if (lastRead !== undefined && lastRead === chapter.htmlRelativePath) {
+                handle.addClass('last-read');
             }
         };
         var this_1 = this;
@@ -216,7 +235,7 @@ var ItemHandle = /** @class */ (function () {
             if (!_this.menu.isActive()) {
                 return;
             }
-            handler();
+            handler(_this.element);
         });
         return this;
     };
@@ -284,7 +303,12 @@ var Menu = /** @class */ (function () {
         else {
             $element = document.createElement('div');
         }
-        $element.innerText = title;
+        if (options.html) {
+            $element.innerHTML = title;
+        }
+        else {
+            $element.innerText = title;
+        }
         if (options.small) {
             $element.classList.add('small');
         }
@@ -866,6 +890,7 @@ var finalizeChapterLoading = function (selection) {
     }, 1);
 };
 function loadChapter(chapterRelativePath, selection) {
+    localStorage.setItem('lastRead', chapterRelativePath);
     RectMode_1.setRectMode(RectMode_1.RectMode.MAIN);
     var chapterCtx = data_1.relativePathLookUpMap.get(chapterRelativePath);
     state_1.state.currentChapter = chapterCtx;
@@ -1221,6 +1246,7 @@ exports.thanks = [
     { name: 'kookxiang' },
     { name: '櫻川 紗良' },
     { name: 'Skimige' },
+    { name: 'TenmaHiltonWhat' },
 ].sort(function () { return Math.random() - 0.5; });
 
 },{}],25:[function(require,module,exports){
