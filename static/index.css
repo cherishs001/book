@@ -496,4 +496,6 @@ body.animation-enabled .menu .button.selectable::before {
 .last-read {
   color:yellow;
   font-size:15px;
+  display:inline-block;
+  height:0;
 }
