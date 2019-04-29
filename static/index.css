@@ -493,8 +493,9 @@ body.animation-enabled .menu .button.selectable::before {
   background-color: #999;
 }
 
-.last-read {
-  color:yellow;
+.last-read::after {
+  content:'上次阅读';
+  color:#888;
   font-size:15px;
   display:inline-block;
   height:0;

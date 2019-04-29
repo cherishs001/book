@@ -8,7 +8,6 @@ import { loadingText } from './loadingText';
 import { RectMode, setRectMode } from './RectMode';
 import { earlyAccess } from './settings';
 import { Selection, state } from './state';
-import { Cookie } from './Cookie'
 
 const $content = id('content');
 const chaptersCache = new Map<string, string | null>();
@@ -147,7 +146,7 @@ const finalizeChapterLoading = (selection?: Selection) => {
 };
 
 export function loadChapter(chapterRelativePath: string, selection?: Selection) {
-  Cookie.SetCookie('LastReading',chapterRelativePath,365);
+  localStorage.lastRead = chapterRelativePath;
   setRectMode(RectMode.MAIN);
   const chapterCtx = relativePathLookUpMap.get(chapterRelativePath)!;
   state.currentChapter = chapterCtx;

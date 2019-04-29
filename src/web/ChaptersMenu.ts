@@ -3,7 +3,6 @@ import { loadChapter } from './chapterControl';
 import { data } from './data';
 import { updateHistory } from './history';
 import { Menu } from './Menu';
-import { Cookie } from './Cookie';
 
 export class ChaptersMenu extends Menu {
   public constructor(parent: Menu, folder?: Folder) {
@@ -15,15 +14,15 @@ export class ChaptersMenu extends Menu {
       const handle = this.addLink(new ChaptersMenu(this, subfolder), true);
       handle.addClass('folder');
     }
-    const lastReading = Cookie.GetCookie("LastReading");
+    const lastRead = localStorage.lastRead;
     for (const chapter of folder.chapters) {
-      const handle = this.addItem(chapter.displayName + (lastReading == null || lastReading != chapter.htmlRelativePath ? '' : '<span class="last-read">上次阅读</span>'), { small: true, button: true, html: true })
+      const handle = this.addItem(chapter.displayName + (lastRead == undefined || lastRead != chapter.htmlRelativePath ? '' : '<span class="last-read">上次阅读</span>'), { small: true, button: true, html: (lastRead == undefined || lastRead != chapter.htmlRelativePath ? false : true) })
         .onClick((element: HTMLDivElement | HTMLAnchorElement) => {
           let lastReads = document.querySelectorAll('.last-read');
           for (let el of lastReads as any) {
-            el.parentNode.removeChild(el);
+            el.classList.remove('last-read');
           }
-          element.innerHTML += '<span class="last-read">上次阅读</span>';
+          element.classList.add('last-read');
           loadChapter(chapter.htmlRelativePath);
           updateHistory(true);
         });
