@@ -25,7 +25,7 @@ class Style {
   public constructor(
     public readonly name: string,
     public readonly def: StyleDef,
-  ) {}
+  ) { }
   private injectStyleSheet() {
     const $style = document.createElement('style');
     document.head.appendChild($style);
@@ -40,7 +40,7 @@ class Style {
     sheet.insertRule(`.rect.reading>.content a:active { color: ${this.def.linkActiveColor}; }`);
     sheet.insertRule(`.rect.reading>.content>.earlyAccess.block { background-color: ${this.def.contentBlockEarlyAccessColor}; }`);
     sheet.insertRule(`.rect>.comments>div { background-color: ${this.def.commentColor}; }`);
-    sheet.insertRule(`::-webkit-scrollbar-button { width: 5px; height: 5px; background-color: ${this.def.paperBgColor}; border-radius: 2.5px; }`);
+    sheet.insertRule(`::-webkit-scrollbar-thumb { width: 5px; height: 5px; background-color: ${this.def.paperBgColor}; border-radius: 2.5px; }`);
 
     const key = this.def.keyIsDark ? 'black' : 'white';
     sheet.insertRule(`.rect>.comments>.create-comment::before { background-color: ${key}; }`);
