@@ -508,6 +508,21 @@ body.animation-enabled .menu .button.selectable::before {
   font-size: 15px;
 }
 
+.comment > .btn {
+  float: right;
+  padding: 5px 10px;
+  border-radius: 3px;
+  transition:all .3s linear;
+}
+
+.comment > .btn:hover {
+  background-color: rgba(255,255,255,0.1);
+}
+
+.comment > .btn:active {
+  background-color: rgba(255,255,255,0.5);
+}
+
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;

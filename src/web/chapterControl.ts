@@ -8,7 +8,7 @@ import { loadingText } from './loadingText';
 import { RectMode, setRectMode } from './RectMode';
 import { earlyAccess } from './settings';
 import { Selection, state } from './state';
-import { LastRead } from './LastRead';
+import { LastRead } from './LocalStorage';
 
 const $content = id('content');
 const chaptersCache = new Map<string, string | null>();

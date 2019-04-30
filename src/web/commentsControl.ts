@@ -2,6 +2,7 @@ import { id } from './DOM';
 import { formatTime } from './formatTime';
 import { COMMENTS_LOADED, COMMENTS_LOADING, COMMENTS_UNAVAILABLE } from './messages';
 import { useComments } from './settings';
+import { CommentBlock } from './LocalStorage';
 
 const $comments = id('comments');
 const $commentsStatus = id('comments-status');
@@ -30,6 +31,8 @@ function createCommentElement(
   userAvatarUrl: string,
   userName: string,
   userUrl: string,
+  userId: number,
+  commentId: number,
   createTime: string,
   updateTime: string,
   content: string,
@@ -52,6 +55,20 @@ function createCommentElement(
     ? formatTime(new Date(createTime))
     : `${formatTime(new Date(createTime))}（最后修改于 ${formatTime(new Date(updateTime))}）`;
   $comment.appendChild($time);
+  const $blockPeople = document.createElement('a');
+  $blockPeople.classList.add('btn');
+  $blockPeople.innerText = '屏蔽此人';
+  $blockPeople.onclick = function () {
+    CommentBlock.BlockPeople(userId,userName);
+  }
+  $comment.appendChild($blockPeople);
+  const $blockComment = document.createElement('a');
+  $blockComment.classList.add('btn');
+  $blockComment.innerText = '屏蔽此评论';
+  $blockComment.onclick = function () {
+    CommentBlock.BlockComment(commentId,content.substring(0,10));
+  }
+  $comment.appendChild($blockComment);
   content.split('\n\n').forEach(paragraph => {
     const $p = document.createElement('p');
     $p.innerText = paragraph;
@@ -99,6 +116,8 @@ export function loadComments(issueUrl: string | null) {
           comment.user.avatar_url,
           comment.user.login,
           comment.user.html_url,
+          comment.user.id,
+          comment.id,
           comment.created_at,
           comment.updated_at,
           comment.body,
