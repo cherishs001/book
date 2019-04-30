@@ -23,7 +23,7 @@ export class ChaptersMenu extends Menu {
           loadChapter(chapter.htmlRelativePath);
           updateHistory(true);
         });
-      handle.element.setAttribute("data-chapterPath", chapter.htmlRelativePath);
+      handle.element.setAttribute('data-chapterPath', chapter.htmlRelativePath);
       if (chapter.isEarlyAccess) {
         handle.setInnerText(`[编写中] ${chapter.displayName}`);
         handle.addClass('early-access');

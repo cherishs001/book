@@ -98,7 +98,7 @@ const finalizeChapterLoading = (selection?: Selection) => {
     $prevLink.style.flex = '1';
     $prevLink.addEventListener('click', event => {
       event.preventDefault();
-      const element = document.querySelector("[data-chapterPath=" + prevChapter + "]");
+      const element = document.querySelector('[data-chapterPath="' + prevChapter + '"]');
       if (element != null) {
         LastRead.UpdateLastRead(element);
       }
@@ -129,7 +129,7 @@ const finalizeChapterLoading = (selection?: Selection) => {
     $nextLink.style.flex = '1';
     $nextLink.addEventListener('click', event => {
       event.preventDefault();
-      const element = document.querySelector("[data-chapterPath=" + nextChapter + "]");
+      const element = document.querySelector('[data-chapterPath="' + nextChapter + '"]');
       if (element != null) {
         LastRead.UpdateLastRead(element);
       }

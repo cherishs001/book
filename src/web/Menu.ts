@@ -21,7 +21,7 @@ export class ItemHandle {
   public constructor(
     private menu: Menu,
     public element: HTMLDivElement | HTMLAnchorElement,
-  ) {}
+  ) { }
   public setSelected(selected: boolean) {
     this.element.classList.toggle('selected', selected);
     return this;
