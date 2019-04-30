@@ -8,6 +8,7 @@ import { loadingText } from './loadingText';
 import { RectMode, setRectMode } from './RectMode';
 import { earlyAccess } from './settings';
 import { Selection, state } from './state';
+import { LastRead } from './LastRead';
 
 const $content = id('content');
 const chaptersCache = new Map<string, string | null>();
@@ -97,6 +98,10 @@ const finalizeChapterLoading = (selection?: Selection) => {
     $prevLink.style.flex = '1';
     $prevLink.addEventListener('click', event => {
       event.preventDefault();
+      const element = document.querySelector("[data-chapterPath=" + prevChapter + "]");
+      if (element != null) {
+        LastRead.UpdateLastRead(element);
+      }
       loadChapter(prevChapter);
       updateHistory(true);
     });
@@ -124,6 +129,10 @@ const finalizeChapterLoading = (selection?: Selection) => {
     $nextLink.style.flex = '1';
     $nextLink.addEventListener('click', event => {
       event.preventDefault();
+      const element = document.querySelector("[data-chapterPath=" + nextChapter + "]");
+      if (element != null) {
+        LastRead.UpdateLastRead(element);
+      }
       loadChapter(nextChapter);
       updateHistory(true);
     });

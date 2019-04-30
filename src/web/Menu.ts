@@ -20,7 +20,7 @@ type ItemOptions = {
 export class ItemHandle {
   public constructor(
     private menu: Menu,
-    private element: HTMLDivElement | HTMLAnchorElement,
+    public element: HTMLDivElement | HTMLAnchorElement,
   ) {}
   public setSelected(selected: boolean) {
     this.element.classList.toggle('selected', selected);

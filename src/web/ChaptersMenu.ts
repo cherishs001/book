@@ -3,6 +3,7 @@ import { loadChapter } from './chapterControl';
 import { data } from './data';
 import { updateHistory } from './history';
 import { Menu } from './Menu';
+import { LastRead } from './LastRead';
 
 export class ChaptersMenu extends Menu {
   public constructor(parent: Menu, folder?: Folder) {
@@ -18,13 +19,11 @@ export class ChaptersMenu extends Menu {
     for (const chapter of folder.chapters) {
       const handle = this.addItem(chapter.displayName, { small: true, button: true })
         .onClick((element: HTMLDivElement | HTMLAnchorElement) => {
-          for (const $element of Array.from(document.getElementsByClassName('last-read'))) {
-            $element.classList.remove('last-read');
-          }
-          element.classList.add('last-read');
+          LastRead.UpdateLastRead(element);
           loadChapter(chapter.htmlRelativePath);
           updateHistory(true);
         });
+      handle.element.setAttribute("data-chapterPath", chapter.htmlRelativePath);
       if (chapter.isEarlyAccess) {
         handle.setInnerText(`[编写中] ${chapter.displayName}`);
         handle.addClass('early-access');
