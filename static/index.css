@@ -508,7 +508,7 @@ body.animation-enabled .menu .button.selectable::before {
   font-size: 15px;
 }
 
-::-webkit-scrollbar-track {
-  width: 5px;
-  height: 5px;
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
 }

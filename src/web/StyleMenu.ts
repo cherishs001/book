@@ -40,7 +40,9 @@ class Style {
     sheet.insertRule(`.rect.reading>.content a:active { color: ${this.def.linkActiveColor}; }`);
     sheet.insertRule(`.rect.reading>.content>.earlyAccess.block { background-color: ${this.def.contentBlockEarlyAccessColor}; }`);
     sheet.insertRule(`.rect>.comments>div { background-color: ${this.def.commentColor}; }`);
-    sheet.insertRule(`::-webkit-scrollbar-thumb { width: 5px; height: 5px; background-color: ${this.def.paperBgColor}; border-radius: 2.5px; }`);
+    sheet.insertRule(`::-webkit-scrollbar-thumb { width: 10px; height: 10px; background-color: ${this.def.paperBgColor}; border-radius: 5px; }`);
+    sheet.insertRule(`::-webkit-scrollbar-thumb:hover { background-color: ${this.def.linkColor}; }`);
+    sheet.insertRule(`::-webkit-scrollbar-thumb:active { background-color: ${this.def.linkActiveColor}; }`);
 
     const key = this.def.keyIsDark ? 'black' : 'white';
     sheet.insertRule(`.rect>.comments>.create-comment::before { background-color: ${key}; }`);
