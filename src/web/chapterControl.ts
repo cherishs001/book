@@ -141,7 +141,8 @@ const finalizeChapterLoading = (selection?: Selection) => {
     $div.appendChild(getFlexOneSpan());
   }
   $content.appendChild($div);
-  $content.insertBefore($div, $content.children[0]);
+  const topDiv = $div.cloneNode(true);
+  $content.insertBefore(topDiv, $content.children[0]);
 
   loadComments(chapterCtx.chapter.commentsUrl);
 
