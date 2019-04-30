@@ -96,7 +96,7 @@ export const CommentBlock = {
     return false;
   },
   IsPeopleCommentBlocked: function (id: number) {
-    const blockedPeoples = localStorage.getItem('CommentBlocked');
+    const blockedPeoples = localStorage.getItem('CommentBlockedPeople');
     if (blockedPeoples == null) {
       return false;
     } else {
