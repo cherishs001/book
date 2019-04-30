@@ -10,7 +10,11 @@ export class BlockMenu extends Menu {
     } else {
       super(mod, parent);
       if (mod == '屏蔽的用户') {
-        for (const people of CommentBlock.GetBlockedPeople()) {
+        const blocked = CommentBlock.GetBlockedPeople();
+        if (blocked.length == 0) {
+          this.addItem("没有用户被屏蔽", { small: true });
+        }
+        for (const people of blocked) {
           const handle = this.addItem(people.name + '（点击以取消屏蔽）', { small: true, button: true })
             .onClick(() => {
               CommentBlock.UnblockPeople(people.id);
@@ -21,7 +25,11 @@ export class BlockMenu extends Menu {
             });
         }
       } else if (mod == '屏蔽的评论') {
-        for (const comment of CommentBlock.GetBlocked()) {
+        const blocked = CommentBlock.GetBlocked();
+        if (blocked.length == 0) {
+          this.addItem("没有被屏蔽的评论", { small: true });
+        }
+        for (const comment of blocked) {
           const handle = this.addItem(comment.content + '（点击以取消屏蔽）', { small: true, button: true })
             .onClick(() => {
               CommentBlock.UnblockComment(comment.id);

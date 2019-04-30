@@ -11,79 +11,79 @@ export const LastRead = {
 
 export const CommentBlock = {
   BlockPeople: function (id: number, username: string) {
-    let blockPeoples: any = localStorage.getItem('CommentBlockedPeople');
-    if (blockPeoples == null) {
-      blockPeoples = [
+    const blockPeople = localStorage.getItem('commentBlockedPeople');
+    if (blockPeople == null) {
+      const blockPeople = [
         {
           id: id,
           name: username
         }
       ];
-      localStorage.setItem('CommentBlockedPeople', JSON.stringify(blockPeoples));
+      localStorage.setItem('commentBlockedPeople', JSON.stringify(blockPeople));
     } else {
-      blockPeoples = JSON.parse(blockPeoples);
-      blockPeoples.push({
+      const $blockPeople = JSON.parse(blockPeople);
+      $blockPeople.push({
         id: id,
         name: username
       });
-      localStorage.setItem('CommentBlockedPeople', JSON.stringify(blockPeoples));
+      localStorage.setItem('commentBlockedPeople', JSON.stringify($blockPeople));
     }
   },
   BlockComment: function (id: number, content: string) {
-    let blockComments: any = localStorage.getItem('CommentBlocked');
+    const blockComments = localStorage.getItem('commentBlocked');
     if (blockComments == null) {
-      blockComments = [
+      const blockComments = [
         {
           id: id,
           content: content
         }
       ];
-      localStorage.setItem('CommentBlocked', JSON.stringify(blockComments));
+      localStorage.setItem('commentBlocked', JSON.stringify(blockComments));
     } else {
-      blockComments = JSON.parse(blockComments);
-      blockComments.push({
+      const $blockComments = JSON.parse(blockComments);
+      $blockComments.push({
         id: id,
         content: content
       });
-      localStorage.setItem('CommentBlocked', JSON.stringify(blockComments));
+      localStorage.setItem('commentBlocked', JSON.stringify($blockComments));
     }
   },
   UnblockPeople: function (id: number) {
-    let blockPeoples: any = localStorage.getItem('CommentBlockedPeople');
-    if (blockPeoples != null) {
-      blockPeoples = JSON.parse(blockPeoples);
-      for (const blockPeople of blockPeoples) {
-        if (blockPeople.id == id) {
-          blockPeoples.splice(blockPeoples.indexOf(blockPeople), 1);
-          localStorage.setItem('CommentBlockedPeople', JSON.stringify(blockPeoples));
+    const _blockPeople = localStorage.getItem('commentBlockedPeople');
+    if (_blockPeople != null) {
+      const blockPeople = JSON.parse(_blockPeople);
+      for (const $blockPeople of blockPeople) {
+        if ($blockPeople.id == id) {
+          $blockPeople.splice($blockPeople.indexOf(blockPeople), 1);
+          localStorage.setItem('commentBlockedPeople', JSON.stringify(blockPeople));
           return;
         }
       }
     }
   },
   UnblockComment: function (id: number) {
-    let blockComments: any = localStorage.getItem('CommentBlocked');
+    const blockComments = localStorage.getItem('commentBlocked');
     if (blockComments != null) {
-      blockComments = JSON.parse(blockComments);
-      for (const blockComment of blockComments) {
+      const $blockComments = JSON.parse(blockComments);
+      for (const blockComment of $blockComments) {
         if (blockComment.id == id) {
-          blockComments.splice(blockComments.indexOf(blockComment), 1);
-          localStorage.setItem('CommentBlocked', JSON.stringify(blockComments));
+          $blockComments.splice(blockComments.indexOf(blockComment), 1);
+          localStorage.setItem('commentBlocked', JSON.stringify($blockComments));
           return;
         }
       }
     }
   },
   GetBlockedPeople: function () {
-    const blocked = localStorage.getItem('CommentBlockedPeople');
+    const blocked = localStorage.getItem('commentBlockedPeople');
     return blocked == null ? [] : JSON.parse(blocked);
   },
   GetBlocked: function () {
-    const blocked = localStorage.getItem('CommentBlocked');
+    const blocked = localStorage.getItem('commentBlocked');
     return blocked == null ? [] : JSON.parse(blocked);
   },
   IsCommentBlocked: function (id: number) {
-    const blockedComments = localStorage.getItem('CommentBlocked');
+    const blockedComments = localStorage.getItem('commentBlocked');
     if (blockedComments == null) {
       return false;
     } else {
@@ -96,7 +96,7 @@ export const CommentBlock = {
     return false;
   },
   IsPeopleCommentBlocked: function (id: number) {
-    const blockedPeoples = localStorage.getItem('CommentBlockedPeople');
+    const blockedPeoples = localStorage.getItem('commentBlockedPeople');
     if (blockedPeoples == null) {
       return false;
     } else {
