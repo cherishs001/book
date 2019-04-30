@@ -15,7 +15,6 @@ export class ChaptersMenu extends Menu {
       const handle = this.addLink(new ChaptersMenu(this, subfolder), true);
       handle.addClass('folder');
     }
-    const lastRead = window.localStorage.getItem('lastRead');
     for (const chapter of folder.chapters) {
       const handle = this.addItem(chapter.displayName, { small: true, button: true })
         .onClick((element: HTMLDivElement | HTMLAnchorElement) => {
@@ -28,6 +27,7 @@ export class ChaptersMenu extends Menu {
         handle.setInnerText(`[编写中] ${chapter.displayName}`);
         handle.addClass('early-access');
       }
+      const lastRead = window.localStorage.getItem('lastRead');
       if (lastRead !== undefined && lastRead === chapter.htmlRelativePath) {
         handle.addClass('last-read');
       }

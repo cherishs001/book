@@ -500,7 +500,6 @@ body.animation-enabled .menu .button.selectable::before {
   display: inline-block;
 
   width: max-content;
-  height: 0;
 
   content: '（上次阅读）';
 

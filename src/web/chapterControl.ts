@@ -98,10 +98,6 @@ const finalizeChapterLoading = (selection?: Selection) => {
     $prevLink.style.flex = '1';
     $prevLink.addEventListener('click', event => {
       event.preventDefault();
-      const element = document.querySelector('[data-chapterPath="' + prevChapter + '"]');
-      if (element != null) {
-        LastRead.UpdateLastRead(element);
-      }
       loadChapter(prevChapter);
       updateHistory(true);
     });
@@ -129,10 +125,6 @@ const finalizeChapterLoading = (selection?: Selection) => {
     $nextLink.style.flex = '1';
     $nextLink.addEventListener('click', event => {
       event.preventDefault();
-      const element = document.querySelector('[data-chapterPath="' + nextChapter + '"]');
-      if (element != null) {
-        LastRead.UpdateLastRead(element);
-      }
       loadChapter(nextChapter);
       updateHistory(true);
     });
@@ -153,10 +145,6 @@ const finalizeChapterLoading = (selection?: Selection) => {
     $prevLink.style.flex = '1';
     $prevLink.addEventListener('click', event => {
       event.preventDefault();
-      const element = document.querySelector('[data-chapterPath="' + prevChapter + '"]');
-      if (element != null) {
-        LastRead.UpdateLastRead(element);
-      }
       loadChapter(prevChapter);
       updateHistory(true);
     });
@@ -184,10 +172,6 @@ const finalizeChapterLoading = (selection?: Selection) => {
     $nextLink.style.flex = '1';
     $nextLink.addEventListener('click', event => {
       event.preventDefault();
-      const element = document.querySelector('[data-chapterPath="' + nextChapter + '"]');
-      if (element != null) {
-        LastRead.UpdateLastRead(element);
-      }
       loadChapter(nextChapter);
       updateHistory(true);
     });
@@ -211,6 +195,10 @@ const finalizeChapterLoading = (selection?: Selection) => {
 
 export function loadChapter(chapterHtmlRelativePath: string, selection?: Selection) {
   localStorage.setItem('lastRead', chapterHtmlRelativePath);
+  const element = document.querySelector('[data-chapterPath="' + chapterHtmlRelativePath + '"]');
+  if (element != null) {
+    LastRead.UpdateLastRead(element);
+  }
   setRectMode(RectMode.MAIN);
   const chapterCtx = relativePathLookUpMap.get(chapterHtmlRelativePath)!;
   state.currentChapter = chapterCtx;
