@@ -30,7 +30,7 @@ export const CommentBlock = {
     }
   },
   BlockComment: function (id: number, content: string) {
-    let blockComments: any = localStorage.getItem('CommentBlockedComments');
+    let blockComments: any = localStorage.getItem('CommentBlocked');
     if (blockComments == null) {
       blockComments = [
         {
@@ -81,5 +81,31 @@ export const CommentBlock = {
   GetBlocked: function () {
     const blocked = localStorage.getItem('CommentBlocked');
     return blocked == null ? [] : JSON.parse(blocked);
+  },
+  IsCommentBlocked: function (id: number) {
+    const blockedComments = localStorage.getItem('CommentBlocked');
+    if (blockedComments == null) {
+      return false;
+    } else {
+      for (const blockedComment of JSON.parse(blockedComments)) {
+        if (blockedComment.id == id) {
+          return true;
+        }
+      }
+    }
+    return false;
+  },
+  IsPeopleCommentBlocked: function (id: number) {
+    const blockedPeoples = localStorage.getItem('CommentBlocked');
+    if (blockedPeoples == null) {
+      return false;
+    } else {
+      for (const blockedPeople of JSON.parse(blockedPeoples)) {
+        if (blockedPeople.id == id) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 }

@@ -509,6 +509,7 @@ body.animation-enabled .menu .button.selectable::before {
 }
 
 .comment > .btn {
+  cursor: pointer;
   float: right;
   padding: 5px 10px;
   border-radius: 3px;

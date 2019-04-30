@@ -37,6 +37,9 @@ function createCommentElement(
   updateTime: string,
   content: string,
 ) {
+  if (CommentBlock.IsPeopleCommentBlocked(userId)||CommentBlock.IsCommentBlocked(commentId)) {
+    return document.createElement('blocked');
+  }
   const $comment = document.createElement('div');
   $comment.classList.add('comment');
   const $avatar = document.createElement('img');
@@ -58,15 +61,33 @@ function createCommentElement(
   const $blockPeople = document.createElement('a');
   $blockPeople.classList.add('btn');
   $blockPeople.innerText = '屏蔽此人';
-  $blockPeople.onclick = function () {
-    CommentBlock.BlockPeople(userId,userName);
+  $blockPeople.onclick = function (e) {
+    CommentBlock.BlockPeople(userId, userName);
+    if (e.target != null) {
+      const el = (e.target as Element);
+      if (el.parentNode != null) {
+        const parent = el.parentNode;
+        if (parent.parentNode != null) {
+          parent.parentNode.removeChild(parent);
+        }
+      }
+    }
   }
   $comment.appendChild($blockPeople);
   const $blockComment = document.createElement('a');
   $blockComment.classList.add('btn');
   $blockComment.innerText = '屏蔽此评论';
-  $blockComment.onclick = function () {
-    CommentBlock.BlockComment(commentId,content.substring(0,10));
+  $blockComment.onclick = function (e) {
+    CommentBlock.BlockComment(commentId, content.substring(0, 10));
+    if (e.target != null) {
+      const el = (e.target as Element);
+      if (el.parentNode != null) {
+        const parent = el.parentNode;
+        if (parent.parentNode != null) {
+          parent.parentNode.removeChild(parent);
+        }
+      }
+    }
   }
   $comment.appendChild($blockComment);
   content.split('\n\n').forEach(paragraph => {
