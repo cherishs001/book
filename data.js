@@ -170,11 +170,30 @@ window.DATA={
           }
         ],
         "subfolders": []
+      },
+      {
+        "displayName": "杂项",
+        "displayIndex": 2,
+        "name": "2 - 杂项",
+        "sourceRelativePath": "2 - 杂项",
+        "isRoot": false,
+        "chapters": [
+          {
+            "displayName": "业余女装照欣赏指南",
+            "displayIndex": 1,
+            "name": "1 - 业余女装照欣赏指南",
+            "sourceRelativePath": "2 - 杂项/1 - 业余女装照欣赏指南.md",
+            "isEarlyAccess": false,
+            "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/24",
+            "htmlRelativePath": "杂项/业余女装照欣赏指南.html"
+          }
+        ],
+        "subfolders": []
       }
     ]
   },
-  "charsCount": 79059,
-  "paragraphsCount": 1762,
+  "charsCount": 80420,
+  "paragraphsCount": 1769,
   "keywordsCount": [
     [
       "高潮",
@@ -237,5 +256,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "96"
+  "buildNumber": "97"
 };
