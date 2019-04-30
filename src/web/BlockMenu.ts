@@ -16,7 +16,7 @@ export class BlockMenu extends Menu {
               CommentBlock.UnblockPeople(people.id);
               const parent = handle.element.parentNode;
               if (parent != null) {
-                parent.removeChild(parent);
+                parent.removeChild(handle.element);
               }
             });
         }
@@ -27,7 +27,7 @@ export class BlockMenu extends Menu {
               CommentBlock.UnblockComment(comment.id);
               const parent = handle.element.parentNode;
               if (parent != null) {
-                parent.removeChild(parent);
+                parent.removeChild(handle.element);
               }
             });
         }
