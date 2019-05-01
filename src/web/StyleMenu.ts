@@ -141,6 +141,9 @@ export class StyleMenu extends Menu {
         $rect.style.zIndex = '';
         $header.style.opacity = '';
         $header.style.pointerEvents = '';
+        if ($me != null) {
+          ($me as HTMLElement).style.backgroundColor = '';
+        }
       })
       .linkTo(parent);
     for (const style of styles) {
@@ -148,12 +151,6 @@ export class StyleMenu extends Menu {
         .onClick(() => {
           style.active();
         });
-    }
-    $rect.style.zIndex = '-1';
-    $header.style.opacity = '0';
-    $header.style.pointerEvents = 'none';
-    if ($me != null) {
-      ($me as HTMLElement).style.backgroundColor = 'rgba(0,0,0,0.5)';
     }
     const usedStyle = window.localStorage.getItem('style');
     let flag = false;
