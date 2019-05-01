@@ -528,3 +528,7 @@ body.animation-enabled .menu .button.selectable::before {
   width: 10px;
   height: 10px;
 }
+
+#header {
+  transition:all .3s linear;
+}
