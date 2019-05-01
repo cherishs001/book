@@ -170,4 +170,18 @@ export class StyleMenu extends Menu {
       id('content').innerHTML = stylePreviewArticle;
     });
   }
+  public setActive(active: boolean) {
+    super.setActive(active);
+    if (active) {
+      const $rect = id('rect');
+      const $header = id('header');
+      const $me = document.querySelector('.menu:not(.hidden)');
+      $rect.style.zIndex = '-1';
+      $header.style.opacity = '0';
+      $header.style.pointerEvents = 'none';
+      if ($me != null) {
+        ($me as HTMLElement).style.backgroundColor = 'rgba(0,0,0,0.5)';
+      }
+    }
+  }
 }
