@@ -132,7 +132,7 @@ const styles = [
 
 export class StyleMenu extends Menu {
   public constructor(parent: Menu) {
-    super('阅读器样式', null);
+    super('阅读器样式', null, RectMode.MAIN);
     const $rect = id('rect');
     const $header = id('header');
     const $me = document.querySelector('.menu:not(.hidden)');
