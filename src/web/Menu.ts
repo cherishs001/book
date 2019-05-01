@@ -1,4 +1,6 @@
-import { RectMode, setRectMode } from './RectMode';
+import { DebugLogger } from './DebugLogger';
+import { Event } from './Event';
+import { RectMode, rectModeChangeEvent, setRectMode } from './RectMode';
 
 export enum ItemDecoration {
   SELECTABLE,
@@ -57,11 +59,14 @@ export class Menu {
   private container: HTMLDivElement;
   private active: boolean;
   private fullPath: Array<string>;
+  private debugLogger: DebugLogger;
   public constructor(
     public readonly name: string,
     parent: Menu | null,
     public readonly rectMode: RectMode = RectMode.OFF,
   ) {
+    this.debugLogger = new DebugLogger('Menu', { name });
+
     this.fullPath = parent === null ? [] : parent.fullPath.slice();
     if (name !== '') {
       this.fullPath.push(name);
@@ -79,11 +84,28 @@ export class Menu {
         .linkTo(parent);
     }
     document.body.appendChild(this.container);
+
+    // 当显示模式变化时
+    rectModeChangeEvent.on(({ newRectMode }) => {
+      // 如果自己是当前激活的菜单并且显示模式正在变化为全屏阅读器
+      if (this.active && newRectMode === RectMode.MAIN) {
+        // 设置自己为非激活模式
+        this.setActive(false);
+        // 等待显示模式再次变化时
+        rectModeChangeEvent.expect().then(() => {
+          // 设置自己为激活模式
+          this.setActive(true);
+        });
+      }
+    });
   }
-  public onActive() { /* Override */ }
+
+  public activateEvent = new Event();
   public setActive(active: boolean) {
+    this.debugLogger.log(`setActive(${active})`);
+
     if (!this.active && active) {
-      this.onActive();
+      this.activateEvent.emit();
     }
     this.active = active;
     this.container.classList.toggle('hidden', !active);

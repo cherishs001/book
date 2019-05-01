@@ -151,9 +151,10 @@ export class StyleMenu extends Menu {
     if (!flag) {
       styles[0].active();
     }
-  }
-  public onActive() {
-    hideComments();
-    id('content').innerHTML = stylePreviewArticle;
+
+    this.activateEvent.on(() => {
+      hideComments();
+      id('content').innerHTML = stylePreviewArticle;
+    });
   }
 }
