@@ -1,7 +1,7 @@
 import { hideComments } from './commentsControl';
 import { id } from './DOM';
 import { ItemDecoration, ItemHandle, Menu } from './Menu';
-import { RectMode } from './RectMode';
+import { RectMode, rectModeChangeEvent } from './RectMode';
 import { stylePreviewArticle } from './stylePreviewArticle';
 
 interface StyleDef {
@@ -132,12 +132,28 @@ const styles = [
 
 export class StyleMenu extends Menu {
   public constructor(parent: Menu) {
-    super('阅读器样式', parent, RectMode.SIDE);
+    super('阅读器样式', null);
+    const $rect = id('rect');
+    const $header = id('header');
+    const $me = document.querySelector('.menu:not(.hidden)');
+    this.addItem('返回', { button: true, decoration: ItemDecoration.BACK })
+      .onClick(() => {
+        $rect.style.zIndex = '';
+        $header.style.opacity = '';
+        $header.style.pointerEvents = '';
+      })
+      .linkTo(parent);
     for (const style of styles) {
       style.itemHandle = this.addItem(style.name, { small: true, button: true, decoration: ItemDecoration.SELECTABLE })
         .onClick(() => {
           style.active();
         });
+    }
+    $rect.style.zIndex = '-1';
+    $header.style.opacity = '0';
+    $header.style.pointerEvents = 'none';
+    if ($me != null) {
+      ($me as HTMLElement).style.backgroundColor = 'rgba(0,0,0,0.5)';
     }
     const usedStyle = window.localStorage.getItem('style');
     let flag = false;

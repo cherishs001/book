@@ -2,8 +2,8 @@ import { Folder } from '../Data';
 import { loadChapter } from './chapterControl';
 import { data } from './data';
 import { updateHistory } from './history';
-import { Menu } from './Menu';
 import { LastRead } from './LocalStorage';
+import { Menu } from './Menu';
 
 export class ChaptersMenu extends Menu {
   public constructor(parent: Menu, folder?: Folder) {

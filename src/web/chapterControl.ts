@@ -5,10 +5,10 @@ import { relativePathLookUpMap } from './data';
 import { getTextNodes, id } from './DOM';
 import { updateHistory } from './history';
 import { loadingText } from './loadingText';
+import { LastRead } from './LocalStorage';
 import { RectMode, setRectMode } from './RectMode';
 import { earlyAccess } from './settings';
 import { Selection, state } from './state';
-import { LastRead } from './LocalStorage';
 
 const $content = id('content');
 const chaptersCache = new Map<string, string | null>();

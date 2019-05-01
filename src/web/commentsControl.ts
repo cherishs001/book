@@ -1,8 +1,8 @@
 import { id } from './DOM';
 import { formatTime } from './formatTime';
+import { CommentBlock } from './LocalStorage';
 import { COMMENTS_LOADED, COMMENTS_LOADING, COMMENTS_UNAVAILABLE } from './messages';
 import { useComments } from './settings';
-import { CommentBlock } from './LocalStorage';
 
 const $comments = id('comments');
 const $commentsStatus = id('comments-status');
@@ -37,7 +37,7 @@ function createCommentElement(
   updateTime: string,
   content: string,
 ) {
-  if (CommentBlock.IsPeopleCommentBlocked(userId)||CommentBlock.IsCommentBlocked(commentId)) {
+  if (CommentBlock.IsPeopleCommentBlocked(userId) || CommentBlock.IsCommentBlocked(commentId)) {
     return document.createElement('blocked');
   }
   const $comment = document.createElement('div');
@@ -58,10 +58,15 @@ function createCommentElement(
     ? formatTime(new Date(createTime))
     : `${formatTime(new Date(createTime))}（最后修改于 ${formatTime(new Date(updateTime))}）`;
   $comment.appendChild($time);
+  content.split('\n\n').forEach(paragraph => {
+    const $p = document.createElement('p');
+    $p.innerText = paragraph;
+    $comment.appendChild($p);
+  });
   const $blockPeople = document.createElement('a');
   $blockPeople.classList.add('btn');
   $blockPeople.innerText = '屏蔽此人';
-  $blockPeople.onclick = function (e) {
+  $blockPeople.onclick = (e) => {
     CommentBlock.BlockPeople(userId, userName);
     if (e.target != null) {
       const el = (e.target as Element);
@@ -72,12 +77,12 @@ function createCommentElement(
         }
       }
     }
-  }
+  };
   $comment.appendChild($blockPeople);
   const $blockComment = document.createElement('a');
   $blockComment.classList.add('btn');
   $blockComment.innerText = '屏蔽此评论';
-  $blockComment.onclick = function (e) {
+  $blockComment.onclick = (e) => {
     CommentBlock.BlockComment(commentId, content.substring(0, 10));
     if (e.target != null) {
       const el = (e.target as Element);
@@ -88,13 +93,8 @@ function createCommentElement(
         }
       }
     }
-  }
+  };
   $comment.appendChild($blockComment);
-  content.split('\n\n').forEach(paragraph => {
-    const $p = document.createElement('p');
-    $p.innerText = paragraph;
-    $comment.appendChild($p);
-  });
   return $comment;
 }
 

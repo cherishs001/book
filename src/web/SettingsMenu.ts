@@ -1,6 +1,6 @@
+import { BlockMenu } from './BlockMenu';
 import { Menu } from './Menu';
 import { animation, BooleanSetting, earlyAccess, useComments, warning } from './settings';
-import { BlockMenu } from './BlockMenu';
 
 export class SettingsMenu extends Menu {
   public constructor(parent: Menu) {
