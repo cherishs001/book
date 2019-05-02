@@ -3,7 +3,6 @@ import { id } from './DOM';
 import { ItemDecoration, ItemHandle, Menu } from './Menu';
 import { RectMode, rectModeChangeEvent } from './RectMode';
 import { stylePreviewArticle } from './stylePreviewArticle';
-import { UserAgent } from './User';
 
 interface StyleDef {
   readonly rectBgColor: string;
@@ -133,22 +132,7 @@ const styles = [
 
 export class StyleMenu extends Menu {
   public constructor(parent: Menu) {
-    super('阅读器样式', null, UserAgent.mobile ? RectMode.MAIN : RectMode.SIDE, true);
-    const $rect = id('rect');
-    const $header = id('header');
-    const $me = document.querySelector('.menu:not(.hidden)');
-    this.addItem('返回', { button: true, decoration: ItemDecoration.BACK })
-      .onClick(() => {
-        if (UserAgent.mobile) {
-          $rect.style.zIndex = '';
-          $header.style.opacity = '';
-          $header.style.pointerEvents = '';
-          if ($me != null) {
-            ($me as HTMLElement).style.backgroundColor = '';
-          }
-        }
-      })
-      .linkTo(parent);
+    super('阅读器样式', null, RectMode.SIDE);
     for (const style of styles) {
       style.itemHandle = this.addItem(style.name, { small: true, button: true, decoration: ItemDecoration.SELECTABLE })
         .onClick(() => {
@@ -172,19 +156,5 @@ export class StyleMenu extends Menu {
       hideComments();
       id('content').innerHTML = stylePreviewArticle;
     });
-  }
-  public setActive(active: boolean) {
-    super.setActive(active);
-    if (active && UserAgent.mobile) {
-      const $rect = id('rect');
-      const $header = id('header');
-      const $me = document.querySelector('.menu:not(.hidden)');
-      $rect.style.zIndex = '-1';
-      $header.style.opacity = '0';
-      $header.style.pointerEvents = 'none';
-      if ($me != null) {
-        ($me as HTMLElement).style.backgroundColor = 'rgba(0,0,0,0.5)';
-      }
-    }
   }
 }
