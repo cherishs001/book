@@ -78,6 +78,8 @@ const finalizeChapterLoading = (selection?: Selection) => {
     }
   }
 
+  Array.from($content.getElementsByClassName('a')).forEach($anchor => ($anchor as HTMLAnchorElement).target = '_blank');
+
   const chapterCtx = state.currentChapter!;
   const chapterIndex = chapterCtx.inFolderIndex;
 
