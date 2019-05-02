@@ -98,7 +98,7 @@ const commentsUrlEnd = ')';
         if (!link.startsWith('./')) {
           return link;
         }
-        return join('/chapters', dirname(htmlRelativePath), link);
+        return join('./chapters', dirname(htmlRelativePath), link);
       },
     } as MDI.Options).use(mdiReplaceLinkPlugin);
 
