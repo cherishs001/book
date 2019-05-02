@@ -1,6 +1,7 @@
-import { copy, ensureDir, mkdirp, readdir, readFile, stat, writeFile } from 'fs-extra';
+import { copy, copyFile, ensureDir, mkdirp, readdir, readFile, stat, writeFile } from 'fs-extra';
 import * as MDI from 'markdown-it';
-import { basename, dirname, relative, resolve } from 'path';
+import * as mdiReplaceLinkPlugin from 'markdown-it-replace-link';
+import { basename, dirname, join, relative, resolve } from 'path';
 import { Chapter, Data, Folder, Node } from '../Data';
 import { countCertainWord } from './countCertainWord';
 import { countChars } from './countChars';
@@ -23,9 +24,6 @@ const commentsUrlEnd = ')';
   // Copy static
   await copy(staticDir, distDir);
   console.info('Static copied.');
-
-  // Render chapters
-  const mdi = new MDI();
 
   const chapterDefaultNamer = (displayIndex: number) => `第 ${displayIndex} 章`;
   const folderDefaultNamer = (displayIndex: number) => `新建文件夹（${displayIndex}）`;
@@ -62,6 +60,10 @@ const commentsUrlEnd = ')';
     keywordsCount.set(keyword, 0);
   });
 
+  function getHtmlRelativePath(parentHtmlRelativePath: string, fileName: string) {
+    return ((parentHtmlRelativePath + '/').substr(1) /* Remove "/" in the beginning */ + fileName).split(' ').join('-');
+  }
+
   async function loadChapter(path: string, parentHtmlRelativePath: string): Promise<Chapter> {
     let markdown = (await readFile(path)).toString();
     let isEarlyAccess = false;
@@ -87,12 +89,21 @@ const commentsUrlEnd = ')';
       }
     });
 
-    const output = mdi.render(markdown);
-    paragraphsCount += countParagraphs(output);
-
     const node = destructPath(path, false);
 
-    const htmlRelativePath = ((parentHtmlRelativePath + '/').substr(1) /* Remove "/" in the beginning */ + node.displayName + '.html').split(' ').join('-');
+    const htmlRelativePath = getHtmlRelativePath(parentHtmlRelativePath, node.displayName + '.html');
+
+    const mdi = new MDI({
+      replaceLink(link: string) {
+        if (!link.startsWith('./')) {
+          return link;
+        }
+        return join('./chapters', dirname(htmlRelativePath), link);
+      },
+    } as MDI.Options).use(mdiReplaceLinkPlugin);
+
+    const output = mdi.render(markdown);
+    paragraphsCount += countParagraphs(output);
 
     const htmlPath = resolve(distChapters, htmlRelativePath);
 
@@ -107,6 +118,15 @@ const commentsUrlEnd = ')';
       commentsUrl,
       htmlRelativePath,
     };
+  }
+
+  async function copyResource(path: string, parentHtmlRelativePath: string): Promise<void> {
+    const targetRelativePath = getHtmlRelativePath(parentHtmlRelativePath, basename(path));
+    const targetPath = resolve(distChapters, targetRelativePath);
+    await mkdirp(dirname(targetPath));
+    await (copyFile as any)(path, targetPath);
+
+    console.info(`${path} copied to ${targetPath}.`);
   }
 
   interface HasDisplayIndex {
@@ -129,6 +149,9 @@ const commentsUrlEnd = ')';
       if (isDirectory) {
         subDirsLoadingPromises.push(loadFolder(subpath, htmlRelativePath, false));
       } else {
+        if (subpath.endsWith('.pdf')) {
+          await copyResource(subpath, htmlRelativePath);
+        }
         // Ignore backup files created by text editors
         if (!subpath.endsWith('.md')) {
           continue;
