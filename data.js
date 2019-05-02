@@ -12,7 +12,7 @@ window.DATA={
         "name": "1 - 琳的“足疗馆”",
         "sourceRelativePath": "1 - 琳的“足疗馆”.md",
         "isEarlyAccess": false,
-        "commentsUrl": null,
+        "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/27",
         "htmlRelativePath": "琳的“足疗馆”.html"
       },
       {
@@ -265,5 +265,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "110"
+  "buildNumber": "111"
 };
