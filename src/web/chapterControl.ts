@@ -134,54 +134,51 @@ const finalizeChapterLoading = (selection?: Selection) => {
   }
   $content.appendChild($div);
 
-  const topDiv = document.createElement('div');
-  topDiv.style.display = 'flex';
-  if (chapterIndex >= 1 && canChapterShown(chapterCtx.folder.chapters[chapterIndex - 1])) {
-    const prevChapter = chapterCtx.folder.chapters[chapterIndex - 1].htmlRelativePath;
-    const $prevLink = document.createElement('a');
-    $prevLink.innerText = '上一章';
-    $prevLink.href = `${window.location.pathname}?chapter=${prevChapter}`;
-    $prevLink.style.textAlign = 'left';
-    $prevLink.style.flex = '1';
-    $prevLink.addEventListener('click', event => {
-      event.preventDefault();
+  loadComments(chapterCtx.chapter.commentsUrl);
+
+  let slideF: boolean = false;
+  let startX: number;
+  const onMove = (x: number) => {
+    const cond = window.outerWidth * 0.3;
+    if (x < startX && startX - x >= cond) {
+      const prevChapter = chapterCtx.folder.chapters[chapterIndex - 1].htmlRelativePath;
       loadChapter(prevChapter);
       updateHistory(true);
-    });
-    topDiv.appendChild($prevLink);
-  } else {
-    topDiv.appendChild(getFlexOneSpan());
-  }
-  const menuLink = document.createElement('a');
-  menuLink.innerText = '返回菜单';
-  menuLink.href = window.location.pathname;
-  menuLink.style.textAlign = 'center';
-  menuLink.style.flex = '1';
-  menuLink.addEventListener('click', event => {
-    event.preventDefault();
-    closeChapter();
-    updateHistory(true);
-  });
-  topDiv.appendChild(menuLink);
-  if (chapterIndex < chapterCtx.folder.chapters.length - 1 && canChapterShown(chapterCtx.folder.chapters[chapterIndex + 1])) {
-    const nextChapter = chapterCtx.folder.chapters[chapterIndex + 1].htmlRelativePath;
-    const $nextLink = document.createElement('a');
-    $nextLink.innerText = '下一章';
-    $nextLink.href = `${window.location.pathname}?chapter=${nextChapter}`;
-    $nextLink.style.textAlign = 'right';
-    $nextLink.style.flex = '1';
-    $nextLink.addEventListener('click', event => {
-      event.preventDefault();
+    } else if (x > startX && x - startX >= cond) {
+      const nextChapter = chapterCtx.folder.chapters[chapterIndex + 1].htmlRelativePath;
       loadChapter(nextChapter);
       updateHistory(true);
-    });
-    topDiv.appendChild($nextLink);
-  } else {
-    topDiv.appendChild(getFlexOneSpan());
-  }
-  $content.insertBefore(topDiv, $content.children[0]);
+    }
+  };
 
-  loadComments(chapterCtx.chapter.commentsUrl);
+  window.onmousedown = (e) => {
+    slideF = true;
+    startX = e.clientX;
+  };
+  window.ontouchstart = (e) => {
+    slideF = true;
+    startX = e.touches[0].pageX;
+  };
+
+  window.onmouseup = () => {
+    slideF = false;
+  };
+  window.ontouchend = () => {
+    slideF = false;
+  };
+
+  window.onmousemove = (e) => {
+    if (!slideF) {
+      return;
+    }
+    onMove(e.clientX);
+  };
+  window.ontouchmove = (e) => {
+    if (!slideF) {
+      return;
+    }
+    onMove(e.touches[0].pageX);
+  };
 
   // fix for stupid scrolling issues under iOS
   id('rect').style.overflow = 'hidden';
