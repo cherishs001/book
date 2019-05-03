@@ -508,23 +508,33 @@ body.animation-enabled .menu .button.selectable::before {
   font-size: 15px;
 }
 
-.comment > .btn {
-  cursor: pointer;
+.comment>.btn {
   float: right;
+
   padding: 5px 10px;
+
+  cursor: pointer;
+  transition: all 0.3s linear;
+
   border-radius: 3px;
-  transition:all .3s linear;
 }
 
-.comment > .btn:hover {
+.comment>.btn:hover {
   background-color: rgba(255,255,255,0.1);
 }
 
-.comment > .btn:active {
+.comment>.btn:active {
   background-color: rgba(255,255,255,0.5);
 }
 
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  width: 10px;
+  height: 10px;
+
+  border-radius: 5px;
 }
