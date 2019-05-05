@@ -825,7 +825,7 @@ var finalizeChapterLoading = function (selection) {
             });
         }
     }
-    Array.from($content.getElementsByClassName('a')).forEach(function ($anchor) { return $anchor.target = '_blank'; });
+    Array.from($content.getElementsByTagName('a')).forEach(function ($anchor) { return $anchor.target = '_blank'; });
     var chapterCtx = state_1.state.currentChapter;
     var chapterIndex = chapterCtx.inFolderIndex;
     if (chapterCtx.chapter.isEarlyAccess) {
