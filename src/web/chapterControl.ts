@@ -9,6 +9,7 @@ import { LastRead } from './LocalStorage';
 import { RectMode, setRectMode } from './RectMode';
 import { earlyAccess } from './settings';
 import { Selection, state } from './state';
+import { UserAgent } from './User';
 
 const $content = id('content');
 const chaptersCache = new Map<string, string | null>();
@@ -141,14 +142,14 @@ const finalizeChapterLoading = (selection?: Selection) => {
   let slideF: boolean = false;
   let startX: number;
   const onMove = (x: number) => {
-    const cond = window.outerWidth * 0.3;
+    const cond = (UserAgent.iOS ? window.innerWidth : window.outerWidth) * 0.3;
     if (x < startX && startX - x >= cond) {
-      const prevChapter = chapterCtx.folder.chapters[chapterIndex - 1].htmlRelativePath;
-      loadChapter(prevChapter);
-      updateHistory(true);
-    } else if (x > startX && x - startX >= cond) {
       const nextChapter = chapterCtx.folder.chapters[chapterIndex + 1].htmlRelativePath;
       loadChapter(nextChapter);
+      updateHistory(true);
+    } else if (x > startX && x - startX >= cond) {
+      const prevChapter = chapterCtx.folder.chapters[chapterIndex - 1].htmlRelativePath;
+      loadChapter(prevChapter);
       updateHistory(true);
     }
   };
