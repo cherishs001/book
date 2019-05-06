@@ -96,7 +96,7 @@ const finalizeChapterLoading = (selection?: Selection) => {
     const prevChapter = chapterCtx.folder.chapters[chapterIndex - 1].htmlRelativePath;
     const $prevLink = document.createElement('a');
     $prevLink.innerText = '上一章';
-    $prevLink.href = `${window.location.pathname}?chapter=${prevChapter}`;
+    $prevLink.href = `${window.location.pathname}#${prevChapter}`;
     $prevLink.style.textAlign = 'left';
     $prevLink.style.flex = '1';
     $prevLink.addEventListener('click', event => {
@@ -123,7 +123,7 @@ const finalizeChapterLoading = (selection?: Selection) => {
     const nextChapter = chapterCtx.folder.chapters[chapterIndex + 1].htmlRelativePath;
     const $nextLink = document.createElement('a');
     $nextLink.innerText = '下一章';
-    $nextLink.href = `${window.location.pathname}?chapter=${nextChapter}`;
+    $nextLink.href = `${window.location.pathname}#${nextChapter}`;
     $nextLink.style.textAlign = 'right';
     $nextLink.style.flex = '1';
     $nextLink.addEventListener('click', event => {
