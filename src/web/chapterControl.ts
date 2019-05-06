@@ -3,13 +3,13 @@ import { loadComments } from './commentsControl';
 import { ContentBlockType } from './ContentBlockType';
 import { relativePathLookUpMap } from './data';
 import { getTextNodes, id } from './DOM';
+import { SwipeDirection, swipeEvent } from './gestures';
 import { updateHistory } from './history';
 import { loadingText } from './loadingText';
 import { LastRead } from './LocalStorage';
 import { RectMode, setRectMode } from './RectMode';
-import { earlyAccess } from './settings';
+import { earlyAccess, gestureSwitchChapter } from './settings';
 import { Selection, state } from './state';
-import { UserAgent } from './User';
 
 const $content = id('content');
 const chaptersCache = new Map<string, string | null>();
@@ -139,50 +139,6 @@ const finalizeChapterLoading = (selection?: Selection) => {
 
   loadComments(chapterCtx.chapter.commentsUrl);
 
-  let slideF: boolean = false;
-  let startX: number;
-  const onMove = (x: number) => {
-    const cond = (UserAgent.iOS ? window.innerWidth : window.outerWidth) * 0.3;
-    if (x < startX && startX - x >= cond) {
-      const nextChapter = chapterCtx.folder.chapters[chapterIndex + 1].htmlRelativePath;
-      loadChapter(nextChapter);
-      updateHistory(true);
-    } else if (x > startX && x - startX >= cond) {
-      const prevChapter = chapterCtx.folder.chapters[chapterIndex - 1].htmlRelativePath;
-      loadChapter(prevChapter);
-      updateHistory(true);
-    }
-  };
-
-  window.onmousedown = (e) => {
-    slideF = true;
-    startX = e.clientX;
-  };
-  window.ontouchstart = (e) => {
-    slideF = true;
-    startX = e.touches[0].pageX;
-  };
-
-  window.onmouseup = () => {
-    slideF = false;
-  };
-  window.ontouchend = () => {
-    slideF = false;
-  };
-
-  window.onmousemove = (e) => {
-    if (!slideF) {
-      return;
-    }
-    onMove(e.clientX);
-  };
-  window.ontouchmove = (e) => {
-    if (!slideF) {
-      return;
-    }
-    onMove(e.touches[0].pageX);
-  };
-
   // fix for stupid scrolling issues under iOS
   id('rect').style.overflow = 'hidden';
   setTimeout(() => {
@@ -192,6 +148,29 @@ const finalizeChapterLoading = (selection?: Selection) => {
     }
   }, 1);
 };
+
+swipeEvent.on(direction => {
+  if (!gestureSwitchChapter.getValue()) {
+    return;
+  }
+  const chapterCtx = state.currentChapter!;
+  const chapterIndex = chapterCtx.inFolderIndex;
+  if (direction === SwipeDirection.TO_RIGHT) {
+    // 上一章
+    if (chapterIndex >= 1 && canChapterShown(chapterCtx.folder.chapters[chapterIndex - 1])) {
+      const prevChapter = chapterCtx.folder.chapters[chapterIndex - 1].htmlRelativePath;
+      loadChapter(prevChapter);
+      updateHistory(true);
+    }
+  } else if (direction === SwipeDirection.TO_LEFT) {
+    // 下一章
+    if (chapterIndex < chapterCtx.folder.chapters.length - 1 && canChapterShown(chapterCtx.folder.chapters[chapterIndex + 1])) {
+      const nextChapter = chapterCtx.folder.chapters[chapterIndex + 1].htmlRelativePath;
+      loadChapter(nextChapter);
+      updateHistory(true);
+    }
+  }
+});
 
 export function loadChapter(chapterHtmlRelativePath: string, selection?: Selection) {
   localStorage.setItem('lastRead', chapterHtmlRelativePath);

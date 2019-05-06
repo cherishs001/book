@@ -104,6 +104,8 @@ body.animation-enabled .rect {
   top: -50vmax;
   left: 35vmax;
 
+  overflow-x: hidden;
+
   width: 75vh;
   height: 200vmax;
 
@@ -114,7 +116,7 @@ body.animation-enabled .rect {
 .rect.reading {
   z-index: 1;
 
-  overflow: auto;
+  overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
 body.animation-enabled .rect>div {
