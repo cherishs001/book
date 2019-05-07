@@ -53,9 +53,9 @@ class Style {
     attemptInsertRule(`.rect.reading>.content a:active { color: ${this.def.linkActiveColor}; }`);
     attemptInsertRule(`.rect.reading>.content>.earlyAccess.block { background-color: ${this.def.contentBlockEarlyAccessColor}; }`);
     attemptInsertRule(`.rect>.comments>div { background-color: ${this.def.commentColor}; }`);
-    attemptInsertRule(`::-webkit-scrollbar-thumb { background-color: ${this.def.paperBgColor}; }`);
-    attemptInsertRule(`::-webkit-scrollbar-thumb:hover { background-color: ${this.def.linkColor}; }`);
-    attemptInsertRule(`::-webkit-scrollbar-thumb:active { background-color: ${this.def.linkActiveColor}; }`);
+    attemptInsertRule(`@media (min-width: 901px) { ::-webkit-scrollbar-thumb { background-color: ${this.def.paperBgColor}; } }`);
+    attemptInsertRule(`@media (min-width: 901px) { ::-webkit-scrollbar-thumb:hover { background-color: ${this.def.linkColor}; } }`);
+    attemptInsertRule(`@media (min-width: 901px) { ::-webkit-scrollbar-thumb:active { background-color: ${this.def.linkActiveColor}; } }`);
 
     const key = this.def.keyIsDark ? 'black' : 'white';
     attemptInsertRule(`.rect>.comments>.create-comment::before { background-color: ${key}; }`);
