@@ -3,16 +3,18 @@ import { loadComments } from './commentsControl';
 import { ContentBlockType } from './ContentBlockType';
 import { relativePathLookUpMap } from './data';
 import { getTextNodes, id } from './DOM';
+import { Event } from './Event';
 import { SwipeDirection, swipeEvent } from './gestures';
 import { updateHistory } from './history';
 import { loadingText } from './loadingText';
-import { LastRead } from './LocalStorage';
 import { RectMode, setRectMode } from './RectMode';
 import { earlyAccess, gestureSwitchChapter } from './settings';
 import { Selection, state } from './state';
 
 const $content = id('content');
 const chaptersCache = new Map<string, string | null>();
+
+export const loadChapterEvent = new Event<string>();
 
 export function closeChapter() {
   setRectMode(RectMode.OFF);
@@ -173,11 +175,8 @@ swipeEvent.on(direction => {
 });
 
 export function loadChapter(chapterHtmlRelativePath: string, selection?: Selection) {
-  localStorage.setItem('lastRead', chapterHtmlRelativePath);
-  const element = document.querySelector('[data-chapterPath="' + chapterHtmlRelativePath + '"]');
-  if (element != null) {
-    LastRead.UpdateLastRead(element);
-  }
+  loadChapterEvent.emit(chapterHtmlRelativePath);
+  window.localStorage.setItem('lastRead', chapterHtmlRelativePath);
   setRectMode(RectMode.MAIN);
   const chapterCtx = relativePathLookUpMap.get(chapterHtmlRelativePath)!;
   state.currentChapter = chapterCtx;

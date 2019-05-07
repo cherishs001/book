@@ -1,14 +1,3 @@
-export const LastRead = {
-  UpdateLastRead: (element?: Element) => {
-    for (const $element of Array.from(document.getElementsByClassName('last-read'))) {
-      $element.classList.remove('last-read');
-    }
-    if (element !== undefined) {
-      element.classList.add('last-read');
-    }
-  },
-};
-
 export const CommentBlock = {
   BlockPeople: (id: number, username: string) => {
     const blockPeople = localStorage.getItem('commentBlockedPeople');

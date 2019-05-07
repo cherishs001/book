@@ -43,7 +43,7 @@ export class Event<T = void> {
     this.onceListeners.push(onceListener);
     return onceListener;
   }
-  public expect(filter?: (arg: T) => boolean) {
+  public expect(filter?: (arg: T) => boolean): Promise<T> {
     if (this.isEmitting) {
       return new Promise(resolve => {
         this.queue.push(() => {

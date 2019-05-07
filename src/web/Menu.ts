@@ -53,6 +53,10 @@ export class ItemHandle {
     this.element.classList.add(className);
     return this;
   }
+  public removeClass(className: string) {
+    this.element.classList.remove(className);
+    return this;
+  }
 }
 
 export class Menu {
