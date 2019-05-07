@@ -3,6 +3,7 @@ import { id } from './DOM';
 import { ItemDecoration, ItemHandle, Menu } from './Menu';
 import { RectMode, rectModeChangeEvent } from './RectMode';
 import { stylePreviewArticle } from './stylePreviewArticle';
+import { DebugLogger } from './DebugLogger';
 
 interface StyleDef {
   readonly rectBgColor: string;
@@ -21,31 +22,43 @@ interface StyleDef {
 class Style {
   public static currentlyEnabled: Style | null = null;
   private styleSheet: StyleSheet | null = null;
+  private debugLogger: DebugLogger;
   public itemHandle: ItemHandle;
   public constructor(
     public readonly name: string,
     public readonly def: StyleDef,
-  ) { }
+  ) {
+    this.debugLogger = new DebugLogger('Style', { name });
+  }
   private injectStyleSheet() {
     const $style = document.createElement('style');
     document.head.appendChild($style);
     const sheet = $style.sheet as CSSStyleSheet;
     sheet.disabled = true;
-    sheet.insertRule(`.rect.reading { background-color: ${this.def.rectBgColor}; }`);
-    sheet.insertRule(`.rect.reading>div { background-color: ${this.def.paperBgColor}; }`);
-    sheet.insertRule(`.rect.reading>div { color: ${this.def.textColor}; }`);
-    sheet.insertRule(`.rect.reading>.content a { color: ${this.def.linkColor}; }`);
-    sheet.insertRule(`.rect.reading>.content a:visited { color: ${this.def.linkColor}; }`);
-    sheet.insertRule(`.rect.reading>.content a:hover { color: ${this.def.linkHoverColor}; }`);
-    sheet.insertRule(`.rect.reading>.content a:active { color: ${this.def.linkActiveColor}; }`);
-    sheet.insertRule(`.rect.reading>.content>.earlyAccess.block { background-color: ${this.def.contentBlockEarlyAccessColor}; }`);
-    sheet.insertRule(`.rect>.comments>div { background-color: ${this.def.commentColor}; }`);
-    sheet.insertRule(`::-webkit-scrollbar-thumb { background-color: ${this.def.paperBgColor}; }`);
-    sheet.insertRule(`::-webkit-scrollbar-thumb:hover { background-color: ${this.def.linkColor}; }`);
-    sheet.insertRule(`::-webkit-scrollbar-thumb:active { background-color: ${this.def.linkActiveColor}; }`);
+
+    const attemptInsertRule = (rule: string) => {
+      try {
+        sheet.insertRule(rule);
+      } catch (error) {
+        this.debugLogger.log(`Failed to inject rule "${rule}".`, error);
+      }
+    };
+
+    attemptInsertRule(`.rect.reading { background-color: ${this.def.rectBgColor}; }`);
+    attemptInsertRule(`.rect.reading>div { background-color: ${this.def.paperBgColor}; }`);
+    attemptInsertRule(`.rect.reading>div { color: ${this.def.textColor}; }`);
+    attemptInsertRule(`.rect.reading>.content a { color: ${this.def.linkColor}; }`);
+    attemptInsertRule(`.rect.reading>.content a:visited { color: ${this.def.linkColor}; }`);
+    attemptInsertRule(`.rect.reading>.content a:hover { color: ${this.def.linkHoverColor}; }`);
+    attemptInsertRule(`.rect.reading>.content a:active { color: ${this.def.linkActiveColor}; }`);
+    attemptInsertRule(`.rect.reading>.content>.earlyAccess.block { background-color: ${this.def.contentBlockEarlyAccessColor}; }`);
+    attemptInsertRule(`.rect>.comments>div { background-color: ${this.def.commentColor}; }`);
+    attemptInsertRule(`::-webkit-scrollbar-thumb { background-color: ${this.def.paperBgColor}; }`);
+    attemptInsertRule(`::-webkit-scrollbar-thumb:hover { background-color: ${this.def.linkColor}; }`);
+    attemptInsertRule(`::-webkit-scrollbar-thumb:active { background-color: ${this.def.linkActiveColor}; }`);
 
     const key = this.def.keyIsDark ? 'black' : 'white';
-    sheet.insertRule(`.rect>.comments>.create-comment::before { background-color: ${key}; }`);
+    attemptInsertRule(`.rect>.comments>.create-comment::before { background-color: ${key}; }`);
 
     this.styleSheet = sheet;
   }
