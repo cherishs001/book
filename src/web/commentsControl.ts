@@ -1,6 +1,6 @@
+import { blockUser, isUserBlocked } from './commentBlock';
 import { id } from './DOM';
 import { formatTime } from './formatTime';
-import { CommentBlock } from './LocalStorage';
 import { COMMENTS_LOADED, COMMENTS_LOADING, COMMENTS_UNAVAILABLE } from './messages';
 import { useComments } from './settings';
 
@@ -31,15 +31,10 @@ function createCommentElement(
   userAvatarUrl: string,
   userName: string,
   userUrl: string,
-  userId: number,
-  commentId: number,
   createTime: string,
   updateTime: string,
   content: string,
 ) {
-  if (CommentBlock.IsPeopleCommentBlocked(userId) || CommentBlock.IsCommentBlocked(commentId)) {
-    return document.createElement('blocked');
-  }
   const $comment = document.createElement('div');
   $comment.classList.add('comment');
   const $avatar = document.createElement('img');
@@ -63,38 +58,14 @@ function createCommentElement(
     $p.innerText = paragraph;
     $comment.appendChild($p);
   });
-  const $blockPeople = document.createElement('a');
-  $blockPeople.classList.add('btn');
-  $blockPeople.innerText = '屏蔽此人';
-  $blockPeople.onclick = (e) => {
-    CommentBlock.BlockPeople(userId, userName);
-    if (e.target != null) {
-      const el = (e.target as Element);
-      if (el.parentNode != null) {
-        const parent = el.parentNode;
-        if (parent.parentNode != null) {
-          parent.parentNode.removeChild(parent);
-        }
-      }
-    }
+  const $blockUser = document.createElement('a');
+  $blockUser.classList.add('btn');
+  $blockUser.innerText = '屏蔽此人';
+  $blockUser.onclick = () => {
+    blockUser(userName);
+    $comment.remove();
   };
-  $comment.appendChild($blockPeople);
-  const $blockComment = document.createElement('a');
-  $blockComment.classList.add('btn');
-  $blockComment.innerText = '屏蔽此评论';
-  $blockComment.onclick = (e) => {
-    CommentBlock.BlockComment(commentId, content.substring(0, 10));
-    if (e.target != null) {
-      const el = (e.target as Element);
-      if (el.parentNode != null) {
-        const parent = el.parentNode;
-        if (parent.parentNode != null) {
-          parent.parentNode.removeChild(parent);
-        }
-      }
-    }
-  };
-  $comment.appendChild($blockComment);
+  $comment.appendChild($blockUser);
   return $comment;
 }
 
@@ -133,12 +104,13 @@ export function loadComments(issueUrl: string | null) {
       }
       $commentsStatus.innerText = COMMENTS_LOADED;
       data.forEach((comment: any) => {
+        if (isUserBlocked(comment.user.login)) {
+          return;
+        }
         $comments.appendChild(createCommentElement(
           comment.user.avatar_url,
           comment.user.login,
           comment.user.html_url,
-          comment.user.id,
-          comment.id,
           comment.created_at,
           comment.updated_at,
           comment.body,

@@ -9,8 +9,7 @@ export enum ItemDecoration {
 
 type ItemOptions = {
   small?: true;
-} & {
-  html?: boolean;
+  unclearable?: true;
 } & ({
   button?: false;
 } | {
@@ -63,6 +62,7 @@ export class Menu {
   private container: HTMLDivElement;
   private active: boolean;
   private fullPath: Array<string>;
+  private clearableElements: Array<HTMLElement> = [];
   private debugLogger: DebugLogger;
   public constructor(
     public readonly name: string,
@@ -84,7 +84,7 @@ export class Menu {
       this.container.appendChild(path);
     }
     if (parent !== null) {
-      this.addItem('返回', { button: true, decoration: ItemDecoration.BACK })
+      this.addItem('返回', { button: true, decoration: ItemDecoration.BACK, unclearable: true })
         .linkTo(parent);
     }
     document.body.appendChild(this.container);
@@ -126,11 +126,7 @@ export class Menu {
     } else {
       $element = document.createElement('div');
     }
-    if (options.html) {
-      $element.innerHTML = title;
-    } else {
-      $element.innerText = title;
-    }
+    $element.innerText = title;
     if (options.small) {
       $element.classList.add('small');
     }
@@ -143,7 +139,16 @@ export class Menu {
       }
     }
     this.container.appendChild($element);
+
+    if (!options.unclearable) {
+      this.clearableElements.push($element);
+    }
+
     return new ItemHandle(this, $element);
+  }
+  protected clearItems() {
+    this.clearableElements.forEach($element => $element.remove());
+    this.clearableElements = [];
   }
   protected addLink(menu: Menu, smallButton?: true): ItemHandle {
     return this.addItem(menu.name, { small: smallButton, button: true })
