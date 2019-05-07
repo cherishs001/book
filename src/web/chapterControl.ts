@@ -155,7 +155,11 @@ swipeEvent.on(direction => {
   if (!gestureSwitchChapter.getValue()) {
     return;
   }
-  const chapterCtx = state.currentChapter!;
+  const chapterCtx = state.currentChapter;
+  // 如果目前没在阅读，那么就啥也不做
+  if (chapterCtx === null) {
+    return;
+  }
   const chapterIndex = chapterCtx.inFolderIndex;
   if (direction === SwipeDirection.TO_RIGHT) {
     // 上一章
