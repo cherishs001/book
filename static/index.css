@@ -402,7 +402,6 @@ body.animation-enabled .menu {
   font-family: 'ZCOOL QingKe HuangYou', sans-serif;
 }
 .menu.hidden {
-  transform: none;
   transform: translateX(-5vh);
   pointer-events: none;
 
