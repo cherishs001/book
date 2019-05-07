@@ -1,3 +1,5 @@
+import { debugLogging } from './settings';
+
 function simpleToString(value: string | number | boolean) {
   switch (typeof value) {
     case 'string':
@@ -18,6 +20,9 @@ export class DebugLogger {
      + ')';
   }
   public log(...stuff: any) {
+    if (!debugLogging.getValue()) {
+      return;
+    }
     console.info(this.prefix, ...stuff);
   }
 }

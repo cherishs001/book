@@ -41,3 +41,4 @@ export const earlyAccess = new BooleanSetting('earlyAccess', false, value => {
 });
 export const useComments = new BooleanSetting('useComments', true);
 export const gestureSwitchChapter = new BooleanSetting('gestureSwitchChapter', true);
+export const debugLogging = new BooleanSetting('debugLogging', false);
