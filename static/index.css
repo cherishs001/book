@@ -104,7 +104,7 @@ body.animation-enabled .rect {
   top: -50vmax;
   left: 35vmax;
 
-  overflow-x: hidden;
+  overflow: hidden;
 
   width: 75vh;
   height: 200vmax;
