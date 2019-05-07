@@ -53,19 +53,19 @@ function createCommentElement(
     ? formatTime(new Date(createTime))
     : `${formatTime(new Date(createTime))}（最后修改于 ${formatTime(new Date(updateTime))}）`;
   $comment.appendChild($time);
-  content.split('\n\n').forEach(paragraph => {
-    const $p = document.createElement('p');
-    $p.innerText = paragraph;
-    $comment.appendChild($p);
-  });
   const $blockUser = document.createElement('a');
-  $blockUser.classList.add('btn');
+  $blockUser.classList.add('block-user');
   $blockUser.innerText = '屏蔽此人';
   $blockUser.onclick = () => {
     blockUser(userName);
     $comment.remove();
   };
   $comment.appendChild($blockUser);
+  content.split('\n\n').forEach(paragraph => {
+    const $p = document.createElement('p');
+    $p.innerText = paragraph;
+    $comment.appendChild($p);
+  });
   return $comment;
 }
 
