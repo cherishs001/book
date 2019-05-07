@@ -1,9 +1,9 @@
 import { hideComments } from './commentsControl';
+import { DebugLogger } from './DebugLogger';
 import { id } from './DOM';
 import { ItemDecoration, ItemHandle, Menu } from './Menu';
-import { RectMode, rectModeChangeEvent } from './RectMode';
+import { RectMode } from './RectMode';
 import { stylePreviewArticle } from './stylePreviewArticle';
-import { DebugLogger } from './DebugLogger';
 
 interface StyleDef {
   readonly rectBgColor: string;
