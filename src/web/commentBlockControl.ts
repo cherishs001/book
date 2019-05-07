@@ -5,7 +5,7 @@ const blockedUsers = new Set<string>(JSON.parse(window.localStorage.getItem('blo
 export const blockedUserUpdateEvent = new Event();
 
 function saveBlockedUsers() {
-  window.localStorage.setItem('commentBlockedUsers', JSON.stringify(Array.from(blockedUsers)));
+  window.localStorage.setItem('blockedUsers', JSON.stringify(Array.from(blockedUsers)));
   blockedUserUpdateEvent.emit();
 }
 

@@ -1,4 +1,4 @@
-import { blockUser, isUserBlocked } from './commentBlock';
+import { blockUser, isUserBlocked } from './commentBlockControl';
 import { id } from './DOM';
 import { formatTime } from './formatTime';
 import { COMMENTS_LOADED, COMMENTS_LOADING, COMMENTS_UNAVAILABLE } from './messages';
