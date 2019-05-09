@@ -201,16 +201,16 @@ window.DATA={
       }
     ]
   },
-  "charsCount": 80579,
-  "paragraphsCount": 1771,
+  "charsCount": 81882,
+  "paragraphsCount": 1804,
   "keywordsCount": [
     [
       "高潮",
-      222
+      235
     ],
     [
       "按摩棒",
-      135
+      141
     ],
     [
       "陈变态",
@@ -265,5 +265,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "120"
+  "buildNumber": "140"
 };
