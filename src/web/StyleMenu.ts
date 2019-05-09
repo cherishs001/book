@@ -58,7 +58,10 @@ class Style {
     attemptInsertRule(`@media (min-width: 901px) { ::-webkit-scrollbar-thumb:active { background-color: ${this.def.linkActiveColor}; } }`);
 
     const key = this.def.keyIsDark ? 'black' : 'white';
+    const keyComponent = this.def.keyIsDark ? 0 : 255;
     attemptInsertRule(`.rect>.comments>.create-comment::before { background-color: ${key}; }`);
+    attemptInsertRule(`:root { --key-opacity-01: rgba(${keyComponent},${keyComponent},${keyComponent},0.1); } `);
+    attemptInsertRule(`:root { --key-opacity-05: rgba(${keyComponent},${keyComponent},${keyComponent},0.5); } `);
 
     this.styleSheet = sheet;
   }

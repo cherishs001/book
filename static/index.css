@@ -522,11 +522,11 @@ body.animation-enabled .comment>.block-user {
   border-radius: 3px;
 }
 .comment>.block-user:hover {
-  background-color: rgba(255,255,255,0.1);
+  background-color: var(--key-opacity-01);
 }
 
 .comment>.block-user:active {
-  background-color: rgba(255,255,255,0.5);
+  background-color: var(--key-opacity-05);
 }
 @media (min-width: 901px) {
   .comment>.block-user {
