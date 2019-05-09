@@ -17,4 +17,5 @@ export const thanks: Array<{ name: string, link?: string }> = [
   { name: '櫻川 紗良' },
   { name: 'Skimige' },
   { name: 'TenmaHiltonWhat', link: 'https://tenmahw.com' },
+  { name: '路人乙' },
 ].sort(() => Math.random() - 0.5);
