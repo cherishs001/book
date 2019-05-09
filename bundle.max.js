@@ -13,6 +13,54 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+Object.defineProperty(exports, "__esModule", { value: true });
+var commentBlockControl_1 = require("./commentBlockControl");
+var Menu_1 = require("./Menu");
+var messages_1 = require("./messages");
+var BlockMenu = /** @class */ (function (_super) {
+    __extends(BlockMenu, _super);
+    function BlockMenu(parent) {
+        var _this = _super.call(this, '屏蔽用户评论管理', parent) || this;
+        _this.update();
+        commentBlockControl_1.blockedUserUpdateEvent.on(_this.update.bind(_this));
+        return _this;
+    }
+    BlockMenu.prototype.update = function () {
+        var _this = this;
+        this.clearItems();
+        var blockedUsers = commentBlockControl_1.getBlockedUsers();
+        if (blockedUsers.length === 0) {
+            this.addItem(messages_1.NO_BLOCKED_USERS, { small: true });
+        }
+        else {
+            this.addItem(messages_1.CLICK_TO_UNBLOCK, { small: true });
+        }
+        blockedUsers.forEach(function (userName) {
+            _this.addItem(userName, { small: true, button: true })
+                .onClick(function () {
+                commentBlockControl_1.unblockUser(userName);
+            });
+        });
+    };
+    return BlockMenu;
+}(Menu_1.Menu));
+exports.BlockMenu = BlockMenu;
+
+},{"./Menu":8,"./commentBlockControl":16,"./messages":25}],2:[function(require,module,exports){
+"use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var __values = (this && this.__values) || function (o) {
     var m = typeof Symbol === "function" && o[Symbol.iterator], i = 0;
     if (m) return m.call(o);
@@ -28,6 +76,18 @@ var chapterControl_1 = require("./chapterControl");
 var data_1 = require("./data");
 var history_1 = require("./history");
 var Menu_1 = require("./Menu");
+var chapterSelectionButtonsMap = new Map();
+var currentLastReadLabelAt = null;
+function attachLastReadLabelTo(button, htmlRelativePath) {
+    button.addClass('last-read');
+    currentLastReadLabelAt = button;
+}
+chapterControl_1.loadChapterEvent.on(function (newChapterHtmlRelativePath) {
+    if (currentLastReadLabelAt !== null) {
+        currentLastReadLabelAt.removeClass('last-read');
+    }
+    attachLastReadLabelTo(chapterSelectionButtonsMap.get(newChapterHtmlRelativePath), newChapterHtmlRelativePath);
+});
 var ChaptersMenu = /** @class */ (function (_super) {
     __extends(ChaptersMenu, _super);
     function ChaptersMenu(parent, folder) {
@@ -51,25 +111,9 @@ var ChaptersMenu = /** @class */ (function (_super) {
             }
             finally { if (e_1) throw e_1.error; }
         }
-        var lastRead = window.localStorage.getItem('lastRead');
         var _loop_1 = function (chapter) {
             var handle = this_1.addItem(chapter.displayName, { small: true, button: true })
-                .onClick(function (element) {
-                var e_3, _a;
-                try {
-                    for (var _b = __values(Array.from(document.getElementsByClassName('last-read'))), _c = _b.next(); !_c.done; _c = _b.next()) {
-                        var $element = _c.value;
-                        $element.classList.remove('last-read');
-                    }
-                }
-                catch (e_3_1) { e_3 = { error: e_3_1 }; }
-                finally {
-                    try {
-                        if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
-                    }
-                    finally { if (e_3) throw e_3.error; }
-                }
-                element.classList.add('last-read');
+                .onClick(function () {
                 chapterControl_1.loadChapter(chapter.htmlRelativePath);
                 history_1.updateHistory(true);
             });
@@ -77,9 +121,11 @@ var ChaptersMenu = /** @class */ (function (_super) {
                 handle.setInnerText("[\u7F16\u5199\u4E2D] " + chapter.displayName);
                 handle.addClass('early-access');
             }
-            if (lastRead !== undefined && lastRead === chapter.htmlRelativePath) {
-                handle.addClass('last-read');
+            var lastRead = window.localStorage.getItem('lastRead');
+            if (lastRead === chapter.htmlRelativePath) {
+                attachLastReadLabelTo(handle, chapter.htmlRelativePath);
             }
+            chapterSelectionButtonsMap.set(chapter.htmlRelativePath, handle);
         };
         var this_1 = this;
         try {
@@ -101,7 +147,7 @@ var ChaptersMenu = /** @class */ (function (_super) {
 }(Menu_1.Menu));
 exports.ChaptersMenu = ChaptersMenu;
 
-},{"./Menu":5,"./chapterControl":12,"./data":14,"./history":17}],2:[function(require,module,exports){
+},{"./Menu":8,"./chapterControl":15,"./data":18,"./history":22}],3:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -148,7 +194,7 @@ var ContactMenu = /** @class */ (function (_super) {
 }(Menu_1.Menu));
 exports.ContactMenu = ContactMenu;
 
-},{"./Menu":5}],3:[function(require,module,exports){
+},{"./Menu":8}],4:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 function id(id) {
@@ -171,7 +217,158 @@ function getTextNodes(parent, initArray) {
 }
 exports.getTextNodes = getTextNodes;
 
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
+"use strict";
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+var __spread = (this && this.__spread) || function () {
+    for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
+    return ar;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var settings_1 = require("./settings");
+function simpleToString(value) {
+    switch (typeof value) {
+        case 'string':
+            return "\"" + value + "\"";
+        default:
+            return String(value);
+    }
+}
+var DebugLogger = /** @class */ (function () {
+    function DebugLogger(name, parameters) {
+        if (parameters === void 0) { parameters = {}; }
+        this.prefix = name + '('
+            + Object.keys(parameters).map(function (key) { return key + "=" + simpleToString(parameters[key]); }).join(',')
+            + ')';
+    }
+    DebugLogger.prototype.log = function () {
+        var stuff = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            stuff[_i] = arguments[_i];
+        }
+        if (!settings_1.debugLogging.getValue()) {
+            return;
+        }
+        console.info.apply(console, __spread([this.prefix], stuff));
+    };
+    return DebugLogger;
+}());
+exports.DebugLogger = DebugLogger;
+
+},{"./settings":26}],6:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var Event = /** @class */ (function () {
+    function Event() {
+        this.listeners = null;
+        this.onceListeners = null;
+        this.isEmitting = false;
+        this.queue = [];
+    }
+    Event.prototype.on = function (listener) {
+        var _this = this;
+        if (this.isEmitting) {
+            this.queue.push(function () {
+                _this.on(listener);
+            });
+            return listener;
+        }
+        if (this.listeners === null) {
+            this.listeners = new Set();
+        }
+        this.listeners.add(listener);
+        return listener;
+    };
+    Event.prototype.off = function (listener) {
+        var _this = this;
+        if (this.isEmitting) {
+            this.queue.push(function () {
+                _this.off(listener);
+            });
+            return;
+        }
+        if (this.listeners === null) {
+            return;
+        }
+        this.listeners.delete(listener);
+    };
+    Event.prototype.once = function (onceListener) {
+        var _this = this;
+        if (this.isEmitting) {
+            this.queue.push(function () {
+                _this.once(onceListener);
+            });
+            return onceListener;
+        }
+        if (this.onceListeners === null) {
+            this.onceListeners = [];
+        }
+        this.onceListeners.push(onceListener);
+        return onceListener;
+    };
+    Event.prototype.expect = function (filter) {
+        var _this = this;
+        if (this.isEmitting) {
+            return new Promise(function (resolve) {
+                _this.queue.push(function () {
+                    _this.expect(filter).then(resolve);
+                });
+            });
+        }
+        if (filter === undefined) {
+            return new Promise(function (resolve) { return _this.once(resolve); });
+        }
+        return new Promise(function (resolve) {
+            var listener = _this.on(function (arg) {
+                if (!filter(arg)) {
+                    return;
+                }
+                _this.off(listener);
+                resolve(arg);
+            });
+        });
+    };
+    Event.prototype.emit = function (arg) {
+        var _this = this;
+        if (this.isEmitting) {
+            this.queue.push(function () {
+                _this.emit(arg);
+            });
+            return;
+        }
+        this.isEmitting = true;
+        if (this.listeners !== null) {
+            this.listeners.forEach(function (listener) { return listener(arg); });
+        }
+        if (this.onceListeners !== null) {
+            this.onceListeners.forEach(function (onceListener) { return onceListener(arg); });
+            this.onceListeners.length = 0;
+        }
+        this.isEmitting = false;
+        while (this.queue.length >= 1) {
+            this.queue.shift()();
+        }
+    };
+    return Event;
+}());
+exports.Event = Event;
+
+},{}],7:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -211,9 +408,11 @@ var MainMenu = /** @class */ (function (_super) {
 }(Menu_1.Menu));
 exports.MainMenu = MainMenu;
 
-},{"./ChaptersMenu":1,"./ContactMenu":2,"./Menu":5,"./SettingsMenu":7,"./StatsMenu":9,"./StyleMenu":10,"./ThanksMenu":11}],5:[function(require,module,exports){
+},{"./ChaptersMenu":2,"./ContactMenu":3,"./Menu":8,"./SettingsMenu":10,"./StatsMenu":12,"./StyleMenu":13,"./ThanksMenu":14}],8:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+var DebugLogger_1 = require("./DebugLogger");
+var Event_1 = require("./Event");
 var RectMode_1 = require("./RectMode");
 var ItemDecoration;
 (function (ItemDecoration) {
@@ -256,14 +455,22 @@ var ItemHandle = /** @class */ (function () {
         this.element.classList.add(className);
         return this;
     };
+    ItemHandle.prototype.removeClass = function (className) {
+        this.element.classList.remove(className);
+        return this;
+    };
     return ItemHandle;
 }());
 exports.ItemHandle = ItemHandle;
 var Menu = /** @class */ (function () {
     function Menu(name, parent, rectMode) {
+        var _this = this;
         if (rectMode === void 0) { rectMode = RectMode_1.RectMode.OFF; }
         this.name = name;
         this.rectMode = rectMode;
+        this.clearableElements = [];
+        this.activateEvent = new Event_1.Event();
+        this.debugLogger = new DebugLogger_1.DebugLogger('Menu', { name: name });
         this.fullPath = parent === null ? [] : parent.fullPath.slice();
         if (name !== '') {
             this.fullPath.push(name);
@@ -277,15 +484,29 @@ var Menu = /** @class */ (function () {
             this.container.appendChild(path);
         }
         if (parent !== null) {
-            this.addItem('返回', { button: true, decoration: ItemDecoration.BACK })
+            this.addItem('返回', { button: true, decoration: ItemDecoration.BACK, unclearable: true })
                 .linkTo(parent);
         }
         document.body.appendChild(this.container);
+        // 当显示模式变化时
+        RectMode_1.rectModeChangeEvent.on(function (_a) {
+            var newRectMode = _a.newRectMode;
+            // 如果自己是当前激活的菜单并且显示模式正在变化为全屏阅读器
+            if (_this.active && newRectMode === RectMode_1.RectMode.MAIN) {
+                // 设置自己为非激活模式
+                _this.setActive(false);
+                // 等待显示模式再次变化时
+                RectMode_1.rectModeChangeEvent.expect().then(function () {
+                    // 设置自己为激活模式
+                    _this.setActive(true);
+                });
+            }
+        });
     }
-    Menu.prototype.onActive = function () { };
     Menu.prototype.setActive = function (active) {
+        this.debugLogger.log("setActive(" + active + ")");
         if (!this.active && active) {
-            this.onActive();
+            this.activateEvent.emit();
         }
         this.active = active;
         this.container.classList.toggle('hidden', !active);
@@ -303,12 +524,7 @@ var Menu = /** @class */ (function () {
         else {
             $element = document.createElement('div');
         }
-        if (options.html) {
-            $element.innerHTML = title;
-        }
-        else {
-            $element.innerText = title;
-        }
+        $element.innerText = title;
         if (options.small) {
             $element.classList.add('small');
         }
@@ -322,7 +538,14 @@ var Menu = /** @class */ (function () {
             }
         }
         this.container.appendChild($element);
+        if (!options.unclearable) {
+            this.clearableElements.push($element);
+        }
         return new ItemHandle(this, $element);
+    };
+    Menu.prototype.clearItems = function () {
+        this.clearableElements.forEach(function ($element) { return $element.remove(); });
+        this.clearableElements = [];
     };
     Menu.prototype.addLink = function (menu, smallButton) {
         return this.addItem(menu.name, { small: smallButton, button: true })
@@ -332,10 +555,12 @@ var Menu = /** @class */ (function () {
 }());
 exports.Menu = Menu;
 
-},{"./RectMode":6}],6:[function(require,module,exports){
+},{"./DebugLogger":5,"./Event":6,"./RectMode":9}],9:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+var DebugLogger_1 = require("./DebugLogger");
 var DOM_1 = require("./DOM");
+var Event_1 = require("./Event");
 var RectMode;
 (function (RectMode) {
     RectMode[RectMode["SIDE"] = 0] = "SIDE";
@@ -343,9 +568,11 @@ var RectMode;
     RectMode[RectMode["OFF"] = 2] = "OFF";
 })(RectMode = exports.RectMode || (exports.RectMode = {}));
 var $rect = DOM_1.id('rect');
+var debugLogger = new DebugLogger_1.DebugLogger('RectMode');
+exports.rectModeChangeEvent = new Event_1.Event();
 var rectMode = RectMode.OFF;
 function setRectMode(newRectMode) {
-    // console.info(`${RectMode[rectMode]} -> ${RectMode[newRectMode]}`);
+    debugLogger.log(RectMode[rectMode] + " -> " + RectMode[newRectMode]);
     if (rectMode === newRectMode) {
         return;
     }
@@ -370,11 +597,15 @@ function setRectMode(newRectMode) {
             $rect.classList.add('side');
         }
     }
+    exports.rectModeChangeEvent.emit({
+        previousRectMode: rectMode,
+        newRectMode: newRectMode,
+    });
     rectMode = newRectMode;
 }
 exports.setRectMode = setRectMode;
 
-},{"./DOM":3}],7:[function(require,module,exports){
+},{"./DOM":4,"./DebugLogger":5,"./Event":6}],10:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -390,6 +621,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
+var BlockMenu_1 = require("./BlockMenu");
 var Menu_1 = require("./Menu");
 var settings_1 = require("./settings");
 var SettingsMenu = /** @class */ (function (_super) {
@@ -400,6 +632,9 @@ var SettingsMenu = /** @class */ (function (_super) {
         _this.addBooleanSetting('使用动画', settings_1.animation);
         _this.addBooleanSetting('显示编写中章节', settings_1.earlyAccess);
         _this.addBooleanSetting('显示评论', settings_1.useComments);
+        _this.addBooleanSetting('手势切换章节（仅限手机）', settings_1.gestureSwitchChapter);
+        _this.addBooleanSetting('开发人员模式', settings_1.debugLogging);
+        _this.addLink(new BlockMenu_1.BlockMenu(_this), true);
         return _this;
     }
     SettingsMenu.prototype.addBooleanSetting = function (label, setting) {
@@ -414,7 +649,7 @@ var SettingsMenu = /** @class */ (function (_super) {
 }(Menu_1.Menu));
 exports.SettingsMenu = SettingsMenu;
 
-},{"./Menu":5,"./settings":21}],8:[function(require,module,exports){
+},{"./BlockMenu":1,"./Menu":8,"./settings":26}],11:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -467,7 +702,7 @@ var StatsKeywordsCountMenu = /** @class */ (function (_super) {
 }(Menu_1.Menu));
 exports.StatsKeywordsCountMenu = StatsKeywordsCountMenu;
 
-},{"./Menu":5,"./data":14}],9:[function(require,module,exports){
+},{"./Menu":8,"./data":18}],12:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -500,7 +735,7 @@ var StatsMenu = /** @class */ (function (_super) {
 }(Menu_1.Menu));
 exports.StatsMenu = StatsMenu;
 
-},{"./Menu":5,"./StatsKeywordsCountMenu":8,"./data":14}],10:[function(require,module,exports){
+},{"./Menu":8,"./StatsKeywordsCountMenu":11,"./data":18}],13:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -527,6 +762,7 @@ var __values = (this && this.__values) || function (o) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var commentsControl_1 = require("./commentsControl");
+var DebugLogger_1 = require("./DebugLogger");
 var DOM_1 = require("./DOM");
 var Menu_1 = require("./Menu");
 var RectMode_1 = require("./RectMode");
@@ -536,23 +772,39 @@ var Style = /** @class */ (function () {
         this.name = name;
         this.def = def;
         this.styleSheet = null;
+        this.debugLogger = new DebugLogger_1.DebugLogger('Style', { name: name });
     }
     Style.prototype.injectStyleSheet = function () {
+        var _this = this;
         var $style = document.createElement('style');
         document.head.appendChild($style);
         var sheet = $style.sheet;
         sheet.disabled = true;
-        sheet.insertRule(".rect.reading { background-color: " + this.def.rectBgColor + "; }");
-        sheet.insertRule(".rect.reading>div { background-color: " + this.def.paperBgColor + "; }");
-        sheet.insertRule(".rect.reading>div { color: " + this.def.textColor + "; }");
-        sheet.insertRule(".rect.reading>.content a { color: " + this.def.linkColor + "; }");
-        sheet.insertRule(".rect.reading>.content a:visited { color: " + this.def.linkColor + "; }");
-        sheet.insertRule(".rect.reading>.content a:hover { color: " + this.def.linkHoverColor + "; }");
-        sheet.insertRule(".rect.reading>.content a:active { color: " + this.def.linkActiveColor + "; }");
-        sheet.insertRule(".rect.reading>.content>.earlyAccess.block { background-color: " + this.def.contentBlockEarlyAccessColor + "; }");
-        sheet.insertRule(".rect>.comments>div { background-color: " + this.def.commentColor + "; }");
+        var attemptInsertRule = function (rule) {
+            try {
+                sheet.insertRule(rule);
+            }
+            catch (error) {
+                _this.debugLogger.log("Failed to inject rule \"" + rule + "\".", error);
+            }
+        };
+        attemptInsertRule(".rect.reading { background-color: " + this.def.rectBgColor + "; }");
+        attemptInsertRule(".rect.reading>div { background-color: " + this.def.paperBgColor + "; }");
+        attemptInsertRule(".rect.reading>div { color: " + this.def.textColor + "; }");
+        attemptInsertRule(".rect.reading>.content a { color: " + this.def.linkColor + "; }");
+        attemptInsertRule(".rect.reading>.content a:visited { color: " + this.def.linkColor + "; }");
+        attemptInsertRule(".rect.reading>.content a:hover { color: " + this.def.linkHoverColor + "; }");
+        attemptInsertRule(".rect.reading>.content a:active { color: " + this.def.linkActiveColor + "; }");
+        attemptInsertRule(".rect.reading>.content>.earlyAccess.block { background-color: " + this.def.contentBlockEarlyAccessColor + "; }");
+        attemptInsertRule(".rect>.comments>div { background-color: " + this.def.commentColor + "; }");
+        attemptInsertRule("@media (min-width: 901px) { ::-webkit-scrollbar-thumb { background-color: " + this.def.paperBgColor + "; } }");
+        attemptInsertRule("@media (min-width: 901px) { ::-webkit-scrollbar-thumb:hover { background-color: " + this.def.linkColor + "; } }");
+        attemptInsertRule("@media (min-width: 901px) { ::-webkit-scrollbar-thumb:active { background-color: " + this.def.linkActiveColor + "; } }");
         var key = this.def.keyIsDark ? 'black' : 'white';
-        sheet.insertRule(".rect>.comments>.create-comment::before { background-color: " + key + "; }");
+        var keyComponent = this.def.keyIsDark ? 0 : 255;
+        attemptInsertRule(".rect>.comments>.create-comment::before { background-color: " + key + "; }");
+        attemptInsertRule(":root { --key-opacity-01: rgba(" + keyComponent + "," + keyComponent + "," + keyComponent + ",0.1); } ");
+        attemptInsertRule(":root { --key-opacity-05: rgba(" + keyComponent + "," + keyComponent + "," + keyComponent + ",0.5); } ");
         this.styleSheet = sheet;
     };
     Style.prototype.active = function () {
@@ -678,17 +930,17 @@ var StyleMenu = /** @class */ (function (_super) {
         if (!flag) {
             styles[0].active();
         }
+        _this.activateEvent.on(function () {
+            commentsControl_1.hideComments();
+            DOM_1.id('content').innerHTML = stylePreviewArticle_1.stylePreviewArticle;
+        });
         return _this;
     }
-    StyleMenu.prototype.onActive = function () {
-        commentsControl_1.hideComments();
-        DOM_1.id('content').innerHTML = stylePreviewArticle_1.stylePreviewArticle;
-    };
     return StyleMenu;
 }(Menu_1.Menu));
 exports.StyleMenu = StyleMenu;
 
-},{"./DOM":3,"./Menu":5,"./RectMode":6,"./commentsControl":13,"./stylePreviewArticle":23}],11:[function(require,module,exports){
+},{"./DOM":4,"./DebugLogger":5,"./Menu":8,"./RectMode":9,"./commentsControl":17,"./stylePreviewArticle":28}],14:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -742,7 +994,7 @@ var ThanksMenu = /** @class */ (function (_super) {
 }(Menu_1.Menu));
 exports.ThanksMenu = ThanksMenu;
 
-},{"./Menu":5,"./thanks":24}],12:[function(require,module,exports){
+},{"./Menu":8,"./thanks":29}],15:[function(require,module,exports){
 "use strict";
 var __read = (this && this.__read) || function (o, n) {
     var m = typeof Symbol === "function" && o[Symbol.iterator];
@@ -764,6 +1016,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var commentsControl_1 = require("./commentsControl");
 var data_1 = require("./data");
 var DOM_1 = require("./DOM");
+var Event_1 = require("./Event");
+var gestures_1 = require("./gestures");
 var history_1 = require("./history");
 var loadingText_1 = require("./loadingText");
 var RectMode_1 = require("./RectMode");
@@ -771,6 +1025,7 @@ var settings_1 = require("./settings");
 var state_1 = require("./state");
 var $content = DOM_1.id('content');
 var chaptersCache = new Map();
+exports.loadChapterEvent = new Event_1.Event();
 function closeChapter() {
     RectMode_1.setRectMode(RectMode_1.RectMode.OFF);
     state_1.state.currentChapter = null;
@@ -838,7 +1093,7 @@ var finalizeChapterLoading = function (selection) {
         var prevChapter_1 = chapterCtx.folder.chapters[chapterIndex - 1].htmlRelativePath;
         var $prevLink = document.createElement('a');
         $prevLink.innerText = '上一章';
-        $prevLink.href = window.location.pathname + "?chapter=" + prevChapter_1;
+        $prevLink.href = window.location.pathname + "#" + prevChapter_1;
         $prevLink.style.textAlign = 'left';
         $prevLink.style.flex = '1';
         $prevLink.addEventListener('click', function (event) {
@@ -866,7 +1121,7 @@ var finalizeChapterLoading = function (selection) {
         var nextChapter_1 = chapterCtx.folder.chapters[chapterIndex + 1].htmlRelativePath;
         var $nextLink = document.createElement('a');
         $nextLink.innerText = '下一章';
-        $nextLink.href = window.location.pathname + "?chapter=" + nextChapter_1;
+        $nextLink.href = window.location.pathname + "#" + nextChapter_1;
         $nextLink.style.textAlign = 'right';
         $nextLink.style.flex = '1';
         $nextLink.addEventListener('click', function (event) {
@@ -890,8 +1145,36 @@ var finalizeChapterLoading = function (selection) {
         }
     }, 1);
 };
+gestures_1.swipeEvent.on(function (direction) {
+    if (!settings_1.gestureSwitchChapter.getValue()) {
+        return;
+    }
+    var chapterCtx = state_1.state.currentChapter;
+    // 如果目前没在阅读，那么就啥也不做
+    if (chapterCtx === null) {
+        return;
+    }
+    var chapterIndex = chapterCtx.inFolderIndex;
+    if (direction === gestures_1.SwipeDirection.TO_RIGHT) {
+        // 上一章
+        if (chapterIndex >= 1 && canChapterShown(chapterCtx.folder.chapters[chapterIndex - 1])) {
+            var prevChapter = chapterCtx.folder.chapters[chapterIndex - 1].htmlRelativePath;
+            loadChapter(prevChapter);
+            history_1.updateHistory(true);
+        }
+    }
+    else if (direction === gestures_1.SwipeDirection.TO_LEFT) {
+        // 下一章
+        if (chapterIndex < chapterCtx.folder.chapters.length - 1 && canChapterShown(chapterCtx.folder.chapters[chapterIndex + 1])) {
+            var nextChapter = chapterCtx.folder.chapters[chapterIndex + 1].htmlRelativePath;
+            loadChapter(nextChapter);
+            history_1.updateHistory(true);
+        }
+    }
+});
 function loadChapter(chapterHtmlRelativePath, selection) {
-    localStorage.setItem('lastRead', chapterHtmlRelativePath);
+    exports.loadChapterEvent.emit(chapterHtmlRelativePath);
+    window.localStorage.setItem('lastRead', chapterHtmlRelativePath);
     RectMode_1.setRectMode(RectMode_1.RectMode.MAIN);
     var chapterCtx = data_1.relativePathLookUpMap.get(chapterHtmlRelativePath);
     state_1.state.currentChapter = chapterCtx;
@@ -920,9 +1203,39 @@ function loadChapter(chapterHtmlRelativePath, selection) {
 }
 exports.loadChapter = loadChapter;
 
-},{"./DOM":3,"./RectMode":6,"./commentsControl":13,"./data":14,"./history":17,"./loadingText":19,"./settings":21,"./state":22}],13:[function(require,module,exports){
+},{"./DOM":4,"./Event":6,"./RectMode":9,"./commentsControl":17,"./data":18,"./gestures":21,"./history":22,"./loadingText":24,"./settings":26,"./state":27}],16:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+var Event_1 = require("./Event");
+var blockedUsers = new Set(JSON.parse(window.localStorage.getItem('blockedUsers') || '[]'));
+exports.blockedUserUpdateEvent = new Event_1.Event();
+function saveBlockedUsers() {
+    window.localStorage.setItem('blockedUsers', JSON.stringify(Array.from(blockedUsers)));
+    exports.blockedUserUpdateEvent.emit();
+}
+function blockUser(userName) {
+    blockedUsers.add(userName);
+    saveBlockedUsers();
+}
+exports.blockUser = blockUser;
+function unblockUser(userName) {
+    blockedUsers.delete(userName);
+    saveBlockedUsers();
+}
+exports.unblockUser = unblockUser;
+function isUserBlocked(userName) {
+    return blockedUsers.has(userName);
+}
+exports.isUserBlocked = isUserBlocked;
+function getBlockedUsers() {
+    return Array.from(blockedUsers);
+}
+exports.getBlockedUsers = getBlockedUsers;
+
+},{"./Event":6}],17:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var commentBlockControl_1 = require("./commentBlockControl");
 var DOM_1 = require("./DOM");
 var formatTime_1 = require("./formatTime");
 var messages_1 = require("./messages");
@@ -965,6 +1278,14 @@ function createCommentElement(userAvatarUrl, userName, userUrl, createTime, upda
         ? formatTime_1.formatTime(new Date(createTime))
         : formatTime_1.formatTime(new Date(createTime)) + "\uFF08\u6700\u540E\u4FEE\u6539\u4E8E " + formatTime_1.formatTime(new Date(updateTime)) + "\uFF09";
     $comment.appendChild($time);
+    var $blockUser = document.createElement('a');
+    $blockUser.classList.add('block-user');
+    $blockUser.innerText = '屏蔽此人';
+    $blockUser.onclick = function () {
+        commentBlockControl_1.blockUser(userName);
+        $comment.remove();
+    };
+    $comment.appendChild($blockUser);
     content.split('\n\n').forEach(function (paragraph) {
         var $p = document.createElement('p');
         $p.innerText = paragraph;
@@ -1003,13 +1324,16 @@ function loadComments(issueUrl) {
         }
         $commentsStatus.innerText = messages_1.COMMENTS_LOADED;
         data.forEach(function (comment) {
+            if (commentBlockControl_1.isUserBlocked(comment.user.login)) {
+                return;
+            }
             $comments.appendChild(createCommentElement(comment.user.avatar_url, comment.user.login, comment.user.html_url, comment.created_at, comment.updated_at, comment.body));
         });
     });
 }
 exports.loadComments = loadComments;
 
-},{"./DOM":3,"./formatTime":16,"./messages":20,"./settings":21}],14:[function(require,module,exports){
+},{"./DOM":4,"./commentBlockControl":16,"./formatTime":20,"./messages":25,"./settings":26}],18:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.data = window.DATA;
@@ -1028,7 +1352,7 @@ function iterateFolder(folder) {
 }
 iterateFolder(exports.data.chapterTree);
 
-},{}],15:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var chapterControl_1 = require("./chapterControl");
@@ -1067,7 +1391,7 @@ function followQuery() {
 }
 exports.followQuery = followQuery;
 
-},{"./chapterControl":12,"./data":14,"./history":17,"./state":22}],16:[function(require,module,exports){
+},{"./chapterControl":15,"./data":18,"./history":22,"./state":27}],20:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var SECOND = 1000;
@@ -1093,7 +1417,78 @@ function formatTime(time) {
 }
 exports.formatTime = formatTime;
 
-},{}],17:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var DebugLogger_1 = require("./DebugLogger");
+var Event_1 = require("./Event");
+var SwipeDirection;
+(function (SwipeDirection) {
+    SwipeDirection[SwipeDirection["TO_TOP"] = 0] = "TO_TOP";
+    SwipeDirection[SwipeDirection["TO_RIGHT"] = 1] = "TO_RIGHT";
+    SwipeDirection[SwipeDirection["TO_BOTTOM"] = 2] = "TO_BOTTOM";
+    SwipeDirection[SwipeDirection["TO_LEFT"] = 3] = "TO_LEFT";
+})(SwipeDirection = exports.SwipeDirection || (exports.SwipeDirection = {}));
+var gestureMinWidth = 900;
+exports.swipeEvent = new Event_1.Event();
+var horizontalMinXProportion = 0.17;
+var horizontalMaxYProportion = 0.1;
+var verticalMinYProportion = 0.1;
+var verticalMaxPropotyion = 0.1;
+var swipeTimeThreshold = 500;
+var startX = 0;
+var startY = 0;
+var startTime = 0;
+window.addEventListener('touchstart', function (event) {
+    // Only listen for first touch starts
+    if (event.touches.length !== 1) {
+        return;
+    }
+    startX = event.touches[0].clientX;
+    startY = event.touches[0].clientY;
+    startTime = Date.now();
+});
+window.addEventListener('touchend', function (event) {
+    // Only listen for last touch ends
+    if (event.touches.length !== 0) {
+        return;
+    }
+    // Ignore touches that lasted too long
+    if (Date.now() - startTime > swipeTimeThreshold) {
+        return;
+    }
+    if (window.innerWidth > gestureMinWidth) {
+        return;
+    }
+    var deltaX = event.changedTouches[0].clientX - startX;
+    var deltaY = event.changedTouches[0].clientY - startY;
+    var xProportion = Math.abs(deltaX / window.innerWidth);
+    var yProportion = Math.abs(deltaY / window.innerHeight);
+    if (xProportion > horizontalMinXProportion && yProportion < horizontalMaxYProportion) {
+        // Horizontal swipe detected
+        if (deltaX > 0) {
+            exports.swipeEvent.emit(SwipeDirection.TO_RIGHT);
+        }
+        else {
+            exports.swipeEvent.emit(SwipeDirection.TO_LEFT);
+        }
+    }
+    else if (yProportion > verticalMinYProportion && xProportion < verticalMaxPropotyion) {
+        // Vertical swipe detected
+        if (deltaY > 0) {
+            exports.swipeEvent.emit(SwipeDirection.TO_BOTTOM);
+        }
+        else {
+            exports.swipeEvent.emit(SwipeDirection.TO_TOP);
+        }
+    }
+});
+var swipeEventDebugLogger = new DebugLogger_1.DebugLogger('swipeEvent');
+exports.swipeEvent.on(function (direction) {
+    swipeEventDebugLogger.log(SwipeDirection[direction]);
+});
+
+},{"./DebugLogger":5,"./Event":6}],22:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var state_1 = require("./state");
@@ -1120,7 +1515,7 @@ function updateHistory(push) {
 }
 exports.updateHistory = updateHistory;
 
-},{"./state":22}],18:[function(require,module,exports){
+},{"./state":27}],23:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var data_1 = require("./data");
@@ -1154,19 +1549,21 @@ window.addEventListener('popstate', function () {
 });
 followQuery_1.followQuery();
 
-},{"./DOM":3,"./MainMenu":4,"./data":14,"./followQuery":15,"./settings":21,"./updateSelection":25}],19:[function(require,module,exports){
+},{"./DOM":4,"./MainMenu":7,"./data":18,"./followQuery":19,"./settings":26,"./updateSelection":30}],24:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.loadingText = '加载中...';
 
-},{}],20:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.COMMENTS_UNAVAILABLE = '本文评论不可用。';
 exports.COMMENTS_LOADING = '评论加载中...';
 exports.COMMENTS_LOADED = '以下为本章节的评论区。（您可以在设置中禁用评论）';
+exports.NO_BLOCKED_USERS = '没有用户的评论被屏蔽';
+exports.CLICK_TO_UNBLOCK = '(点击用户名以解除屏蔽)';
 
-},{}],21:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var noop = function () { };
@@ -1211,8 +1608,10 @@ exports.earlyAccess = new BooleanSetting('earlyAccess', false, function (value) 
     document.body.classList.toggle('early-access-disabled', !value);
 });
 exports.useComments = new BooleanSetting('useComments', true);
+exports.gestureSwitchChapter = new BooleanSetting('gestureSwitchChapter', true);
+exports.debugLogging = new BooleanSetting('debugLogging', false);
 
-},{}],22:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.state = {
@@ -1221,12 +1620,12 @@ exports.state = {
     chapterTextNodes: null,
 };
 
-},{}],23:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.stylePreviewArticle = "<h1>\u5348\u996D</h1>\n<p><em>\u4F5C\u8005\uFF1A\u53CB\u4EBA\u266AB</em></p>\n<p>\u201C\u5348\u996D\uFF0C\u5348\u996D\u266A\u201D</p>\n<p>\u9633\u4F1E\u4E0B\u7684\u7433\uFF0C\u5F88\u662F\u671F\u5F85\u4ECA\u5929\u7684\u5348\u996D\u3002</p>\n<p>\u6216\u8BB8\u662F\u4F53\u8D28\u548C\u522B\u7684\u8840\u65CF\u4E0D\u592A\u4E00\u6837\uFF0C\u7433\u80FD\u591F\u611F\u77E5\u5230\u98DF\u7269\u7684\u5473\u9053\uFF0C\u4F3C\u4E4E\u4E5F\u4FDD\u6709\u7740\u751F\u7269\u5BF9\u98DF\u7269\u7684\u559C\u7231\u3002</p>\n<p>\u867D\u7136\u5979\u5E76\u4E0D\u80FD\u4ECE\u8FD9\u4E9B\u98DF\u7269\u4E2D\u83B7\u53D6\u80FD\u91CF\u5C31\u662F\u3002</p>\n<p>\u5B66\u6821\u98DF\u5802\u7684\u590F\u5B63\u9650\u5B9A\u751C\u70B9\u4ECA\u5929\u4E5F\u5F88\u662F\u62A2\u624B\uFF0C\u8FD9\u70B9\u4ECE\u961F\u4F0D\u7684\u957F\u5EA6\u5C31\u80FD\u770B\u51FA\u6765\u2014\u2014\u961F\u4F0D\u9669\u4E9B\u5C31\u8981\u8D85\u51FA\u98DF\u5802\u7684\u8303\u56F4\u4E86\u3002</p>\n<p>\u201C\u4F60\u8BF4\u6211\u8981\u6709\u94B1\u591A\u597D\u2014\u2014\u201D</p>\n<p>\u5DF2\u7ECF\u4ECE\u9694\u58C1\u7A97\u53E3\u4E70\u4E0B\u4E86\u666E\u901A\uFF0C\u4F46\u662F\u5F88\u4FBF\u5B9C\u7684\u8425\u517B\u9910\u7684\u79CB\u955C\u60AC\uFF0C\u770B\u7740\u961F\u4F0D\u4E2D\u5174\u81F4\u52C3\u52C3\u7684\u7433\u3002</p>\n<p>\u5176\u5B9E\u5979\u5E76\u4E0D\u662F\u7F3A\u94B1\uFF0C\u5927\u7EA6\u662F\u541D\u556C\u3002</p>\n<p>\u8FD9\u5F97\u602A\u5979\u5A18\uFF0C\u7A77\u517B\u79CB\u955C\u60AC\u517B\u4E60\u60EF\u4E86\uFF0C\u73B0\u5728\u5979\u5149\u81EA\u5DF1\u9664\u7075\u9000\u9B54\u6323\u6765\u7684\u5916\u5FEB\u90FD\u591F\u5979\u5962\u4F88\u4E0A\u4E00\u628A\u4E86\uFF0C\u53EF\u5374\u8FD8\u4FDD\u7559\u7740\u80FD\u4E0D\u82B1\u94B1\u7EDD\u5BF9\u4E0D\u82B1\uFF0C\u5FC5\u987B\u82B1\u94B1\u8D8A\u5C11\u8D8A\u597D\u7684\u541D\u556C\u4E60\u60EF\u3002</p>\n<p>\u5C11\u9877\uFF0C\u7433\u5DF2\u7ECF\u5E26\u7740\u5979\u7684\u751C\u54C1\u5EFA\u7B51\u2014\u2014\u6BCF\u5757\u7816\u5934\u90FD\u662F\u4E00\u5757\u86CB\u7CD5\uFF0C\u5806\u6210\u4E00\u4E2A\u8BE1\u5F02\u7684\u706B\u67F4\u76D2\u2014\u2014\u6765\u5230\u4E86\u684C\u524D\u3002</p>\n<p>\u201C\uFF08\u5403\u4E0D\u80D6\u771F\u597D\uFF0C\u6709\u94B1\u771F\u597D\u2026\u2026\u201D</p>\n<p>\u8840\u65CF\u7684\u542C\u89C9\u81EA\u7136\u662F\u6355\u6349\u5230\u4E86\u79CB\u955C\u60AC\u7684\u5600\u5495\uFF0C\u7433\u653E\u4E0B\u76D8\u5B50\uFF0C\u6084\u54AA\u54AA\u5730\u5C06\u7259\u8D34\u4E0A\u4E86\u79CB\u955C\u60AC\u7684\u8116\u9888\u3002</p>\n<p>\u201C\u563B\u563B\u266A\u201D</p>\n<p>\u201C\u545C\u2014\u2014\u201D</p>\n<p>\u76EF\u2014\u2014</p>\n<p>\u79CB\u955C\u60AC\u770B\u4E86\u770B\u76D8\u4E2D\u5269\u4E0B\u7684\u4E00\u5757\u6BDB\u8840\u65FA\uFF0C\u4F3C\u662F\u8054\u7CFB\u5230\u4E86\u4EC0\u4E48\uFF0C\u5C06\u76EE\u5149\u8F6C\u5411\u4E86\u7433\u7684\u7259\u3002</p>\n<p>\u6B63\u5728\u4EAB\u7528\u86CB\u7CD5\u76DB\u5BB4\u7684\u7433\u4EE5\u4F59\u5149\u77A5\u89C1\u4E86\u5979\u7684\u89C6\u7EBF\uFF0C</p>\n<p>\u201C\u76EF\u7740\u672C\u5C0F\u59D0\u662F\u8981\u505A\u4EC0\u4E48\u5462\uFF1F\u201D</p>\n<p>\u201C\u554A\uFF0C\u6CA1\uFF0C\u6CA1\u4EC0\u4E48\u2026\u2026\u201D</p>\n<p>\u79CB\u955C\u60AC\u652F\u652F\u543E\u543E\u7684\u8BF4\u7740\uFF0C</p>\n<p>\u201C\u5C31\u662F\u597D\u5947\u4E00\u4E2A\u95EE\u9898\uFF0C\u8840\u65CF\u4E3A\u4EC0\u4E48\u4E0D\u5403\u6BDB\u8840\u65FA\u2026\u2026\u201D</p>\n<p>\u201C\u5662\u2606\u6BDB\u8840\u65FA\u5C31\u662F\u90A3\u4E2A\u716E\u719F\u7684\u8840\u5757\u662F\u5427\uFF1F\u592A\u6CA1\u6709\u7F8E\u611F\u4E86\u8FD9\u79CD\u8840\uFF01\u800C\u4E14\u5403\u4E86\u4E5F\u6CA1\u6CD5\u513F\u6062\u590D\u80FD\u91CF\uFF0C\u7B80\u76F4\u5C31\u662F\u8840\u6DB2\u7684\u7EDD\u4F73\u6D6A\u8D39\u2606\uFF01\u201D</p>\n<p>\u7433\u53D1\u51FA\u4E86\u5BF9\u8FD9\u6837\u7F8E\u98DF\u7684\u9119\u89C6\uFF0C\u4E0D\u8FC7\u8FD9\u79CD\u9119\u89C6\u5927\u7EA6\u53EA\u6709\u8840\u65CF\u548C\u868A\u5B50\u4F1A\u51FA\u73B0\u5427\u2026\u2026</p>\n<p>\u201C\u8840\u65CF\u9700\u8981\u6444\u5165\u8840\uFF0C\u662F\u56E0\u4E3A\u8840\u6240\u5177\u6709\u7684\u751F\u547D\u80FD\u91CF\uFF0C\u5982\u679C\u716E\u719F\u4E86\u7684\u8BDD\uFF0C\u8D85\u8FC7\u4E5D\u6210\u7684\u80FD\u91CF\u90FD\u88AB\u8F6C\u5316\u6210\u5176\u4ED6\u7684\u4E1C\u897F\u4E86\uFF0C\u5BF9\u6211\u4EEC\u6765\u8BF4\u5B9E\u5728\u662F\u6CA1\u4EC0\u4E48\u7528\u5904\uFF0C\u8FD8\u767D\u767D\u6D6A\u8D39\u4E86\u4F5C\u4E3A\u539F\u6599\u7684\u8840\uFF0C\u8FD9\u79CD\u4E1C\u897F\u672C\u5C0F\u59D0\u624D\u4E0D\u5403\u54A7\u2718\uFF01\u997F\u6B7B\uFF0C\u6B7B\u5916\u8FB9\uFF0C\u4ECE\u8FD9\u8FB9\u8DF3\u4E0B\u53BB\u4E5F\u4E0D\u5403\u2718\uFF01\u201D</p>\n<p>\u201C\u6B38\uFF0C\u522B\u8FD9\u4E48\u8BF4\u561B\uFF0C\u4F60\u80FD\u5C1D\u5F97\u5230\u5473\u9053\u7684\u5427\uFF0C\u5403\u4E00\u5757\u8BD5\u8BD5\u5457\uFF1F\u201D</p>\n<p>\u201C\u771F\u2026\u2026\u771F\u9999\u266A\u201D</p>\n<p>\u5F53\u665A\uFF0C\u56E0\u4E3A\u89E6\u53D1\u4E86\u771F\u9999\u5B9A\u5F8B\u800C\u611F\u5230\u5F88\u706B\u5927\u7684\u7433\uFF0C\u628A\u79CB\u955C\u60AC\u4E22\u8FDB\u4E86\u81EA\u5DF1\u7684\u9AD8\u7EF4\u7A7A\u95F4\u91CC\u5934\u653E\u7F6E\u4E86\u4E00\u665A\u4E0A\uFF08\u9AD8\u7EF4\u65F6\u95F4\u4E09\u5929\uFF09\u6CC4\u6124\u3002</p>";
 
-},{}],24:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.thanks = [
@@ -1247,10 +1646,11 @@ exports.thanks = [
     { name: 'kookxiang' },
     { name: '櫻川 紗良' },
     { name: 'Skimige' },
-    { name: 'TenmaHiltonWhat' },
+    { name: 'TenmaHiltonWhat', link: 'https://tenmahw.com' },
+    { name: '路人乙' },
 ].sort(function () { return Math.random() - 0.5; });
 
-},{}],25:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var history_1 = require("./history");
@@ -1303,4 +1703,4 @@ function updateSelection() {
 }
 exports.updateSelection = updateSelection;
 
-},{"./history":17,"./state":22}]},{},[18]);
+},{"./history":22,"./state":27}]},{},[23]);
