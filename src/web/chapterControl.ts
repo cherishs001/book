@@ -3,14 +3,18 @@ import { loadComments } from './commentsControl';
 import { ContentBlockType } from './ContentBlockType';
 import { relativePathLookUpMap } from './data';
 import { getTextNodes, id } from './DOM';
+import { Event } from './Event';
+import { SwipeDirection, swipeEvent } from './gestures';
 import { updateHistory } from './history';
 import { loadingText } from './loadingText';
 import { RectMode, setRectMode } from './RectMode';
-import { earlyAccess } from './settings';
+import { earlyAccess, gestureSwitchChapter } from './settings';
 import { Selection, state } from './state';
 
 const $content = id('content');
 const chaptersCache = new Map<string, string | null>();
+
+export const loadChapterEvent = new Event<string>();
 
 export function closeChapter() {
   setRectMode(RectMode.OFF);
@@ -94,7 +98,7 @@ const finalizeChapterLoading = (selection?: Selection) => {
     const prevChapter = chapterCtx.folder.chapters[chapterIndex - 1].htmlRelativePath;
     const $prevLink = document.createElement('a');
     $prevLink.innerText = '上一章';
-    $prevLink.href = `${window.location.pathname}?chapter=${prevChapter}`;
+    $prevLink.href = `${window.location.pathname}#${prevChapter}`;
     $prevLink.style.textAlign = 'left';
     $prevLink.style.flex = '1';
     $prevLink.addEventListener('click', event => {
@@ -121,7 +125,7 @@ const finalizeChapterLoading = (selection?: Selection) => {
     const nextChapter = chapterCtx.folder.chapters[chapterIndex + 1].htmlRelativePath;
     const $nextLink = document.createElement('a');
     $nextLink.innerText = '下一章';
-    $nextLink.href = `${window.location.pathname}?chapter=${nextChapter}`;
+    $nextLink.href = `${window.location.pathname}#${nextChapter}`;
     $nextLink.style.textAlign = 'right';
     $nextLink.style.flex = '1';
     $nextLink.addEventListener('click', event => {
@@ -147,8 +151,36 @@ const finalizeChapterLoading = (selection?: Selection) => {
   }, 1);
 };
 
+swipeEvent.on(direction => {
+  if (!gestureSwitchChapter.getValue()) {
+    return;
+  }
+  const chapterCtx = state.currentChapter;
+  // 如果目前没在阅读，那么就啥也不做
+  if (chapterCtx === null) {
+    return;
+  }
+  const chapterIndex = chapterCtx.inFolderIndex;
+  if (direction === SwipeDirection.TO_RIGHT) {
+    // 上一章
+    if (chapterIndex >= 1 && canChapterShown(chapterCtx.folder.chapters[chapterIndex - 1])) {
+      const prevChapter = chapterCtx.folder.chapters[chapterIndex - 1].htmlRelativePath;
+      loadChapter(prevChapter);
+      updateHistory(true);
+    }
+  } else if (direction === SwipeDirection.TO_LEFT) {
+    // 下一章
+    if (chapterIndex < chapterCtx.folder.chapters.length - 1 && canChapterShown(chapterCtx.folder.chapters[chapterIndex + 1])) {
+      const nextChapter = chapterCtx.folder.chapters[chapterIndex + 1].htmlRelativePath;
+      loadChapter(nextChapter);
+      updateHistory(true);
+    }
+  }
+});
+
 export function loadChapter(chapterHtmlRelativePath: string, selection?: Selection) {
-  localStorage.setItem('lastRead', chapterHtmlRelativePath);
+  loadChapterEvent.emit(chapterHtmlRelativePath);
+  window.localStorage.setItem('lastRead', chapterHtmlRelativePath);
   setRectMode(RectMode.MAIN);
   const chapterCtx = relativePathLookUpMap.get(chapterHtmlRelativePath)!;
   state.currentChapter = chapterCtx;

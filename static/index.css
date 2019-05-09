@@ -11,6 +11,11 @@ a {
 
   color: inherit;
 }
+p {
+  text-align: justify;
+
+  line-height: 1.7em;
+}
 .display-none {
   display: none;
 }
@@ -104,6 +109,8 @@ body.animation-enabled .rect {
   top: -50vmax;
   left: 35vmax;
 
+  overflow: hidden;
+
   width: 75vh;
   height: 200vmax;
 
@@ -114,7 +121,7 @@ body.animation-enabled .rect {
 .rect.reading {
   z-index: 1;
 
-  overflow: auto;
+  overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
 body.animation-enabled .rect>div {
@@ -400,7 +407,6 @@ body.animation-enabled .menu {
   font-family: 'ZCOOL QingKe HuangYou', sans-serif;
 }
 .menu.hidden {
-  transform: none;
   transform: translateX(-5vh);
   pointer-events: none;
 
@@ -500,11 +506,52 @@ body.animation-enabled .menu .button.selectable::before {
   display: inline-block;
 
   width: max-content;
-  height: 0;
 
   content: '（上次阅读）';
 
   color: #888;
 
   font-size: 15px;
+}
+
+body.animation-enabled .comment>.block-user {
+  transition: background-color 0.12s linear, opacity 0.12s linear;
+}
+.comment>.block-user {
+  float: right;
+
+  padding: 5px 10px;
+
+  cursor: pointer;
+
+  border-radius: 3px;
+}
+.comment>.block-user:hover {
+  background-color: var(--key-opacity-01);
+}
+
+.comment>.block-user:active {
+  background-color: var(--key-opacity-05);
+}
+@media (min-width: 901px) {
+  .comment>.block-user {
+    opacity: 0;
+  }
+  .comment:hover>.block-user {
+    opacity: 0.8;
+  }
+}
+
+@media (min-width: 901px) {
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    width: 10px;
+    height: 10px;
+
+    border-radius: 5px;
+  }
 }
