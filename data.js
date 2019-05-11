@@ -14,24 +14,6 @@ window.DATA={
         "isEarlyAccess": true,
         "commentsUrl": null,
         "htmlRelativePath": "出场人员名单.html"
-      },
-      {
-        "displayName": "特别篇 公主殿下",
-        "displayIndex": 200000,
-        "name": "200000 - 特别篇 公主殿下",
-        "sourceRelativePath": "200000 - 特别篇 公主殿下.md",
-        "isEarlyAccess": false,
-        "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/22",
-        "htmlRelativePath": "特别篇-公主殿下.html"
-      },
-      {
-        "displayName": "新能源",
-        "displayIndex": 200001,
-        "name": "200001 - 新能源",
-        "sourceRelativePath": "200001 - 新能源.md",
-        "isEarlyAccess": false,
-        "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/21",
-        "htmlRelativePath": "新能源.html"
       }
     ],
     "subfolders": [
@@ -172,6 +154,34 @@ window.DATA={
         "subfolders": []
       },
       {
+        "displayName": "支线",
+        "displayIndex": 2,
+        "name": "2 - 支线",
+        "sourceRelativePath": "2 - 支线",
+        "isRoot": false,
+        "chapters": [
+          {
+            "displayName": "特别篇 公主殿下",
+            "displayIndex": 1,
+            "name": "1 - 特别篇 公主殿下",
+            "sourceRelativePath": "2 - 支线/1 - 特别篇 公主殿下.md",
+            "isEarlyAccess": false,
+            "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/22",
+            "htmlRelativePath": "支线/特别篇-公主殿下.html"
+          },
+          {
+            "displayName": "新能源",
+            "displayIndex": 2,
+            "name": "2 - 新能源",
+            "sourceRelativePath": "2 - 支线/2 - 新能源.md",
+            "isEarlyAccess": false,
+            "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/21",
+            "htmlRelativePath": "支线/新能源.html"
+          }
+        ],
+        "subfolders": []
+      },
+      {
         "displayName": "小作品",
         "displayIndex": 3,
         "name": "3 - 小作品",
@@ -220,7 +230,7 @@ window.DATA={
       }
     ]
   },
-  "charsCount": 82702,
+  "charsCount": 82234,
   "paragraphsCount": 1831,
   "keywordsCount": [
     [
@@ -284,5 +294,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "145"
+  "buildNumber": "146"
 };
