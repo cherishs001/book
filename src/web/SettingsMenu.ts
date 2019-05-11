@@ -53,7 +53,7 @@ export class SettingsMenu extends Menu {
       });
   }
   public addEnumSetting(label: string, setting: EnumSetting, usePreview?: true) {
-    const getText = () => `${label}: ${setting.getValueName()}`;
+    const getText = () => `${label}：${setting.getValueName()}`;
     const handle = this.addItem(getText(), { small: true, button: true });
     const enumSettingMenu = new EnumSettingMenu(this, label, setting, usePreview === true);
     handle.linkTo(enumSettingMenu).onClick(() => {
