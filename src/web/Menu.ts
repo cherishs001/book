@@ -1,4 +1,6 @@
-import { RectMode, setRectMode } from './RectMode';
+import { DebugLogger } from './DebugLogger';
+import { Event } from './Event';
+import { RectMode, rectModeChangeEvent, setRectMode } from './RectMode';
 
 export enum ItemDecoration {
   SELECTABLE,
@@ -7,8 +9,7 @@ export enum ItemDecoration {
 
 type ItemOptions = {
   small?: true;
-} & {
-  html?: boolean;
+  unclearable?: true;
 } & ({
   button?: false;
 } | {
@@ -20,8 +21,8 @@ type ItemOptions = {
 export class ItemHandle {
   public constructor(
     private menu: Menu,
-    private element: HTMLDivElement | HTMLAnchorElement,
-  ) {}
+    public element: HTMLDivElement | HTMLAnchorElement,
+  ) { }
   public setSelected(selected: boolean) {
     this.element.classList.toggle('selected', selected);
     return this;
@@ -51,17 +52,25 @@ export class ItemHandle {
     this.element.classList.add(className);
     return this;
   }
+  public removeClass(className: string) {
+    this.element.classList.remove(className);
+    return this;
+  }
 }
 
 export class Menu {
   private container: HTMLDivElement;
   private active: boolean;
   private fullPath: Array<string>;
+  private clearableElements: Array<HTMLElement> = [];
+  private debugLogger: DebugLogger;
   public constructor(
     public readonly name: string,
     parent: Menu | null,
     public readonly rectMode: RectMode = RectMode.OFF,
   ) {
+    this.debugLogger = new DebugLogger('Menu', { name });
+
     this.fullPath = parent === null ? [] : parent.fullPath.slice();
     if (name !== '') {
       this.fullPath.push(name);
@@ -75,15 +84,32 @@ export class Menu {
       this.container.appendChild(path);
     }
     if (parent !== null) {
-      this.addItem('返回', { button: true, decoration: ItemDecoration.BACK })
+      this.addItem('返回', { button: true, decoration: ItemDecoration.BACK, unclearable: true })
         .linkTo(parent);
     }
     document.body.appendChild(this.container);
+
+    // 当显示模式变化时
+    rectModeChangeEvent.on(({ newRectMode }) => {
+      // 如果自己是当前激活的菜单并且显示模式正在变化为全屏阅读器
+      if (this.active && newRectMode === RectMode.MAIN) {
+        // 设置自己为非激活模式
+        this.setActive(false);
+        // 等待显示模式再次变化时
+        rectModeChangeEvent.expect().then(() => {
+          // 设置自己为激活模式
+          this.setActive(true);
+        });
+      }
+    });
   }
-  public onActive() { /* Override */ }
+
+  public activateEvent = new Event();
   public setActive(active: boolean) {
+    this.debugLogger.log(`setActive(${active})`);
+
     if (!this.active && active) {
-      this.onActive();
+      this.activateEvent.emit();
     }
     this.active = active;
     this.container.classList.toggle('hidden', !active);
@@ -100,11 +126,7 @@ export class Menu {
     } else {
       $element = document.createElement('div');
     }
-    if (options.html) {
-      $element.innerHTML = title;
-    } else {
-      $element.innerText = title;
-    }
+    $element.innerText = title;
     if (options.small) {
       $element.classList.add('small');
     }
@@ -117,7 +139,16 @@ export class Menu {
       }
     }
     this.container.appendChild($element);
+
+    if (!options.unclearable) {
+      this.clearableElements.push($element);
+    }
+
     return new ItemHandle(this, $element);
+  }
+  protected clearItems() {
+    this.clearableElements.forEach($element => $element.remove());
+    this.clearableElements = [];
   }
   protected addLink(menu: Menu, smallButton?: true): ItemHandle {
     return this.addItem(menu.name, { small: smallButton, button: true })

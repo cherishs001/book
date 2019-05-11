@@ -1,8 +1,23 @@
 import { Folder } from '../Data';
-import { loadChapter } from './chapterControl';
+import { loadChapter, loadChapterEvent } from './chapterControl';
 import { data } from './data';
 import { updateHistory } from './history';
-import { Menu } from './Menu';
+import { ItemHandle, Menu } from './Menu';
+
+const chapterSelectionButtonsMap: Map<string, ItemHandle> = new Map();
+let currentLastReadLabelAt: ItemHandle | null = null;
+
+function attachLastReadLabelTo(button: ItemHandle, htmlRelativePath: string) {
+  button.addClass('last-read');
+  currentLastReadLabelAt = button;
+}
+
+loadChapterEvent.on(newChapterHtmlRelativePath => {
+  if (currentLastReadLabelAt !== null) {
+    currentLastReadLabelAt.removeClass('last-read');
+  }
+  attachLastReadLabelTo(chapterSelectionButtonsMap.get(newChapterHtmlRelativePath)!, newChapterHtmlRelativePath);
+});
 
 export class ChaptersMenu extends Menu {
   public constructor(parent: Menu, folder?: Folder) {
@@ -14,14 +29,9 @@ export class ChaptersMenu extends Menu {
       const handle = this.addLink(new ChaptersMenu(this, subfolder), true);
       handle.addClass('folder');
     }
-    const lastRead = window.localStorage.getItem('lastRead');
     for (const chapter of folder.chapters) {
       const handle = this.addItem(chapter.displayName, { small: true, button: true })
-        .onClick((element: HTMLDivElement | HTMLAnchorElement) => {
-          for (const $element of Array.from(document.getElementsByClassName('last-read'))) {
-            $element.classList.remove('last-read');
-          }
-          element.classList.add('last-read');
+        .onClick(() => {
           loadChapter(chapter.htmlRelativePath);
           updateHistory(true);
         });
@@ -29,9 +39,13 @@ export class ChaptersMenu extends Menu {
         handle.setInnerText(`[编写中] ${chapter.displayName}`);
         handle.addClass('early-access');
       }
-      if (lastRead !== undefined && lastRead === chapter.htmlRelativePath) {
-        handle.addClass('last-read');
+
+      const lastRead = window.localStorage.getItem('lastRead');
+      if (lastRead === chapter.htmlRelativePath) {
+        attachLastReadLabelTo(handle, chapter.htmlRelativePath);
       }
+
+      chapterSelectionButtonsMap.set(chapter.htmlRelativePath, handle);
     }
   }
 }

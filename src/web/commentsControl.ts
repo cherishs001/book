@@ -1,3 +1,4 @@
+import { blockUser, isUserBlocked } from './commentBlockControl';
 import { id } from './DOM';
 import { formatTime } from './formatTime';
 import { COMMENTS_LOADED, COMMENTS_LOADING, COMMENTS_UNAVAILABLE } from './messages';
@@ -52,6 +53,14 @@ function createCommentElement(
     ? formatTime(new Date(createTime))
     : `${formatTime(new Date(createTime))}（最后修改于 ${formatTime(new Date(updateTime))}）`;
   $comment.appendChild($time);
+  const $blockUser = document.createElement('a');
+  $blockUser.classList.add('block-user');
+  $blockUser.innerText = '屏蔽此人';
+  $blockUser.onclick = () => {
+    blockUser(userName);
+    $comment.remove();
+  };
+  $comment.appendChild($blockUser);
   content.split('\n\n').forEach(paragraph => {
     const $p = document.createElement('p');
     $p.innerText = paragraph;
@@ -95,6 +104,9 @@ export function loadComments(issueUrl: string | null) {
       }
       $commentsStatus.innerText = COMMENTS_LOADED;
       data.forEach((comment: any) => {
+        if (isUserBlocked(comment.user.login)) {
+          return;
+        }
         $comments.appendChild(createCommentElement(
           comment.user.avatar_url,
           comment.user.login,

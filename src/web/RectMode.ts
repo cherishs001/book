@@ -1,4 +1,6 @@
+import { DebugLogger } from './DebugLogger';
 import { id } from './DOM';
+import { Event } from './Event';
 
 export enum RectMode {
   SIDE,
@@ -8,12 +10,21 @@ export enum RectMode {
 
 const $rect = id('rect');
 
+const debugLogger = new DebugLogger('RectMode');
+
+export const rectModeChangeEvent = new Event<{
+  previousRectMode: RectMode,
+  newRectMode: RectMode,
+}>();
+
 let rectMode: RectMode = RectMode.OFF;
 export function setRectMode(newRectMode: RectMode) {
-  // console.info(`${RectMode[rectMode]} -> ${RectMode[newRectMode]}`);
+  debugLogger.log(`${RectMode[rectMode]} -> ${RectMode[newRectMode]}`);
+
   if (rectMode === newRectMode) {
     return;
   }
+
   if (newRectMode === RectMode.OFF) {
     $rect.classList.remove('reading');
   } else {
@@ -31,5 +42,9 @@ export function setRectMode(newRectMode: RectMode) {
       $rect.classList.add('side');
     }
   }
+  rectModeChangeEvent.emit({
+    previousRectMode: rectMode,
+    newRectMode,
+  });
   rectMode = newRectMode;
 }
