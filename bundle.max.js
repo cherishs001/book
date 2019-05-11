@@ -431,9 +431,6 @@ var ItemHandle = /** @class */ (function () {
     ItemHandle.prototype.onClick = function (handler) {
         var _this = this;
         this.element.addEventListener('click', function () {
-            if (!_this.menu.isActive()) {
-                return;
-            }
             handler(_this.element);
         });
         return this;
