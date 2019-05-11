@@ -29,9 +29,6 @@ export class ItemHandle {
   }
   public onClick(handler: (element?: any) => void) {
     this.element.addEventListener('click', () => {
-      if (!this.menu.isActive()) {
-        return;
-      }
       handler(this.element);
     });
     return this;
