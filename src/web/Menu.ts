@@ -38,9 +38,7 @@ export class ItemHandle {
   }
   public linkTo(targetMenu: Menu) {
     this.onClick(() => {
-      this.menu.setActive(false);
-      targetMenu.setActive(true);
-      setRectMode(targetMenu.rectMode);
+      this.menu.navigateTo(targetMenu);
     });
     return this;
   }
@@ -66,7 +64,7 @@ export class Menu {
   private debugLogger: DebugLogger;
   public constructor(
     public readonly name: string,
-    parent: Menu | null,
+    private parent: Menu | null,
     public readonly rectMode: RectMode = RectMode.OFF,
   ) {
     this.debugLogger = new DebugLogger('Menu', { name });
@@ -102,6 +100,19 @@ export class Menu {
         });
       }
     });
+  }
+
+  public navigateTo(targetMenu: Menu) {
+    this.setActive(false);
+    targetMenu.setActive(true);
+    setRectMode(targetMenu.rectMode);
+  }
+
+  protected exit() {
+    if (this.parent === null) {
+      throw new Error('Cannot exit the root menu.');
+    }
+    this.navigateTo(this.parent);
   }
 
   public activateEvent = new Event();
