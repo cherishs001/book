@@ -1,3 +1,6 @@
+[评论](https://github.com/SCLeoX/Wearable-Technology/issues/28)
+
+# 戴着可穿戴科技参加 AP 考试
 今天考 AP。
 
 监考老师：Good afternoon. According to College Board regulations, the following electronic equipment is prohibited: phones, smartwatches or any other wearable technology...
