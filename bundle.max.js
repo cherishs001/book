@@ -688,7 +688,7 @@ var SettingsMenu = /** @class */ (function (_super) {
     };
     SettingsMenu.prototype.addEnumSetting = function (label, setting, usePreview) {
         var _this = this;
-        var getText = function () { return label + ": " + setting.getValueName(); };
+        var getText = function () { return label + "\uFF1A" + setting.getValueName(); };
         var handle = this.addItem(getText(), { small: true, button: true });
         var enumSettingMenu = new EnumSettingMenu(this, label, setting, usePreview === true);
         handle.linkTo(enumSettingMenu).onClick(function () {
