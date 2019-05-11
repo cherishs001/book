@@ -441,9 +441,7 @@ var ItemHandle = /** @class */ (function () {
     ItemHandle.prototype.linkTo = function (targetMenu) {
         var _this = this;
         this.onClick(function () {
-            _this.menu.setActive(false);
-            targetMenu.setActive(true);
-            RectMode_1.setRectMode(targetMenu.rectMode);
+            _this.menu.navigateTo(targetMenu);
         });
         return this;
     };
@@ -467,6 +465,7 @@ var Menu = /** @class */ (function () {
         var _this = this;
         if (rectMode === void 0) { rectMode = RectMode_1.RectMode.OFF; }
         this.name = name;
+        this.parent = parent;
         this.rectMode = rectMode;
         this.clearableElements = [];
         this.activateEvent = new Event_1.Event();
@@ -503,6 +502,17 @@ var Menu = /** @class */ (function () {
             }
         });
     }
+    Menu.prototype.navigateTo = function (targetMenu) {
+        this.setActive(false);
+        targetMenu.setActive(true);
+        RectMode_1.setRectMode(targetMenu.rectMode);
+    };
+    Menu.prototype.exit = function () {
+        if (this.parent === null) {
+            throw new Error('Cannot exit the root menu.');
+        }
+        this.navigateTo(this.parent);
+    };
     Menu.prototype.setActive = function (active) {
         this.debugLogger.log("setActive(" + active + ")");
         if (!this.active && active) {
@@ -622,8 +632,41 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 var BlockMenu_1 = require("./BlockMenu");
+var commentsControl_1 = require("./commentsControl");
+var DOM_1 = require("./DOM");
 var Menu_1 = require("./Menu");
+var RectMode_1 = require("./RectMode");
 var settings_1 = require("./settings");
+var stylePreviewArticle_1 = require("./stylePreviewArticle");
+var EnumSettingMenu = /** @class */ (function (_super) {
+    __extends(EnumSettingMenu, _super);
+    function EnumSettingMenu(parent, label, setting, usePreview) {
+        var _this = _super.call(this, label + "\u8BBE\u7F6E", parent, usePreview ? RectMode_1.RectMode.SIDE : RectMode_1.RectMode.MAIN) || this;
+        var currentHandle;
+        if (usePreview) {
+            _this.activateEvent.on(function () {
+                commentsControl_1.hideComments();
+                DOM_1.id('content').innerHTML = stylePreviewArticle_1.stylePreviewArticle;
+            });
+        }
+        setting.options.forEach(function (valueName, value) {
+            var handle = _this.addItem(valueName, { small: true, button: true, decoration: Menu_1.ItemDecoration.SELECTABLE })
+                .onClick(function () {
+                currentHandle.setSelected(false);
+                handle.setSelected(true);
+                setting.setValue(value);
+                currentHandle = handle;
+            });
+            if (value === setting.getValue()) {
+                currentHandle = handle;
+                handle.setSelected(true);
+            }
+        });
+        return _this;
+    }
+    return EnumSettingMenu;
+}(Menu_1.Menu));
+exports.EnumSettingMenu = EnumSettingMenu;
 var SettingsMenu = /** @class */ (function (_super) {
     __extends(SettingsMenu, _super);
     function SettingsMenu(parent) {
@@ -633,6 +676,7 @@ var SettingsMenu = /** @class */ (function (_super) {
         _this.addBooleanSetting('显示编写中章节', settings_1.earlyAccess);
         _this.addBooleanSetting('显示评论', settings_1.useComments);
         _this.addBooleanSetting('手势切换章节（仅限手机）', settings_1.gestureSwitchChapter);
+        _this.addEnumSetting('字体', settings_1.fontFamily, true);
         _this.addBooleanSetting('开发人员模式', settings_1.debugLogging);
         _this.addLink(new BlockMenu_1.BlockMenu(_this), true);
         return _this;
@@ -645,11 +689,22 @@ var SettingsMenu = /** @class */ (function (_super) {
             handle.setInnerText(getText());
         });
     };
+    SettingsMenu.prototype.addEnumSetting = function (label, setting, usePreview) {
+        var _this = this;
+        var getText = function () { return label + ": " + setting.getValueName(); };
+        var handle = this.addItem(getText(), { small: true, button: true });
+        var enumSettingMenu = new EnumSettingMenu(this, label, setting, usePreview === true);
+        handle.linkTo(enumSettingMenu).onClick(function () {
+            _this.activateEvent.once(function () {
+                handle.setInnerText(getText());
+            });
+        });
+    };
     return SettingsMenu;
 }(Menu_1.Menu));
 exports.SettingsMenu = SettingsMenu;
 
-},{"./BlockMenu":1,"./Menu":8,"./settings":26}],11:[function(require,module,exports){
+},{"./BlockMenu":1,"./DOM":4,"./Menu":8,"./RectMode":9,"./commentsControl":17,"./settings":26,"./stylePreviewArticle":28}],11:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -1600,6 +1655,47 @@ var BooleanSetting = /** @class */ (function () {
     return BooleanSetting;
 }());
 exports.BooleanSetting = BooleanSetting;
+var EnumSetting = /** @class */ (function () {
+    function EnumSetting(key, options, defaultValue, onUpdate) {
+        if (onUpdate === void 0) { onUpdate = noop; }
+        this.key = key;
+        this.options = options;
+        this.defaultValue = defaultValue;
+        this.onUpdate = onUpdate;
+        if (!this.isCorrectValue(defaultValue)) {
+            throw new Error("Default value " + defaultValue + " is not correct.");
+        }
+        this.value = +(window.localStorage.getItem(key) || defaultValue);
+        this.correctValue();
+        this.onUpdate(this.value, this.options[this.value]);
+    }
+    EnumSetting.prototype.isCorrectValue = function (value) {
+        return !(Number.isNaN(value) || value % 1 !== 0 || value < 0 || value >= this.options.length);
+    };
+    EnumSetting.prototype.correctValue = function () {
+        if (!this.isCorrectValue(this.value)) {
+            this.value = this.defaultValue;
+        }
+    };
+    EnumSetting.prototype.updateLocalStorage = function () {
+        window.localStorage.setItem(this.key, String(this.value));
+    };
+    EnumSetting.prototype.getValue = function () {
+        return this.value;
+    };
+    EnumSetting.prototype.getValueName = function () {
+        return this.options[this.value];
+    };
+    EnumSetting.prototype.setValue = function (newValue) {
+        if (newValue !== this.value) {
+            this.onUpdate(newValue, this.options[newValue]);
+        }
+        this.value = newValue;
+        this.updateLocalStorage();
+    };
+    return EnumSetting;
+}());
+exports.EnumSetting = EnumSetting;
 exports.animation = new BooleanSetting('animation', true, function (value) {
     document.body.classList.toggle('animation-enabled', value);
 });
@@ -1609,6 +1705,16 @@ exports.earlyAccess = new BooleanSetting('earlyAccess', false, function (value) 
 });
 exports.useComments = new BooleanSetting('useComments', true);
 exports.gestureSwitchChapter = new BooleanSetting('gestureSwitchChapter', true);
+// https://github.com/zenozeng/fonts.css
+var fontFamilyCssValues = [
+    '-apple-system, "Noto Sans", "Helvetica Neue", Helvetica, "Nimbus Sans L", Arial, "Liberation Sans", "PingFang SC", "Hiragino Sans GB", "Noto Sans CJK SC", "Source Han Sans SC", "Source Han Sans CN", "Microsoft YaHei", "Wenquanyi Micro Hei", "WenQuanYi Zen Hei", "ST Heiti", SimHei, "WenQuanYi Zen Hei Sharp", sans-serif',
+    'Baskerville, Georgia, "Liberation Serif", "Kaiti SC", STKaiti, "AR PL UKai CN", "AR PL UKai HK", "AR PL UKai TW", "AR PL UKai TW MBE", "AR PL KaitiM GB", KaiTi, KaiTi_GB2312, DFKai-SB, "TW\-Kai", serif',
+    'Georgia, "Nimbus Roman No9 L", "Songti SC", "Noto Serif CJK SC", "Source Han Serif SC", "Source Han Serif CN", STSong, "AR PL New Sung", "AR PL SungtiL GB", NSimSun, SimSun, "TW\-Sung", "WenQuanYi Bitmap Song", "AR PL UMing CN", "AR PL UMing HK", "AR PL UMing TW", "AR PL UMing TW MBE", PMingLiU, MingLiU, serif',
+    'Baskerville, "Times New Roman", "Liberation Serif", STFangsong, FangSong, FangSong_GB2312, "CWTEX\-F", serif',
+];
+exports.fontFamily = new EnumSetting('fontFamily', ['黑体', '楷体', '宋体', '仿宋'], 0, function (fontFamilyIndex) {
+    document.documentElement.style.setProperty('--font-family', fontFamilyCssValues[fontFamilyIndex]);
+});
 exports.debugLogging = new BooleanSetting('debugLogging', false);
 
 },{}],27:[function(require,module,exports){

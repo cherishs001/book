@@ -131,6 +131,8 @@ body.animation-enabled .rect>div {
   overflow: hidden;
 
   opacity: 0;
+
+  font-family: var(--font-family);
 }
 @media (min-width: 901px) {
   .rect>div>.block {
@@ -150,8 +152,6 @@ body.animation-enabled .rect>div {
     box-shadow: rgba(0,0,0,0.24) 0 1.01372px 2.32903px;
   }
 }
-
-
 .rect>div>.block>p {
   margin-bottom: 0;
 }
