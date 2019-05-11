@@ -7,15 +7,6 @@ window.DATA={
     "isRoot": true,
     "chapters": [
       {
-        "displayName": "琳的“足疗馆”",
-        "displayIndex": 1,
-        "name": "1 - 琳的“足疗馆”",
-        "sourceRelativePath": "1 - 琳的“足疗馆”.md",
-        "isEarlyAccess": false,
-        "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/27",
-        "htmlRelativePath": "琳的“足疗馆”.html"
-      },
-      {
         "displayName": "出场人员名单",
         "displayIndex": 99999,
         "name": "99999 - 出场人员名单",
@@ -181,17 +172,45 @@ window.DATA={
         "subfolders": []
       },
       {
+        "displayName": "小作品",
+        "displayIndex": 3,
+        "name": "3 - 小作品",
+        "sourceRelativePath": "3 - 小作品",
+        "isRoot": false,
+        "chapters": [
+          {
+            "displayName": "琳的“足疗馆”",
+            "displayIndex": 1,
+            "name": "1 - 琳的“足疗馆”",
+            "sourceRelativePath": "3 - 小作品/1 - 琳的“足疗馆”.md",
+            "isEarlyAccess": false,
+            "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/27",
+            "htmlRelativePath": "小作品/琳的“足疗馆”.html"
+          },
+          {
+            "displayName": "戴着可穿戴科技参加 AP 考试",
+            "displayIndex": 2,
+            "name": "2 - 戴着可穿戴科技参加 AP 考试",
+            "sourceRelativePath": "3 - 小作品/2 - 戴着可穿戴科技参加 AP 考试.md",
+            "isEarlyAccess": false,
+            "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/28",
+            "htmlRelativePath": "小作品/戴着可穿戴科技参加-AP-考试.html"
+          }
+        ],
+        "subfolders": []
+      },
+      {
         "displayName": "杂项",
-        "displayIndex": 2,
-        "name": "2 - 杂项",
-        "sourceRelativePath": "2 - 杂项",
+        "displayIndex": 10,
+        "name": "10 - 杂项",
+        "sourceRelativePath": "10 - 杂项",
         "isRoot": false,
         "chapters": [
           {
             "displayName": "业余女装照欣赏指南",
             "displayIndex": 1,
             "name": "1 - 业余女装照欣赏指南",
-            "sourceRelativePath": "2 - 杂项/1 - 业余女装照欣赏指南.md",
+            "sourceRelativePath": "10 - 杂项/1 - 业余女装照欣赏指南.md",
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/24",
             "htmlRelativePath": "杂项/业余女装照欣赏指南.html"
@@ -201,8 +220,8 @@ window.DATA={
       }
     ]
   },
-  "charsCount": 81882,
-  "paragraphsCount": 1804,
+  "charsCount": 82702,
+  "paragraphsCount": 1831,
   "keywordsCount": [
     [
       "高潮",
@@ -265,5 +284,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "144"
+  "buildNumber": "145"
 };
