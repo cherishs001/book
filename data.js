@@ -230,16 +230,16 @@ window.DATA={
       }
     ]
   },
-  "charsCount": 82234,
-  "paragraphsCount": 1831,
+  "charsCount": 83921,
+  "paragraphsCount": 1871,
   "keywordsCount": [
     [
       "高潮",
-      235
+      236
     ],
     [
       "按摩棒",
-      141
+      151
     ],
     [
       "陈变态",
@@ -247,7 +247,7 @@ window.DATA={
     ],
     [
       "按摩器",
-      20
+      21
     ],
     [
       "姓陈的",
@@ -294,5 +294,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "153"
+  "buildNumber": "154"
 };
