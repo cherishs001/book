@@ -48,7 +48,6 @@ class Style {
     attemptInsertRule(`.rect.reading>div { background-color: ${this.def.paperBgColor}; }`);
     attemptInsertRule(`.rect.reading>div { color: ${this.def.textColor}; }`);
     attemptInsertRule(`.rect.reading>.content a { color: ${this.def.linkColor}; }`);
-    attemptInsertRule(`.rect.reading>.content a:visited { color: ${this.def.linkColor}; }`);
     attemptInsertRule(`.rect.reading>.content a:hover { color: ${this.def.linkHoverColor}; }`);
     attemptInsertRule(`.rect.reading>.content a:active { color: ${this.def.linkActiveColor}; }`);
     attemptInsertRule(`.rect.reading>.content>.earlyAccess.block { background-color: ${this.def.contentBlockEarlyAccessColor}; }`);
@@ -89,7 +88,7 @@ const styles = [
     paperBgColor: '#FFF',
     textColor: '#000',
     linkColor: '#00E',
-    linkHoverColor: '#00E',
+    linkHoverColor: '#F00',
     linkActiveColor: '#00C',
     contentBlockEarlyAccessColor: '#FFE082',
     commentColor: '#F5F5F5',
@@ -113,7 +112,7 @@ const styles = [
     paperBgColor: '#F8F4E9',
     textColor: '#552830',
     linkColor: '#00E',
-    linkHoverColor: '#00E',
+    linkHoverColor: '#F00',
     linkActiveColor: '#00C',
     contentBlockEarlyAccessColor: '#FFE082',
     commentColor: '#F9EFD7',

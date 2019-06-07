@@ -217,8 +217,20 @@ body.animation-enabled .rect>div {
     opacity: 1;
   }
 }
-.rect>div h1 {
+.rect>div *:first-child {
   margin-top: 0;
+}
+.rect>.content code {
+  margin: 0;
+  padding: 0.12em 0.3em;
+
+  word-break: break-all;
+
+  border-radius: 3px;
+  background-color: rgba(50, 50, 50 , 0.08);
+
+  font-family: var(--font-family);
+  font-size: 1em;
 }
 .rect>.content blockquote {
   margin: 0;

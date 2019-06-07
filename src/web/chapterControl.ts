@@ -2,7 +2,7 @@ import { Chapter } from '../Data';
 import { loadComments } from './commentsControl';
 import { ContentBlockType } from './ContentBlockType';
 import { relativePathLookUpMap } from './data';
-import { getTextNodes, id } from './DOM';
+import { getTextNodes, id, selectNode } from './DOM';
 import { Event } from './Event';
 import { SwipeDirection, swipeEvent } from './gestures';
 import { updateHistory } from './history';
@@ -83,6 +83,9 @@ const finalizeChapterLoading = (selection?: Selection) => {
   }
 
   Array.from($content.getElementsByTagName('a')).forEach($anchor => ($anchor as HTMLAnchorElement).target = '_blank');
+  Array.from($content.getElementsByTagName('code')).forEach($code => $code.addEventListener('dblclick', () => {
+    selectNode($code);
+  }));
 
   const chapterCtx = state.currentChapter!;
   const chapterIndex = chapterCtx.inFolderIndex;
