@@ -197,6 +197,7 @@ exports.ContactMenu = ContactMenu;
 },{"./Menu":8}],4:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+var DebugLogger_1 = require("./DebugLogger");
 function id(id) {
     return document.getElementById(id);
 }
@@ -216,8 +217,22 @@ function getTextNodes(parent, initArray) {
     return textNodes;
 }
 exports.getTextNodes = getTextNodes;
+var selectNodeDebugLogger = new DebugLogger_1.DebugLogger('selectNode');
+function selectNode(node) {
+    try {
+        var selection = window.getSelection();
+        var range = document.createRange();
+        range.selectNodeContents(node);
+        selection.removeAllRanges();
+        selection.addRange(range);
+    }
+    catch (error) {
+        selectNodeDebugLogger.log('Failed to select node: ', node, '; Error: ', error);
+    }
+}
+exports.selectNode = selectNode;
 
-},{}],5:[function(require,module,exports){
+},{"./DebugLogger":5}],5:[function(require,module,exports){
 "use strict";
 var __read = (this && this.__read) || function (o, n) {
     var m = typeof Symbol === "function" && o[Symbol.iterator];
@@ -844,7 +859,6 @@ var Style = /** @class */ (function () {
         attemptInsertRule(".rect.reading>div { background-color: " + this.def.paperBgColor + "; }");
         attemptInsertRule(".rect.reading>div { color: " + this.def.textColor + "; }");
         attemptInsertRule(".rect.reading>.content a { color: " + this.def.linkColor + "; }");
-        attemptInsertRule(".rect.reading>.content a:visited { color: " + this.def.linkColor + "; }");
         attemptInsertRule(".rect.reading>.content a:hover { color: " + this.def.linkHoverColor + "; }");
         attemptInsertRule(".rect.reading>.content a:active { color: " + this.def.linkActiveColor + "; }");
         attemptInsertRule(".rect.reading>.content>.earlyAccess.block { background-color: " + this.def.contentBlockEarlyAccessColor + "; }");
@@ -884,7 +898,7 @@ var styles = [
         paperBgColor: '#FFF',
         textColor: '#000',
         linkColor: '#00E',
-        linkHoverColor: '#00E',
+        linkHoverColor: '#F00',
         linkActiveColor: '#00C',
         contentBlockEarlyAccessColor: '#FFE082',
         commentColor: '#F5F5F5',
@@ -906,7 +920,7 @@ var styles = [
         paperBgColor: '#F8F4E9',
         textColor: '#552830',
         linkColor: '#00E',
-        linkHoverColor: '#00E',
+        linkHoverColor: '#F00',
         linkActiveColor: '#00C',
         contentBlockEarlyAccessColor: '#FFE082',
         commentColor: '#F9EFD7',
@@ -1133,6 +1147,9 @@ var finalizeChapterLoading = function (selection) {
         }
     }
     Array.from($content.getElementsByTagName('a')).forEach(function ($anchor) { return $anchor.target = '_blank'; });
+    Array.from($content.getElementsByTagName('code')).forEach(function ($code) { return $code.addEventListener('dblclick', function () {
+        DOM_1.selectNode($code);
+    }); });
     var chapterCtx = state_1.state.currentChapter;
     var chapterIndex = chapterCtx.inFolderIndex;
     if (chapterCtx.chapter.isEarlyAccess) {
