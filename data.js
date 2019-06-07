@@ -222,7 +222,7 @@ window.DATA={
             "name": "0 - 概述",
             "sourceRelativePath": "4 - 道具集/0 - 概述.md",
             "isEarlyAccess": false,
-            "commentsUrl": null,
+            "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/36",
             "htmlRelativePath": "道具集/概述.html"
           },
           {
@@ -231,7 +231,7 @@ window.DATA={
             "name": "50 - 强制灌食器",
             "sourceRelativePath": "4 - 道具集/50 - 强制灌食器.md",
             "isEarlyAccess": false,
-            "commentsUrl": null,
+            "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/37",
             "htmlRelativePath": "道具集/强制灌食器.html"
           }
         ],
@@ -322,5 +322,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "172"
+  "buildNumber": "173"
 };
