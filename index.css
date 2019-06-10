@@ -217,7 +217,7 @@ body.animation-enabled .rect>div {
     opacity: 1;
   }
 }
-.rect>div *:first-child {
+.rect>div *:first-child, .rect>div .block+* {
   margin-top: 0;
 }
 .rect>.content code {
