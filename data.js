@@ -276,20 +276,20 @@ window.DATA={
       }
     ]
   },
-  "charsCount": 95363,
-  "paragraphsCount": 2007,
+  "charsCount": 97766,
+  "paragraphsCount": 2084,
   "keywordsCount": [
     [
       "高潮",
-      279
+      287
     ],
     [
       "按摩棒",
-      161
+      168
     ],
     [
       "陈变态",
-      23
+      26
     ],
     [
       "按摩器",
@@ -297,7 +297,7 @@ window.DATA={
     ],
     [
       "姓陈的",
-      18
+      20
     ],
     [
       "陈志鹏",
@@ -305,7 +305,7 @@ window.DATA={
     ],
     [
       "陈色狼",
-      6
+      7
     ],
     [
       "陈同学",
@@ -340,5 +340,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "182"
+  "buildNumber": "191"
 };
