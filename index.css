@@ -511,19 +511,21 @@ body.animation-enabled .menu .button.selectable::before {
   background-color: #999;
 }
 
-.last-read::before {
-  position: absolute;
-  left: 100%;
-
+.menu .item-side {
   display: inline-block;
 
-  width: max-content;
-
-  content: '（上次阅读）';
-
   color: #888;
+}
 
-  font-size: 15px;
+.menu .prepend .item-side {
+  padding-right: 5px;
+}
+.menu .append .item-side {
+  padding-left: 5px;
+}
+
+.char-count-disabled .menu .char-count {
+  display: none;
 }
 
 body.animation-enabled .comment>.block-user {

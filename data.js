@@ -13,10 +13,11 @@ window.DATA={
         "sourceRelativePath": "99999 - 出场人员名单.md",
         "isEarlyAccess": true,
         "commentsUrl": null,
-        "htmlRelativePath": "出场人员名单.html"
+        "htmlRelativePath": "出场人员名单.html",
+        "chapterCharCount": 32
       }
     ],
-    "subfolders": [
+    "subFolders": [
       {
         "displayName": "主线",
         "displayIndex": 1,
@@ -31,7 +32,8 @@ window.DATA={
             "sourceRelativePath": "1 - 主线/0.md",
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/7",
-            "htmlRelativePath": "主线/第-0-章.html"
+            "htmlRelativePath": "主线/第-0-章.html",
+            "chapterCharCount": 2759
           },
           {
             "displayName": "第 1 章",
@@ -40,7 +42,8 @@ window.DATA={
             "sourceRelativePath": "1 - 主线/1.md",
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/8",
-            "htmlRelativePath": "主线/第-1-章.html"
+            "htmlRelativePath": "主线/第-1-章.html",
+            "chapterCharCount": 3901
           },
           {
             "displayName": "第 2 章",
@@ -49,7 +52,8 @@ window.DATA={
             "sourceRelativePath": "1 - 主线/2.md",
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/9",
-            "htmlRelativePath": "主线/第-2-章.html"
+            "htmlRelativePath": "主线/第-2-章.html",
+            "chapterCharCount": 2056
           },
           {
             "displayName": "第 3 章",
@@ -58,7 +62,8 @@ window.DATA={
             "sourceRelativePath": "1 - 主线/3.md",
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/10",
-            "htmlRelativePath": "主线/第-3-章.html"
+            "htmlRelativePath": "主线/第-3-章.html",
+            "chapterCharCount": 3477
           },
           {
             "displayName": "第 4 章",
@@ -67,7 +72,8 @@ window.DATA={
             "sourceRelativePath": "1 - 主线/4.md",
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/11",
-            "htmlRelativePath": "主线/第-4-章.html"
+            "htmlRelativePath": "主线/第-4-章.html",
+            "chapterCharCount": 3964
           },
           {
             "displayName": "第 5 章",
@@ -76,7 +82,8 @@ window.DATA={
             "sourceRelativePath": "1 - 主线/5.md",
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/12",
-            "htmlRelativePath": "主线/第-5-章.html"
+            "htmlRelativePath": "主线/第-5-章.html",
+            "chapterCharCount": 6025
           },
           {
             "displayName": "第 6 章",
@@ -85,7 +92,8 @@ window.DATA={
             "sourceRelativePath": "1 - 主线/6.md",
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/13",
-            "htmlRelativePath": "主线/第-6-章.html"
+            "htmlRelativePath": "主线/第-6-章.html",
+            "chapterCharCount": 3253
           },
           {
             "displayName": "第 7 章",
@@ -94,7 +102,8 @@ window.DATA={
             "sourceRelativePath": "1 - 主线/7.md",
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/14",
-            "htmlRelativePath": "主线/第-7-章.html"
+            "htmlRelativePath": "主线/第-7-章.html",
+            "chapterCharCount": 5566
           },
           {
             "displayName": "第 8 章",
@@ -103,7 +112,8 @@ window.DATA={
             "sourceRelativePath": "1 - 主线/8.md",
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/15",
-            "htmlRelativePath": "主线/第-8-章.html"
+            "htmlRelativePath": "主线/第-8-章.html",
+            "chapterCharCount": 5843
           },
           {
             "displayName": "第 9 章",
@@ -112,7 +122,8 @@ window.DATA={
             "sourceRelativePath": "1 - 主线/9.md",
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/16",
-            "htmlRelativePath": "主线/第-9-章.html"
+            "htmlRelativePath": "主线/第-9-章.html",
+            "chapterCharCount": 5668
           },
           {
             "displayName": "第 10 章",
@@ -121,7 +132,8 @@ window.DATA={
             "sourceRelativePath": "1 - 主线/10.md",
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/17",
-            "htmlRelativePath": "主线/第-10-章.html"
+            "htmlRelativePath": "主线/第-10-章.html",
+            "chapterCharCount": 5136
           },
           {
             "displayName": "第 11 章",
@@ -130,7 +142,8 @@ window.DATA={
             "sourceRelativePath": "1 - 主线/11.md",
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/18",
-            "htmlRelativePath": "主线/第-11-章.html"
+            "htmlRelativePath": "主线/第-11-章.html",
+            "chapterCharCount": 6958
           },
           {
             "displayName": "第 12 章",
@@ -139,7 +152,8 @@ window.DATA={
             "sourceRelativePath": "1 - 主线/12.md",
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/19",
-            "htmlRelativePath": "主线/第-12-章.html"
+            "htmlRelativePath": "主线/第-12-章.html",
+            "chapterCharCount": 7947
           },
           {
             "displayName": "第 13 章",
@@ -148,7 +162,8 @@ window.DATA={
             "sourceRelativePath": "1 - 主线/13.md",
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/20",
-            "htmlRelativePath": "主线/第-13-章.html"
+            "htmlRelativePath": "主线/第-13-章.html",
+            "chapterCharCount": 5909
           },
           {
             "displayName": "第 14 章",
@@ -157,10 +172,12 @@ window.DATA={
             "sourceRelativePath": "1 - 主线/14.md",
             "isEarlyAccess": true,
             "commentsUrl": null,
-            "htmlRelativePath": "主线/第-14-章.html"
+            "htmlRelativePath": "主线/第-14-章.html",
+            "chapterCharCount": 3465
           }
         ],
-        "subfolders": []
+        "subFolders": [],
+        "folderCharCount": 71927
       },
       {
         "displayName": "支线",
@@ -176,7 +193,8 @@ window.DATA={
             "sourceRelativePath": "2 - 支线/1 - 特别篇 公主殿下.md",
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/22",
-            "htmlRelativePath": "支线/特别篇-公主殿下.html"
+            "htmlRelativePath": "支线/特别篇-公主殿下.html",
+            "chapterCharCount": 4051
           },
           {
             "displayName": "新能源",
@@ -185,10 +203,12 @@ window.DATA={
             "sourceRelativePath": "2 - 支线/2 - 新能源.md",
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/21",
-            "htmlRelativePath": "支线/新能源.html"
+            "htmlRelativePath": "支线/新能源.html",
+            "chapterCharCount": 11028
           }
         ],
-        "subfolders": []
+        "subFolders": [],
+        "folderCharCount": 15079
       },
       {
         "displayName": "小作品",
@@ -204,7 +224,8 @@ window.DATA={
             "sourceRelativePath": "3 - 小作品/1 - 琳的“足疗馆”.md",
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/27",
-            "htmlRelativePath": "小作品/琳的“足疗馆”.html"
+            "htmlRelativePath": "小作品/琳的“足疗馆”.html",
+            "chapterCharCount": 159
           },
           {
             "displayName": "戴着可穿戴科技参加 AP 考试",
@@ -213,10 +234,12 @@ window.DATA={
             "sourceRelativePath": "3 - 小作品/2 - 戴着可穿戴科技参加 AP 考试.md",
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/28",
-            "htmlRelativePath": "小作品/戴着可穿戴科技参加-AP-考试.html"
+            "htmlRelativePath": "小作品/戴着可穿戴科技参加-AP-考试.html",
+            "chapterCharCount": 820
           }
         ],
-        "subfolders": []
+        "subFolders": [],
+        "folderCharCount": 979
       },
       {
         "displayName": "道具集",
@@ -232,7 +255,8 @@ window.DATA={
             "sourceRelativePath": "4 - 道具集/0 - 概述.md",
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/36",
-            "htmlRelativePath": "道具集/概述.html"
+            "htmlRelativePath": "道具集/概述.html",
+            "chapterCharCount": 641
           },
           {
             "displayName": "强制灌食器",
@@ -241,7 +265,8 @@ window.DATA={
             "sourceRelativePath": "4 - 道具集/50 - 强制灌食器.md",
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/37",
-            "htmlRelativePath": "道具集/强制灌食器.html"
+            "htmlRelativePath": "道具集/强制灌食器.html",
+            "chapterCharCount": 2533
           },
           {
             "displayName": "现代女仆管理系统",
@@ -250,10 +275,12 @@ window.DATA={
             "sourceRelativePath": "4 - 道具集/100 - 现代女仆管理系统.md",
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/39",
-            "htmlRelativePath": "道具集/现代女仆管理系统.html"
+            "htmlRelativePath": "道具集/现代女仆管理系统.html",
+            "chapterCharCount": 5214
           }
         ],
-        "subfolders": []
+        "subFolders": [],
+        "folderCharCount": 8388
       },
       {
         "displayName": "杂项",
@@ -269,12 +296,15 @@ window.DATA={
             "sourceRelativePath": "10 - 杂项/1 - 业余女装照欣赏指南.md",
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/24",
-            "htmlRelativePath": "杂项/业余女装照欣赏指南.html"
+            "htmlRelativePath": "杂项/业余女装照欣赏指南.html",
+            "chapterCharCount": 1361
           }
         ],
-        "subfolders": []
+        "subFolders": [],
+        "folderCharCount": 1361
       }
-    ]
+    ],
+    "folderCharCount": 97766
   },
   "charsCount": 97766,
   "paragraphsCount": 2084,
@@ -340,5 +370,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "191"
+  "buildNumber": "193"
 };

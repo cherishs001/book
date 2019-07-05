@@ -76,15 +76,15 @@ var chapterControl_1 = require("./chapterControl");
 var data_1 = require("./data");
 var history_1 = require("./history");
 var Menu_1 = require("./Menu");
+var shortNumber_1 = require("./shortNumber");
 var chapterSelectionButtonsMap = new Map();
 var currentLastReadLabelAt = null;
 function attachLastReadLabelTo(button, htmlRelativePath) {
-    button.addClass('last-read');
-    currentLastReadLabelAt = button;
+    currentLastReadLabelAt = button.append('[上次阅读]');
 }
 chapterControl_1.loadChapterEvent.on(function (newChapterHtmlRelativePath) {
     if (currentLastReadLabelAt !== null) {
-        currentLastReadLabelAt.removeClass('last-read');
+        currentLastReadLabelAt.remove();
     }
     attachLastReadLabelTo(chapterSelectionButtonsMap.get(newChapterHtmlRelativePath), newChapterHtmlRelativePath);
 });
@@ -98,10 +98,11 @@ var ChaptersMenu = /** @class */ (function (_super) {
         }
         _this = _super.call(this, folder.isRoot ? '章节选择' : folder.displayName, parent) || this;
         try {
-            for (var _c = __values(folder.subfolders), _d = _c.next(); !_d.done; _d = _c.next()) {
+            for (var _c = __values(folder.subFolders), _d = _c.next(); !_d.done; _d = _c.next()) {
                 var subfolder = _d.value;
                 var handle = _this.addLink(new ChaptersMenu(_this, subfolder), true);
                 handle.addClass('folder');
+                handle.append("[" + shortNumber_1.shortNumber(subfolder.folderCharCount) + "]", 'char-count');
             }
         }
         catch (e_1_1) { e_1 = { error: e_1_1 }; }
@@ -118,9 +119,10 @@ var ChaptersMenu = /** @class */ (function (_super) {
                 history_1.updateHistory(true);
             });
             if (chapter.isEarlyAccess) {
-                handle.setInnerText("[\u7F16\u5199\u4E2D] " + chapter.displayName);
+                handle.prepend('[编写中]');
                 handle.addClass('early-access');
             }
+            handle.append("[" + shortNumber_1.shortNumber(chapter.chapterCharCount) + "]", 'char-count');
             var lastRead = window.localStorage.getItem('lastRead');
             if (lastRead === chapter.htmlRelativePath) {
                 attachLastReadLabelTo(handle, chapter.htmlRelativePath);
@@ -147,7 +149,7 @@ var ChaptersMenu = /** @class */ (function (_super) {
 }(Menu_1.Menu));
 exports.ChaptersMenu = ChaptersMenu;
 
-},{"./Menu":8,"./chapterControl":15,"./data":18,"./history":22}],3:[function(require,module,exports){
+},{"./Menu":8,"./chapterControl":15,"./data":18,"./history":22,"./shortNumber":27}],3:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -425,6 +427,26 @@ exports.MainMenu = MainMenu;
 
 },{"./ChaptersMenu":2,"./ContactMenu":3,"./Menu":8,"./SettingsMenu":10,"./StatsMenu":12,"./StyleMenu":13,"./ThanksMenu":14}],8:[function(require,module,exports){
 "use strict";
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+var __spread = (this && this.__spread) || function () {
+    for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
+    return ar;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 var DebugLogger_1 = require("./DebugLogger");
 var Event_1 = require("./Event");
@@ -434,10 +456,23 @@ var ItemDecoration;
     ItemDecoration[ItemDecoration["SELECTABLE"] = 0] = "SELECTABLE";
     ItemDecoration[ItemDecoration["BACK"] = 1] = "BACK";
 })(ItemDecoration = exports.ItemDecoration || (exports.ItemDecoration = {}));
+function createSpan(text) {
+    var _a;
+    var classNames = [];
+    for (var _i = 1; _i < arguments.length; _i++) {
+        classNames[_i - 1] = arguments[_i];
+    }
+    var $span = document.createElement('span');
+    $span.innerText = text;
+    (_a = $span.classList).add.apply(_a, __spread(classNames));
+    return $span;
+}
 var ItemHandle = /** @class */ (function () {
     function ItemHandle(menu, element) {
         this.menu = menu;
         this.element = element;
+        this.$prependSpan = null;
+        this.$appendSpan = null;
     }
     ItemHandle.prototype.setSelected = function (selected) {
         this.element.classList.toggle('selected', selected);
@@ -468,6 +503,30 @@ var ItemHandle = /** @class */ (function () {
     ItemHandle.prototype.removeClass = function (className) {
         this.element.classList.remove(className);
         return this;
+    };
+    ItemHandle.prototype.prepend = function (text, className) {
+        if (this.$prependSpan === null) {
+            this.$prependSpan = createSpan('', 'prepend');
+            this.element.prepend(this.$prependSpan);
+        }
+        var $span = createSpan(text, 'item-side');
+        if (className !== undefined) {
+            $span.classList.add(className);
+        }
+        this.$prependSpan.prepend($span);
+        return $span;
+    };
+    ItemHandle.prototype.append = function (text, className) {
+        if (this.$appendSpan === null) {
+            this.$appendSpan = createSpan('', 'append');
+            this.element.appendChild(this.$appendSpan);
+        }
+        var $span = createSpan(text, 'item-side');
+        if (className !== undefined) {
+            $span.classList.add(className);
+        }
+        this.$appendSpan.appendChild($span);
+        return $span;
     };
     return ItemHandle;
 }());
@@ -689,6 +748,7 @@ var SettingsMenu = /** @class */ (function (_super) {
         _this.addBooleanSetting('显示评论', settings_1.useComments);
         _this.addBooleanSetting('手势切换章节（仅限手机）', settings_1.gestureSwitchChapter);
         _this.addEnumSetting('字体', settings_1.fontFamily, true);
+        _this.addBooleanSetting('显示每个章节的字数', settings_1.charCount);
         _this.addBooleanSetting('开发人员模式', settings_1.debugLogging);
         _this.addLink(new BlockMenu_1.BlockMenu(_this), true);
         return _this;
@@ -716,7 +776,7 @@ var SettingsMenu = /** @class */ (function (_super) {
 }(Menu_1.Menu));
 exports.SettingsMenu = SettingsMenu;
 
-},{"./BlockMenu":1,"./DOM":4,"./Menu":8,"./RectMode":9,"./commentsControl":17,"./settings":26,"./stylePreviewArticle":28}],11:[function(require,module,exports){
+},{"./BlockMenu":1,"./DOM":4,"./Menu":8,"./RectMode":9,"./commentsControl":17,"./settings":26,"./stylePreviewArticle":29}],11:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -1006,7 +1066,7 @@ var StyleMenu = /** @class */ (function (_super) {
 }(Menu_1.Menu));
 exports.StyleMenu = StyleMenu;
 
-},{"./DOM":4,"./DebugLogger":5,"./Menu":8,"./RectMode":9,"./commentsControl":17,"./stylePreviewArticle":28}],14:[function(require,module,exports){
+},{"./DOM":4,"./DebugLogger":5,"./Menu":8,"./RectMode":9,"./commentsControl":17,"./stylePreviewArticle":29}],14:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -1060,7 +1120,7 @@ var ThanksMenu = /** @class */ (function (_super) {
 }(Menu_1.Menu));
 exports.ThanksMenu = ThanksMenu;
 
-},{"./Menu":8,"./thanks":29}],15:[function(require,module,exports){
+},{"./Menu":8,"./thanks":30}],15:[function(require,module,exports){
 "use strict";
 var __read = (this && this.__read) || function (o, n) {
     var m = typeof Symbol === "function" && o[Symbol.iterator];
@@ -1272,7 +1332,7 @@ function loadChapter(chapterHtmlRelativePath, selection) {
 }
 exports.loadChapter = loadChapter;
 
-},{"./DOM":4,"./Event":6,"./RectMode":9,"./commentsControl":17,"./data":18,"./gestures":21,"./history":22,"./loadingText":24,"./settings":26,"./state":27}],16:[function(require,module,exports){
+},{"./DOM":4,"./Event":6,"./RectMode":9,"./commentsControl":17,"./data":18,"./gestures":21,"./history":22,"./loadingText":24,"./settings":26,"./state":28}],16:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var Event_1 = require("./Event");
@@ -1408,7 +1468,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.data = window.DATA;
 exports.relativePathLookUpMap = new Map();
 function iterateFolder(folder) {
-    folder.subfolders.forEach(function (subFolder) {
+    folder.subFolders.forEach(function (subFolder) {
         iterateFolder(subFolder);
     });
     folder.chapters.forEach(function (chapter, index) {
@@ -1460,7 +1520,7 @@ function followQuery() {
 }
 exports.followQuery = followQuery;
 
-},{"./chapterControl":15,"./data":18,"./history":22,"./state":27}],20:[function(require,module,exports){
+},{"./chapterControl":15,"./data":18,"./history":22,"./state":28}],20:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var SECOND = 1000;
@@ -1584,7 +1644,7 @@ function updateHistory(push) {
 }
 exports.updateHistory = updateHistory;
 
-},{"./state":27}],23:[function(require,module,exports){
+},{"./state":28}],23:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var data_1 = require("./data");
@@ -1618,7 +1678,7 @@ window.addEventListener('popstate', function () {
 });
 followQuery_1.followQuery();
 
-},{"./DOM":4,"./MainMenu":7,"./data":18,"./followQuery":19,"./settings":26,"./updateSelection":30}],24:[function(require,module,exports){
+},{"./DOM":4,"./MainMenu":7,"./data":18,"./followQuery":19,"./settings":26,"./updateSelection":31}],24:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.loadingText = '加载中...';
@@ -1730,8 +1790,25 @@ exports.fontFamily = new EnumSetting('fontFamily', ['黑体', '楷体', '宋体'
     document.documentElement.style.setProperty('--font-family', fontFamilyCssValues[fontFamilyIndex]);
 });
 exports.debugLogging = new BooleanSetting('debugLogging', false);
+exports.charCount = new BooleanSetting('charCount', true, function (value) {
+    document.body.classList.toggle('char-count-disabled', !value);
+});
 
 },{}],27:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+function shortNumber(input) {
+    if (input < 1000) {
+        return String(input);
+    }
+    if (input < 1000000) {
+        return (input / 1000).toFixed(1) + 'k';
+    }
+    return (input / 1000000).toFixed(1) + 'M';
+}
+exports.shortNumber = shortNumber;
+
+},{}],28:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.state = {
@@ -1740,12 +1817,12 @@ exports.state = {
     chapterTextNodes: null,
 };
 
-},{}],28:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.stylePreviewArticle = "<h1>\u5348\u996D</h1>\n<p><em>\u4F5C\u8005\uFF1A\u53CB\u4EBA\u266AB</em></p>\n<p>\u201C\u5348\u996D\uFF0C\u5348\u996D\u266A\u201D</p>\n<p>\u9633\u4F1E\u4E0B\u7684\u7433\uFF0C\u5F88\u662F\u671F\u5F85\u4ECA\u5929\u7684\u5348\u996D\u3002</p>\n<p>\u6216\u8BB8\u662F\u4F53\u8D28\u548C\u522B\u7684\u8840\u65CF\u4E0D\u592A\u4E00\u6837\uFF0C\u7433\u80FD\u591F\u611F\u77E5\u5230\u98DF\u7269\u7684\u5473\u9053\uFF0C\u4F3C\u4E4E\u4E5F\u4FDD\u6709\u7740\u751F\u7269\u5BF9\u98DF\u7269\u7684\u559C\u7231\u3002</p>\n<p>\u867D\u7136\u5979\u5E76\u4E0D\u80FD\u4ECE\u8FD9\u4E9B\u98DF\u7269\u4E2D\u83B7\u53D6\u80FD\u91CF\u5C31\u662F\u3002</p>\n<p>\u5B66\u6821\u98DF\u5802\u7684\u590F\u5B63\u9650\u5B9A\u751C\u70B9\u4ECA\u5929\u4E5F\u5F88\u662F\u62A2\u624B\uFF0C\u8FD9\u70B9\u4ECE\u961F\u4F0D\u7684\u957F\u5EA6\u5C31\u80FD\u770B\u51FA\u6765\u2014\u2014\u961F\u4F0D\u9669\u4E9B\u5C31\u8981\u8D85\u51FA\u98DF\u5802\u7684\u8303\u56F4\u4E86\u3002</p>\n<p>\u201C\u4F60\u8BF4\u6211\u8981\u6709\u94B1\u591A\u597D\u2014\u2014\u201D</p>\n<p>\u5DF2\u7ECF\u4ECE\u9694\u58C1\u7A97\u53E3\u4E70\u4E0B\u4E86\u666E\u901A\uFF0C\u4F46\u662F\u5F88\u4FBF\u5B9C\u7684\u8425\u517B\u9910\u7684\u79CB\u955C\u60AC\uFF0C\u770B\u7740\u961F\u4F0D\u4E2D\u5174\u81F4\u52C3\u52C3\u7684\u7433\u3002</p>\n<p>\u5176\u5B9E\u5979\u5E76\u4E0D\u662F\u7F3A\u94B1\uFF0C\u5927\u7EA6\u662F\u541D\u556C\u3002</p>\n<p>\u8FD9\u5F97\u602A\u5979\u5A18\uFF0C\u7A77\u517B\u79CB\u955C\u60AC\u517B\u4E60\u60EF\u4E86\uFF0C\u73B0\u5728\u5979\u5149\u81EA\u5DF1\u9664\u7075\u9000\u9B54\u6323\u6765\u7684\u5916\u5FEB\u90FD\u591F\u5979\u5962\u4F88\u4E0A\u4E00\u628A\u4E86\uFF0C\u53EF\u5374\u8FD8\u4FDD\u7559\u7740\u80FD\u4E0D\u82B1\u94B1\u7EDD\u5BF9\u4E0D\u82B1\uFF0C\u5FC5\u987B\u82B1\u94B1\u8D8A\u5C11\u8D8A\u597D\u7684\u541D\u556C\u4E60\u60EF\u3002</p>\n<p>\u5C11\u9877\uFF0C\u7433\u5DF2\u7ECF\u5E26\u7740\u5979\u7684\u751C\u54C1\u5EFA\u7B51\u2014\u2014\u6BCF\u5757\u7816\u5934\u90FD\u662F\u4E00\u5757\u86CB\u7CD5\uFF0C\u5806\u6210\u4E00\u4E2A\u8BE1\u5F02\u7684\u706B\u67F4\u76D2\u2014\u2014\u6765\u5230\u4E86\u684C\u524D\u3002</p>\n<p>\u201C\uFF08\u5403\u4E0D\u80D6\u771F\u597D\uFF0C\u6709\u94B1\u771F\u597D\u2026\u2026\u201D</p>\n<p>\u8840\u65CF\u7684\u542C\u89C9\u81EA\u7136\u662F\u6355\u6349\u5230\u4E86\u79CB\u955C\u60AC\u7684\u5600\u5495\uFF0C\u7433\u653E\u4E0B\u76D8\u5B50\uFF0C\u6084\u54AA\u54AA\u5730\u5C06\u7259\u8D34\u4E0A\u4E86\u79CB\u955C\u60AC\u7684\u8116\u9888\u3002</p>\n<p>\u201C\u563B\u563B\u266A\u201D</p>\n<p>\u201C\u545C\u2014\u2014\u201D</p>\n<p>\u76EF\u2014\u2014</p>\n<p>\u79CB\u955C\u60AC\u770B\u4E86\u770B\u76D8\u4E2D\u5269\u4E0B\u7684\u4E00\u5757\u6BDB\u8840\u65FA\uFF0C\u4F3C\u662F\u8054\u7CFB\u5230\u4E86\u4EC0\u4E48\uFF0C\u5C06\u76EE\u5149\u8F6C\u5411\u4E86\u7433\u7684\u7259\u3002</p>\n<p>\u6B63\u5728\u4EAB\u7528\u86CB\u7CD5\u76DB\u5BB4\u7684\u7433\u4EE5\u4F59\u5149\u77A5\u89C1\u4E86\u5979\u7684\u89C6\u7EBF\uFF0C</p>\n<p>\u201C\u76EF\u7740\u672C\u5C0F\u59D0\u662F\u8981\u505A\u4EC0\u4E48\u5462\uFF1F\u201D</p>\n<p>\u201C\u554A\uFF0C\u6CA1\uFF0C\u6CA1\u4EC0\u4E48\u2026\u2026\u201D</p>\n<p>\u79CB\u955C\u60AC\u652F\u652F\u543E\u543E\u7684\u8BF4\u7740\uFF0C</p>\n<p>\u201C\u5C31\u662F\u597D\u5947\u4E00\u4E2A\u95EE\u9898\uFF0C\u8840\u65CF\u4E3A\u4EC0\u4E48\u4E0D\u5403\u6BDB\u8840\u65FA\u2026\u2026\u201D</p>\n<p>\u201C\u5662\u2606\u6BDB\u8840\u65FA\u5C31\u662F\u90A3\u4E2A\u716E\u719F\u7684\u8840\u5757\u662F\u5427\uFF1F\u592A\u6CA1\u6709\u7F8E\u611F\u4E86\u8FD9\u79CD\u8840\uFF01\u800C\u4E14\u5403\u4E86\u4E5F\u6CA1\u6CD5\u513F\u6062\u590D\u80FD\u91CF\uFF0C\u7B80\u76F4\u5C31\u662F\u8840\u6DB2\u7684\u7EDD\u4F73\u6D6A\u8D39\u2606\uFF01\u201D</p>\n<p>\u7433\u53D1\u51FA\u4E86\u5BF9\u8FD9\u6837\u7F8E\u98DF\u7684\u9119\u89C6\uFF0C\u4E0D\u8FC7\u8FD9\u79CD\u9119\u89C6\u5927\u7EA6\u53EA\u6709\u8840\u65CF\u548C\u868A\u5B50\u4F1A\u51FA\u73B0\u5427\u2026\u2026</p>\n<p>\u201C\u8840\u65CF\u9700\u8981\u6444\u5165\u8840\uFF0C\u662F\u56E0\u4E3A\u8840\u6240\u5177\u6709\u7684\u751F\u547D\u80FD\u91CF\uFF0C\u5982\u679C\u716E\u719F\u4E86\u7684\u8BDD\uFF0C\u8D85\u8FC7\u4E5D\u6210\u7684\u80FD\u91CF\u90FD\u88AB\u8F6C\u5316\u6210\u5176\u4ED6\u7684\u4E1C\u897F\u4E86\uFF0C\u5BF9\u6211\u4EEC\u6765\u8BF4\u5B9E\u5728\u662F\u6CA1\u4EC0\u4E48\u7528\u5904\uFF0C\u8FD8\u767D\u767D\u6D6A\u8D39\u4E86\u4F5C\u4E3A\u539F\u6599\u7684\u8840\uFF0C\u8FD9\u79CD\u4E1C\u897F\u672C\u5C0F\u59D0\u624D\u4E0D\u5403\u54A7\u2718\uFF01\u997F\u6B7B\uFF0C\u6B7B\u5916\u8FB9\uFF0C\u4ECE\u8FD9\u8FB9\u8DF3\u4E0B\u53BB\u4E5F\u4E0D\u5403\u2718\uFF01\u201D</p>\n<p>\u201C\u6B38\uFF0C\u522B\u8FD9\u4E48\u8BF4\u561B\uFF0C\u4F60\u80FD\u5C1D\u5F97\u5230\u5473\u9053\u7684\u5427\uFF0C\u5403\u4E00\u5757\u8BD5\u8BD5\u5457\uFF1F\u201D</p>\n<p>\u201C\u771F\u2026\u2026\u771F\u9999\u266A\u201D</p>\n<p>\u5F53\u665A\uFF0C\u56E0\u4E3A\u89E6\u53D1\u4E86\u771F\u9999\u5B9A\u5F8B\u800C\u611F\u5230\u5F88\u706B\u5927\u7684\u7433\uFF0C\u628A\u79CB\u955C\u60AC\u4E22\u8FDB\u4E86\u81EA\u5DF1\u7684\u9AD8\u7EF4\u7A7A\u95F4\u91CC\u5934\u653E\u7F6E\u4E86\u4E00\u665A\u4E0A\uFF08\u9AD8\u7EF4\u65F6\u95F4\u4E09\u5929\uFF09\u6CC4\u6124\u3002</p>";
 
-},{}],29:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.thanks = [
@@ -1770,7 +1847,7 @@ exports.thanks = [
     { name: '路人乙' },
 ].sort(function () { return Math.random() - 0.5; });
 
-},{}],30:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var history_1 = require("./history");
@@ -1823,4 +1900,4 @@ function updateSelection() {
 }
 exports.updateSelection = updateSelection;
 
-},{"./history":22,"./state":27}]},{},[23]);
+},{"./history":22,"./state":28}]},{},[23]);
