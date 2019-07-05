@@ -9,7 +9,7 @@ export interface ChapterContext {
 
 export const relativePathLookUpMap: Map<string, ChapterContext> = new Map();
 function iterateFolder(folder: Folder) {
-  folder.subfolders.forEach(subFolder => {
+  folder.subFolders.forEach(subFolder => {
     iterateFolder(subFolder);
   });
   folder.chapters.forEach((chapter, index) => {

@@ -18,7 +18,16 @@ type ItemOptions = {
   decoration?: ItemDecoration;
 });
 
+function createSpan(text: string, ...classNames: Array<string>) {
+  const $span = document.createElement('span');
+  $span.innerText = text;
+  $span.classList.add(...classNames);
+  return $span;
+}
+
 export class ItemHandle {
+  private $prependSpan: HTMLSpanElement | null = null;
+  private $appendSpan: HTMLSpanElement | null = null;
   public constructor(
     private menu: Menu,
     public element: HTMLDivElement | HTMLAnchorElement,
@@ -50,6 +59,30 @@ export class ItemHandle {
   public removeClass(className: string) {
     this.element.classList.remove(className);
     return this;
+  }
+  public prepend(text: string, className?: string) {
+    if (this.$prependSpan === null) {
+      this.$prependSpan = createSpan('', 'prepend');
+      this.element.prepend(this.$prependSpan);
+    }
+    const $span = createSpan(text, 'item-side');
+    if (className !== undefined) {
+      $span.classList.add(className);
+    }
+    this.$prependSpan.prepend($span);
+    return $span;
+  }
+  public append(text: string, className?: string) {
+    if (this.$appendSpan === null) {
+      this.$appendSpan = createSpan('', 'append');
+      this.element.appendChild(this.$appendSpan);
+    }
+    const $span = createSpan(text, 'item-side');
+    if (className !== undefined) {
+      $span.classList.add(className);
+    }
+    this.$appendSpan.appendChild($span);
+    return $span;
   }
 }
 

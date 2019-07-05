@@ -80,7 +80,8 @@ const commentsUrlEnd = ')';
       markdown = markdown.substr(commentsUrlEndIndex + 1).trimLeft();
     }
 
-    charsCount += countChars(markdown);
+    const chapterCharCount = countChars(markdown);
+    charsCount += chapterCharCount;
 
     keywords.forEach(keyword => {
       const count = countCertainWord(markdown, keyword);
@@ -117,6 +118,7 @@ const commentsUrlEnd = ')';
       isEarlyAccess,
       commentsUrl,
       htmlRelativePath,
+      chapterCharCount,
     };
   }
 
@@ -160,11 +162,16 @@ const commentsUrlEnd = ')';
       }
     }
 
+    const chapters = (await Promise.all(chaptersLoadingPromises)).sort(byDisplayIndex);
+    const subFolders = (await Promise.all(subDirsLoadingPromises)).sort(byDisplayIndex);
+
     return {
       ...node,
       isRoot,
-      chapters: (await Promise.all(chaptersLoadingPromises)).sort(byDisplayIndex),
-      subfolders: (await Promise.all(subDirsLoadingPromises)).sort(byDisplayIndex),
+      chapters,
+      subFolders,
+      folderCharCount: chapters.reduce((count, chapter) => count += chapter.chapterCharCount, 0) +
+        subFolders.reduce((count, folder) => count += folder.folderCharCount, 0),
     };
   }
 

@@ -93,3 +93,6 @@ export const fontFamily = new EnumSetting('fontFamily', ['黑体', '楷体', '�
   document.documentElement.style.setProperty('--font-family', fontFamilyCssValues[fontFamilyIndex]);
 });
 export const debugLogging = new BooleanSetting('debugLogging', false);
+export const charCount = new BooleanSetting('charCount', true, value => {
+  document.body.classList.toggle('char-count-disabled', !value);
+});
