@@ -3,7 +3,7 @@ import { hideComments } from './commentsControl';
 import { id } from './DOM';
 import { ItemDecoration, ItemHandle, Menu } from './Menu';
 import { RectMode } from './RectMode';
-import { animation, BooleanSetting, debugLogging, earlyAccess, EnumSetting, fontFamily, gestureSwitchChapter, useComments, warning, charCount } from './settings';
+import { animation, BooleanSetting, charCount, debugLogging, earlyAccess, EnumSetting, fontFamily, gestureSwitchChapter, useComments, warning } from './settings';
 import { stylePreviewArticle } from './stylePreviewArticle';
 
 export class EnumSettingMenu extends Menu {
