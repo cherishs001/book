@@ -259,6 +259,16 @@ window.DATA={
             "chapterCharCount": 641
           },
           {
+            "displayName": "mWatch",
+            "displayIndex": 24,
+            "name": "24 - mWatch",
+            "sourceRelativePath": "4 - 道具集/24 - mWatch.md",
+            "isEarlyAccess": false,
+            "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/47",
+            "htmlRelativePath": "道具集/mWatch.html",
+            "chapterCharCount": 2064
+          },
+          {
             "displayName": "强制灌食器",
             "displayIndex": 50,
             "name": "50 - 强制灌食器",
@@ -280,7 +290,7 @@ window.DATA={
           }
         ],
         "subFolders": [],
-        "folderCharCount": 8388
+        "folderCharCount": 10452
       },
       {
         "displayName": "杂项",
@@ -304,14 +314,14 @@ window.DATA={
         "folderCharCount": 1361
       }
     ],
-    "folderCharCount": 100281
+    "folderCharCount": 102345
   },
-  "charsCount": 100281,
-  "paragraphsCount": 2149,
+  "charsCount": 102345,
+  "paragraphsCount": 2166,
   "keywordsCount": [
     [
       "高潮",
-      291
+      293
     ],
     [
       "按摩棒",
@@ -370,5 +380,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "194"
+  "buildNumber": "197"
 };
