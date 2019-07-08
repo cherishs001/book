@@ -173,11 +173,11 @@ window.DATA={
             "isEarlyAccess": true,
             "commentsUrl": null,
             "htmlRelativePath": "主线/第-14-章.html",
-            "chapterCharCount": 3465
+            "chapterCharCount": 5980
           }
         ],
         "subFolders": [],
-        "folderCharCount": 71927
+        "folderCharCount": 74442
       },
       {
         "displayName": "支线",
@@ -304,22 +304,22 @@ window.DATA={
         "folderCharCount": 1361
       }
     ],
-    "folderCharCount": 97766
+    "folderCharCount": 100281
   },
-  "charsCount": 97766,
-  "paragraphsCount": 2084,
+  "charsCount": 100281,
+  "paragraphsCount": 2149,
   "keywordsCount": [
     [
       "高潮",
-      287
+      291
     ],
     [
       "按摩棒",
-      168
+      169
     ],
     [
       "陈变态",
-      26
+      29
     ],
     [
       "按摩器",
@@ -327,19 +327,19 @@ window.DATA={
     ],
     [
       "姓陈的",
-      20
+      21
     ],
     [
       "陈志鹏",
       10
     ],
     [
-      "陈色狼",
+      "陈同学",
       7
     ],
     [
-      "陈同学",
-      5
+      "陈色狼",
+      7
     ],
     [
       "陈智障",
@@ -370,5 +370,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "193"
+  "buildNumber": "194"
 };
