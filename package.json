@@ -14,7 +14,7 @@
   "repository": "github:SCLeoX/Wearable-Technology",
   "dependencies": {
     "@types/fs-extra": "^5.0.4",
-    "@types/markdown-it": "0.0.7",
+    "@types/markdown-it": "0.0.8",
     "@types/node": "^12.6.1",
     "browserify": "^16.2.3",
     "fs-extra": "^8.1.0",
