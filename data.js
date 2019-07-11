@@ -174,10 +174,20 @@ window.DATA={
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/48",
             "htmlRelativePath": "主线/第-14-章.html",
             "chapterCharCount": 7159
+          },
+          {
+            "displayName": "第 15 章",
+            "displayIndex": 15,
+            "name": "15",
+            "sourceRelativePath": "1 - 主线/15.md",
+            "isEarlyAccess": true,
+            "commentsUrl": null,
+            "htmlRelativePath": "主线/第-15-章.html",
+            "chapterCharCount": 2765
           }
         ],
         "subFolders": [],
-        "folderCharCount": 75621
+        "folderCharCount": 78386
       },
       {
         "displayName": "支线",
@@ -314,18 +324,18 @@ window.DATA={
         "folderCharCount": 1361
       }
     ],
-    "folderCharCount": 103524
+    "folderCharCount": 106289
   },
-  "charsCount": 103524,
-  "paragraphsCount": 2190,
+  "charsCount": 106289,
+  "paragraphsCount": 2246,
   "keywordsCount": [
     [
       "高潮",
-      295
+      304
     ],
     [
       "按摩棒",
-      171
+      172
     ],
     [
       "陈变态",
@@ -333,7 +343,7 @@ window.DATA={
     ],
     [
       "按摩器",
-      22
+      23
     ],
     [
       "姓陈的",
@@ -380,5 +390,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "218"
+  "buildNumber": "219"
 };
