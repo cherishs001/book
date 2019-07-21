@@ -1273,6 +1273,10 @@ var finalizeChapterLoading = function (selection) {
             DOM_1.id('rect').scrollTo(0, 0);
         }
     }, 1);
+    // Re-focus the rect so it is arrow-scrollable
+    setTimeout(function () {
+        DOM_1.id('rect').focus();
+    }, 1);
 };
 gestures_1.swipeEvent.on(function (direction) {
     if (!settings_1.gestureSwitchChapter.getValue()) {
