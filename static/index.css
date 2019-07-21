@@ -116,6 +116,7 @@ body.animation-enabled .rect {
 
   transform: rotate(40deg);
 
+  outline: none;
   background-color: #555;
 }
 .rect.reading {

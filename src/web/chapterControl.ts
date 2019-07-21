@@ -152,6 +152,11 @@ const finalizeChapterLoading = (selection?: Selection) => {
       id('rect').scrollTo(0, 0);
     }
   }, 1);
+
+  // Re-focus the rect so it is arrow-scrollable
+  setTimeout(() => {
+    id('rect').focus();
+  }, 1);
 };
 
 swipeEvent.on(direction => {
