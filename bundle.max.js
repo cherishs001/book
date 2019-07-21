@@ -1328,6 +1328,7 @@ keyboard_1.arrowKeyPressEvent.on(function (arrowKey) {
 });
 function loadChapter(chapterHtmlRelativePath, selection) {
     debugLogger.log('Load chapter', chapterHtmlRelativePath, 'selection', selection);
+    commentsControl_1.hideComments();
     exports.loadChapterEvent.emit(chapterHtmlRelativePath);
     window.localStorage.setItem('lastRead', chapterHtmlRelativePath);
     RectMode_1.setRectMode(RectMode_1.RectMode.MAIN);
@@ -1456,17 +1457,15 @@ function hideComments() {
 exports.hideComments = hideComments;
 function loadComments(issueUrl) {
     if (settings_1.useComments.getValue() === false) {
-        hideComments();
         return;
     }
     Array.from($comments.getElementsByClassName('comment')).forEach(function ($element) { return $element.remove(); });
     $comments.classList.toggle('display-none', false);
+    $createComment.classList.toggle('display-none', true);
     if (issueUrl === null) {
         $commentsStatus.innerText = messages_1.COMMENTS_UNAVAILABLE;
-        $createComment.classList.toggle('display-none', true);
         return;
     }
-    $createComment.classList.toggle('display-none', false);
     currentCreateCommentLinkUrl = issueUrl;
     var requestId = currentRequestId = nextRequestId++;
     var apiUrl = getApiUrl(issueUrl);
@@ -1484,6 +1483,7 @@ function loadComments(issueUrl) {
             }
             $comments.appendChild(createCommentElement(comment.user.avatar_url, comment.user.login, comment.user.html_url, comment.created_at, comment.updated_at, comment.body));
         });
+        $createComment.classList.toggle('display-none', false);
     });
 }
 exports.loadComments = loadComments;
