@@ -1,5 +1,5 @@
 import { Chapter } from '../Data';
-import { loadComments } from './commentsControl';
+import { hideComments, loadComments } from './commentsControl';
 import { ContentBlockType } from './ContentBlockType';
 import { relativePathLookUpMap } from './data';
 import { DebugLogger } from './DebugLogger';
@@ -210,6 +210,7 @@ arrowKeyPressEvent.on(arrowKey => {
 
 export function loadChapter(chapterHtmlRelativePath: string, selection?: Selection) {
   debugLogger.log('Load chapter', chapterHtmlRelativePath, 'selection', selection);
+  hideComments();
   loadChapterEvent.emit(chapterHtmlRelativePath);
   window.localStorage.setItem('lastRead', chapterHtmlRelativePath);
   setRectMode(RectMode.MAIN);
