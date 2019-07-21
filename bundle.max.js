@@ -1905,6 +1905,7 @@ exports.thanks = [
     { name: 'Skimige' },
     { name: 'TenmaHiltonWhat', link: 'https://tenmahw.com' },
     { name: '路人乙' },
+    { name: 'pokemonchw', link: 'https://github.com/pokemonchw/AlithCalendar' },
 ].sort(function () { return Math.random() - 0.5; });
 
 },{}],32:[function(require,module,exports){
