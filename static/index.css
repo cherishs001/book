@@ -116,12 +116,13 @@ body.animation-enabled .rect {
 
   transform: rotate(40deg);
 
+  outline: none;
   background-color: #555;
 }
 .rect.reading {
   z-index: 1;
 
-  overflow-y: auto;
+  overflow-y: overlay;
   -webkit-overflow-scrolling: touch;
 }
 body.animation-enabled .rect>div {

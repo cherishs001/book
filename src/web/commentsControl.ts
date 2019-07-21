@@ -76,21 +76,19 @@ export function hideComments() {
 }
 export function loadComments(issueUrl: string | null) {
   if (useComments.getValue() === false) {
-    hideComments();
     return;
   }
 
   Array.from($comments.getElementsByClassName('comment')).forEach($element => $element.remove());
 
   $comments.classList.toggle('display-none', false);
+  $createComment.classList.toggle('display-none', true);
 
   if (issueUrl === null) {
     $commentsStatus.innerText = COMMENTS_UNAVAILABLE;
-    $createComment.classList.toggle('display-none', true);
     return;
   }
 
-  $createComment.classList.toggle('display-none', false);
   currentCreateCommentLinkUrl = issueUrl;
 
   const requestId = currentRequestId = nextRequestId++;
@@ -116,5 +114,6 @@ export function loadComments(issueUrl: string | null) {
           comment.body,
         ));
       });
+      $createComment.classList.toggle('display-none', false);
     });
 }

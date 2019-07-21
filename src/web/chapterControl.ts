@@ -1,15 +1,19 @@
 import { Chapter } from '../Data';
-import { loadComments } from './commentsControl';
+import { hideComments, loadComments } from './commentsControl';
 import { ContentBlockType } from './ContentBlockType';
 import { relativePathLookUpMap } from './data';
+import { DebugLogger } from './DebugLogger';
 import { getTextNodes, id, selectNode } from './DOM';
 import { Event } from './Event';
 import { SwipeDirection, swipeEvent } from './gestures';
 import { updateHistory } from './history';
+import { ArrowKey, arrowKeyPressEvent } from './keyboard';
 import { loadingText } from './loadingText';
 import { RectMode, setRectMode } from './RectMode';
 import { earlyAccess, gestureSwitchChapter } from './settings';
 import { Selection, state } from './state';
+
+const debugLogger = new DebugLogger('chapterControl');
 
 const $content = id('content');
 const chaptersCache = new Map<string, string | null>();
@@ -70,6 +74,32 @@ const createContentBlock = (type: ContentBlockType, title: string, text: string)
   return $block;
 };
 
+export function loadPrevChapter() {
+  const chapterCtx = state.currentChapter;
+  if (chapterCtx === null) {
+    return;
+  }
+  const chapterIndex = chapterCtx.inFolderIndex;
+  if (chapterIndex >= 1 && canChapterShown(chapterCtx.folder.chapters[chapterIndex - 1])) {
+    const prevChapter = chapterCtx.folder.chapters[chapterIndex - 1].htmlRelativePath;
+    loadChapter(prevChapter);
+    updateHistory(true);
+  }
+}
+
+export function loadNextChapter() {
+  const chapterCtx = state.currentChapter;
+  if (chapterCtx === null) {
+    return;
+  }
+  const chapterIndex = chapterCtx.inFolderIndex;
+  if (chapterIndex < chapterCtx.folder.chapters.length - 1 && canChapterShown(chapterCtx.folder.chapters[chapterIndex + 1])) {
+    const nextChapter = chapterCtx.folder.chapters[chapterIndex + 1].htmlRelativePath;
+    loadChapter(nextChapter);
+    updateHistory(true);
+  }
+}
+
 const finalizeChapterLoading = (selection?: Selection) => {
   state.chapterTextNodes = getTextNodes($content);
   if (selection !== undefined) {
@@ -106,8 +136,7 @@ const finalizeChapterLoading = (selection?: Selection) => {
     $prevLink.style.flex = '1';
     $prevLink.addEventListener('click', event => {
       event.preventDefault();
-      loadChapter(prevChapter);
-      updateHistory(true);
+      loadPrevChapter();
     });
     $div.appendChild($prevLink);
   } else {
@@ -133,8 +162,7 @@ const finalizeChapterLoading = (selection?: Selection) => {
     $nextLink.style.flex = '1';
     $nextLink.addEventListener('click', event => {
       event.preventDefault();
-      loadChapter(nextChapter);
-      updateHistory(true);
+      loadNextChapter();
     });
     $div.appendChild($nextLink);
   } else {
@@ -152,36 +180,37 @@ const finalizeChapterLoading = (selection?: Selection) => {
       id('rect').scrollTo(0, 0);
     }
   }, 1);
+
+  // Re-focus the rect so it is arrow-scrollable
+  setTimeout(() => {
+    id('rect').focus();
+  }, 1);
 };
 
 swipeEvent.on(direction => {
   if (!gestureSwitchChapter.getValue()) {
     return;
   }
-  const chapterCtx = state.currentChapter;
-  // 如果目前没在阅读，那么就啥也不做
-  if (chapterCtx === null) {
-    return;
-  }
-  const chapterIndex = chapterCtx.inFolderIndex;
   if (direction === SwipeDirection.TO_RIGHT) {
     // 上一章
-    if (chapterIndex >= 1 && canChapterShown(chapterCtx.folder.chapters[chapterIndex - 1])) {
-      const prevChapter = chapterCtx.folder.chapters[chapterIndex - 1].htmlRelativePath;
-      loadChapter(prevChapter);
-      updateHistory(true);
-    }
+    loadPrevChapter();
   } else if (direction === SwipeDirection.TO_LEFT) {
     // 下一章
-    if (chapterIndex < chapterCtx.folder.chapters.length - 1 && canChapterShown(chapterCtx.folder.chapters[chapterIndex + 1])) {
-      const nextChapter = chapterCtx.folder.chapters[chapterIndex + 1].htmlRelativePath;
-      loadChapter(nextChapter);
-      updateHistory(true);
-    }
+    loadNextChapter();
+  }
+});
+
+arrowKeyPressEvent.on(arrowKey => {
+  if (arrowKey === ArrowKey.LEFT) {
+    loadPrevChapter();
+  } else if (arrowKey === ArrowKey.RIGHT) {
+    loadNextChapter();
   }
 });
 
 export function loadChapter(chapterHtmlRelativePath: string, selection?: Selection) {
+  debugLogger.log('Load chapter', chapterHtmlRelativePath, 'selection', selection);
+  hideComments();
   loadChapterEvent.emit(chapterHtmlRelativePath);
   window.localStorage.setItem('lastRead', chapterHtmlRelativePath);
   setRectMode(RectMode.MAIN);
