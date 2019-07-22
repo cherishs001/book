@@ -23,6 +23,12 @@ const commentsUrlEnd = ')';
 
   // Copy static
   await copy(staticDir, distDir);
+  const indexPath = resolve(distDir, 'index.html');
+  const nowTime = new Date().getTime();
+  let result = await readFile(indexPath, 'utf-8');
+  result = result.replace(new RegExp('js" defer>', 'g'), 'js?v=' + nowTime + '" defer>');
+  result = result.replace(new RegExp('css">', 'g'), 'css?v=' + nowTime + '">');
+  await writeFile(indexPath, result, 'utf-8');
   console.info('Static copied.');
 
   const chapterDefaultNamer = (displayIndex: number) => `第 ${displayIndex} 章`;
