@@ -181,7 +181,7 @@ window.DATA={
             "name": "15",
             "sourceRelativePath": "1 - 主线/15.md",
             "isEarlyAccess": true,
-            "commentsUrl": null,
+            "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/55",
             "htmlRelativePath": "主线/第-15-章.html",
             "chapterCharCount": 4506
           }
@@ -400,5 +400,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "240"
+  "buildNumber": "241"
 };
