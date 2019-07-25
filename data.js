@@ -183,11 +183,11 @@ window.DATA={
             "isEarlyAccess": true,
             "commentsUrl": null,
             "htmlRelativePath": "主线/第-15-章.html",
-            "chapterCharCount": 4505
+            "chapterCharCount": 4506
           }
         ],
         "subFolders": [],
-        "folderCharCount": 80126
+        "folderCharCount": 80127
       },
       {
         "displayName": "支线",
@@ -334,9 +334,9 @@ window.DATA={
         "folderCharCount": 1361
       }
     ],
-    "folderCharCount": 111795
+    "folderCharCount": 111796
   },
-  "charsCount": 111795,
+  "charsCount": 111796,
   "paragraphsCount": 2326,
   "keywordsCount": [
     [
@@ -400,5 +400,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "239"
+  "buildNumber": "240"
 };
