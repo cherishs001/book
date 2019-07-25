@@ -289,6 +289,16 @@ window.DATA={
             "chapterCharCount": 2533
           },
           {
+            "displayName": "充电宝少女捕获器",
+            "displayIndex": 79,
+            "name": "79 - 充电宝少女捕获器",
+            "sourceRelativePath": "4 - 道具集/79 - 充电宝少女捕获器.md",
+            "isEarlyAccess": false,
+            "commentsUrl": null,
+            "htmlRelativePath": "道具集/充电宝少女捕获器.html",
+            "chapterCharCount": 3766
+          },
+          {
             "displayName": "现代女仆管理系统",
             "displayIndex": 100,
             "name": "100 - 现代女仆管理系统",
@@ -300,7 +310,7 @@ window.DATA={
           }
         ],
         "subFolders": [],
-        "folderCharCount": 10452
+        "folderCharCount": 14218
       },
       {
         "displayName": "杂项",
@@ -324,18 +334,18 @@ window.DATA={
         "folderCharCount": 1361
       }
     ],
-    "folderCharCount": 106289
+    "folderCharCount": 110055
   },
-  "charsCount": 106289,
-  "paragraphsCount": 2246,
+  "charsCount": 110055,
+  "paragraphsCount": 2289,
   "keywordsCount": [
     [
       "高潮",
-      304
+      306
     ],
     [
       "按摩棒",
-      172
+      173
     ],
     [
       "陈变态",
@@ -390,5 +400,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "232"
+  "buildNumber": "237"
 };
