@@ -19,4 +19,5 @@ export const thanks: Array<{ name: string, link?: string }> = [
   { name: 'TenmaHiltonWhat', link: 'https://tenmahw.com' },
   { name: '路人乙' },
   { name: 'pokemonchw', link: 'https://github.com/pokemonchw/AlithCalendar' },
+  { name: '帕蒂卡', link: 'https://github.com/Patika-ailemait' },
 ].sort(() => Math.random() - 0.5);
