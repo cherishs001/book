@@ -183,11 +183,11 @@ window.DATA={
             "isEarlyAccess": true,
             "commentsUrl": null,
             "htmlRelativePath": "主线/第-15-章.html",
-            "chapterCharCount": 2765
+            "chapterCharCount": 4505
           }
         ],
         "subFolders": [],
-        "folderCharCount": 78386
+        "folderCharCount": 80126
       },
       {
         "displayName": "支线",
@@ -334,18 +334,18 @@ window.DATA={
         "folderCharCount": 1361
       }
     ],
-    "folderCharCount": 110055
+    "folderCharCount": 111795
   },
-  "charsCount": 110055,
-  "paragraphsCount": 2289,
+  "charsCount": 111795,
+  "paragraphsCount": 2326,
   "keywordsCount": [
     [
       "高潮",
-      306
+      316
     ],
     [
       "按摩棒",
-      173
+      174
     ],
     [
       "陈变态",
@@ -353,7 +353,7 @@ window.DATA={
     ],
     [
       "按摩器",
-      23
+      24
     ],
     [
       "姓陈的",
@@ -400,5 +400,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "238"
+  "buildNumber": "239"
 };
