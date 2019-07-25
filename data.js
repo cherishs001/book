@@ -294,7 +294,7 @@ window.DATA={
             "name": "79 - 充电宝少女捕获器",
             "sourceRelativePath": "4 - 道具集/79 - 充电宝少女捕获器.md",
             "isEarlyAccess": false,
-            "commentsUrl": null,
+            "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/54",
             "htmlRelativePath": "道具集/充电宝少女捕获器.html",
             "chapterCharCount": 3766
           },
@@ -400,5 +400,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "237"
+  "buildNumber": "238"
 };
