@@ -15,4 +15,6 @@ export const keywords: Array<string> = [
   '高潮',
   '按摩棒',
   '按摩器',
+  '仙女棒',
+  '贞操带',
 ];
