@@ -170,7 +170,7 @@ body.animation-enabled .rect>div {
     width: 800px;
     padding: 5vh;
 
-    transform: translate(-5vh, -5vh);
+    transform: translate(calc(-1.8em - 1.2vw), calc(-1.8em - 1.2vw));
   }
 }
 @media (max-width: 900px) {
