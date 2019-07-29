@@ -82,14 +82,23 @@ class Style {
   }
 }
 
+const darkKeyLinkColors = {
+  linkColor: '#00E',
+  linkHoverColor: '#F00',
+  linkActiveColor: '#00E',
+};
+const lightKeyLinkColors = {
+  linkColor: '#88F',
+  linkHoverColor: '#F33',
+  linkActiveColor: '#88F',
+};
+
 const styles = [
   new Style('默认', {
     rectBgColor: '#EFEFED',
     paperBgColor: '#FFF',
     textColor: '#000',
-    linkColor: '#00E',
-    linkHoverColor: '#F00',
-    linkActiveColor: '#00C',
+    ...darkKeyLinkColors,
     contentBlockEarlyAccessColor: '#FFE082',
     commentColor: '#F5F5F5',
 
@@ -99,9 +108,7 @@ const styles = [
     rectBgColor: '#272B36',
     paperBgColor: '#38404D',
     textColor: '#DDD',
-    linkColor: '#55E',
-    linkHoverColor: '#55E',
-    linkActiveColor: '#33C',
+    ...lightKeyLinkColors,
     contentBlockEarlyAccessColor: '#E65100',
     commentColor: '#272B36',
 
@@ -111,9 +118,7 @@ const styles = [
     rectBgColor: '#D8D4C9',
     paperBgColor: '#F8F4E9',
     textColor: '#552830',
-    linkColor: '#00E',
-    linkHoverColor: '#F00',
-    linkActiveColor: '#00C',
+    ...darkKeyLinkColors,
     contentBlockEarlyAccessColor: '#FFE082',
     commentColor: '#F9EFD7',
 
@@ -123,21 +128,17 @@ const styles = [
     rectBgColor: '#444',
     paperBgColor: '#333',
     textColor: '#DDD',
-    linkColor: '#66F',
-    linkHoverColor: '#66F',
-    linkActiveColor: '#44D',
+    ...lightKeyLinkColors,
     contentBlockEarlyAccessColor: '#E65100',
     commentColor: '#444',
 
     keyIsDark: false,
   }),
   new Style('巧克力', {
-    rectBgColor: '#2C1C11',
-    paperBgColor: '#3E2519',
-    textColor: '#CD9F89',
-    linkColor: '#66F',
-    linkHoverColor: '#66F',
-    linkActiveColor: '#44D',
+    rectBgColor: '#2E1C11',
+    paperBgColor: '#3A2519',
+    textColor: '#DDAF99',
+    ...lightKeyLinkColors,
     contentBlockEarlyAccessColor: '#E65100',
     commentColor: '#2C1C11',
 
