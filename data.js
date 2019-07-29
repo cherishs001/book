@@ -14,7 +14,7 @@ window.DATA={
         "isEarlyAccess": true,
         "commentsUrl": null,
         "htmlRelativePath": "出场人员名单.html",
-        "chapterCharCount": 32
+        "chapterCharCount": 821
       }
     ],
     "subFolders": [
@@ -334,26 +334,26 @@ window.DATA={
         "folderCharCount": 1361
       }
     ],
-    "folderCharCount": 114203
+    "folderCharCount": 114992
   },
-  "charsCount": 114203,
-  "paragraphsCount": 2362,
+  "charsCount": 114992,
+  "paragraphsCount": 2374,
   "keywordsCount": [
     [
       "高潮",
-      321
+      322
     ],
     [
       "按摩棒",
-      180
+      181
     ],
     [
       "贞操带",
-      136
+      137
     ],
     [
       "陈变态",
-      29
+      30
     ],
     [
       "按摩器",
@@ -361,7 +361,7 @@ window.DATA={
     ],
     [
       "仙女棒",
-      23
+      24
     ],
     [
       "姓陈的",
@@ -369,19 +369,19 @@ window.DATA={
     ],
     [
       "陈志鹏",
-      10
+      15
+    ],
+    [
+      "陈色狼",
+      8
     ],
     [
       "陈同学",
       7
     ],
     [
-      "陈色狼",
-      7
-    ],
-    [
       "陈智障",
-      4
+      5
     ],
     [
       "陈沙雕",
@@ -408,5 +408,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "247"
+  "buildNumber": "248"
 };
