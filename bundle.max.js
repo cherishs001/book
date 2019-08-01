@@ -1878,6 +1878,7 @@ exports.thanks = [
     { name: '路人乙' },
     { name: 'pokemonchw', link: 'https://github.com/pokemonchw/AlithCalendar' },
     { name: '帕蒂卡', link: 'https://github.com/Patika-ailemait' },
+    { name: '零件', link: 'https://nekosc.com' },
 ].sort(function () { return Math.random() - 0.5; });
 
 },{}],32:[function(require,module,exports){
