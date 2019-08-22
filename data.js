@@ -316,7 +316,7 @@ window.DATA={
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/58",
             "htmlRelativePath": "道具集/载人风筝.html",
-            "chapterCharCount": 2799
+            "chapterCharCount": 2802
           },
           {
             "displayName": "家庭 SM 套件",
@@ -330,7 +330,7 @@ window.DATA={
           }
         ],
         "subFolders": [],
-        "folderCharCount": 19622
+        "folderCharCount": 19625
       },
       {
         "displayName": "杂项",
@@ -354,9 +354,9 @@ window.DATA={
         "folderCharCount": 1361
       }
     ],
-    "folderCharCount": 120396
+    "folderCharCount": 120399
   },
-  "charsCount": 120396,
+  "charsCount": 120399,
   "paragraphsCount": 2498,
   "keywordsCount": [
     [
@@ -428,5 +428,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "259"
+  "buildNumber": "261"
 };
