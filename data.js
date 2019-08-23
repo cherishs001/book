@@ -326,11 +326,11 @@ window.DATA={
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/60",
             "htmlRelativePath": "道具集/家庭-SM-套件.html",
-            "chapterCharCount": 2605
+            "chapterCharCount": 3325
           }
         ],
         "subFolders": [],
-        "folderCharCount": 19625
+        "folderCharCount": 20345
       },
       {
         "displayName": "杂项",
@@ -354,10 +354,10 @@ window.DATA={
         "folderCharCount": 1361
       }
     ],
-    "folderCharCount": 120399
+    "folderCharCount": 121119
   },
-  "charsCount": 120399,
-  "paragraphsCount": 2498,
+  "charsCount": 121119,
+  "paragraphsCount": 2512,
   "keywordsCount": [
     [
       "高潮",
@@ -428,5 +428,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "263"
+  "buildNumber": "266"
 };
