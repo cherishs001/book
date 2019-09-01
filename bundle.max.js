@@ -61,15 +61,16 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-var __values = (this && this.__values) || function (o) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator], i = 0;
+var __values = (this && this.__values) || function(o) {
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
     if (m) return m.call(o);
-    return {
+    if (o && typeof o.length === "number") return {
         next: function () {
             if (o && i >= o.length) o = void 0;
             return { value: o && o[i++], done: !o };
         }
     };
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var chapterControl_1 = require("./chapterControl");
@@ -888,15 +889,16 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
-var __values = (this && this.__values) || function (o) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator], i = 0;
+var __values = (this && this.__values) || function(o) {
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
     if (m) return m.call(o);
-    return {
+    if (o && typeof o.length === "number") return {
         next: function () {
             if (o && i >= o.length) o = void 0;
             return { value: o && o[i++], done: !o };
         }
     };
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var commentsControl_1 = require("./commentsControl");
@@ -974,11 +976,11 @@ var lightKeyLinkColors = {
     linkActiveColor: '#88F',
 };
 var styles = [
-    new Style('默认', __assign({ rectBgColor: '#EFEFED', paperBgColor: '#FFF', textColor: '#000' }, darkKeyLinkColors, { contentBlockEarlyAccessColor: '#FFE082', commentColor: '#F5F5F5', keyIsDark: true })),
-    new Style('夜间', __assign({ rectBgColor: '#272B36', paperBgColor: '#38404D', textColor: '#DDD' }, lightKeyLinkColors, { contentBlockEarlyAccessColor: '#E65100', commentColor: '#272B36', keyIsDark: false })),
-    new Style('羊皮纸', __assign({ rectBgColor: '#D8D4C9', paperBgColor: '#F8F4E9', textColor: '#552830' }, darkKeyLinkColors, { contentBlockEarlyAccessColor: '#FFE082', commentColor: '#F9EFD7', keyIsDark: true })),
-    new Style('可穿戴科技', __assign({ rectBgColor: '#444', paperBgColor: '#333', textColor: '#DDD' }, lightKeyLinkColors, { contentBlockEarlyAccessColor: '#E65100', commentColor: '#444', keyIsDark: false })),
-    new Style('巧克力', __assign({ rectBgColor: '#2E1C11', paperBgColor: '#3A2519', textColor: '#DDAF99' }, lightKeyLinkColors, { contentBlockEarlyAccessColor: '#E65100', commentColor: '#2C1C11', keyIsDark: false })),
+    new Style('默认', __assign(__assign({ rectBgColor: '#EFEFED', paperBgColor: '#FFF', textColor: '#000' }, darkKeyLinkColors), { contentBlockEarlyAccessColor: '#FFE082', commentColor: '#F5F5F5', keyIsDark: true })),
+    new Style('夜间', __assign(__assign({ rectBgColor: '#272B36', paperBgColor: '#38404D', textColor: '#DDD' }, lightKeyLinkColors), { contentBlockEarlyAccessColor: '#E65100', commentColor: '#272B36', keyIsDark: false })),
+    new Style('羊皮纸', __assign(__assign({ rectBgColor: '#D8D4C9', paperBgColor: '#F8F4E9', textColor: '#552830' }, darkKeyLinkColors), { contentBlockEarlyAccessColor: '#FFE082', commentColor: '#F9EFD7', keyIsDark: true })),
+    new Style('可穿戴科技', __assign(__assign({ rectBgColor: '#444', paperBgColor: '#333', textColor: '#DDD' }, lightKeyLinkColors), { contentBlockEarlyAccessColor: '#E65100', commentColor: '#444', keyIsDark: false })),
+    new Style('巧克力', __assign(__assign({ rectBgColor: '#2E1C11', paperBgColor: '#3A2519', textColor: '#DDAF99' }, lightKeyLinkColors), { contentBlockEarlyAccessColor: '#E65100', commentColor: '#2C1C11', keyIsDark: false })),
 ];
 var StyleMenu = /** @class */ (function (_super) {
     __extends(StyleMenu, _super);
@@ -1052,15 +1054,16 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-var __values = (this && this.__values) || function (o) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator], i = 0;
+var __values = (this && this.__values) || function(o) {
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
     if (m) return m.call(o);
-    return {
+    if (o && typeof o.length === "number") return {
         next: function () {
             if (o && i >= o.length) o = void 0;
             return { value: o && o[i++], done: !o };
         }
     };
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var Menu_1 = require("./Menu");
@@ -1266,7 +1269,7 @@ var finalizeChapterLoading = function (selection) {
     // fix for stupid scrolling issues under iOS
     DOM_1.id('rect').style.overflow = 'hidden';
     setTimeout(function () {
-        DOM_1.id('rect').style.overflow = null;
+        DOM_1.id('rect').style.overflow = '';
         if (selection === undefined) {
             DOM_1.id('rect').scrollTo(0, 0);
         }
