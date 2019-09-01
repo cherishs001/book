@@ -355,7 +355,7 @@ window.DATA={
             "name": "1 - 人名请求",
             "sourceRelativePath": "5 - META/1 - 人名请求.md",
             "isEarlyAccess": false,
-            "commentsUrl": null,
+            "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/64",
             "htmlRelativePath": "META/人名请求.html",
             "chapterCharCount": 250
           }
@@ -459,5 +459,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "269"
+  "buildNumber": "270"
 };
