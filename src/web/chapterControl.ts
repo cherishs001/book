@@ -175,7 +175,7 @@ const finalizeChapterLoading = (selection?: Selection) => {
   // fix for stupid scrolling issues under iOS
   id('rect').style.overflow = 'hidden';
   setTimeout(() => {
-    id('rect').style.overflow = null;
+    id('rect').style.overflow = '';
     if (selection === undefined) {
       id('rect').scrollTo(0, 0);
     }
