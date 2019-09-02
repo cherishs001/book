@@ -157,7 +157,7 @@ const commentsUrlEnd = ')';
       if (isDirectory) {
         subDirsLoadingPromises.push(loadFolder(subpath, htmlRelativePath, false));
       } else {
-        if (subpath.endsWith('.pdf')) {
+        if (subpath.endsWith('.pdf') || subpath.endsWith('.png') || subpath.endsWith('.jpg')) {
           await copyResource(subpath, htmlRelativePath);
         }
         // Ignore backup files created by text editors
