@@ -116,6 +116,18 @@ const finalizeChapterLoading = (selection?: Selection) => {
   Array.from($content.getElementsByTagName('code')).forEach($code => $code.addEventListener('dblclick', () => {
     selectNode($code);
   }));
+  Array.from($content.getElementsByTagName('img')).forEach($image => {
+    const src = $image.src;
+    const lastDotIndex = src.lastIndexOf('.');
+    const pathNoExtension = src.substr(0, lastDotIndex);
+    console.info(pathNoExtension);
+    if (pathNoExtension.endsWith('_low')) {
+      const extension = src.substr(lastDotIndex + 1);
+      const pathNoLowNoExtension = pathNoExtension.substr(0, pathNoExtension.length - 4);
+      $image.style.cursor = 'zoom-in';
+      $image.addEventListener('click', () => window.open(pathNoLowNoExtension + '.' + extension));
+    }
+  });
 
   const chapterCtx = state.currentChapter!;
   const chapterIndex = chapterCtx.inFolderIndex;
