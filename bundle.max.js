@@ -1213,6 +1213,18 @@ var finalizeChapterLoading = function (selection) {
     Array.from($content.getElementsByTagName('code')).forEach(function ($code) { return $code.addEventListener('dblclick', function () {
         DOM_1.selectNode($code);
     }); });
+    Array.from($content.getElementsByTagName('img')).forEach(function ($image) {
+        var src = $image.src;
+        var lastDotIndex = src.lastIndexOf('.');
+        var pathNoExtension = src.substr(0, lastDotIndex);
+        console.info(pathNoExtension);
+        if (pathNoExtension.endsWith('_low')) {
+            var extension_1 = src.substr(lastDotIndex + 1);
+            var pathNoLowNoExtension_1 = pathNoExtension.substr(0, pathNoExtension.length - 4);
+            $image.style.cursor = 'zoom-in';
+            $image.addEventListener('click', function () { return window.open(pathNoLowNoExtension_1 + '.' + extension_1); });
+        }
+    });
     var chapterCtx = state_1.state.currentChapter;
     var chapterIndex = chapterCtx.inFolderIndex;
     if (chapterCtx.chapter.isEarlyAccess) {

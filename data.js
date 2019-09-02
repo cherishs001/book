@@ -316,7 +316,7 @@ window.DATA={
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/58",
             "htmlRelativePath": "道具集/载人风筝.html",
-            "chapterCharCount": 2823
+            "chapterCharCount": 2827
           },
           {
             "displayName": "强奸体验机",
@@ -340,7 +340,7 @@ window.DATA={
           }
         ],
         "subFolders": [],
-        "folderCharCount": 21537
+        "folderCharCount": 21541
       },
       {
         "displayName": "META",
@@ -385,9 +385,9 @@ window.DATA={
         "folderCharCount": 1361
       }
     ],
-    "folderCharCount": 122561
+    "folderCharCount": 122565
   },
-  "charsCount": 122561,
+  "charsCount": 122565,
   "paragraphsCount": 2524,
   "keywordsCount": [
     [
@@ -459,5 +459,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "271"
+  "buildNumber": "272"
 };
