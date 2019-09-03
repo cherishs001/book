@@ -1217,7 +1217,6 @@ var finalizeChapterLoading = function (selection) {
         var src = $image.src;
         var lastDotIndex = src.lastIndexOf('.');
         var pathNoExtension = src.substr(0, lastDotIndex);
-        console.info(pathNoExtension);
         if (pathNoExtension.endsWith('_low')) {
             var extension_1 = src.substr(lastDotIndex + 1);
             var pathNoLowNoExtension_1 = pathNoExtension.substr(0, pathNoExtension.length - 4);
