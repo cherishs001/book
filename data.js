@@ -357,11 +357,11 @@ window.DATA={
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/64",
             "htmlRelativePath": "META/人名请求.html",
-            "chapterCharCount": 416
+            "chapterCharCount": 415
           }
         ],
         "subFolders": [],
-        "folderCharCount": 416
+        "folderCharCount": 415
       },
       {
         "displayName": "杂项",
@@ -385,9 +385,9 @@ window.DATA={
         "folderCharCount": 1361
       }
     ],
-    "folderCharCount": 122731
+    "folderCharCount": 122730
   },
-  "charsCount": 122731,
+  "charsCount": 122730,
   "paragraphsCount": 2527,
   "keywordsCount": [
     [
@@ -459,5 +459,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "274"
+  "buildNumber": "275"
 };
