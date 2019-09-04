@@ -1895,6 +1895,9 @@ exports.thanks = [
     { name: '零件', link: 'https://nekosc.com' },
     { name: '幻梦', link: 'https://t.me/HuanmengQwQ' },
     { name: 'acted咕咕喵', link: 'https://h2.xqqy11.top' },
+    { name: '重水时雨', link: 'https://t.me/boatmasteronD2O' },
+    { name: '神楽坂 紫' },
+    { name: 'Runian Lee', link: 'https://t.me/Runian' },
 ].sort(function () { return Math.random() - 0.5; });
 
 },{}],32:[function(require,module,exports){
