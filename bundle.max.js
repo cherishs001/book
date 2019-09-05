@@ -101,8 +101,7 @@ var ChaptersMenu = /** @class */ (function (_super) {
         try {
             for (var _c = __values(folder.subFolders), _d = _c.next(); !_d.done; _d = _c.next()) {
                 var subfolder = _d.value;
-                var handle = _this.addLink(new ChaptersMenu(_this, subfolder), true);
-                handle.addClass('folder');
+                var handle = _this.addLink(new ChaptersMenu(_this, subfolder), true, Menu_1.ItemDecoration.ICON_FOLDER);
                 handle.append("[" + shortNumber_1.shortNumber(subfolder.folderCharCount) + "]", 'char-count');
             }
         }
@@ -175,21 +174,25 @@ var ContactMenu = /** @class */ (function (_super) {
             small: true,
             button: true,
             link: 'https://t.me/joinchat/AAAAAEpkRVwZ-3s5V3YHjA',
+            decoration: Menu_1.ItemDecoration.ICON_LINK,
         });
         _this.addItem('Telegram 讨论组', {
             small: true,
             button: true,
             link: 'https://t.me/joinchat/Dt8_WlJnmEwYNbjzlnLyNA',
+            decoration: Menu_1.ItemDecoration.ICON_LINK,
         });
         _this.addItem('GitHub Repo', {
             small: true,
             button: true,
             link: 'https://github.com/SCLeoX/Wearable-Technology',
+            decoration: Menu_1.ItemDecoration.ICON_LINK,
         });
         _this.addItem('原始 Google Docs', {
             small: true,
             button: true,
             link: 'https://docs.google.com/document/d/1Pp5CtO8c77DnWGqbXg-3e7w9Q3t88P35FOl6iIJvMfo/edit?usp=sharing',
+            decoration: Menu_1.ItemDecoration.ICON_LINK,
         });
         return _this;
     }
@@ -456,6 +459,9 @@ var ItemDecoration;
 (function (ItemDecoration) {
     ItemDecoration[ItemDecoration["SELECTABLE"] = 0] = "SELECTABLE";
     ItemDecoration[ItemDecoration["BACK"] = 1] = "BACK";
+    ItemDecoration[ItemDecoration["ICON_FOLDER"] = 2] = "ICON_FOLDER";
+    ItemDecoration[ItemDecoration["ICON_LINK"] = 3] = "ICON_LINK";
+    ItemDecoration[ItemDecoration["ICON_EQUALIZER"] = 4] = "ICON_EQUALIZER";
 })(ItemDecoration = exports.ItemDecoration || (exports.ItemDecoration = {}));
 function createSpan(text) {
     var _a;
@@ -612,11 +618,22 @@ var Menu = /** @class */ (function () {
         }
         if (options.button) {
             $element.classList.add('button');
-            if (options.decoration === ItemDecoration.BACK) {
-                $element.classList.add('back');
-            }
-            else if (options.decoration === ItemDecoration.SELECTABLE) {
-                $element.classList.add('selectable');
+            switch (options.decoration) {
+                case ItemDecoration.BACK:
+                    $element.classList.add('back');
+                    break;
+                case ItemDecoration.SELECTABLE:
+                    $element.classList.add('selectable');
+                    break;
+                case ItemDecoration.ICON_FOLDER:
+                    $element.classList.add('icon', 'folder');
+                    break;
+                case ItemDecoration.ICON_LINK:
+                    $element.classList.add('icon', 'link');
+                    break;
+                case ItemDecoration.ICON_EQUALIZER:
+                    $element.classList.add('icon', 'equalizer');
+                    break;
             }
         }
         this.container.appendChild($element);
@@ -629,8 +646,8 @@ var Menu = /** @class */ (function () {
         this.clearableElements.forEach(function ($element) { return $element.remove(); });
         this.clearableElements = [];
     };
-    Menu.prototype.addLink = function (menu, smallButton) {
-        return this.addItem(menu.name, { small: smallButton, button: true })
+    Menu.prototype.addLink = function (menu, smallButton, decoration) {
+        return this.addItem(menu.name, { small: smallButton, button: true, decoration: decoration })
             .linkTo(menu);
     };
     return Menu;
@@ -819,6 +836,7 @@ var StatsKeywordsCountMenu = /** @class */ (function (_super) {
             small: true,
             button: true,
             link: 'https://github.com/SCLeoX/Wearable-Technology/edit/master/src/builder/keywords.ts',
+            decoration: Menu_1.ItemDecoration.ICON_LINK,
         });
         data_1.data.keywordsCount.forEach(function (_a) {
             var _b = __read(_a, 2), keyword = _b[0], count = _b[1];
@@ -854,7 +872,7 @@ var StatsMenu = /** @class */ (function (_super) {
     function StatsMenu(parent) {
         var _this = _super.call(this, '统计', parent) || this;
         _this.addItem('统计数据由构建脚本自动生成', { small: true });
-        _this.addLink(new StatsKeywordsCountMenu_1.StatsKeywordsCountMenu(_this), true);
+        _this.addLink(new StatsKeywordsCountMenu_1.StatsKeywordsCountMenu(_this), true, Menu_1.ItemDecoration.ICON_EQUALIZER);
         _this.addItem("\u603B\u5B57\u6570\uFF1A" + data_1.data.charsCount, { small: true });
         _this.addItem("\u603B\u6BB5\u843D\u6570\uFF1A" + data_1.data.paragraphsCount, { small: true });
         return _this;
@@ -1083,7 +1101,7 @@ var ThanksMenu = /** @class */ (function (_super) {
                 var person = thanks_2_1.value;
                 _this.addItem(person.name, person.link === undefined
                     ? { small: true }
-                    : { small: true, button: true, link: person.link });
+                    : { small: true, button: true, link: person.link, decoration: Menu_1.ItemDecoration.ICON_LINK });
             }
         }
         catch (e_1_1) { e_1 = { error: e_1_1 }; }
