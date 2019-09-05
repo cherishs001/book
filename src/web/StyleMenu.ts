@@ -44,7 +44,13 @@ class Style {
       }
     };
 
-    attemptInsertRule(`.rect.reading { background-color: ${this.def.rectBgColor}; }`);
+    attemptInsertRule(`.container { color: ${this.def.textColor}; }`);
+    attemptInsertRule(`.menu { color: ${this.def.textColor}; }`);
+    attemptInsertRule(`.menu .button:active::after { background-color: ${this.def.textColor}; }`);
+    attemptInsertRule(`.button::after { background-color: ${this.def.textColor}; }`);
+    attemptInsertRule(`body { background-color: ${this.def.paperBgColor}; }`);
+    attemptInsertRule(`.rect { background-color: ${this.def.rectBgColor}; }`);
+
     attemptInsertRule(`.rect.reading>div { background-color: ${this.def.paperBgColor}; }`);
     attemptInsertRule(`.rect.reading>div { color: ${this.def.textColor}; }`);
     attemptInsertRule(`.rect.reading>.content a { color: ${this.def.linkColor}; }`);
@@ -94,7 +100,17 @@ const lightKeyLinkColors = {
 };
 
 const styles = [
-  new Style('默认', {
+  new Style('可穿戴科技（默认）', {
+    rectBgColor: '#444',
+    paperBgColor: '#333',
+    textColor: '#DDD',
+    ...lightKeyLinkColors,
+    contentBlockEarlyAccessColor: '#E65100',
+    commentColor: '#444',
+
+    keyIsDark: false,
+  }),
+  new Style('白纸', {
     rectBgColor: '#EFEFED',
     paperBgColor: '#FFF',
     textColor: '#000',
@@ -123,16 +139,6 @@ const styles = [
     commentColor: '#F9EFD7',
 
     keyIsDark: true,
-  }),
-  new Style('可穿戴科技', {
-    rectBgColor: '#444',
-    paperBgColor: '#333',
-    textColor: '#DDD',
-    ...lightKeyLinkColors,
-    contentBlockEarlyAccessColor: '#E65100',
-    commentColor: '#444',
-
-    keyIsDark: false,
   }),
   new Style('巧克力', {
     rectBgColor: '#2E1C11',
