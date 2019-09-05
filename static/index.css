@@ -512,12 +512,20 @@ body.animation-enabled .menu {
 .menu .button.back::before {
   content: '\25C0\FE0E';
 }
-.menu .button.folder::before {
-  content: 'folder_open';
+.menu .button.icon::before {
   transform: translateX(0.2vh);
 
   font-family: 'Material Icons';
   font-size: 1em;
+}
+.menu .button.icon.link::before {
+  content: 'link';
+}
+.menu .button.icon.equalizer::before {
+  content: 'equalizer';
+}
+.menu .button.icon.folder::before {
+  content: 'folder_open';
 }
 .menu .button.folder:hover::before {
   content: 'folder';

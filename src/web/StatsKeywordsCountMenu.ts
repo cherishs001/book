@@ -1,5 +1,5 @@
 import { data } from './data';
-import { Menu } from './Menu';
+import { ItemDecoration, Menu } from './Menu';
 
 export class StatsKeywordsCountMenu extends Menu {
   public constructor(parent: Menu) {
@@ -8,6 +8,7 @@ export class StatsKeywordsCountMenu extends Menu {
       small: true,
       button: true,
       link: 'https://github.com/SCLeoX/Wearable-Technology/edit/master/src/builder/keywords.ts',
+      decoration: ItemDecoration.ICON_LINK,
     });
     data.keywordsCount.forEach(([keyword, count]) => {
       this.addItem(`${keyword}：${count}`, { small: true });

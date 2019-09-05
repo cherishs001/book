@@ -2,7 +2,7 @@ import { Folder } from '../Data';
 import { loadChapter, loadChapterEvent } from './chapterControl';
 import { data } from './data';
 import { updateHistory } from './history';
-import { ItemHandle, Menu } from './Menu';
+import { ItemDecoration, ItemHandle, Menu } from './Menu';
 import { shortNumber } from './shortNumber';
 
 const chapterSelectionButtonsMap: Map<string, ItemHandle> = new Map();
@@ -26,8 +26,7 @@ export class ChaptersMenu extends Menu {
     }
     super(folder.isRoot ? '章节选择' : folder.displayName, parent);
     for (const subfolder of folder.subFolders) {
-      const handle = this.addLink(new ChaptersMenu(this, subfolder), true);
-      handle.addClass('folder');
+      const handle = this.addLink(new ChaptersMenu(this, subfolder), true, ItemDecoration.ICON_FOLDER);
       handle.append(`[${shortNumber(subfolder.folderCharCount)}]`, 'char-count');
     }
     for (const chapter of folder.chapters) {

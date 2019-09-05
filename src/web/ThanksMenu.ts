@@ -1,4 +1,4 @@
-import { Menu } from './Menu';
+import { ItemDecoration, Menu } from './Menu';
 import { thanks } from './thanks';
 
 export class ThanksMenu extends Menu {
@@ -7,7 +7,7 @@ export class ThanksMenu extends Menu {
     for (const person of thanks) {
       this.addItem(person.name, person.link === undefined
         ? { small: true }
-        : { small: true, button: true, link: person.link },
+        : { small: true, button: true, link: person.link, decoration: ItemDecoration.ICON_LINK },
       );
     }
   }

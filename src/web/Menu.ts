@@ -5,6 +5,9 @@ import { RectMode, rectModeChangeEvent, setRectMode } from './RectMode';
 export enum ItemDecoration {
   SELECTABLE,
   BACK,
+  ICON_FOLDER,
+  ICON_LINK,
+  ICON_EQUALIZER,
 }
 
 type ItemOptions = {
@@ -173,10 +176,22 @@ export class Menu {
     }
     if (options.button) {
       $element.classList.add('button');
-      if (options.decoration === ItemDecoration.BACK) {
-        $element.classList.add('back');
-      } else if (options.decoration === ItemDecoration.SELECTABLE) {
-        $element.classList.add('selectable');
+      switch (options.decoration) {
+        case ItemDecoration.BACK:
+          $element.classList.add('back');
+          break;
+        case ItemDecoration.SELECTABLE:
+          $element.classList.add('selectable');
+          break;
+        case ItemDecoration.ICON_FOLDER:
+          $element.classList.add('icon', 'folder');
+          break;
+        case ItemDecoration.ICON_LINK:
+          $element.classList.add('icon', 'link');
+          break;
+        case ItemDecoration.ICON_EQUALIZER:
+          $element.classList.add('icon', 'equalizer');
+          break;
       }
     }
     this.container.appendChild($element);
@@ -191,8 +206,8 @@ export class Menu {
     this.clearableElements.forEach($element => $element.remove());
     this.clearableElements = [];
   }
-  protected addLink(menu: Menu, smallButton?: true): ItemHandle {
-    return this.addItem(menu.name, { small: smallButton, button: true })
+  protected addLink(menu: Menu, smallButton?: true, decoration?: ItemDecoration): ItemHandle {
+    return this.addItem(menu.name, { small: smallButton, button: true, decoration })
       .linkTo(menu);
   }
 }
