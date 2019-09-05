@@ -928,7 +928,12 @@ var Style = /** @class */ (function () {
                 _this.debugLogger.log("Failed to inject rule \"" + rule + "\".", error);
             }
         };
-        attemptInsertRule(".rect.reading { background-color: " + this.def.rectBgColor + "; }");
+        attemptInsertRule(".container { color: " + this.def.textColor + "; }");
+        attemptInsertRule(".menu { color: " + this.def.textColor + "; }");
+        attemptInsertRule(".menu .button:active::after { background-color: " + this.def.textColor + "; }");
+        attemptInsertRule(".button::after { background-color: " + this.def.textColor + "; }");
+        attemptInsertRule("body { background-color: " + this.def.paperBgColor + "; }");
+        attemptInsertRule(".rect { background-color: " + this.def.rectBgColor + "; }");
         attemptInsertRule(".rect.reading>div { background-color: " + this.def.paperBgColor + "; }");
         attemptInsertRule(".rect.reading>div { color: " + this.def.textColor + "; }");
         attemptInsertRule(".rect.reading>.content a { color: " + this.def.linkColor + "; }");
@@ -976,10 +981,10 @@ var lightKeyLinkColors = {
     linkActiveColor: '#88F',
 };
 var styles = [
-    new Style('默认', __assign(__assign({ rectBgColor: '#EFEFED', paperBgColor: '#FFF', textColor: '#000' }, darkKeyLinkColors), { contentBlockEarlyAccessColor: '#FFE082', commentColor: '#F5F5F5', keyIsDark: true })),
+    new Style('可穿戴科技（默认）', __assign(__assign({ rectBgColor: '#444', paperBgColor: '#333', textColor: '#DDD' }, lightKeyLinkColors), { contentBlockEarlyAccessColor: '#E65100', commentColor: '#444', keyIsDark: false })),
+    new Style('白纸', __assign(__assign({ rectBgColor: '#EFEFED', paperBgColor: '#FFF', textColor: '#000' }, darkKeyLinkColors), { contentBlockEarlyAccessColor: '#FFE082', commentColor: '#F5F5F5', keyIsDark: true })),
     new Style('夜间', __assign(__assign({ rectBgColor: '#272B36', paperBgColor: '#38404D', textColor: '#DDD' }, lightKeyLinkColors), { contentBlockEarlyAccessColor: '#E65100', commentColor: '#272B36', keyIsDark: false })),
     new Style('羊皮纸', __assign(__assign({ rectBgColor: '#D8D4C9', paperBgColor: '#F8F4E9', textColor: '#552830' }, darkKeyLinkColors), { contentBlockEarlyAccessColor: '#FFE082', commentColor: '#F9EFD7', keyIsDark: true })),
-    new Style('可穿戴科技', __assign(__assign({ rectBgColor: '#444', paperBgColor: '#333', textColor: '#DDD' }, lightKeyLinkColors), { contentBlockEarlyAccessColor: '#E65100', commentColor: '#444', keyIsDark: false })),
     new Style('巧克力', __assign(__assign({ rectBgColor: '#2E1C11', paperBgColor: '#3A2519', textColor: '#DDAF99' }, lightKeyLinkColors), { contentBlockEarlyAccessColor: '#E65100', commentColor: '#2C1C11', keyIsDark: false })),
 ];
 var StyleMenu = /** @class */ (function (_super) {

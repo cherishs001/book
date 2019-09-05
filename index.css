@@ -1,3 +1,6 @@
+body.animation-enabled {
+  transition: background-color 0.3s;
+}
 body {
   margin: 0;
 
@@ -350,12 +353,13 @@ body.animation-enabled .rect>.comments>.create-comment::before {
   margin-bottom: 0;
 }
 
+body.animation-enabled .container {
+  transition: color 0.3s;
+}
 .container {
   position: fixed;
   top: 5vh;
   left: 5vh;
-
-  color: #DDD;
 }
 @media (max-width: 900px) {
   .container {
@@ -411,7 +415,7 @@ body.animation-enabled .rect>.comments>.create-comment::before {
   user-select: none;
 }
 body.animation-enabled .button::after {
-  transition: transform 0.2s, transform-origin 0.2s;
+  transition: background-color 0.3s, transform 0.2s, transform-origin 0.2s;
 
   will-change: transform;
 }
@@ -428,7 +432,6 @@ body.animation-enabled .button::after {
   transform-origin: 20%;
 
   border-radius: 0.03em;
-  background-color: #DDD;
 }
 .button:hover::after {
   transform: scaleX(1);
@@ -436,7 +439,7 @@ body.animation-enabled .button::after {
 }
 
 body.animation-enabled .menu {
-  transition: opacity 0.3s, transform 0.3s;
+  transition: color 0.3s, opacity 0.3s, transform 0.3s;
 }
 .menu {
   position: fixed;
@@ -480,7 +483,7 @@ body.animation-enabled .menu {
   display: none;
 }
 .menu .path {
-  color: #999;
+  opacity: 0.6;
 
   font-size: 2vh;
   line-height: 2vh;
@@ -510,21 +513,14 @@ body.animation-enabled .menu {
   content: '\25C0\FE0E';
 }
 .menu .button.folder::before {
-  top: 0vh;
-
-  width: 2.8vh;
-  height: 3vh;
-
-  content: ' ';
+  content: 'folder_open';
   transform: translateX(0.2vh);
 
-  background-image: url('data:image/svg+xml; utf8, <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z" fill="white"/></svg>');
-  background-repeat: no-repeat;
-  background-position-y: center;
-  background-size: contain;
+  font-family: 'Material Icons';
+  font-size: 1em;
 }
 .menu .button.folder:hover::before {
-  background-image: url('data:image/svg+xml; utf8, <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z" fill="white"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+  content: 'folder';
 }
 body.animation-enabled .menu .button.selectable::before {
   transition: opacity 0.3s, transform 0.3s;
@@ -541,16 +537,20 @@ body.animation-enabled .menu .button.selectable::before {
   opacity: 1;
 }
 .menu .button:active {
-  color: #999;
+  opacity: 0.6;
+}
+
+body.animation-enabled .menu .button.active::after {
+  transition: background-color 0.3s;
 }
 .menu .button:active::after {
-  background-color: #999;
+  opacity: 0.6;
 }
 
 .menu .item-side {
   display: inline-block;
 
-  color: #888;
+  opacity: 0.6;
 }
 
 .menu .prepend .item-side {
