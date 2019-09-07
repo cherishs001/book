@@ -37,7 +37,7 @@
 - [帕蒂卡](https://github.com/Patika-ailemait)
 - [零件](https://nekosc.com)
 - [幻梦](https://t.me/HuanmengQwQ)
-- [acted咕咕喵](https://h2.xqqy11.top)
+- [acted咕咕喵](https://acted.gitlab.io)
 - [重水时雨](https://t.me/boatmasteronD2O)
 - 神楽坂 紫
 - [Runian Lee](https://t.me/Runian)
