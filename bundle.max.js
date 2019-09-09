@@ -1839,7 +1839,9 @@ var EnumSetting = /** @class */ (function () {
 }());
 exports.EnumSetting = EnumSetting;
 exports.animation = new BooleanSetting('animation', true, function (value) {
-    document.body.classList.toggle('animation-enabled', value);
+    setTimeout(function () {
+        document.body.classList.toggle('animation-enabled', value);
+    }, 1);
 });
 exports.warning = new BooleanSetting('warning', false);
 exports.earlyAccess = new BooleanSetting('earlyAccess', false, function (value) {
