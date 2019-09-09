@@ -74,7 +74,9 @@ export class EnumSetting {
 }
 
 export const animation = new BooleanSetting('animation', true, value => {
-  document.body.classList.toggle('animation-enabled', value);
+  setTimeout(() => {
+    document.body.classList.toggle('animation-enabled', value);
+  }, 1);
 });
 export const warning = new BooleanSetting('warning', false);
 export const earlyAccess = new BooleanSetting('earlyAccess', false, value => {
