@@ -2,19 +2,19 @@ import { Folder } from '../Data';
 import { loadChapter, loadChapterEvent } from './chapterControl';
 import { data } from './data';
 import { updateHistory } from './history';
-import { ItemHandle, Menu } from './Menu';
+import { ItemDecoration, ItemHandle, Menu } from './Menu';
+import { shortNumber } from './shortNumber';
 
 const chapterSelectionButtonsMap: Map<string, ItemHandle> = new Map();
-let currentLastReadLabelAt: ItemHandle | null = null;
+let currentLastReadLabelAt: HTMLSpanElement | null = null;
 
 function attachLastReadLabelTo(button: ItemHandle, htmlRelativePath: string) {
-  button.addClass('last-read');
-  currentLastReadLabelAt = button;
+  currentLastReadLabelAt = button.append('[上次阅读]');
 }
 
 loadChapterEvent.on(newChapterHtmlRelativePath => {
   if (currentLastReadLabelAt !== null) {
-    currentLastReadLabelAt.removeClass('last-read');
+    currentLastReadLabelAt.remove();
   }
   attachLastReadLabelTo(chapterSelectionButtonsMap.get(newChapterHtmlRelativePath)!, newChapterHtmlRelativePath);
 });
@@ -25,9 +25,9 @@ export class ChaptersMenu extends Menu {
       folder = data.chapterTree;
     }
     super(folder.isRoot ? '章节选择' : folder.displayName, parent);
-    for (const subfolder of folder.subfolders) {
-      const handle = this.addLink(new ChaptersMenu(this, subfolder), true);
-      handle.addClass('folder');
+    for (const subfolder of folder.subFolders) {
+      const handle = this.addLink(new ChaptersMenu(this, subfolder), true, ItemDecoration.ICON_FOLDER);
+      handle.append(`[${shortNumber(subfolder.folderCharCount)}]`, 'char-count');
     }
     for (const chapter of folder.chapters) {
       const handle = this.addItem(chapter.displayName, { small: true, button: true })
@@ -36,9 +36,10 @@ export class ChaptersMenu extends Menu {
           updateHistory(true);
         });
       if (chapter.isEarlyAccess) {
-        handle.setInnerText(`[编写中] ${chapter.displayName}`);
+        handle.prepend('[编写中]');
         handle.addClass('early-access');
       }
+      handle.append(`[${shortNumber(chapter.chapterCharCount)}]`, 'char-count');
 
       const lastRead = window.localStorage.getItem('lastRead');
       if (lastRead === chapter.htmlRelativePath) {

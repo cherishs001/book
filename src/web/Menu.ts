@@ -5,6 +5,9 @@ import { RectMode, rectModeChangeEvent, setRectMode } from './RectMode';
 export enum ItemDecoration {
   SELECTABLE,
   BACK,
+  ICON_FOLDER,
+  ICON_LINK,
+  ICON_EQUALIZER,
 }
 
 type ItemOptions = {
@@ -18,7 +21,16 @@ type ItemOptions = {
   decoration?: ItemDecoration;
 });
 
+function createSpan(text: string, ...classNames: Array<string>) {
+  const $span = document.createElement('span');
+  $span.innerText = text;
+  $span.classList.add(...classNames);
+  return $span;
+}
+
 export class ItemHandle {
+  private $prependSpan: HTMLSpanElement | null = null;
+  private $appendSpan: HTMLSpanElement | null = null;
   public constructor(
     private menu: Menu,
     public element: HTMLDivElement | HTMLAnchorElement,
@@ -29,18 +41,13 @@ export class ItemHandle {
   }
   public onClick(handler: (element?: any) => void) {
     this.element.addEventListener('click', () => {
-      if (!this.menu.isActive()) {
-        return;
-      }
       handler(this.element);
     });
     return this;
   }
   public linkTo(targetMenu: Menu) {
     this.onClick(() => {
-      this.menu.setActive(false);
-      targetMenu.setActive(true);
-      setRectMode(targetMenu.rectMode);
+      this.menu.navigateTo(targetMenu);
     });
     return this;
   }
@@ -56,6 +63,30 @@ export class ItemHandle {
     this.element.classList.remove(className);
     return this;
   }
+  public prepend(text: string, className?: string) {
+    if (this.$prependSpan === null) {
+      this.$prependSpan = createSpan('', 'prepend');
+      this.element.prepend(this.$prependSpan);
+    }
+    const $span = createSpan(text, 'item-side');
+    if (className !== undefined) {
+      $span.classList.add(className);
+    }
+    this.$prependSpan.prepend($span);
+    return $span;
+  }
+  public append(text: string, className?: string) {
+    if (this.$appendSpan === null) {
+      this.$appendSpan = createSpan('', 'append');
+      this.element.appendChild(this.$appendSpan);
+    }
+    const $span = createSpan(text, 'item-side');
+    if (className !== undefined) {
+      $span.classList.add(className);
+    }
+    this.$appendSpan.appendChild($span);
+    return $span;
+  }
 }
 
 export class Menu {
@@ -66,7 +97,7 @@ export class Menu {
   private debugLogger: DebugLogger;
   public constructor(
     public readonly name: string,
-    parent: Menu | null,
+    private parent: Menu | null,
     public readonly rectMode: RectMode = RectMode.OFF,
   ) {
     this.debugLogger = new DebugLogger('Menu', { name });
@@ -104,6 +135,19 @@ export class Menu {
     });
   }
 
+  public navigateTo(targetMenu: Menu) {
+    this.setActive(false);
+    targetMenu.setActive(true);
+    setRectMode(targetMenu.rectMode);
+  }
+
+  protected exit() {
+    if (this.parent === null) {
+      throw new Error('Cannot exit the root menu.');
+    }
+    this.navigateTo(this.parent);
+  }
+
   public activateEvent = new Event();
   public setActive(active: boolean) {
     this.debugLogger.log(`setActive(${active})`);
@@ -132,10 +176,22 @@ export class Menu {
     }
     if (options.button) {
       $element.classList.add('button');
-      if (options.decoration === ItemDecoration.BACK) {
-        $element.classList.add('back');
-      } else if (options.decoration === ItemDecoration.SELECTABLE) {
-        $element.classList.add('selectable');
+      switch (options.decoration) {
+        case ItemDecoration.BACK:
+          $element.classList.add('back');
+          break;
+        case ItemDecoration.SELECTABLE:
+          $element.classList.add('selectable');
+          break;
+        case ItemDecoration.ICON_FOLDER:
+          $element.classList.add('icon', 'folder');
+          break;
+        case ItemDecoration.ICON_LINK:
+          $element.classList.add('icon', 'link');
+          break;
+        case ItemDecoration.ICON_EQUALIZER:
+          $element.classList.add('icon', 'equalizer');
+          break;
       }
     }
     this.container.appendChild($element);
@@ -150,8 +206,8 @@ export class Menu {
     this.clearableElements.forEach($element => $element.remove());
     this.clearableElements = [];
   }
-  protected addLink(menu: Menu, smallButton?: true): ItemHandle {
-    return this.addItem(menu.name, { small: smallButton, button: true })
+  protected addLink(menu: Menu, smallButton?: true, decoration?: ItemDecoration): ItemHandle {
+    return this.addItem(menu.name, { small: smallButton, button: true, decoration })
       .linkTo(menu);
   }
 }

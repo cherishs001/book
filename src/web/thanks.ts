@@ -18,4 +18,12 @@ export const thanks: Array<{ name: string, link?: string }> = [
   { name: 'Skimige' },
   { name: 'TenmaHiltonWhat', link: 'https://tenmahw.com' },
   { name: '路人乙' },
+  { name: 'pokemonchw', link: 'https://github.com/pokemonchw' },
+  { name: '帕蒂卡', link: 'https://github.com/Patika-ailemait' },
+  { name: '零件', link: 'https://nekosc.com' },
+  { name: '幻梦', link: 'https://t.me/HuanmengQwQ' },
+  { name: 'acted咕咕喵', link: 'https://acted.gitlab.io' },
+  { name: '重水时雨', link: 'https://t.me/boatmasteronD2O' },
+  { name: '神楽坂 紫' },
+  { name: 'Runian Lee', link: 'https://t.me/Runian' },
 ].sort(() => Math.random() - 0.5);

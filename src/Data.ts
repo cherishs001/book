@@ -9,12 +9,14 @@ export interface Chapter extends Node {
   isEarlyAccess: boolean;
   commentsUrl: string | null;
   htmlRelativePath: string;
+  chapterCharCount: number;
 }
 
 export interface Folder extends Node {
   chapters: Array<Chapter>;
-  subfolders: Array<Folder>;
+  subFolders: Array<Folder>;
   isRoot: boolean;
+  folderCharCount: number;
 }
 
 export interface Data {

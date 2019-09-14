@@ -23,6 +23,12 @@ const commentsUrlEnd = ')';
 
   // Copy static
   await copy(staticDir, distDir);
+  const indexPath = resolve(distDir, 'index.html');
+  const nowTime = new Date().getTime();
+  let result = await readFile(indexPath, 'utf-8');
+  result = result.replace(new RegExp('js" defer>', 'g'), 'js?v=' + nowTime + '" defer>');
+  result = result.replace(new RegExp('css">', 'g'), 'css?v=' + nowTime + '">');
+  await writeFile(indexPath, result, 'utf-8');
   console.info('Static copied.');
 
   const chapterDefaultNamer = (displayIndex: number) => `第 ${displayIndex} 章`;
@@ -80,7 +86,8 @@ const commentsUrlEnd = ')';
       markdown = markdown.substr(commentsUrlEndIndex + 1).trimLeft();
     }
 
-    charsCount += countChars(markdown);
+    const chapterCharCount = countChars(markdown);
+    charsCount += chapterCharCount;
 
     keywords.forEach(keyword => {
       const count = countCertainWord(markdown, keyword);
@@ -117,6 +124,7 @@ const commentsUrlEnd = ')';
       isEarlyAccess,
       commentsUrl,
       htmlRelativePath,
+      chapterCharCount,
     };
   }
 
@@ -149,7 +157,7 @@ const commentsUrlEnd = ')';
       if (isDirectory) {
         subDirsLoadingPromises.push(loadFolder(subpath, htmlRelativePath, false));
       } else {
-        if (subpath.endsWith('.pdf')) {
+        if (subpath.endsWith('.pdf') || subpath.endsWith('.png') || subpath.endsWith('.jpg')) {
           await copyResource(subpath, htmlRelativePath);
         }
         // Ignore backup files created by text editors
@@ -160,11 +168,16 @@ const commentsUrlEnd = ')';
       }
     }
 
+    const chapters = (await Promise.all(chaptersLoadingPromises)).sort(byDisplayIndex);
+    const subFolders = (await Promise.all(subDirsLoadingPromises)).sort(byDisplayIndex);
+
     return {
       ...node,
       isRoot,
-      chapters: (await Promise.all(chaptersLoadingPromises)).sort(byDisplayIndex),
-      subfolders: (await Promise.all(subDirsLoadingPromises)).sort(byDisplayIndex),
+      chapters,
+      subFolders,
+      folderCharCount: chapters.reduce((count, chapter) => count += chapter.chapterCharCount, 0) +
+        subFolders.reduce((count, folder) => count += folder.folderCharCount, 0),
     };
   }
 
