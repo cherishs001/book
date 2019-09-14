@@ -16,7 +16,7 @@ export const thanks: Array<{ name: string, link?: string }> = [
   { name: 'kookxiang' },
   { name: '櫻川 紗良' },
   { name: 'Skimige' },
-  { name: 'TenmaHiltonWhat', link: 'https://tenmahw.com' },
+  { name: 'TExL', link: 'http://texas.penguin-logistics.cn' },
   { name: '路人乙' },
   { name: 'pokemonchw', link: 'https://github.com/pokemonchw' },
   { name: '帕蒂卡', link: 'https://github.com/Patika-ailemait' },
