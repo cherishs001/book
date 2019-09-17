@@ -12,7 +12,7 @@ export interface SingleSectionContent {
   html: string;
   /** Variables used in the html */
   variables: Array<{
-    elementId: string,
+    elementClass: string,
     variableName: string,
   }>;
 }

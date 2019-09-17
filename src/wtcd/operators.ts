@@ -61,7 +61,7 @@ export const binaryOperators = new Map<string, BinaryOperatorDefinition>([
       return: 'number',
       fn: (arg0, arg1) => arg0 * arg1,
     }],
-  }]
+  }],
 ]);
 
 export const conditionalOperatorPrecedence = 4;

@@ -386,19 +386,19 @@ export function parse(source: string, mdi: MDI, logger: SimpleLogger) {
       ? sectionName
       : `${sectionName}@${sectionBound}`;
     logger.info(`Parsing markdown for section ${sectionFullName}.`);
-    const variables: Array<{ elementId: string, variableName: string }> = [];
+    const variables: Array<{ elementClass: string, variableName: string }> = [];
     const sig = new SimpleIdGenerator();
     /**
      * Markdown content of the section whose interpolated values are converted
      * to spans with unique ids.
      */
     const sectionParameterizedMarkdown = sectionMarkdown.replace(/<\$([a-zA-Z_][a-zA-Z_0-9]*)\$>/g, (full, variableName) => {
-      const elementId = 'wtcd-variable-' + sig.next();
+      const elementClass = 'wtcd-variable-' + sig.next();
       variables.push({
-        elementId,
+        elementClass,
         variableName,
       });
-      return `<span id="${elementId}"></span>`;
+      return `<span class="${elementClass}"></span>`;
     });
 
     // Parse bounds
