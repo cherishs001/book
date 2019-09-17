@@ -5,6 +5,8 @@ import { MainMenu } from './MainMenu';
 import { animation } from './settings';
 import { updateSelection } from './updateSelection';
 
+import '../wtcd/test';
+
 const $warning = id('warning');
 
 if ($warning !== null) {

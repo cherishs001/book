@@ -25,4 +25,22 @@ export class DebugLogger {
     }
     console.info(this.prefix, ...stuff);
   }
+  public info(...stuff: any) {
+    if (!debugLogging.getValue()) {
+      return;
+    }
+    console.info(this.prefix, ...stuff);
+  }
+  public warn(...stuff: any) {
+    if (!debugLogging.getValue()) {
+      return;
+    }
+    console.warn(this.prefix, ...stuff);
+  }
+  public error(...stuff: any) {
+    if (!debugLogging.getValue()) {
+      return;
+    }
+    console.error(this.prefix, ...stuff);
+  }
 }

@@ -91,7 +91,7 @@ export class ItemHandle {
 
 export class Menu {
   private container: HTMLDivElement;
-  private active: boolean;
+  private active = false;
   private fullPath: Array<string>;
   private clearableElements: Array<HTMLElement> = [];
   private debugLogger: DebugLogger;

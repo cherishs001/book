@@ -23,7 +23,7 @@ class Style {
   public static currentlyEnabled: Style | null = null;
   private styleSheet: StyleSheet | null = null;
   private debugLogger: DebugLogger;
-  public itemHandle: ItemHandle;
+  public itemHandle!: ItemHandle;
   public constructor(
     public readonly name: string,
     public readonly def: StyleDef,
@@ -40,7 +40,7 @@ class Style {
       try {
         sheet.insertRule(rule);
       } catch (error) {
-        this.debugLogger.log(`Failed to inject rule "${rule}".`, error);
+        this.debugLogger.error(`Failed to inject rule "${rule}".`, error);
       }
     };
 
