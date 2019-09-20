@@ -73,8 +73,8 @@ export interface GotoAction extends OptionalLocationInfo {
   section: string;
 }
 
-export interface SelectionCommand {
-  type: 'selectionCommand';
+export interface SelectionAction extends OptionalLocationInfo {
+  type: 'selectionAction';
   choices: Array<ChoiceExpression>;
 }
 
@@ -97,7 +97,7 @@ export type Literal = NumberLiteral | BooleanLiteral | StringLiteral | NullLiter
 
 export type OperatorExpression = BinaryExpression | UnaryExpression | ConditionalExpression;
 
-export type Action = GotoAction;
+export type Action = GotoAction | SelectionAction;
 
 export type Expression = Literal | OperatorExpression | Action | ExpressionSet | ChoiceExpression | VariableReference | DeclarationExpression;
 
@@ -105,7 +105,7 @@ export interface Section {
   name: string;
   content: Array<SingleSectionContent>;
   executes?: Expression;
-  then: Array<Expression>;
+  then: Expression;
 }
 
 export type VariableType = 'number' | 'boolean' | 'string';

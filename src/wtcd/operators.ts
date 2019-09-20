@@ -1,4 +1,4 @@
-import { Evaluator, RuntimeValue, RuntimeValueType, RuntimeValueTypeLookUp } from './Interpreter';
+import { Evaluator, RuntimeValue, RuntimeValueRaw, RuntimeValueType } from './Interpreter';
 import { BinaryExpression, UnaryExpression } from './types';
 import { WTCDError } from './WTCDError';
 
@@ -66,24 +66,34 @@ function autoEvaluated(fn: (
     return fn(arg0, arg1, expr, evaluator, resolveVariableReference);
   };
 }
-function autoEvaluatedSameTypeArg<T extends RuntimeValueType>(
-  type: T,
+function autoEvaluatedSameTypeArg<TArg extends RuntimeValueType, TReturn extends RuntimeValueType>(
+  argType: TArg,
+  returnType: TReturn,
   fn: (
-    arg0: RuntimeValueTypeLookUp<T>,
-    arg1: RuntimeValueTypeLookUp<T>,
+    arg0Raw: RuntimeValueRaw<TArg>,
+    arg1Raw: RuntimeValueRaw<TArg>,
     expr: BinaryExpression,
     evaluator: Evaluator,
     resolveVariableReference: ResolveVariableReferenceFn,
-  ) => RuntimeValue,
+  ) => RuntimeValueRaw<TReturn>,
 ): BinaryOperatorFn {
   return autoEvaluated((arg0, arg1, expr, evaluator, resolveVariableReference) => {
-    if (arg0.type === type && arg1.type === type) {
-      // See https://github.com/microsoft/TypeScript/issues/33517
-      return fn(arg0 as any, arg1 as any, expr, evaluator, resolveVariableReference);
+    if (arg0.type === argType && arg1.type === argType) {
+      // TypeScript is not smart enough to do the conversion here
+      return {
+        type: returnType,
+        value: fn(
+          arg0.value as RuntimeValueRaw<TArg>,
+          arg1.value as RuntimeValueRaw<TArg>,
+          expr,
+          evaluator,
+          resolveVariableReference,
+        ),
+      } as RuntimeValue;
     } else {
       throw WTCDError.atNode(`Binary operator "${expr.operator}" can only be ` +
-      `applied to two ${type}s. Received: ${describe(arg0)} (left) and ` +
-      `${describe(arg1)} (right)`, expr);
+        `applied to two ${argType}s. Received: ${describe(arg0)} (left) and ` +
+        `${describe(arg1)} (right)`, expr);
     }
   });
 }
@@ -91,12 +101,12 @@ function opAssignment<T0 extends RuntimeValueType, T1 extends RuntimeValueType>(
   arg0Type: T0, // Type of the variable
   arg1Type: T1,
   fn: (
-    arg0: RuntimeValueTypeLookUp<T0>,
-    arg1: RuntimeValueTypeLookUp<T1>,
+    arg0Raw: RuntimeValueRaw<T0>,
+    arg1Raw: RuntimeValueRaw<T1>,
     expr: BinaryExpression,
     evaluator: Evaluator,
     resolveVariableReference: ResolveVariableReferenceFn,
-  ) => RuntimeValueTypeLookUp<T0>['value'],
+  ) => RuntimeValueRaw<T0>,
 ): BinaryOperatorFn {
   return (expr, evaluator, resolveVariableReference) => {
     if (expr.arg0.type !== 'variableReference') {
@@ -113,7 +123,13 @@ function opAssignment<T0 extends RuntimeValueType, T1 extends RuntimeValueType>(
       throw WTCDError.atNode(`Right side of binary operator "${expr.operator}" ` +
         ` has to be a ${arg1Type}. Received: ${describe(arg1)}`, expr);
     }
-    const newValue = fn(varRef as any, arg1 as any, expr, evaluator, resolveVariableReference);
+    const newValue = fn(
+      varRef.value as RuntimeValueRaw<T0>,
+      arg1.value as RuntimeValueRaw<T1>,
+      expr,
+      evaluator,
+      resolveVariableReference,
+    );
     varRef.value = newValue;
     return {
       type: arg0Type,
@@ -141,27 +157,27 @@ export const binaryOperators = new Map<string, BinaryOperatorDefinition>([
   }],
   ['+=', {
     precedence: 3,
-    fn: opAssignment('number', 'number', (arg0, arg1) => arg0.value + arg1.value),
+    fn: opAssignment('number', 'number', (arg0Raw, arg1Raw) => arg0Raw + arg1Raw),
   }],
   ['-=', {
     precedence: 3,
-    fn: opAssignment('number', 'number', (arg0, arg1) => arg0.value - arg1.value),
+    fn: opAssignment('number', 'number', (arg0Raw, arg1Raw) => arg0Raw - arg1Raw),
   }],
   ['*=', {
     precedence: 3,
-    fn: opAssignment('number', 'number', (arg0, arg1) => arg0.value * arg1.value),
+    fn: opAssignment('number', 'number', (arg0Raw, arg1Raw) => arg0Raw * arg1Raw),
   }],
   ['/=', {
     precedence: 3,
-    fn: opAssignment('number', 'number', (arg0, arg1) => arg0.value / arg1.value),
+    fn: opAssignment('number', 'number', (arg0Raw, arg1Raw) => arg0Raw / arg1Raw),
   }],
   ['//=', {
     precedence: 3,
-    fn: opAssignment('number', 'number', (arg0, arg1) => Math.trunc(arg0.value / arg1.value)),
+    fn: opAssignment('number', 'number', (arg0Raw, arg1Raw) => Math.trunc(arg0Raw / arg1Raw)),
   }],
   ['%=', {
     precedence: 3,
-    fn: opAssignment('number', 'number', (arg0, arg1) => arg0.value % arg1.value),
+    fn: opAssignment('number', 'number', (arg0Raw, arg1Raw) => arg0Raw % arg1Raw),
   }],
   ['+', {
     precedence: 13,
@@ -185,38 +201,23 @@ export const binaryOperators = new Map<string, BinaryOperatorDefinition>([
   }],
   ['-', {
     precedence: 13,
-    fn: autoEvaluatedSameTypeArg('number', (arg0, arg1) => ({
-      type: 'number',
-      value: arg0.value + arg1.value,
-    })),
+    fn: autoEvaluatedSameTypeArg('number', 'number', (arg0Raw, arg1Raw) => arg0Raw + arg1Raw),
   }],
   ['*', {
     precedence: 14,
-    fn: autoEvaluatedSameTypeArg('number', (arg0, arg1) => ({
-      type: 'number',
-      value: arg0.value * arg1.value,
-    })),
+    fn: autoEvaluatedSameTypeArg('number', 'number', (arg0Raw, arg1Raw) => arg0Raw * arg1Raw),
   }],
   ['/', {
     precedence: 14,
-    fn: autoEvaluatedSameTypeArg('number', (arg0, arg1) => ({
-      type: 'number',
-      value: arg0.value / arg1.value,
-    })),
+    fn: autoEvaluatedSameTypeArg('number', 'number', (arg0Raw, arg1Raw) => arg0Raw / arg1Raw),
   }],
   ['//', {
     precedence: 14,
-    fn: autoEvaluatedSameTypeArg('number', (arg0, arg1) => ({
-      type: 'number',
-      value: Math.trunc(arg0.value / arg1.value),
-    })),
+    fn: autoEvaluatedSameTypeArg('number', 'number', (arg0Raw, arg1Raw) => Math.trunc(arg0Raw / arg1Raw)),
   }],
   ['%', {
     precedence: 14,
-    fn: autoEvaluatedSameTypeArg('number', (arg0, arg1) => ({
-      type: 'number',
-      value: Math.trunc(arg0.value / arg1.value),
-    })),
+    fn: autoEvaluatedSameTypeArg('number', 'number', (arg0Raw, arg1Raw) => arg0Raw % arg1Raw),
   }],
 ]);
 

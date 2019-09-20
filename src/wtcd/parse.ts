@@ -368,6 +368,11 @@ class LogicParser {
     });
   }
 
+  private parseSection() {
+    const sectionToken = this.tokenStream.assertAndSkipNext('keyword', 'section');
+    if ()
+  }
+
   private parseRootBlock() {
     this.tokenStream.assertNext('keyword', ['declare', 'section']);
     if (this.tokenStream.isNext('keyword', 'declare')) {

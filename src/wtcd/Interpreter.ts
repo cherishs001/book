@@ -1,5 +1,5 @@
 import { binaryOperators, unaryOperators } from './operators';
-import { Action, Expression, VariableType, WTCDRoot } from './types';
+import { Action, Expression, VariableType, WTCDRoot, Section } from './types';
 import { WTCDError } from './WTCDError';
 
 interface SingleChoice {
@@ -47,15 +47,7 @@ export type RuntimeValueType = 'number' | 'boolean' | 'string' | 'null' | 'actio
 
 export type RuntimeValue = NumberValue | BooleanValue | StringValue | NullValue | ActionValue | ChoiceValue;
 
-// See https://github.com/microsoft/TypeScript/issues/33517
-export type RuntimeValueTypeLookUp<T extends RuntimeValueType> =
-    T extends 'number' ? NumberValue
-  : T extends 'boolean' ? BooleanValue
-  : T extends 'string' ? StringValue
-  : T extends 'null' ? NullValue
-  : T extends 'action' ? ActionValue
-  : T extends 'choice' ? ChoiceValue
-  : RuntimeValue;
+export type RuntimeValueRaw<T extends RuntimeValueType> = Extract<RuntimeValue, { type: T }>['value'];
 
 export type Evaluator = (expr: Expression) => RuntimeValue;
 
@@ -88,7 +80,12 @@ export class Interpreter {
     }
   }
   public *start() {
-    const currentSection = this.wtcdRoot.sections[0];
-    // this.wtcdRoot.sections[0].;
+    let currentSection: Section | null = this.wtcdRoot.sections[0];
+    while (currentSection !== null) {
+      if (currentSection.executes !== undefined) {
+        this.evaluator(currentSection.executes);
+      }
+      
+    }
   }
 }
