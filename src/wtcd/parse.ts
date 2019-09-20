@@ -1,8 +1,28 @@
 import * as MDI from 'markdown-it';
-import { binaryOperators, conditionalOperatorPrecedence, unaryOperators } from './operators';
+import { BinaryOperator, binaryOperators, conditionalOperatorPrecedence, UnaryOperator, unaryOperators } from './operators';
 import { SimpleIdGenerator } from './SimpleIdGenerator';
 import { Token, TokenStream } from './TokenStream';
-import { BinaryExpression, BinaryOperator, BooleanLiteral, ConditionalExpression, Expression, ExpressionSet, NumberLiteral, OneVariableDeclaration, OptionalLocationInfo, SingleSectionContent, StringLiteral, UnaryExpression, UnaryOperator, VariableReference, VariableType } from './types';
+import {
+  BinaryExpression,
+  BooleanLiteral,
+  ChoiceExpression,
+  ConditionalExpression,
+  DeclarationExpression,
+  Expression,
+  ExpressionSet,
+  GotoAction,
+  NullLiteral,
+  NumberLiteral,
+  OneVariableDeclaration,
+  OptionalLocationInfo,
+  Section,
+  SingleSectionContent,
+  StringLiteral,
+  UnaryExpression,
+  VariableReference,
+  VariableType,
+} from './types';
+
 import { WTCDError } from './WTCDError';
 
 const CURRENT_MAJOR_VERSION = 1;
@@ -16,11 +36,16 @@ export interface SimpleLogger {
   warn(...stuff: any): void;
 }
 
+/**
+ * Represents a single lexical scope. Managed by LexicalScopeProvide.
+ */
 class LexicalScope {
   private declaredVariables: Set<string> = new Set();
+  /** Whether this lexical scope contains the given variable */
   public hasVariable(variableName: string) {
     return this.declaredVariables.has(variableName);
   }
+  /** Add a variable to this lexical scope */
   public addVariable(variableName: string) {
     this.declaredVariables.add(variableName);
   }
@@ -50,7 +75,7 @@ class LexicalScopeProvider {
   public addVariableToCurrentScope(variableName: string) {
     this.getCurrentScope().addVariable(variableName);
   }
-  public findVariable(variableName: string): boolean {
+  public resolveVariableReference(variableName: string): boolean {
     return this.scopes.some(scope => scope.hasVariable(variableName));
   }
 }
@@ -58,7 +83,9 @@ class LexicalScopeProvider {
 class LogicParser {
   private tokenStream: TokenStream;
   private lexicalScopeProvider = new LexicalScopeProvider();
-  private globalVariables: Array<OneVariableDeclaration> = [];
+  private initExpressions: Array<Expression> = [];
+  private postChecks: Array<() => void | never> = [];
+  private sections: Array<Section> = [];
   public constructor(
     source: string,
     private readonly logger: SimpleLogger,
@@ -78,11 +105,39 @@ class LogicParser {
     return target;
   }
 
+  private parseChoice(): ChoiceExpression {
+    const choiceToken = this.tokenStream.assertAndSkipNext('keyword', 'choice');
+    const text = this.parseExpression();
+    const action = this.parseExpression();
+    return this.attachLocationInfo<ChoiceExpression>(choiceToken, {
+      type: 'choiceExpression',
+      text,
+      action,
+    });
+  }
+
+  private parseGotoAction(): GotoAction {
+    const gotoToken = this.tokenStream.assertAndSkipNext('keyword', 'goto');
+    const targetToken = this.tokenStream.assertAndSkipNext('identifier');
+    this.postChecks.push(() => {
+      if (!this.sections.some(section => section.name === targetToken.content)) {
+        throw WTCDError.atToken(`Unknown section "${targetToken.content}"`, targetToken);
+      }
+    });
+    return this.attachLocationInfo<GotoAction>(gotoToken, {
+      type: 'gotoAction',
+      section: targetToken.content,
+    });
+  }
+
   /**
    * Try to parse an atom node, which includes:
    * - number literals
    * - string literals
    * - boolean literals
+   * - nulls
+   * - choices
+   * - goto actions
    * - groups
    * - variables
    * - expression sets
@@ -112,6 +167,23 @@ class LogicParser {
       });
     }
 
+    // Null
+    if (this.tokenStream.isNext('keyword', 'null')) {
+      return this.attachLocationInfo<NullLiteral>(this.tokenStream.peek(), {
+        type: 'nullLiteral',
+      });
+    }
+
+    // Choice
+    if (this.tokenStream.isNext('keyword', 'choice')) {
+      return this.parseChoice();
+    }
+
+    // Goto actions
+    if (this.tokenStream.isNext('keyword',  'goto')) {
+      return this.parseGotoAction();
+    }
+
     // Group
     if (this.tokenStream.isNext('punctuation', '(')) {
       this.tokenStream.next();
@@ -128,7 +200,7 @@ class LogicParser {
     // Variable
     if (this.tokenStream.isNext('identifier')) {
       const identifierToken = this.tokenStream.next();
-      const scopeId = this.lexicalScopeProvider.findVariable(identifierToken.content);
+      const scopeId = this.lexicalScopeProvider.resolveVariableReference(identifierToken.content);
       if (scopeId === null) {
         throw WTCDError.atToken(
           `Cannot locate lexical scope for variable "${identifierToken.content}"`,
@@ -181,15 +253,9 @@ class LogicParser {
       return left;
     }
     const operatorToken = this.tokenStream.peek()!;
-    if (operatorToken.content === ':') {
-      return left;
-    }
     const isConditional = operatorToken.content === '?';
     if (!isConditional && !binaryOperators.has(operatorToken.content)) {
-      throw WTCDError.atToken(
-        `Invalid operator: ${operatorToken.content}`,
-        operatorToken,
-      );
+      return left;
     }
     const nextPrecedence = isConditional
       ? conditionalOperatorPrecedence
@@ -221,6 +287,12 @@ class LogicParser {
     }
   }
 
+  /**
+   * Parse a single expression, which includes:
+   * - unary expressions
+   * - declare expressions
+   * - infix expressions (binary and conditional)
+   */
   private parseExpression: () => Expression = () => {
     if (this.tokenStream.isNext('operator')) { // Unary
       const operatorToken = this.tokenStream.next();
@@ -241,6 +313,8 @@ class LogicParser {
         // to express 3 and -5 in a list, one needs to write [ 3 (-5) ].
         arg: this.parseAtom(), // This is a conscious
       });
+    } else if (this.tokenStream.isNext('keyword', 'declare')) {
+      return this.parseDeclarationExpression();
     } else {
       return this.parseMaybeInfixExpression(
         this.parseAtom(),
@@ -285,15 +359,19 @@ class LogicParser {
     }
   }
 
-  private parseDeclaration() {
-    this.tokenStream.assertAndSkipNext('keyword', 'declare');
-    this.globalVariables.push(...this.parseListOrSingleElement(this.parseOneDeclaration));
+  private parseDeclarationExpression() {
+    const declareToken = this.tokenStream.assertAndSkipNext('keyword', 'declare');
+    const declarations = this.parseListOrSingleElement(this.parseOneDeclaration);
+    return this.attachLocationInfo<DeclarationExpression>(declareToken, {
+      type: 'declarationExpression',
+      declarations,
+    });
   }
 
   private parseRootBlock() {
     this.tokenStream.assertNext('keyword', ['declare', 'section']);
     if (this.tokenStream.isNext('keyword', 'declare')) {
-      this.parseDeclaration();
+      this.initExpressions.push(this.parseDeclarationExpression());
     } else if (this.tokenStream.isNext('keyword', 'section')) {
       throw new Error();
     }
@@ -332,7 +410,7 @@ class LogicParser {
     logger.info('Start parsing logic section.');
     this.parseVersion();
     this.parseRootBlock();
-    logger.info(JSON.stringify(this.globalVariables, null, 4));
+    logger.info(JSON.stringify(this.initExpressions, null, 4));
   }
 }
 
@@ -373,6 +451,8 @@ export function parse(source: string, mdi: MDI, logger: SimpleLogger) {
     true,
   ).parse();
 
+  const sig = new SimpleIdGenerator();
+
   /** Parsed section contents */
   const sectionContents: Array<SingleSectionContent> = [];
   for (let i = 0; i < sectionMarkdowns.length; i++) {
@@ -387,7 +467,6 @@ export function parse(source: string, mdi: MDI, logger: SimpleLogger) {
       : `${sectionName}@${sectionBound}`;
     logger.info(`Parsing markdown for section ${sectionFullName}.`);
     const variables: Array<{ elementClass: string, variableName: string }> = [];
-    const sig = new SimpleIdGenerator();
     /**
      * Markdown content of the section whose interpolated values are converted
      * to spans with unique ids.

@@ -1,4 +1,5 @@
 import { englishConcatenation } from './englishConcatenation';
+import { operators } from './operators';
 import { WTCDError } from './WTCDError';
 
 /**
@@ -139,7 +140,7 @@ function isIdentifierBody(char: string | undefined) {
 }
 
 function isOperatorPart(char: string | undefined) {
-  return includes('+-*/^&|=><!?:', char);
+  return includes('+-*/^&|=><!?:%', char);
 }
 
 function isPunctuation(char: string | undefined) {
@@ -178,14 +179,6 @@ const keywords = new Set([
   'choice',
   'true',
   'false',
-]);
-
-const operators = new Set([
-  '+', '-', '*', '/',
-  '^', '&&', '||', '==',
-  '>', '<', '>=', '<=',
-  '!=', '!', '=', '?',
-  ':', '+=', '-=', '*=', '-=', '++', '--',
 ]);
 
 const escapeMap = new Map([

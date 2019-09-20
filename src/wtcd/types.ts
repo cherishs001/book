@@ -1,3 +1,9 @@
+import { BinaryOperator, UnaryOperator } from './operators';
+
+/**
+ * Nodes that may include location info (for debugging) when sourceMap is
+ * enabled can extend this interface.
+ */
 export interface OptionalLocationInfo {
   line?: number;
   column?: number;
@@ -32,17 +38,15 @@ export interface StringLiteral extends OptionalLocationInfo {
   value: string;
 }
 
-export interface NullLiteral {
-  type: 'null';
+export interface NullLiteral extends OptionalLocationInfo {
+  type: 'nullLiteral';
 }
 
 export interface ChoiceExpression extends OptionalLocationInfo {
   type: 'choiceExpression';
   text: Expression;
-  result: Expression;
+  action: Expression;
 }
-
-export type BinaryOperator = '+' | '-' | '*' | '/' | '^' | '&&' | '||' | '==' | '>' | '<' | '>=' | '<=' | '!=' | '=' | '+=' | '-=' | '*=' | '/=';
 
 export interface BinaryExpression extends OptionalLocationInfo {
   type: 'binaryExpression';
@@ -50,8 +54,6 @@ export interface BinaryExpression extends OptionalLocationInfo {
   arg0: Expression;
   arg1: Expression;
 }
-
-export type UnaryOperator = '-' | '!';
 
 export interface UnaryExpression extends OptionalLocationInfo {
   type: 'unaryExpression';
@@ -66,13 +68,9 @@ export interface ConditionalExpression extends OptionalLocationInfo {
   otherwise: Expression;
 }
 
-export interface GotoAction {
+export interface GotoAction extends OptionalLocationInfo {
   type: 'gotoAction';
   section: string;
-}
-
-export interface DisabledAction {
-  type: 'disabledAction';
 }
 
 export interface SelectionCommand {
@@ -85,9 +83,8 @@ export interface ExpressionSet extends OptionalLocationInfo {
   expressions: Array<Expression>;
 }
 
-export interface DeclarationExpression {
+export interface DeclarationExpression extends OptionalLocationInfo {
   type: 'declarationExpression';
-  lexicalScopeId: number;
   declarations: Array<OneVariableDeclaration>;
 }
 
@@ -100,25 +97,18 @@ export type Literal = NumberLiteral | BooleanLiteral | StringLiteral | NullLiter
 
 export type OperatorExpression = BinaryExpression | UnaryExpression | ConditionalExpression;
 
-export type Action = GotoAction | DisabledAction;
+export type Action = GotoAction;
 
-export type Expression = Literal | OperatorExpression | Action | ExpressionSet | ChoiceExpression | VariableReference;
+export type Expression = Literal | OperatorExpression | Action | ExpressionSet | ChoiceExpression | VariableReference | DeclarationExpression;
 
 export interface Section {
   name: string;
   content: Array<SingleSectionContent>;
-  executes?: Function;
+  executes?: Expression;
   then: Array<Expression>;
 }
 
-export interface VariablesTypesMapping {
-  number: number;
-  boolean: boolean;
-  string: string;
-}
-
-export type VariableType = keyof VariablesTypesMapping;
-export type VariableValue = VariablesTypesMapping[VariableType];
+export type VariableType = 'number' | 'boolean' | 'string';
 
 export interface OneVariableDeclaration extends OptionalLocationInfo {
   variableName: string;
