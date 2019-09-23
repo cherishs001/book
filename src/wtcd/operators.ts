@@ -1,42 +1,41 @@
-import { Evaluator, RuntimeValue, RuntimeValueRaw, RuntimeValueType } from './Interpreter';
+// This file defines all infix and prefix operators in WTCD.
+
+import { getMaybePooled } from './constantsPool';
+import { describe, Evaluator, RuntimeValue, RuntimeValueRaw, RuntimeValueType } from './Interpreter';
 import { BinaryExpression, UnaryExpression } from './types';
 import { WTCDError } from './WTCDError';
-
-function describe(rv: RuntimeValue): string {
-  switch (rv.type) {
-    case 'number':
-    case 'boolean':
-      return `${rv.type} ${rv.value}`;
-    case 'string':
-      return `string "${rv.value}"`;
-    case 'choice':
-      return `choice for action ${describe(rv.value.action)} with label "${rv.value.text}"`;
-    case 'action':
-      return `goto to ${rv.value.action}`;
-    case 'null':
-      return 'null';
-  }
-}
 
 export type UnaryOperator = '-' | '!';
 
 type UnaryOperatorFn = (expr: UnaryExpression, evaluator: Evaluator) => RuntimeValue;
-export const unaryOperators = new Map<string, UnaryOperatorFn>([
-  ['-', (expr, evaluator) => {
-    const arg = evaluator(expr.arg);
-    if (arg.type !== 'number') {
-      throw WTCDError.atNode(`Unary operator "-" can only be applied ` +
-        `to a number. Received: ${describe(arg)}`, expr);
-    }
-    return { type: 'number', value: -arg.value };
+
+export interface UnaryOperatorDefinition {
+  precedence: number;
+  fn: UnaryOperatorFn;
+}
+
+export const unaryOperators = new Map<string, UnaryOperatorDefinition>([
+  ['-', {
+    precedence: 16,
+    fn: (expr, evaluator) => {
+      const arg = evaluator(expr.arg);
+      if (arg.type !== 'number') {
+        throw WTCDError.atNode(`Unary operator "-" can only be applied ` +
+          `to a number. Received: ${describe(arg)}`, expr);
+      }
+      return getMaybePooled('number', -arg.value);
+    },
   }],
-  ['!', (expr, evaluator) => {
-    const arg = evaluator(expr.arg);
-    if (arg.type !== 'boolean') {
-      throw WTCDError.atNode(`Unary operator "!" can only be applied ` +
-        `to a boolean. Received: ${describe(arg)}`, expr);
-    }
-    return { type: 'boolean', value: !arg.value };
+  ['!', {
+    precedence: 16,
+    fn: (expr, evaluator) => {
+      const arg = evaluator(expr.arg);
+      if (arg.type !== 'boolean') {
+        throw WTCDError.atNode(`Unary operator "!" can only be applied ` +
+          `to a boolean. Received: ${describe(arg)}`, expr);
+      }
+      return getMaybePooled('boolean', !arg.value);
+    },
   }],
 ]);
 
@@ -80,16 +79,16 @@ function autoEvaluatedSameTypeArg<TArg extends RuntimeValueType, TReturn extends
   return autoEvaluated((arg0, arg1, expr, evaluator, resolveVariableReference) => {
     if (arg0.type === argType && arg1.type === argType) {
       // TypeScript is not smart enough to do the conversion here
-      return {
-        type: returnType,
-        value: fn(
+      return getMaybePooled(
+        returnType,
+        fn(
           arg0.value as RuntimeValueRaw<TArg>,
           arg1.value as RuntimeValueRaw<TArg>,
           expr,
           evaluator,
           resolveVariableReference,
         ),
-      } as RuntimeValue;
+      );
     } else {
       throw WTCDError.atNode(`Binary operator "${expr.operator}" can only be ` +
         `applied to two ${argType}s. Received: ${describe(arg0)} (left) and ` +
@@ -131,10 +130,7 @@ function opAssignment<T0 extends RuntimeValueType, T1 extends RuntimeValueType>(
       resolveVariableReference,
     );
     varRef.value = newValue;
-    return {
-      type: arg0Type,
-      value: newValue,
-    } as RuntimeValue;
+    return getMaybePooled(arg0Type, newValue);
   };
 }
 export const binaryOperators = new Map<string, BinaryOperatorDefinition>([
@@ -179,19 +175,87 @@ export const binaryOperators = new Map<string, BinaryOperatorDefinition>([
     precedence: 3,
     fn: opAssignment('number', 'number', (arg0Raw, arg1Raw) => arg0Raw % arg1Raw),
   }],
+  ['||', {
+    precedence: 5,
+    fn: (expr, evaluator) => {
+      const arg0 = evaluator(expr.arg0);
+      if (arg0.type !== 'boolean') {
+        throw WTCDError.atNode(`Left side of binary operator "||" has to be a boolean. ` +
+          `Received ${describe(arg0)}`, expr);
+      }
+      if (arg0.value === true) {
+        return getMaybePooled('boolean', true);
+      }
+      const arg1 = evaluator(expr.arg1); // Short-circuit evaluation
+      if (arg1.type !== 'boolean') {
+        throw WTCDError.atNode(`Right side of binary operator "||" has to be a boolean. ` +
+          `Received ${describe(arg1)}`, expr);
+      }
+      return getMaybePooled('boolean', arg1.value);
+    },
+  }],
+  ['&&', {
+    precedence: 6,
+    fn: (expr, evaluator) => {
+      const arg0 = evaluator(expr.arg0);
+      if (arg0.type !== 'boolean') {
+        throw WTCDError.atNode(`Left side of binary operator "&&" has to be a boolean. ` +
+          `Received ${describe(arg0)}`, expr);
+      }
+      if (arg0.value === false) {
+        return getMaybePooled('boolean', false);
+      }
+      const arg1 = evaluator(expr.arg1); // Short-circuit evaluation
+      if (arg1.type !== 'boolean') {
+        throw WTCDError.atNode(`Right side of binary operator "&&" has to be a boolean. ` +
+          `Received ${describe(arg1)}`, expr);
+      }
+      return getMaybePooled('boolean', arg1.value);
+    },
+  }],
+  ['==', {
+    precedence: 10,
+    fn: autoEvaluated((arg0, arg1) => (getMaybePooled(
+      'boolean',
+      (arg0.type === arg1.type) && (arg0.value === arg1.value),
+    ))),
+  }],
+  ['!=', {
+    precedence: 10,
+    fn: autoEvaluated((arg0, arg1) => (getMaybePooled(
+      'boolean',
+      (arg0.type !== arg1.type) || (arg0.value !== arg1.value),
+    ))),
+  }],
+  ['<', {
+    precedence: 11,
+    fn: autoEvaluatedSameTypeArg('number', 'boolean', (arg0Raw, arg1Raw) => arg0Raw < arg1Raw),
+  }],
+  ['<=', {
+    precedence: 11,
+    fn: autoEvaluatedSameTypeArg('number', 'boolean', (arg0Raw, arg1Raw) => arg0Raw <= arg1Raw),
+  }],
+  ['>', {
+    precedence: 11,
+    fn: autoEvaluatedSameTypeArg('number', 'boolean', (arg0Raw, arg1Raw) => arg0Raw > arg1Raw),
+  }],
+  ['>=', {
+    precedence: 11,
+    fn: autoEvaluatedSameTypeArg('number', 'boolean', (arg0Raw, arg1Raw) => arg0Raw <= arg1Raw),
+  }],
   ['+', {
     precedence: 13,
     fn: autoEvaluated((arg0, arg1, expr) => {
       if (arg0.type === 'number' && arg1.type === 'number') {
-        return {
-          type: 'number',
-          value: arg0.value + arg1.value,
-        };
+        return getMaybePooled(
+          'number',
+          arg0.value + arg1.value,
+        );
       } else if (arg0.type === 'string' && arg1.type === 'string') {
-        return {
-          type: 'string',
-          value: arg0.value + arg1.value,
-        };
+        return getMaybePooled(
+          'string',
+          arg0.value + arg1.value,
+        );
       } else {
         throw WTCDError.atNode(`Binary operator "+" can only be applied to two ` +
           `strings or two numbers. Received: ${describe(arg0)} (left) and ` +

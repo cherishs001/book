@@ -73,9 +73,9 @@ export interface GotoAction extends OptionalLocationInfo {
   section: string;
 }
 
-export interface SelectionAction extends OptionalLocationInfo {
-  type: 'selectionAction';
-  choices: Array<ChoiceExpression>;
+export interface Selection extends OptionalLocationInfo {
+  type: 'selection';
+  choices: Array<Expression>;
 }
 
 export interface ExpressionSet extends OptionalLocationInfo {
@@ -97,11 +97,11 @@ export type Literal = NumberLiteral | BooleanLiteral | StringLiteral | NullLiter
 
 export type OperatorExpression = BinaryExpression | UnaryExpression | ConditionalExpression;
 
-export type Action = GotoAction | SelectionAction;
+export type Action = GotoAction;
 
-export type Expression = Literal | OperatorExpression | Action | ExpressionSet | ChoiceExpression | VariableReference | DeclarationExpression;
+export type Expression = Literal | OperatorExpression | Selection | Action | ExpressionSet | ChoiceExpression | VariableReference | DeclarationExpression;
 
-export interface Section {
+export interface Section extends OptionalLocationInfo {
   name: string;
   content: Array<SingleSectionContent>;
   executes?: Expression;

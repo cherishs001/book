@@ -144,7 +144,7 @@ function isOperatorPart(char: string | undefined) {
 }
 
 function isPunctuation(char: string | undefined) {
-  return includes('[]()', char);
+  return includes('[](){}', char);
 }
 
 function isStringQuote(char: string | undefined) {
@@ -176,6 +176,7 @@ const keywords = new Set([
   'true',
   'false',
   'disabled',
+  'selection',
   'choice',
   'true',
   'false',

@@ -2,27 +2,7 @@ import * as MDI from 'markdown-it';
 import { BinaryOperator, binaryOperators, conditionalOperatorPrecedence, UnaryOperator, unaryOperators } from './operators';
 import { SimpleIdGenerator } from './SimpleIdGenerator';
 import { Token, TokenStream } from './TokenStream';
-import {
-  BinaryExpression,
-  BooleanLiteral,
-  ChoiceExpression,
-  ConditionalExpression,
-  DeclarationExpression,
-  Expression,
-  ExpressionSet,
-  GotoAction,
-  NullLiteral,
-  NumberLiteral,
-  OneVariableDeclaration,
-  OptionalLocationInfo,
-  Section,
-  SingleSectionContent,
-  StringLiteral,
-  UnaryExpression,
-  VariableReference,
-  VariableType,
-} from './types';
-
+import { BinaryExpression, BooleanLiteral, ChoiceExpression, ConditionalExpression, DeclarationExpression, Expression, ExpressionSet, GotoAction, NullLiteral, NumberLiteral, OneVariableDeclaration, OptionalLocationInfo, Section, Selection, SingleSectionContent, StringLiteral, UnaryExpression, VariableReference, VariableType } from './types';
 import { WTCDError } from './WTCDError';
 
 const CURRENT_MAJOR_VERSION = 1;
@@ -105,7 +85,7 @@ class LogicParser {
     return target;
   }
 
-  private parseChoice(): ChoiceExpression {
+  private parseChoice() {
     const choiceToken = this.tokenStream.assertAndSkipNext('keyword', 'choice');
     const text = this.parseExpression();
     const action = this.parseExpression();
@@ -136,11 +116,13 @@ class LogicParser {
    * - string literals
    * - boolean literals
    * - nulls
+   * - selection
    * - choices
    * - goto actions
    * - groups
    * - variables
    * - expression sets
+   * - unary expression
    */
   private parseAtom(): Expression {
     // Number literal
@@ -169,8 +151,16 @@ class LogicParser {
 
     // Null
     if (this.tokenStream.isNext('keyword', 'null')) {
-      return this.attachLocationInfo<NullLiteral>(this.tokenStream.peek(), {
+      return this.attachLocationInfo<NullLiteral>(this.tokenStream.next(), {
         type: 'nullLiteral',
+      });
+    }
+
+    // Selection
+    if (this.tokenStream.isNext('keyword', 'selection')) {
+      return this.attachLocationInfo<Selection>(this.tokenStream.next(), {
+        type: 'selection',
+        choices: this.parseListOrSingleElement(this.parseExpression),
       });
     }
 
@@ -200,8 +190,7 @@ class LogicParser {
     // Variable
     if (this.tokenStream.isNext('identifier')) {
       const identifierToken = this.tokenStream.next();
-      const scopeId = this.lexicalScopeProvider.resolveVariableReference(identifierToken.content);
-      if (scopeId === null) {
+      if (!this.lexicalScopeProvider.resolveVariableReference(identifierToken.content)) {
         throw WTCDError.atToken(
           `Cannot locate lexical scope for variable "${identifierToken.content}"`,
           identifierToken,
@@ -210,6 +199,25 @@ class LogicParser {
       return this.attachLocationInfo<VariableReference>(identifierToken, {
         type: 'variableReference',
         variableName: identifierToken.content,
+      });
+    }
+
+    // Unary
+    if (this.tokenStream.isNext('operator')) {
+      const operatorToken = this.tokenStream.next();
+      if (!unaryOperators.has(operatorToken.content)) {
+        throw WTCDError.atToken(
+          `Invalid unary operator: ${operatorToken.content}`,
+          operatorToken,
+        );
+      }
+      return this.attachLocationInfo<UnaryExpression>(operatorToken, {
+        type: 'unaryExpression',
+        operator: operatorToken.content as UnaryOperator,
+        arg: this.parseMaybeInfixExpression(
+          this.parseAtom(),
+          unaryOperators.get(operatorToken.content)!.precedence,
+        ),
       });
     }
     return this.tokenStream.throwUnexpectedNext('atom');
@@ -232,7 +240,6 @@ class LogicParser {
 
   /**
    * - If next token is not an operator, return left as is.
-   * - If next token is ":", return left as is.
    * - If next operator's precedence is smaller than or equal to the precedence
    *   threshold, return left as is. (Because in this case, we want to left
    *   someone on the left wrap us.)
@@ -294,26 +301,7 @@ class LogicParser {
    * - infix expressions (binary and conditional)
    */
   private parseExpression: () => Expression = () => {
-    if (this.tokenStream.isNext('operator')) { // Unary
-      const operatorToken = this.tokenStream.next();
-      if (!unaryOperators.has(operatorToken.content)) {
-        throw WTCDError.atToken(
-          `Invalid unary operator: ${operatorToken.content}`,
-          operatorToken,
-        );
-      }
-      return this.attachLocationInfo<UnaryExpression>(operatorToken, {
-        type: 'unaryExpression',
-        operator: operatorToken.content as UnaryOperator,
-        // This is a conscious decision that unary operators only accept atoms
-        // as their arguments. This is done in order to eliminate ambiguity
-        // between [ 3 -5 ] and [ 3 - 5 ] since our lists do not have
-        // delimiters. In WTCD, [ 3 -5 ] or [ 3 - 5 ] is always interpreted as
-        // an array with one element 2, which is the result of (3 - 5). In order
-        // to express 3 and -5 in a list, one needs to write [ 3 (-5) ].
-        arg: this.parseAtom(), // This is a conscious
-      });
-    } else if (this.tokenStream.isNext('keyword', 'declare')) {
+    if (this.tokenStream.isNext('keyword', 'declare')) {
       return this.parseDeclarationExpression();
     } else {
       return this.parseMaybeInfixExpression(
@@ -324,7 +312,13 @@ class LogicParser {
   }
 
   private parseOneDeclaration: () => OneVariableDeclaration = () => {
-    const typeToken = this.tokenStream.assertAndSkipNext('identifier', ['number', 'boolean']);
+    const typeToken = this.tokenStream.assertAndSkipNext('identifier', [
+      'number',
+      'boolean',
+      'string',
+      'action',
+      'choice',
+    ]);
     const variableNameToken = this.tokenStream.assertAndSkipNext('identifier');
     this.tokenStream.assertAndSkipNext('operator', '=');
     const initialValue = this.parseExpression();
@@ -370,7 +364,22 @@ class LogicParser {
 
   private parseSection() {
     const sectionToken = this.tokenStream.assertAndSkipNext('keyword', 'section');
-    if ()
+    const nameToken = this.tokenStream.assertAndSkipNext('identifier');
+    if (this.sections.some(section => section.name === nameToken.content)) {
+      throw WTCDError.atToken(`Cannot redefine section "${nameToken.content}"`, nameToken);
+    }
+    let executes: Expression | undefined;
+    if (!this.tokenStream.isNext('keyword', 'then')) {
+      executes = this.parseExpression();
+    }
+    this.tokenStream.assertAndSkipNext('keyword', 'then');
+    const then = this.parseExpression();
+    return this.attachLocationInfo<Section>(sectionToken, {
+      name: nameToken.content,
+      executes,
+      then,
+      content: [],
+    });
   }
 
   private parseRootBlock() {
@@ -378,7 +387,7 @@ class LogicParser {
     if (this.tokenStream.isNext('keyword', 'declare')) {
       this.initExpressions.push(this.parseDeclarationExpression());
     } else if (this.tokenStream.isNext('keyword', 'section')) {
-      throw new Error();
+      this.sections.push(this.parseSection());
     }
   }
 
@@ -414,8 +423,11 @@ class LogicParser {
     const logger = this.logger;
     logger.info('Start parsing logic section.');
     this.parseVersion();
-    this.parseRootBlock();
+    while (!this.tokenStream.eof()) {
+      this.parseRootBlock();
+    }
     logger.info(JSON.stringify(this.initExpressions, null, 4));
+    logger.info(JSON.stringify(this.sections, null, 4));
   }
 }
 
@@ -453,7 +465,7 @@ export function parse(source: string, mdi: MDI, logger: SimpleLogger) {
   const logicParser = new LogicParser(
     sectionMarkdowns.shift()!,
     logger,
-    true,
+    false,
   ).parse();
 
   const sig = new SimpleIdGenerator();
