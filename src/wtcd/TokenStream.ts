@@ -87,7 +87,7 @@ class CharStream extends ItemStream<string> {
     return this.throwUnexpectedNext();
   }
   public throw(message: string): never {
-    throw new WTCDError(message, this.line, this.column);
+    throw WTCDError.atLineColumn(this.line, this.column, message);
   }
   public describeNext(): string {
     switch (this.peek()) {
@@ -175,11 +175,26 @@ const keywords = new Set([
   'null',
   'true',
   'false',
-  'disabled',
   'selection',
   'choice',
   'true',
   'false',
+  'yield',
+
+  // Reserved
+  'return',
+  'continue',
+  'break',
+  'switch',
+  'function',
+  'if',
+  'else',
+  'while',
+  'do',
+  'for',
+  'in',
+  'of',
+  'enum',
 ]);
 
 const escapeMap = new Map([
@@ -237,14 +252,14 @@ export class TokenStream extends ItemStream<Token> {
       throw this.charStream.throwUnexpectedNext(expecting);
     }
     if (expecting === undefined) {
-      throw new WTCDError(`Unexpected token ${this.describeToken(token)}`, token.line, token.column);
+      throw WTCDError.atLineColumn(token.line, token.column, `Unexpected token ${this.describeToken(token)}`);
     } else {
-      throw new WTCDError(`Unexpected token ${this.describeToken(token)}, expecting ${expecting}`, token.line, token.column);
+      throw WTCDError.atLineColumn(token.line, token.column, `Unexpected token ${this.describeToken(token)}, expecting ${expecting}`);
     }
   }
 
   protected onNextCallWhenEOF(): never {
-    throw new WTCDError('Unexpected <EOF>', this.charStream.getLine(), this.charStream.getColumn());
+    throw WTCDError.atLineColumn(this.charStream.getLine(), this.charStream.getColumn(), 'Unexpected <EOF>');
   }
 
   /** Reads from charStream until predicate returns false for next char */
@@ -366,7 +381,7 @@ export class TokenStream extends ItemStream<Token> {
         content: this.readOperator(),
       };
       if (!operators.has(tokenContent.content)) {
-        throw new WTCDError(`Unknown operator: "${tokenContent.content}"`, line, column);
+        throw WTCDError.atLineColumn(line, column, `Unknown operator: "${tokenContent.content}"`);
       }
     } else if (isPunctuation(this.charStream.peek())) {
       tokenContent = {

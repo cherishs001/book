@@ -1,38 +1,30 @@
-import { data } from './data';
-import { id } from './DOM';
-import { followQuery } from './followQuery';
-import { MainMenu } from './MainMenu';
-import { animation } from './settings';
-import { updateSelection } from './updateSelection';
+import { ContentOutput, Interpreter } from '../wtcd/Interpreter';
+import { Random } from '../wtcd/Random';
+import { test } from './../wtcd/test';
 
-import '../wtcd/test';
+document.body.innerHTML = '';
 
-const $warning = id('warning');
+console.info(test);
 
-if ($warning !== null) {
-  $warning.addEventListener('click', () => {
-    $warning.style.opacity = '0';
-    if (animation.getValue()) {
-      $warning.addEventListener('transitionend', () => {
-        $warning.remove();
+const interpreter = new Interpreter(test, new Random(String(Math.random())));
+const p = interpreter.start();
+
+function handleOutput(output: ContentOutput | void) {
+  if (output === undefined) {
+    return;
+  }
+  output.content.forEach($element => document.body.appendChild($element));
+  output.choices.forEach((choice, index) => {
+    const $choice = document.createElement('button');
+    $choice.innerText = choice.content;
+    $choice.disabled = choice.disabled;
+    document.body.appendChild($choice);
+    if (!choice.disabled) {
+      $choice.addEventListener('click', () => {
+        handleOutput(p.next(index).value);
       });
-    } else {
-      $warning.remove();
     }
   });
 }
 
-const $buildNumber = id('build-number');
-$buildNumber.innerText = `Build ${data.buildNumber}`;
-
-new MainMenu().setActive(true);
-
-document.addEventListener('selectionchange', () => {
-  updateSelection();
-});
-
-window.addEventListener('popstate', () => {
-  followQuery();
-});
-
-followQuery();
+handleOutput(p.next().value);

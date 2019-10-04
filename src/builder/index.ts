@@ -1,12 +1,15 @@
 import { copy, copyFile, ensureDir, mkdirp, readdir, readFile, stat, writeFile } from 'fs-extra';
 import * as MDI from 'markdown-it';
 import * as mdiReplaceLinkPlugin from 'markdown-it-replace-link';
-import { basename, dirname, join, relative, resolve } from 'path';
+import { basename, dirname, posix, relative, resolve } from 'path';
 import { Chapter, Data, Folder, Node } from '../Data';
 import { countCertainWord } from './countCertainWord';
 import { countChars } from './countChars';
 import { countParagraphs } from './countParagraphs';
+import { isAttachment, isDocument } from './fileExtensions';
 import { keywords } from './keywords';
+
+const { join } = posix;
 
 const earlyAccessFlag = '# 编写中';
 const commentsUrlBegin = '[评论](';
@@ -18,6 +21,8 @@ const commentsUrlEnd = ')';
   const chaptersDir = resolve(rootDir, 'chapters');
   const distDir = resolve(rootDir, 'dist');
   const distChapters = resolve(distDir, 'chapters');
+
+  console.info(distChapters);
 
   await ensureDir(distChapters);
 
@@ -105,7 +110,12 @@ const commentsUrlEnd = ')';
         if (!link.startsWith('./')) {
           return link;
         }
-        return join('./chapters', dirname(htmlRelativePath), link);
+        if (isAttachment(link)) {
+          return join('./chapters', dirname(htmlRelativePath), link);
+        }
+        if (isDocument(link)) {
+          return '#' + join(dirname(htmlRelativePath), link);
+        }
       },
     } as MDI.Options).use(mdiReplaceLinkPlugin);
 
@@ -157,14 +167,12 @@ const commentsUrlEnd = ')';
       if (isDirectory) {
         subDirsLoadingPromises.push(loadFolder(subpath, htmlRelativePath, false));
       } else {
-        if (subpath.endsWith('.pdf') || subpath.endsWith('.png') || subpath.endsWith('.jpg')) {
+        if (isAttachment(subpath)) {
           await copyResource(subpath, htmlRelativePath);
         }
-        // Ignore backup files created by text editors
-        if (!subpath.endsWith('.md')) {
-          continue;
+        if (subpath.endsWith('.md')) {
+          chaptersLoadingPromises.push(loadChapter(subpath, htmlRelativePath));
         }
-        chaptersLoadingPromises.push(loadChapter(subpath, htmlRelativePath));
       }
     }
 

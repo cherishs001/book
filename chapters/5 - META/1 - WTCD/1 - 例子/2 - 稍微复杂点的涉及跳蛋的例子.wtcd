@@ -1,0 +1,43 @@
+WTCD 1.0
+declare [
+  boolean vibrator = false
+]
+section start then selection [
+  choice "按下开关" goto press
+  choice "不按" goto doNotPress
+]
+section press {
+  vibrator = true
+} then goto walkHome
+section doNotPress then goto walkHome
+section walkHome then vibrator
+  ? goto czpClimax
+  : goto czpGoToGrandmasHouse
+section czpClimax
+section czpGoToGrandmasHouse
+
+---<<< start >>>---
+面对少女的背影，手握粉色遥控器的你，是否要按下开关呢？
+
+---<<< press >>>---
+想到手中遥控器能给少女带来的快乐，心善的你毫不犹豫地按下了开关。
+
+然而，出乎意料的是少女似乎丝毫没有被影响。
+
+“可能是没电了吧...”
+
+---<<< doNotPress >>>---
+“还是不了吧...”
+
+---<<< walkHome >>>---
+这样想着，你把遥控器放进了裤子口袋里，朝家中走去。
+
+---<<< czpClimax >>>---
+突然，你远远地看到路边有一只陈志鹏正扶着墙，一脸红晕地走着。你突然明白了什么，然后愤怒地把遥控器调到了最大。
+
+---<<< czpGoToGrandmasHouse >>>---
+路上经过了一只陈志鹏。你还没来得及向他打招呼，他就说道：
+
+“好，我要去奶奶家了。”
+
+一脸懵逼的你只得继续向前走着。

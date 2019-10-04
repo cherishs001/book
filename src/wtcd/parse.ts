@@ -2,7 +2,7 @@ import * as MDI from 'markdown-it';
 import { BinaryOperator, binaryOperators, conditionalOperatorPrecedence, UnaryOperator, unaryOperators } from './operators';
 import { SimpleIdGenerator } from './SimpleIdGenerator';
 import { Token, TokenStream } from './TokenStream';
-import { BinaryExpression, BooleanLiteral, ChoiceExpression, ConditionalExpression, DeclarationExpression, Expression, ExpressionSet, GotoAction, NullLiteral, NumberLiteral, OneVariableDeclaration, OptionalLocationInfo, Section, Selection, SingleSectionContent, StringLiteral, UnaryExpression, VariableReference, VariableType } from './types';
+import { BinaryExpression, BlockExpression, BooleanLiteral, ChoiceExpression, ConditionalExpression, DeclarationStatement, Expression, ExpressionStatement, GotoAction, NullLiteral, NumberLiteral, OneVariableDeclaration, OptionalLocationInfo, RegisterName, ReturnStatement, Section, Selection, SetReturnStatement, SetYieldStatement, SingleSectionContent, Statement, StringLiteral, UnaryExpression, VariableReference, VariableType, WTCDRoot, YieldStatement } from './types';
 import { WTCDError } from './WTCDError';
 
 const CURRENT_MAJOR_VERSION = 1;
@@ -21,6 +21,7 @@ export interface SimpleLogger {
  */
 class LexicalScope {
   private declaredVariables: Set<string> = new Set();
+  private registers: Set<RegisterName> = new Set();
   /** Whether this lexical scope contains the given variable */
   public hasVariable(variableName: string) {
     return this.declaredVariables.has(variableName);
@@ -28,6 +29,14 @@ class LexicalScope {
   /** Add a variable to this lexical scope */
   public addVariable(variableName: string) {
     this.declaredVariables.add(variableName);
+  }
+  /** Whether this lexical scope contains the given register */
+  public hasRegister(registerName: RegisterName) {
+    return this.registers.has(registerName);
+  }
+  /** Add a register to this lexical scope */
+  public addRegister(registerName: RegisterName) {
+    this.registers.add(registerName);
   }
 }
 
@@ -55,15 +64,21 @@ class LexicalScopeProvider {
   public addVariableToCurrentScope(variableName: string) {
     this.getCurrentScope().addVariable(variableName);
   }
-  public resolveVariableReference(variableName: string): boolean {
+  public hasVariableReference(variableName: string): boolean {
     return this.scopes.some(scope => scope.hasVariable(variableName));
+  }
+  public addRegisterToCurrentScope(registerName: RegisterName) {
+    this.getCurrentScope().addRegister(registerName);
+  }
+  public hasRegister(registerName: RegisterName) {
+    return this.scopes.some(scope => scope.hasRegister(registerName));
   }
 }
 
 class LogicParser {
   private tokenStream: TokenStream;
   private lexicalScopeProvider = new LexicalScopeProvider();
-  private initExpressions: Array<Expression> = [];
+  private initStatements: Array<Statement> = [];
   private postChecks: Array<() => void | never> = [];
   private sections: Array<Section> = [];
   public constructor(
@@ -74,7 +89,7 @@ class LogicParser {
     this.tokenStream = new TokenStream(source);
   }
 
-  private attachLocationInfo<T extends OptionalLocationInfo>(token: Token | undefined, target: T) {
+  private attachLocationInfo<T extends OptionalLocationInfo>(token: OptionalLocationInfo | undefined, target: T) {
     if (this.sourceMap) {
       if (token === undefined) {
         return this.tokenStream.throwUnexpectedNext();
@@ -96,17 +111,26 @@ class LogicParser {
     });
   }
 
-  private parseGotoAction(): GotoAction {
-    const gotoToken = this.tokenStream.assertAndSkipNext('keyword', 'goto');
+  private parseSectionName: () => string = () => {
     const targetToken = this.tokenStream.assertAndSkipNext('identifier');
     this.postChecks.push(() => {
       if (!this.sections.some(section => section.name === targetToken.content)) {
-        throw WTCDError.atToken(`Unknown section "${targetToken.content}"`, targetToken);
+        throw WTCDError.atLocation(targetToken, `Unknown section "${targetToken.content}"`);
       }
     });
+    return targetToken.content;
+  }
+
+  private parseGotoAction(): GotoAction {
+    const gotoToken = this.tokenStream.assertAndSkipNext('keyword', 'goto');
     return this.attachLocationInfo<GotoAction>(gotoToken, {
       type: 'gotoAction',
-      section: targetToken.content,
+      sections: this.parseListOrSingleElement(
+        this.parseSectionName,
+
+        // Allow zero elements because we allow actions like goto []
+        false,
+      ),
     });
   }
 
@@ -121,10 +145,15 @@ class LogicParser {
    * - goto actions
    * - groups
    * - variables
-   * - expression sets
-   * - unary expression
+   * - block expressions
+   * - unary expressions
+   *
+   * @param softFail If true, when parsing failed, null is returned instead of
+   * throwing error.
    */
-  private parseAtom(): Expression {
+  private parseAtom(): Expression;
+  private parseAtom(softFail: true): Expression | null;
+  private parseAtom(softFail?: true): Expression | null {
     // Number literal
     if (this.tokenStream.isNext('number')) {
       return this.attachLocationInfo<NumberLiteral>(this.tokenStream.peek(), {
@@ -182,18 +211,18 @@ class LogicParser {
       return result;
     }
 
-    // Expression set
+    // Block expression
     if (this.tokenStream.isNext('punctuation', '{')) {
-      return this.parseExpressionSet();
+      return this.parseBlockExpression();
     }
 
     // Variable
     if (this.tokenStream.isNext('identifier')) {
       const identifierToken = this.tokenStream.next();
-      if (!this.lexicalScopeProvider.resolveVariableReference(identifierToken.content)) {
-        throw WTCDError.atToken(
-          `Cannot locate lexical scope for variable "${identifierToken.content}"`,
+      if (!this.lexicalScopeProvider.hasVariableReference(identifierToken.content)) {
+        throw WTCDError.atLocation(
           identifierToken,
+          `Cannot locate lexical scope for variable "${identifierToken.content}"`,
         );
       }
       return this.attachLocationInfo<VariableReference>(identifierToken, {
@@ -206,36 +235,93 @@ class LogicParser {
     if (this.tokenStream.isNext('operator')) {
       const operatorToken = this.tokenStream.next();
       if (!unaryOperators.has(operatorToken.content)) {
-        throw WTCDError.atToken(
-          `Invalid unary operator: ${operatorToken.content}`,
+        throw WTCDError.atLocation(
           operatorToken,
+          `Invalid unary operator: ${operatorToken.content}`,
         );
       }
       return this.attachLocationInfo<UnaryExpression>(operatorToken, {
         type: 'unaryExpression',
         operator: operatorToken.content as UnaryOperator,
-        arg: this.parseMaybeInfixExpression(
+        arg: this.parseExpression(
           this.parseAtom(),
           unaryOperators.get(operatorToken.content)!.precedence,
         ),
       });
     }
-    return this.tokenStream.throwUnexpectedNext('atom');
+    if (softFail) {
+      return null;
+    } else {
+      return this.tokenStream.throwUnexpectedNext('atom');
+    }
   }
 
-  private parseExpressionSet() {
+  private parseBlockExpression() {
     const firstBraceToken = this.tokenStream.assertAndSkipNext('punctuation', '{');
     this.lexicalScopeProvider.enterScope();
-    const expressions: Array<Expression> = [];
+    const expressions: Array<Statement> = [];
     while (!this.tokenStream.isNext('punctuation', '}')) {
-      expressions.push(this.parseExpression());
+      expressions.push(this.parseStatement());
     }
     this.lexicalScopeProvider.exitScope();
     this.tokenStream.assertAndSkipNext('punctuation', '}');
-    return this.attachLocationInfo<ExpressionSet>(firstBraceToken, {
-      type: 'expressionSet',
-      expressions,
+    return this.attachLocationInfo<BlockExpression>(firstBraceToken, {
+      type: 'block',
+      statements: expressions,
     });
+  }
+
+  private assertHasRegister(registerName: RegisterName, token: Token) {
+    if (!this.lexicalScopeProvider.hasRegister(registerName)) {
+      throw WTCDError.atLocation(
+        token,
+        `Cannot locate lexical scope for ${registerName} register.`,
+      );
+    }
+  }
+
+  private parseYieldOrSetYieldExpression(): YieldStatement | SetYieldStatement {
+    const yieldToken = this.tokenStream.assertAndSkipNext('keyword', 'yield');
+    if (this.tokenStream.isNext('operator', '=')) {
+      // Set yield
+      this.tokenStream.next();
+      return this.attachLocationInfo<SetYieldStatement>(yieldToken, {
+        type: 'setYield',
+        value: this.parseExpression(),
+      });
+    } else {
+      // Yield
+      return this.attachLocationInfo<YieldStatement>(yieldToken, {
+        type: 'yield',
+        value: this.parseExpressionImpliedNull(yieldToken),
+      });
+    }
+  }
+
+  private parseReturnOrSetReturnStatement(): ReturnStatement | SetReturnStatement {
+    const returnToken = this.tokenStream.assertAndSkipNext('keyword', 'return');
+    if (this.tokenStream.isNext('operator', '=')) {
+      // Set return
+      this.tokenStream.next();
+      return this.attachLocationInfo<SetReturnStatement>(returnToken, {
+        type: 'setReturn',
+        value: this.parseExpression(),
+      });
+    } else {
+      // Return
+      return this.attachLocationInfo<ReturnStatement>(returnToken, {
+        type: 'return',
+        value: this.parseExpressionImpliedNull(returnToken),
+      });
+    }
+  }
+
+  private parseExpressionImpliedNull(location: OptionalLocationInfo) {
+    const atom = this.parseAtom(true);
+    if (atom === null) {
+      return this.attachLocationInfo<NullLiteral>(location, { type: 'nullLiteral' });
+    }
+    return this.parseExpression(atom, 0);
   }
 
   /**
@@ -255,7 +341,13 @@ class LogicParser {
    * @param precedenceThreshold minimum (exclusive) precedence required in order
    * to bind with left
    */
-  private parseMaybeInfixExpression(left: Expression, precedenceThreshold: number): Expression {
+  private parseExpression: (
+    left?: Expression,
+    precedenceThreshold?: number,
+  ) => Expression = (
+    left = this.parseAtom(),
+    precedenceThreshold = 0,
+  ) => {
     if (!this.tokenStream.isNext('operator')) {
       return left;
     }
@@ -274,23 +366,23 @@ class LogicParser {
     if (isConditional) {
       const then = this.parseExpression();
       this.tokenStream.assertAndSkipNext('operator', ':');
-      const otherwise = this.parseMaybeInfixExpression(this.parseAtom(), nextPrecedence);
+      const otherwise = this.parseExpression(this.parseAtom(), nextPrecedence);
       const conditional = this.attachLocationInfo<ConditionalExpression>(operatorToken, {
         type: 'conditionalExpression',
         condition: left,
         then,
         otherwise,
       });
-      return this.parseMaybeInfixExpression(conditional, precedenceThreshold);
+      return this.parseExpression(conditional, precedenceThreshold);
     } else {
-      const right = this.parseMaybeInfixExpression(this.parseAtom(), nextPrecedence);
+      const right = this.parseExpression(this.parseAtom(), nextPrecedence);
       const binary = this.attachLocationInfo<BinaryExpression>(operatorToken, {
         type: 'binaryExpression',
         operator: operatorToken.content as BinaryOperator,
         arg0: left,
         arg1: right,
       });
-      return this.parseMaybeInfixExpression(binary, precedenceThreshold);
+      return this.parseExpression(binary, precedenceThreshold);
     }
   }
 
@@ -300,14 +392,18 @@ class LogicParser {
    * - declare expressions
    * - infix expressions (binary and conditional)
    */
-  private parseExpression: () => Expression = () => {
+  private parseStatement: () => Statement = () => {
     if (this.tokenStream.isNext('keyword', 'declare')) {
-      return this.parseDeclarationExpression();
+      return this.parseDeclaration();
+    } else if (this.tokenStream.isNext('keyword', 'return')) {
+      return this.parseReturnOrSetReturnStatement();
+    } else if (this.tokenStream.isNext('keyword', 'yield')) {
+      return this.parseYieldOrSetYieldExpression();
     } else {
-      return this.parseMaybeInfixExpression(
-        this.parseAtom(),
-        0, // Anything that binds is ok.
-      );
+      return this.attachLocationInfo<ExpressionStatement>(this.tokenStream.peek(), {
+        type: 'expression',
+        expression: this.parseExpression(),
+      });
     }
   }
 
@@ -318,14 +414,15 @@ class LogicParser {
       'string',
       'action',
       'choice',
+      'selection',
     ]);
     const variableNameToken = this.tokenStream.assertAndSkipNext('identifier');
     this.tokenStream.assertAndSkipNext('operator', '=');
     const initialValue = this.parseExpression();
     if (this.lexicalScopeProvider.currentScopeHasVariable(variableNameToken.content)) {
-      throw WTCDError.atToken(
-        `Variable "${variableNameToken.content}" has already been declared within the same lexical scope.`,
+      throw WTCDError.atLocation(
         typeToken,
+        `Variable "${variableNameToken.content}" has already been declared within the same lexical scope.`,
       );
     }
     this.lexicalScopeProvider.addVariableToCurrentScope(variableNameToken.content);
@@ -353,11 +450,11 @@ class LogicParser {
     }
   }
 
-  private parseDeclarationExpression() {
+  private parseDeclaration() {
     const declareToken = this.tokenStream.assertAndSkipNext('keyword', 'declare');
     const declarations = this.parseListOrSingleElement(this.parseOneDeclaration);
-    return this.attachLocationInfo<DeclarationExpression>(declareToken, {
-      type: 'declarationExpression',
+    return this.attachLocationInfo<DeclarationStatement>(declareToken, {
+      type: 'declaration',
       declarations,
     });
   }
@@ -366,7 +463,7 @@ class LogicParser {
     const sectionToken = this.tokenStream.assertAndSkipNext('keyword', 'section');
     const nameToken = this.tokenStream.assertAndSkipNext('identifier');
     if (this.sections.some(section => section.name === nameToken.content)) {
-      throw WTCDError.atToken(`Cannot redefine section "${nameToken.content}"`, nameToken);
+      throw WTCDError.atLocation(nameToken, `Cannot redefine section "${nameToken.content}"`);
     }
     let executes: Expression | undefined;
     if (!this.tokenStream.isNext('keyword', 'then')) {
@@ -385,7 +482,7 @@ class LogicParser {
   private parseRootBlock() {
     this.tokenStream.assertNext('keyword', ['declare', 'section']);
     if (this.tokenStream.isNext('keyword', 'declare')) {
-      this.initExpressions.push(this.parseDeclarationExpression());
+      this.initStatements.push(this.parseDeclaration());
     } else if (this.tokenStream.isNext('keyword', 'section')) {
       this.sections.push(this.parseSection());
     }
@@ -401,7 +498,7 @@ class LogicParser {
     const versionContent = versionToken.content;
     const split = versionContent.split('.');
     if (split.length !== 2) {
-      throw WTCDError.atToken(`Invalid WTCD version ${versionContent}`, versionToken);
+      throw WTCDError.atLocation(versionToken, `Invalid WTCD version ${versionContent}`);
     }
     const majorVersion = Number(split[0]);
     const minorVersion = Number(split[1]);
@@ -421,23 +518,27 @@ class LogicParser {
 
   public parse() {
     const logger = this.logger;
-    logger.info('Start parsing logic section.');
+    logger.info('Parsing logic section...');
     this.parseVersion();
     while (!this.tokenStream.eof()) {
       this.parseRootBlock();
     }
-    logger.info(JSON.stringify(this.initExpressions, null, 4));
-    logger.info(JSON.stringify(this.sections, null, 4));
+    logger.info('Run post checks...');
+    this.postChecks.forEach(postCheck => postCheck());
+    return {
+      initStatements: this.initStatements,
+      sections: this.sections,
+    };
   }
 }
 
 /**
  * Parse the given WTCD document.
  * @param source The content of WTCD
- * @param mdi An instance of markdown-it; Require the html flag to be on
+ * @param mdi An instance of markdown-it
  * @param logger A logging function
  */
-export function parse(source: string, mdi: MDI, logger: SimpleLogger) {
+export function parse(source: string, mdi: MDI, logger: SimpleLogger): WTCDRoot {
   // Parse sections and extract the logic part of this WTCD document
 
   /** Regex used to extract section headers. */
@@ -466,12 +567,13 @@ export function parse(source: string, mdi: MDI, logger: SimpleLogger) {
     sectionMarkdowns.shift()!,
     logger,
     false,
-  ).parse();
+  );
+
+  const wtcdRoot: WTCDRoot = logicParser.parse();
 
   const sig = new SimpleIdGenerator();
 
-  /** Parsed section contents */
-  const sectionContents: Array<SingleSectionContent> = [];
+  sectionContentLoop:
   for (let i = 0; i < sectionMarkdowns.length; i++) {
     /** Markdown content of the section */
     const sectionMarkdown = sectionMarkdowns[i];
@@ -484,11 +586,14 @@ export function parse(source: string, mdi: MDI, logger: SimpleLogger) {
       : `${sectionName}@${sectionBound}`;
     logger.info(`Parsing markdown for section ${sectionFullName}.`);
     const variables: Array<{ elementClass: string, variableName: string }> = [];
+
+    const sectionHTML = mdi.render(sectionMarkdown);
+
     /**
-     * Markdown content of the section whose interpolated values are converted
-     * to spans with unique ids.
+     * HTML content of the section whose interpolated values are converted to
+     * spans with unique classes.
      */
-    const sectionParameterizedMarkdown = sectionMarkdown.replace(/<\$([a-zA-Z_][a-zA-Z_0-9]*)\$>/g, (full, variableName) => {
+    const sectionParameterizedHTML = sectionHTML.replace(/&lt;\$\s+([a-zA-Z_][a-zA-Z_0-9]*)\s+\$&gt;/g, (_, variableName) => {
       const elementClass = 'wtcd-variable-' + sig.next();
       variables.push({
         elementClass,
@@ -509,12 +614,22 @@ export function parse(source: string, mdi: MDI, logger: SimpleLogger) {
         lowerBound = upperBound = Number(sectionBound);
       }
     }
-    sectionContents.push({
-      html: mdi.render(sectionParameterizedMarkdown),
+    const singleSectionContent: SingleSectionContent = {
+      html: sectionParameterizedHTML,
       variables,
       lowerBound,
       upperBound,
-    });
-    console.info(sectionContents[sectionContents.length - 1]);
+    };
+    for (const section of wtcdRoot.sections) {
+      if (section.name === sectionName) {
+        section.content.push(singleSectionContent);
+        continue sectionContentLoop;
+      }
+    }
+    // Currently, location data for content sections are not available
+    throw WTCDError.atUnknown(`Cannot find a logic declaration for ` +
+      `section content ${sectionFullName}.`);
   }
+
+  return wtcdRoot;
 }

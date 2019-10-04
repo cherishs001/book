@@ -59,14 +59,13 @@ class Style {
     attemptInsertRule(`.rect.reading>.content>.earlyAccess.block { background-color: ${this.def.contentBlockEarlyAccessColor}; }`);
     attemptInsertRule(`.rect>.comments>div { background-color: ${this.def.commentColor}; }`);
     attemptInsertRule(`@media (min-width: 901px) { ::-webkit-scrollbar-thumb { background-color: ${this.def.paperBgColor}; } }`);
-    attemptInsertRule(`@media (min-width: 901px) { ::-webkit-scrollbar-thumb:hover { background-color: ${this.def.linkColor}; } }`);
-    attemptInsertRule(`@media (min-width: 901px) { ::-webkit-scrollbar-thumb:active { background-color: ${this.def.linkActiveColor}; } }`);
 
     const key = this.def.keyIsDark ? 'black' : 'white';
     const keyComponent = this.def.keyIsDark ? 0 : 255;
     attemptInsertRule(`.rect>.comments>.create-comment::before { background-color: ${key}; }`);
     attemptInsertRule(`:root { --key-opacity-01: rgba(${keyComponent},${keyComponent},${keyComponent},0.1); } `);
     attemptInsertRule(`:root { --key-opacity-05: rgba(${keyComponent},${keyComponent},${keyComponent},0.5); } `);
+    attemptInsertRule(`:root { --key-opacity-007: rgba(${keyComponent},${keyComponent},${keyComponent},0.07); } `);
 
     this.styleSheet = sheet;
   }

@@ -93,6 +93,7 @@ const fontFamilyCssValues = [
 ];
 export const fontFamily = new EnumSetting('fontFamily', ['黑体', '楷体', '宋体', '仿宋'], 0, (fontFamilyIndex: number) => {
   document.documentElement.style.setProperty('--font-family', fontFamilyCssValues[fontFamilyIndex]);
+  document.documentElement.style.setProperty('--font-family-mono', '"Fira Code", ' + fontFamilyCssValues[fontFamilyIndex]);
 });
 export const debugLogging = new BooleanSetting('debugLogging', false);
 export const charCount = new BooleanSetting('charCount', true, value => {

@@ -8,5 +8,4 @@ export function englishConcatenation(strings: Array<string>, relation = 'or') {
       .splice(-1, 1, `${relation} ${strings[strings.length - 1]}`)
       .join(', ');
   }
-
 }

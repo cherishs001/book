@@ -1,29 +1,28 @@
 import { Token } from './TokenStream';
 import { OptionalLocationInfo } from './types';
 
-export class WTCDError extends Error {
-  public constructor(message: string, line: number, column: number)
-  public constructor(message: string, locationInfo: null)
-  public constructor(
+export class WTCDError<TLocationInfo extends boolean> extends Error {
+  private constructor(
     message: string,
-    public readonly line: number | null,
-    public readonly column?: number,
+    public readonly line: TLocationInfo extends true ? number : null,
+    public readonly column: TLocationInfo extends true ? number : null,
   ) {
-    super(
-      (line === null)
-        ? `${message} at unknown location (Try recompile in debug mode to enable source map)`
-        : `${message} at ${line}:${column}.`,
-    );
+    super(message);
     this.name = 'WTCDError';
   }
-  public static atToken(message: string, token: Token) {
-    return new WTCDError(message, token.line, token.column);
+  public static atUnknown(message: string) {
+    return new WTCDError<false>(message + ` at unknown location. (Location info `
+      + `is not available for this type of error)`, null, null);
   }
-  public static atNode(message: string, node: OptionalLocationInfo) {
-    if (node.line === undefined) {
-      return new WTCDError(message, null);
+  public static atLineColumn(line: number, column: number, message: string) {
+    return new WTCDError<true>(message + ` at ${line}: ${column}`, line, column);
+  }
+  public static atLocation(location: OptionalLocationInfo, message: string) {
+    if (location.line === undefined) {
+      return new WTCDError(message + ' at unknown location. (Try recompile in '
+        + 'debug mode to enable source map)', null, null);
     } else {
-      return new WTCDError(message, node.line, node.column!);
+      return this.atLineColumn(location.line, location.column!, message);
     }
   }
 }

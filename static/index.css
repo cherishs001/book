@@ -3,8 +3,6 @@ body.animation-enabled {
 }
 body {
   margin: 0;
-
-  background-color: #333;
 }
 div {
   box-sizing: border-box;
@@ -36,6 +34,9 @@ img {
 }
 tbody>tr:nth-child(odd) {
   background-color: var(--key-opacity-01);
+}
+th {
+  white-space: nowrap;
 }
 td, th {
   line-height: 1.6em;
@@ -260,16 +261,27 @@ body.animation-enabled .rect>div {
   margin-top: 0;
 }
 .rect>.content code {
+  cursor: text;
+
+  font-family: var(--font-family-mono);
+  font-size: 1em;
+}
+.rect>.content :not(pre)>code {
   margin: 0;
   padding: 0.12em 0.3em;
 
   word-break: break-all;
 
   border-radius: 3px;
-  background-color: rgba(50, 50, 50 , 0.08);
+  background-color: var(--key-opacity-007);
+}
+.rect>.content pre {
+  overflow-x: auto;
 
-  font-family: var(--font-family);
-  font-size: 1em;
+  padding: 2em;
+
+  border-radius: 0.8em;
+  background-color: var(--key-opacity-007);
 }
 .rect>.content blockquote {
   margin: 0;
@@ -530,6 +542,12 @@ body.animation-enabled .menu {
 .menu .button.folder:hover::before {
   content: 'folder';
 }
+.menu .button.icon.file::before {
+  content: 'insert_drive_file';
+}
+.menu .button.icon.game::before {
+  content: 'games';
+}
 body.animation-enabled .menu .button.selectable::before {
   transition: opacity 0.3s, transform 0.3s;
 }
@@ -602,14 +620,19 @@ body.animation-enabled .comment>.block-user {
 
 @media (min-width: 901px) {
   ::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
+    width: 18px;
+    height: 18px;
   }
 
   ::-webkit-scrollbar-thumb {
-    width: 10px;
-    height: 10px;
+    transition: border-width 0.5s;
 
-    border-radius: 5px;
+    border: 5px solid rgba(0, 0, 0, 0);
+    border-radius: 0.8em;
+    background-clip: padding-box;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    border-width: 3px;
   }
 }
