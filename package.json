@@ -4,9 +4,21 @@
   "description": "《可穿戴科技》网页构建脚本",
   "main": "builder/index.js",
   "scripts": {
-    "initBuild": "tsc && node ts-out/builder/index.js",
-    "build": "npm run initBuild && browserify ts-out/web/index.js -o dist/bundle.max.js && uglifyjs dist/bundle.max.js --compress --mangle -o dist/bundle.js ",
-    "watch": "npm run initBuild && start echo === Web Server === ^&^& cd ./dist ^&^& static-server -p 2333 && start echo === Static File Sync Watcher === ^&^& cpx static/**/* dist -w && start echo === Bundler Server === ^&^& watchify src/web/index.ts -p tsify -o dist/bundle.js && open-cli http://127.0.0.1:2333",
+    "compileTypeScriptOnce": "tsc",
+    "buildChapters": "node ts-out/builder/index.js",
+    "buildWebScript": "browserify ts-out/web/index.js -o dist/bundle.max.js",
+    "minifyWebScript": "uglifyjs dist/bundle.max.js --compress --mangle -o dist/bundle.js",
+
+    "build": "run-s compileTypeScriptOnce buildChapters buildWebScript minifyWebScript",
+
+    "staticServer": "cd dist && static-server -p 2333 -o --no-cache",
+    "staticFileWatcher": "cpx static/**/* dist -w",
+    "bundler": "watchify src/web/index.ts -p tsify -o dist/bundle.js",
+
+    "startWatchServers": "concurrently -n --kill-others npm:staticServer npm:staticFileWatcher npm:bundler",
+
+    "watch": "run-s compileTypeScriptOnce buildChapters startWatchServers",
+
     "lint": "tslint --project ./"
   },
   "author": "SCLeo",
@@ -24,8 +36,10 @@
     "uglify-js": "^3.4.9"
   },
   "devDependencies": {
+    "concurrently": "^4.1.2",
     "cpx": "^1.5.0",
     "csscomb": "^4.3.0",
+    "npm-run-all": "^4.1.5",
     "open-cli": "^5.0.0",
     "static-server": "^2.2.1",
     "tsify": "^4.0.1",
