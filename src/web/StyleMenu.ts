@@ -63,9 +63,14 @@ class Style {
     const key = this.def.keyIsDark ? 'black' : 'white';
     const keyComponent = this.def.keyIsDark ? 0 : 255;
     attemptInsertRule(`.rect>.comments>.create-comment::before { background-color: ${key}; }`);
-    attemptInsertRule(`:root { --key-opacity-01: rgba(${keyComponent},${keyComponent},${keyComponent},0.1); } `);
-    attemptInsertRule(`:root { --key-opacity-05: rgba(${keyComponent},${keyComponent},${keyComponent},0.5); } `);
-    attemptInsertRule(`:root { --key-opacity-007: rgba(${keyComponent},${keyComponent},${keyComponent},0.07); } `);
+
+    attemptInsertRule(`:root { --key: rgb(${keyComponent},${keyComponent},${keyComponent}); }`);
+    attemptInsertRule(`:root { --key-opacity-01: rgba(${keyComponent},${keyComponent},${keyComponent},0.1); }`);
+    attemptInsertRule(`:root { --key-opacity-05: rgba(${keyComponent},${keyComponent},${keyComponent},0.5); }`);
+    attemptInsertRule(`:root { --key-opacity-007: rgba(${keyComponent},${keyComponent},${keyComponent},0.07); }`);
+    attemptInsertRule(`:root { --key-opacity-004: rgba(${keyComponent},${keyComponent},${keyComponent},0.04); }`);
+
+    attemptInsertRule(`:root { --button-color: ${this.def.commentColor}; }`);
 
     this.styleSheet = sheet;
   }

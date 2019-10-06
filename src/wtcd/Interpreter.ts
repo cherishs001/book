@@ -364,7 +364,7 @@ export class Interpreter {
   private started = false;
   private sectionEnterTimes = new Map<string, number>();
   private currentlyBuilding: Array<HTMLElement> = [];
-  public *start() {
+  public *start(): Generator<ContentOutput, ContentOutput, number> {
     if (this.started) {
       throw new Error('Interpretation has already started.');
     }
@@ -419,7 +419,7 @@ export class Interpreter {
           choices,
         };
         this.currentlyBuilding = [];
-        const playerChoiceId = (yield yieldValue) as number;
+        const playerChoiceId = yield yieldValue;
         const playerChoice = then.value.choices[playerChoiceId];
         if (playerChoice === undefined || playerChoice.value.action.type === 'null') {
           throw new InvalidChoiceError(playerChoiceId);

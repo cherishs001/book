@@ -23,6 +23,8 @@ li {
   line-height: 1.6em;
 }
 table {
+  margin: 1em 0;
+
   border-spacing: 0;
 
   color: inherit;
@@ -65,6 +67,9 @@ body.animation-enabled .warning {
 .warning {
   position: fixed;
   z-index: 2;
+
+  width: 100vw;
+  height: 100vh;
 
   cursor: pointer;
 
@@ -525,10 +530,10 @@ body.animation-enabled .menu {
   content: '\25C0\FE0E';
 }
 .menu .button.icon::before {
-  transform: translateX(0.2vh);
+  transform: translate(0.4vh, 0.03em) scaleX(0.833);
 
   font-family: 'Material Icons';
-  font-size: 1em;
+  font-size: 1.1em;
 }
 .menu .button.icon.link::before {
   content: 'link';
@@ -635,4 +640,64 @@ body.animation-enabled .comment>.block-user {
   ::-webkit-scrollbar-thumb:hover {
     border-width: 3px;
   }
+}
+
+body.animation-enabled .wtcd-button.candidate::before, body.animation-enabled .wtcd-button.selected::before {
+  transition: opacity 0.12s;
+}
+.wtcd-button.candidate::before, .wtcd-button.selected::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 100%;
+
+  content: '';
+  pointer-events: none;
+
+  opacity: 0;
+  background-color: var(--key);
+}
+.wtcd-button.candidate:hover::before, .wtcd-button.selected:hover::before {
+  opacity: 0.1;
+}
+.wtcd-button.candidate:active::before, .wtcd-button.selected:active::before {
+  opacity: 0.04;
+}
+body.animation-enabled .wtcd-button {
+  transition: background-color 0.3s, box-shadow 0.3s, color 0.3s;
+}
+.wtcd-button {
+  position: relative;
+
+  overflow: hidden;
+
+  margin: 0.8em 0;
+  padding: 1em 1.2em;
+
+  border-radius: 0.5em;
+}
+.wtcd-button.disabled {
+  color: var(--key-opacity-05);
+  background: repeating-linear-gradient(45deg, var(--key-opacity-007), var(--key-opacity-007) 15px, rgba(0,0,0,0) 15px, rgba(0,0,0,0) 30px);
+  box-shadow: none;
+}
+.wtcd-button.candidate {
+  cursor: pointer;
+
+  background-color: var(--button-color);
+  box-shadow: rgba(0,0,0,0.24) 0 1.01372px 2.32903px, 0 0 0 0 rgba(255,255,255,0) inset;
+}
+.wtcd-button.selected {
+  cursor: pointer;
+
+  border: white 0.2em sold;
+  background-color: var(--button-color);
+  box-shadow: rgba(0,0,0,0) 0 0 0, 0 0 0 2px var(--key) inset;
+}
+.wtcd-button.unselected {
+  color: var(--key-opacity-05);
+  background-color: var(--key-opacity-004);
+  box-shadow: none;
 }

@@ -13,8 +13,8 @@ section doNotPress then goto walkHome
 section walkHome then vibrator
   ? goto czpClimax
   : goto czpGoToGrandmasHouse
-section czpClimax
-section czpGoToGrandmasHouse
+section czpClimax then null
+section czpGoToGrandmasHouse then null
 
 ---<<< start >>>---
 面对少女的背影，手握粉色遥控器的你，是否要按下开关呢？

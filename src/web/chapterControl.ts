@@ -1,4 +1,5 @@
-import { Chapter } from '../Data';
+import { Chapter, ChapterType } from '../Data';
+import { FlowInterface } from '../wtcd/flowInterface';
 import { hideComments, loadComments } from './commentsControl';
 import { ContentBlockType } from './ContentBlockType';
 import { relativePathLookUpMap } from './data';
@@ -10,7 +11,7 @@ import { updateHistory } from './history';
 import { ArrowKey, arrowKeyPressEvent } from './keyboard';
 import { loadingText } from './loadingText';
 import { RectMode, setRectMode } from './RectMode';
-import { earlyAccess, gestureSwitchChapter } from './settings';
+import { developerMode, earlyAccess, gestureSwitchChapter } from './settings';
 import { Selection, state } from './state';
 
 const debugLogger = new DebugLogger('chapterControl');
@@ -219,6 +220,26 @@ arrowKeyPressEvent.on(arrowKey => {
   }
 });
 
+function insertContent($target: HTMLDivElement, content: string, chapter: Chapter) {
+  switch (chapter.type) {
+    case 'Markdown':
+      $target.innerHTML = content;
+      break;
+    case 'WTCD': {
+      $target.innerHTML = '';
+      const flowInterface = new FlowInterface(
+        chapter.htmlRelativePath,
+        content,
+        developerMode.getValue(),
+      );
+      const $wtcdContainer = document.createElement('div');
+      flowInterface.renderTo($wtcdContainer);
+      $content.appendChild($wtcdContainer);
+      break;
+    }
+  }
+}
+
 export function loadChapter(chapterHtmlRelativePath: string, selection?: Selection) {
   debugLogger.log('Load chapter', chapterHtmlRelativePath, 'selection', selection);
   hideComments();
@@ -231,7 +252,7 @@ export function loadChapter(chapterHtmlRelativePath: string, selection?: Selecti
     if (chaptersCache.get(chapterHtmlRelativePath) === null) {
       $content.innerText = loadingText;
     } else {
-      $content.innerHTML = chaptersCache.get(chapterHtmlRelativePath)!;
+      insertContent($content, chaptersCache.get(chapterHtmlRelativePath)!, chapterCtx.chapter);
       finalizeChapterLoading(selection);
     }
   } else {
@@ -241,7 +262,7 @@ export function loadChapter(chapterHtmlRelativePath: string, selection?: Selecti
       .then(text => {
         chaptersCache.set(chapterHtmlRelativePath, text);
         if (chapterCtx === state.currentChapter) {
-          $content.innerHTML = text;
+          insertContent($content, text, chapterCtx.chapter);
           finalizeChapterLoading(selection);
         }
       });

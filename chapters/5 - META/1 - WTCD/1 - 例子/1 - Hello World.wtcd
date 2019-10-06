@@ -1,5 +1,5 @@
 WTCD 1.0
-section helloWorld
+section helloWorld then null
 
 ---<<< helloWorld >>>---
 Hello **World**!

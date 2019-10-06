@@ -3,11 +3,13 @@ import * as MDI from 'markdown-it';
 import * as mdiReplaceLinkPlugin from 'markdown-it-replace-link';
 import { basename, dirname, posix, relative, resolve } from 'path';
 import { Chapter, Data, Folder, Node } from '../Data';
+import { parse } from '../wtcd/parse';
 import { countCertainWord } from './countCertainWord';
 import { countChars } from './countChars';
 import { countParagraphs } from './countParagraphs';
 import { isAttachment, isDocument } from './fileExtensions';
 import { keywords } from './keywords';
+import { PrefixedConsole } from './PrefixedConsole';
 
 const { join } = posix;
 
@@ -75,7 +77,23 @@ const commentsUrlEnd = ')';
     return ((parentHtmlRelativePath + '/').substr(1) /* Remove "/" in the beginning */ + fileName).split(' ').join('-');
   }
 
-  async function loadChapter(path: string, parentHtmlRelativePath: string): Promise<Chapter> {
+  function createMDI(htmlRelativePath: string) {
+    return new MDI({
+      replaceLink(link: string) {
+        if (!link.startsWith('./')) {
+          return link;
+        }
+        if (isAttachment(link)) {
+          return join('./chapters', dirname(htmlRelativePath), link);
+        }
+        if (isDocument(link)) {
+          return '#' + join(dirname(htmlRelativePath), link);
+        }
+      },
+    } as MDI.Options).use(mdiReplaceLinkPlugin);
+  }
+
+  async function loadMarkdownChapter(path: string, parentHtmlRelativePath: string): Promise<Chapter> {
     let markdown = (await readFile(path)).toString();
     let isEarlyAccess = false;
     if (markdown.startsWith(earlyAccessFlag)) {
@@ -102,22 +120,9 @@ const commentsUrlEnd = ')';
     });
 
     const node = destructPath(path, false);
-
     const htmlRelativePath = getHtmlRelativePath(parentHtmlRelativePath, node.displayName + '.html');
 
-    const mdi = new MDI({
-      replaceLink(link: string) {
-        if (!link.startsWith('./')) {
-          return link;
-        }
-        if (isAttachment(link)) {
-          return join('./chapters', dirname(htmlRelativePath), link);
-        }
-        if (isDocument(link)) {
-          return '#' + join(dirname(htmlRelativePath), link);
-        }
-      },
-    } as MDI.Options).use(mdiReplaceLinkPlugin);
+    const mdi =  createMDI(htmlRelativePath);
 
     const output = mdi.render(markdown);
     paragraphsCount += countParagraphs(output);
@@ -131,10 +136,37 @@ const commentsUrlEnd = ')';
 
     return {
       ...node,
+      type: 'Markdown',
       isEarlyAccess,
       commentsUrl,
       htmlRelativePath,
       chapterCharCount,
+    };
+  }
+
+  async function loadWTCDChapter(path: string, parentHtmlRelativePath: string): Promise<Chapter> {
+    const source = (await readFile(path, 'utf8'));
+    const node = destructPath(path, false);
+    const htmlRelativePath = getHtmlRelativePath(parentHtmlRelativePath, node.displayName + '.html');
+    const mdi = createMDI(htmlRelativePath);
+
+    console.info(`Start parsing WTCD for ${node.sourceRelativePath}`);
+    const logger = new PrefixedConsole('WTCD:', console);
+    const wtcdRoot = parse(source, mdi, logger);
+    const htmlPath = resolve(distChapters, htmlRelativePath);
+
+    await mkdirp(dirname(htmlPath));
+
+    await writeFile(htmlPath, JSON.stringify(wtcdRoot));
+    console.info(`${node.sourceRelativePath} (${node.displayName}) parsed to ${htmlPath}.`);
+
+    return {
+      ...node,
+      type: 'WTCD',
+      isEarlyAccess: false,
+      commentsUrl: null,
+      htmlRelativePath,
+      chapterCharCount: 0,
     };
   }
 
@@ -171,7 +203,10 @@ const commentsUrlEnd = ')';
           await copyResource(subpath, htmlRelativePath);
         }
         if (subpath.endsWith('.md')) {
-          chaptersLoadingPromises.push(loadChapter(subpath, htmlRelativePath));
+          chaptersLoadingPromises.push(loadMarkdownChapter(subpath, htmlRelativePath));
+        }
+        if (subpath.endsWith('.wtcd')) {
+          chaptersLoadingPromises.push(loadWTCDChapter(subpath, htmlRelativePath));
         }
       }
     }
