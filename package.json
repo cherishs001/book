@@ -1,49 +1,46 @@
 {
-  "name": "wearable-technology",
-  "version": "1.0.0",
-  "description": "《可穿戴科技》网页构建脚本",
-  "main": "builder/index.js",
-  "scripts": {
-    "compileTypeScriptOnce": "tsc",
-    "buildChapters": "node ts-out/builder/index.js",
-    "buildWebScript": "browserify ts-out/web/index.js -o dist/bundle.max.js",
-    "minifyWebScript": "uglifyjs dist/bundle.max.js --compress --mangle -o dist/bundle.js",
-
-    "build": "run-s compileTypeScriptOnce buildChapters buildWebScript minifyWebScript",
-
-    "staticServer": "cd dist && static-server -p 2333 -o --no-cache",
-    "staticFileWatcher": "cpx static/**/* dist -w",
-    "bundler": "watchify src/web/index.ts -p tsify -o dist/bundle.js",
-
-    "startWatchServers": "concurrently -n --kill-others npm:staticServer npm:staticFileWatcher npm:bundler",
-
-    "watch": "run-s compileTypeScriptOnce buildChapters startWatchServers",
-
-    "lint": "tslint --project ./"
-  },
-  "author": "SCLeo",
-  "license": "CC-BY-NC-ND-4.0",
-  "repository": "github:SCLeoX/Wearable-Technology",
-  "dependencies": {
-    "@types/fs-extra": "^8.0.0",
-    "@types/markdown-it": "0.0.8",
-    "@types/node": "^12.6.1",
-    "browserify": "^16.2.3",
-    "fs-extra": "^8.1.0",
-    "markdown-it": "^9.0.0",
-    "markdown-it-replace-link": "^1.0.1",
-    "typescript": "^3.2.4",
-    "uglify-js": "^3.4.9"
-  },
-  "devDependencies": {
-    "concurrently": "^4.1.2",
-    "cpx": "^1.5.0",
-    "csscomb": "^4.3.0",
-    "npm-run-all": "^4.1.5",
-    "open-cli": "^5.0.0",
-    "static-server": "^2.2.1",
-    "tsify": "^4.0.1",
-    "tslint": "^5.12.1",
-    "watchify": "^3.11.1"
-  }
+    "name": "wearable-technology",
+    "version": "1.0.0",
+    "description": "《可穿戴科技》网页构建脚本",
+    "main": "builder/index.js",
+    "scripts": {
+        "compileTypeScriptOnce": "tsc",
+        "buildChapters": "node ts-out/builder/index.js",
+        "buildWebScript": "browserify ts-out/web/index.js -o dist/bundle.max.js",
+        "minifyWebScript": "uglifyjs dist/bundle.max.js --compress --mangle -o dist/bundle.js",
+        "build": "run-s compileTypeScriptOnce buildChapters buildWebScript minifyWebScript",
+        "staticServer": "cd dist && static-server -p 2333 -o --no-cache",
+        "staticFileWatcher": "cpx static/**/* dist -w",
+        "bundler": "watchify src/web/index.ts -p tsify -o dist/bundle.js",
+        "watchChapterChange": "chokidar \"./chapters/**/*\" -c \"npm run buildChapters\"",
+        "startWatchServers": "concurrently -n --kill-others npm:staticServer npm:staticFileWatcher npm:bundler npm:watchChapterChange",
+        "watch": "run-s compileTypeScriptOnce buildChapters startWatchServers",
+        "lint": "tslint --project ./"
+    },
+    "author": "SCLeo",
+    "license": "CC-BY-NC-ND-4.0",
+    "repository": "github:SCLeoX/Wearable-Technology",
+    "dependencies": {
+        "@types/fs-extra": "^8.0.0",
+        "@types/markdown-it": "0.0.8",
+        "@types/node": "^12.6.1",
+        "browserify": "^16.2.3",
+        "fs-extra": "^8.1.0",
+        "markdown-it": "^9.0.0",
+        "markdown-it-replace-link": "^1.0.1",
+        "typescript": "^3.2.4",
+        "uglify-js": "^3.4.9"
+    },
+    "devDependencies": {
+        "chokidar-cli": "^2.0.0",
+        "concurrently": "^4.1.2",
+        "cpx": "^1.5.0",
+        "csscomb": "^4.3.0",
+        "npm-run-all": "^4.1.5",
+        "open-cli": "^5.0.0",
+        "static-server": "^2.2.1",
+        "tsify": "^4.0.1",
+        "tslint": "^5.12.1",
+        "watchify": "^3.11.1"
+    }
 }
