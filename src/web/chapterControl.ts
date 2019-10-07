@@ -139,6 +139,7 @@ const finalizeChapterLoading = (selection?: Selection) => {
 
   const $div = document.createElement('div');
   $div.style.display = 'flex';
+  $div.style.marginTop = '2vw';
   if (chapterIndex >= 1 && canChapterShown(chapterCtx.folder.chapters[chapterIndex - 1])) {
     const prevChapter = chapterCtx.folder.chapters[chapterIndex - 1].htmlRelativePath;
     const $prevLink = document.createElement('a');

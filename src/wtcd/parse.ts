@@ -417,13 +417,16 @@ class LogicParser {
       'selection',
     ]);
     const variableNameToken = this.tokenStream.assertAndSkipNext('identifier');
-    this.tokenStream.assertAndSkipNext('operator', '=');
-    const initialValue = this.parseExpression();
-    if (this.lexicalScopeProvider.currentScopeHasVariable(variableNameToken.content)) {
-      throw WTCDError.atLocation(
-        typeToken,
-        `Variable "${variableNameToken.content}" has already been declared within the same lexical scope.`,
-      );
+    let initialValue: Expression | null = null;
+    if (this.tokenStream.isNext('operator', '=')) {
+      this.tokenStream.next();
+      initialValue = this.parseExpression();
+      if (this.lexicalScopeProvider.currentScopeHasVariable(variableNameToken.content)) {
+        throw WTCDError.atLocation(
+          typeToken,
+          `Variable "${variableNameToken.content}" has already been declared within the same lexical scope.`,
+        );
+      }
     }
     this.lexicalScopeProvider.addVariableToCurrentScope(variableNameToken.content);
     return this.attachLocationInfo<OneVariableDeclaration>(typeToken, {
@@ -465,7 +468,7 @@ class LogicParser {
     if (this.sections.some(section => section.name === nameToken.content)) {
       throw WTCDError.atLocation(nameToken, `Cannot redefine section "${nameToken.content}"`);
     }
-    let executes: Expression | undefined;
+    let executes: Expression | null = null;
     if (!this.tokenStream.isNext('keyword', 'then')) {
       executes = this.parseExpression();
     }

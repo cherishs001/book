@@ -156,16 +156,16 @@ export type Statement = DeclarationStatement | ReturnStatement | SetReturnStatem
 export interface Section extends OptionalLocationInfo {
   name: string;
   content: Array<SingleSectionContent>;
-  executes?: Expression;
+  executes: Expression | null;
   then: Expression;
 }
 
-export type VariableType = 'number' | 'boolean' | 'string';
+export type VariableType = 'number' | 'boolean' | 'string' | 'action' | 'choice' | 'selection';
 
 export interface OneVariableDeclaration extends OptionalLocationInfo {
   variableName: string;
   variableType: VariableType;
-  initialValue: Expression;
+  initialValue: Expression | null;
 }
 
 export interface WTCDRoot {

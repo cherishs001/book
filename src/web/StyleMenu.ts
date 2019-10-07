@@ -8,7 +8,7 @@ import { stylePreviewArticle } from './stylePreviewArticle';
 interface StyleDef {
   readonly rectBgColor: string;
   readonly paperBgColor: string;
-  readonly textColor: string;
+  readonly keyColor: [number, number, number];
   readonly linkColor: string;
   readonly linkHoverColor: string;
   readonly linkActiveColor: string;
@@ -44,15 +44,18 @@ class Style {
       }
     };
 
-    attemptInsertRule(`.container { color: ${this.def.textColor}; }`);
-    attemptInsertRule(`.menu { color: ${this.def.textColor}; }`);
-    attemptInsertRule(`.menu .button:active::after { background-color: ${this.def.textColor}; }`);
-    attemptInsertRule(`.button::after { background-color: ${this.def.textColor}; }`);
+    const key = `rgb(${this.def.keyColor.join(',')})`;
+    const keyAlpha = (alpha: number) => `rgba(${this.def.keyColor.join(',')},${alpha})`;
+
+    attemptInsertRule(`.container { color: ${key}; }`);
+    attemptInsertRule(`.menu { color: ${key}; }`);
+    attemptInsertRule(`.menu .button:active::after { background-color: ${key}; }`);
+    attemptInsertRule(`.button::after { background-color: ${key}; }`);
     attemptInsertRule(`body { background-color: ${this.def.paperBgColor}; }`);
     attemptInsertRule(`.rect { background-color: ${this.def.rectBgColor}; }`);
 
     attemptInsertRule(`.rect.reading>div { background-color: ${this.def.paperBgColor}; }`);
-    attemptInsertRule(`.rect.reading>div { color: ${this.def.textColor}; }`);
+    attemptInsertRule(`.rect.reading>div { color: ${key}; }`);
     attemptInsertRule(`.rect.reading>.content a { color: ${this.def.linkColor}; }`);
     attemptInsertRule(`.rect.reading>.content a:hover { color: ${this.def.linkHoverColor}; }`);
     attemptInsertRule(`.rect.reading>.content a:active { color: ${this.def.linkActiveColor}; }`);
@@ -60,15 +63,13 @@ class Style {
     attemptInsertRule(`.rect>.comments>div { background-color: ${this.def.commentColor}; }`);
     attemptInsertRule(`@media (min-width: 901px) { ::-webkit-scrollbar-thumb { background-color: ${this.def.paperBgColor}; } }`);
 
-    const key = this.def.keyIsDark ? 'black' : 'white';
-    const keyComponent = this.def.keyIsDark ? 0 : 255;
     attemptInsertRule(`.rect>.comments>.create-comment::before { background-color: ${key}; }`);
 
-    attemptInsertRule(`:root { --key: rgb(${keyComponent},${keyComponent},${keyComponent}); }`);
-    attemptInsertRule(`:root { --key-opacity-01: rgba(${keyComponent},${keyComponent},${keyComponent},0.1); }`);
-    attemptInsertRule(`:root { --key-opacity-05: rgba(${keyComponent},${keyComponent},${keyComponent},0.5); }`);
-    attemptInsertRule(`:root { --key-opacity-007: rgba(${keyComponent},${keyComponent},${keyComponent},0.07); }`);
-    attemptInsertRule(`:root { --key-opacity-004: rgba(${keyComponent},${keyComponent},${keyComponent},0.04); }`);
+    attemptInsertRule(`:root { --key: ${key}; }`);
+    attemptInsertRule(`:root { --key-opacity-01: ${keyAlpha(0.1)}; }`);
+    attemptInsertRule(`:root { --key-opacity-05: ${keyAlpha(0.5)}; }`);
+    attemptInsertRule(`:root { --key-opacity-007: ${keyAlpha(0.07)}; }`);
+    attemptInsertRule(`:root { --key-opacity-004: ${keyAlpha(0.04)}; }`);
 
     attemptInsertRule(`:root { --button-color: ${this.def.commentColor}; }`);
 
@@ -107,7 +108,7 @@ const styles = [
   new Style('可穿戴科技（默认）', {
     rectBgColor: '#444',
     paperBgColor: '#333',
-    textColor: '#DDD',
+    keyColor: [221, 221, 221],
     ...lightKeyLinkColors,
     contentBlockEarlyAccessColor: '#E65100',
     commentColor: '#444',
@@ -117,7 +118,7 @@ const styles = [
   new Style('白纸', {
     rectBgColor: '#EFEFED',
     paperBgColor: '#FFF',
-    textColor: '#000',
+    keyColor: [0, 0, 0],
     ...darkKeyLinkColors,
     contentBlockEarlyAccessColor: '#FFE082',
     commentColor: '#F5F5F5',
@@ -127,7 +128,7 @@ const styles = [
   new Style('夜间', {
     rectBgColor: '#272B36',
     paperBgColor: '#38404D',
-    textColor: '#DDD',
+    keyColor: [221, 221, 221],
     ...lightKeyLinkColors,
     contentBlockEarlyAccessColor: '#E65100',
     commentColor: '#272B36',
@@ -137,7 +138,7 @@ const styles = [
   new Style('羊皮纸', {
     rectBgColor: '#D8D4C9',
     paperBgColor: '#F8F4E9',
-    textColor: '#552830',
+    keyColor: [85, 40, 48],
     ...darkKeyLinkColors,
     contentBlockEarlyAccessColor: '#FFE082',
     commentColor: '#F9EFD7',
@@ -147,7 +148,7 @@ const styles = [
   new Style('巧克力', {
     rectBgColor: '#2E1C11',
     paperBgColor: '#3A2519',
-    textColor: '#DDAF99',
+    keyColor: [221, 175, 153],
     ...lightKeyLinkColors,
     contentBlockEarlyAccessColor: '#E65100',
     commentColor: '#2C1C11',

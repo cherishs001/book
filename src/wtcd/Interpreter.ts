@@ -1,4 +1,4 @@
-import { getMaybePooled, nullValue } from './constantsPool';
+import { getMaybePooled, nullValue, booleanValue } from './constantsPool';
 import { binaryOperators, unaryOperators } from './operators';
 import { Random } from './Random';
 import { Action, BlockExpression, ChoiceExpression, ConditionalExpression, DeclarationStatement, Expression, RegisterName, Section, Selection, Statement, WTCDRoot } from './types';
@@ -240,7 +240,25 @@ export class Interpreter {
 
   private executeDeclarationStatement(expr: DeclarationStatement) {
     for (const singleDeclaration of expr.declarations) {
-      const value = this.evaluator(singleDeclaration.initialValue);
+      let value: RuntimeValue;
+      if (singleDeclaration.initialValue !== null) {
+        value = this.evaluator(singleDeclaration.initialValue);
+      } else {
+        switch (singleDeclaration.variableType) {
+          case 'boolean':
+            value = getMaybePooled('boolean', false);
+            break;
+          case 'number':
+            value = getMaybePooled('number', 0);
+            break;
+          case 'string':
+            value = getMaybePooled('string', '');
+            break;
+          default:
+            throw WTCDError.atLocation(expr, `Variable type ${singleDeclaration.variableType} ` +
+              `does not have a default initial value.`);
+        }
+      }
       if (value.type !== singleDeclaration.variableType) {
         throw WTCDError.atLocation(expr, `The type of variable ${singleDeclaration.variableName} is ` +
           `${singleDeclaration.variableType}, thus cannot hold ${describe(value)}`);
@@ -377,7 +395,7 @@ export class Interpreter {
     const $host = document.createElement('div');
     while (this.sectionStack.length !== 0) {
       const currentSection = this.sectionStack.pop()!;
-      if (currentSection.executes !== undefined) {
+      if (currentSection.executes !== null) {
         this.evaluator(currentSection.executes);
       }
       const enterTime = this.sectionEnterTimes.has(currentSection.name)
