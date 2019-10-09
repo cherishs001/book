@@ -155,19 +155,28 @@ const commentsUrlEnd = ')';
     const htmlPath = resolve(distChapters, htmlRelativePath);
     await mkdirp(dirname(htmlPath));
 
-    let content: string;
-    try {
-      const wtcdRoot = parse(source, mdi, logger);
-      content = JSON.stringify(wtcdRoot);
-    } catch (error) {
-      console.info(`WTCD parsing failed. Error: `, error.stack);
-      content = JSON.stringify({
-        error: true,
-        message: error.message,
-        stack: error.stack,
+    let chapterCharCount = 0;
+
+    const wtcdParseResult = parse({ source, mdi, logger, markdownPreProcessor: markdown => {
+      chapterCharCount += countChars(markdown);
+      keywords.forEach(keyword => {
+        const count = countCertainWord(markdown, keyword);
+        if (count !== 0) {
+          keywordsCount.set(keyword, keywordsCount.get(keyword)! + count);
+        }
       });
+      return markdown;
+    }, htmlPostProcessor: html => {
+      paragraphsCount += countParagraphs(html);
+      return html;
+    }});
+
+    charsCount += chapterCharCount;
+
+    if (wtcdParseResult.error) {
+      logger.error(wtcdParseResult.internalStack);
     }
-    await writeFile(htmlPath, content);
+    await writeFile(htmlPath, JSON.stringify(wtcdParseResult));
 
     console.info(`${node.sourceRelativePath} (${node.displayName}) parsed to ${htmlPath}.`);
 
@@ -177,7 +186,7 @@ const commentsUrlEnd = ')';
       isEarlyAccess: false,
       commentsUrl: null,
       htmlRelativePath,
-      chapterCharCount: 0,
+      chapterCharCount,
     };
   }
 

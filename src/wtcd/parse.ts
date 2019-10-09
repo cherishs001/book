@@ -2,7 +2,7 @@ import * as MDI from 'markdown-it';
 import { BinaryOperator, binaryOperators, conditionalOperatorPrecedence, UnaryOperator, unaryOperators } from './operators';
 import { SimpleIdGenerator } from './SimpleIdGenerator';
 import { Token, TokenStream } from './TokenStream';
-import { BinaryExpression, BlockExpression, BooleanLiteral, ChoiceExpression, ConditionalExpression, DeclarationStatement, ExitAction, Expression, ExpressionStatement, GotoAction, NullLiteral, NumberLiteral, OneVariableDeclaration, OptionalLocationInfo, RegisterName, ReturnStatement, Section, Selection, SetReturnStatement, SetYieldStatement, SingleSectionContent, Statement, StringLiteral, UnaryExpression, VariableReference, VariableType, WTCDRoot, YieldStatement } from './types';
+import { BinaryExpression, BlockExpression, BooleanLiteral, ChoiceExpression, ConditionalExpression, DeclarationStatement, ExitAction, Expression, ExpressionStatement, GotoAction, NullLiteral, NumberLiteral, OneVariableDeclaration, OptionalLocationInfo, RegisterName, ReturnStatement, Section, Selection, SetReturnStatement, SetYieldStatement, SingleSectionContent, Statement, StringLiteral, UnaryExpression, VariableReference, VariableType, WTCDParseResult, WTCDRoot, YieldStatement } from './types';
 import { WTCDError } from './WTCDError';
 
 const CURRENT_MAJOR_VERSION = 1;
@@ -207,7 +207,7 @@ class LogicParser {
 
     // Exit actions
     if (this.tokenStream.isNext('keyword', 'exit')) {
-      return this.attachLocationInfo<ExitAction>(this.tokenStream.peek(), {
+      return this.attachLocationInfo<ExitAction>(this.tokenStream.next(), {
         type: 'exitAction',
       });
     }
@@ -258,7 +258,7 @@ class LogicParser {
         ),
       });
     }
-    if (softFail) {
+    if (softFail === true) {
       return null;
     } else {
       return this.tokenStream.throwUnexpectedNext('atom');
@@ -552,107 +552,128 @@ class LogicParser {
   }
 }
 
+function identity<T>(input: T) {
+  return input;
+}
+
 /**
  * Parse the given WTCD document.
  * @param source The content of WTCD
  * @param mdi An instance of markdown-it
  * @param logger A logging function
  */
-export function parse(source: string, mdi: MDI, logger: SimpleLogger): WTCDRoot {
-  // Parse sections and extract the logic part of this WTCD document
+export function parse({ source, mdi, logger = console, markdownPreProcessor = identity, htmlPostProcessor = identity }: {
+  source: string;
+  mdi: MDI;
+  logger?: SimpleLogger;
+  markdownPreProcessor?: (markdown: string) => string;
+  htmlPostProcessor?: (html: string) => string;
+}): WTCDParseResult {
+  try {
+    // Parse sections and extract the logic part of this WTCD document
 
-  /** Regex used to extract section headers. */
-  const sectionRegex = /^---<<<\s+([a-zA-Z_][a-zA-Z_0-9]*)(?:@([0-9\-]+))?\s+>>>---$/gm;
-  /** Markdown source of each section */
-  const sectionMarkdowns: Array<string> = [];
-  /** Name of each section, excluding bounds */
-  const sectionNames: Array<string> = [];
-  /** Bounds of each section, not parsed. Undefined means unbounded. */
-  const sectionBounds: Array<string | undefined> = [];
-  /** End index of last section */
-  let lastIndex = 0;
-  /** Rolling regex result object */
-  let result: RegExpExecArray | null;
-  while ((result = sectionRegex.exec(source)) !== null) {
-    sectionMarkdowns.push(source.substring(lastIndex, result.index));
-    sectionNames.push(result[1]);
-    sectionBounds.push(result[2]);
-    lastIndex = sectionRegex.lastIndex;
-  }
+    /** Regex used to extract section headers. */
+    const sectionRegex = /^---<<<\s+([a-zA-Z_][a-zA-Z_0-9]*)(?:@([0-9\-]+))?\s+>>>---$/gm;
+    /** Markdown source of each section */
+    const sectionMarkdowns: Array<string> = [];
+    /** Name of each section, excluding bounds */
+    const sectionNames: Array<string> = [];
+    /** Bounds of each section, not parsed. Undefined means unbounded. */
+    const sectionBounds: Array<string | undefined> = [];
+    /** End index of last section */
+    let lastIndex = 0;
+    /** Rolling regex result object */
+    let result: RegExpExecArray | null;
+    while ((result = sectionRegex.exec(source)) !== null) {
+      sectionMarkdowns.push(source.substring(lastIndex, result.index));
+      sectionNames.push(result[1]);
+      sectionBounds.push(result[2]);
+      lastIndex = sectionRegex.lastIndex;
+    }
 
-  // Push the remaining content to last section's markdown
-  sectionMarkdowns.push(source.substring(lastIndex));
+    // Push the remaining content to last section's markdown
+    sectionMarkdowns.push(source.substring(lastIndex));
 
-  const logicParser = new LogicParser(
-    sectionMarkdowns.shift()!,
-    logger,
-    false,
-  );
+    const logicParser = new LogicParser(
+      sectionMarkdowns.shift()!,
+      logger,
+      false,
+    );
 
-  const wtcdRoot: WTCDRoot = logicParser.parse();
+    const wtcdRoot: WTCDRoot = logicParser.parse();
 
-  const sig = new SimpleIdGenerator();
+    const sig = new SimpleIdGenerator();
 
-  sectionContentLoop:
-  for (let i = 0; i < sectionMarkdowns.length; i++) {
-    /** Markdown content of the section */
-    const sectionMarkdown = sectionMarkdowns[i];
-    /** Name (without bound) of the section */
-    const sectionName = sectionNames[i];
-    /** Unparsed bounds of the section */
-    const sectionBound = sectionBounds[i];
-    const sectionFullName = (sectionBound === undefined)
-      ? sectionName
-      : `${sectionName}@${sectionBound}`;
-    logger.info(`Parsing markdown for section ${sectionFullName}.`);
-    const variables: Array<{ elementClass: string, variableName: string }> = [];
+    sectionContentLoop:
+    for (let i = 0; i < sectionMarkdowns.length; i++) {
+      /** Markdown content of the section */
+      const sectionMarkdown = markdownPreProcessor(sectionMarkdowns[i]);
+      /** Name (without bound) of the section */
+      const sectionName = sectionNames[i];
+      /** Unparsed bounds of the section */
+      const sectionBound = sectionBounds[i];
+      const sectionFullName = (sectionBound === undefined)
+        ? sectionName
+        : `${sectionName}@${sectionBound}`;
+      logger.info(`Parsing markdown for section ${sectionFullName}.`);
+      const variables: Array<{ elementClass: string, variableName: string }> = [];
 
-    const sectionHTML = mdi.render(sectionMarkdown);
+      const sectionHTML = mdi.render(sectionMarkdown);
 
-    /**
-     * HTML content of the section whose interpolated values are converted to
-     * spans with unique classes.
-     */
-    const sectionParameterizedHTML = sectionHTML.replace(/&lt;\$\s+([a-zA-Z_][a-zA-Z_0-9]*)\s+\$&gt;/g, (_, variableName) => {
-      if (!logicParser.hasRootDeclaration(variableName)) {
-        throw WTCDError.atUnknown(`Cannot resolve variable reference "${variableName}" in section "${sectionFullName}"`);
-      }
-      const elementClass = 'wtcd-variable-' + sig.next();
-      variables.push({
-        elementClass,
-        variableName,
+      /**
+       * HTML content of the section whose interpolated values are converted to
+       * spans with unique classes.
+       */
+      const sectionParameterizedHTML = sectionHTML.replace(/&lt;\$\s+([a-zA-Z_][a-zA-Z_0-9]*)\s+\$&gt;/g, (_, variableName) => {
+        if (!logicParser.hasRootDeclaration(variableName)) {
+          throw WTCDError.atUnknown(`Cannot resolve variable reference "${variableName}" in section "${sectionFullName}"`);
+        }
+        const elementClass = 'wtcd-variable-' + sig.next();
+        variables.push({
+          elementClass,
+          variableName,
+        });
+        return `<span class="${elementClass}"></span>`;
       });
-      return `<span class="${elementClass}"></span>`;
-    });
 
-    // Parse bounds
-    let lowerBound: number | undefined;
-    let upperBound: number | undefined;
-    if (sectionBound !== undefined) {
-      if (sectionBound.includes('-')) {
-        const split = sectionBound.split('-');
-        lowerBound = split[0] === '' ? undefined : Number(split[0]);
-        upperBound = split[1] === '' ? undefined : Number(split[1]);
-      } else {
-        lowerBound = upperBound = Number(sectionBound);
+      // Parse bounds
+      let lowerBound: number | undefined;
+      let upperBound: number | undefined;
+      if (sectionBound !== undefined) {
+        if (sectionBound.includes('-')) {
+          const split = sectionBound.split('-');
+          lowerBound = split[0] === '' ? undefined : Number(split[0]);
+          upperBound = split[1] === '' ? undefined : Number(split[1]);
+        } else {
+          lowerBound = upperBound = Number(sectionBound);
+        }
       }
+      const singleSectionContent: SingleSectionContent = {
+        html: htmlPostProcessor(sectionParameterizedHTML),
+        variables,
+        lowerBound,
+        upperBound,
+      };
+      for (const section of wtcdRoot.sections) {
+        if (section.name === sectionName) {
+          section.content.push(singleSectionContent);
+          continue sectionContentLoop;
+        }
+      }
+      // Currently, location data for content sections are not available
+      throw WTCDError.atUnknown(`Cannot find a logic declaration for ` +
+        `section content ${sectionFullName}`);
     }
-    const singleSectionContent: SingleSectionContent = {
-      html: sectionParameterizedHTML,
-      variables,
-      lowerBound,
-      upperBound,
+
+    return {
+      error: false,
+      wtcdRoot,
     };
-    for (const section of wtcdRoot.sections) {
-      if (section.name === sectionName) {
-        section.content.push(singleSectionContent);
-        continue sectionContentLoop;
-      }
-    }
-    // Currently, location data for content sections are not available
-    throw WTCDError.atUnknown(`Cannot find a logic declaration for ` +
-      `section content ${sectionFullName}`);
+  } catch (error) {
+    return {
+      error: true,
+      message: error.message,
+      internalStack: error.stack,
+    };
   }
-
-  return wtcdRoot;
 }

@@ -1,5 +1,6 @@
 import { Chapter, ChapterType } from '../Data';
 import { FlowInterface } from '../wtcd/flowInterface';
+import { WTCDParseResult } from '../wtcd/types';
 import { hideComments, loadComments } from './commentsControl';
 import { ContentBlockType } from './ContentBlockType';
 import { relativePathLookUpMap } from './data';
@@ -246,14 +247,14 @@ function insertContent($target: HTMLDivElement, content: string, chapter: Chapte
       break;
     case 'WTCD': {
       $target.innerHTML = '';
-      const wtcdRoot = JSON.parse(content);
-      if (wtcdRoot.error === true) {
-        attachWTCDCompileErrorMessage($target, wtcdRoot.message, wtcdRoot.stack);
+      const wtcdParseResult: WTCDParseResult = JSON.parse(content);
+      if (wtcdParseResult.error === true) {
+        attachWTCDCompileErrorMessage($target, wtcdParseResult.message, wtcdParseResult.internalStack);
         break;
       }
       const flowInterface = new FlowInterface(
         chapter.htmlRelativePath,
-        wtcdRoot,
+        JSON.stringify(wtcdParseResult.wtcdRoot),
         developerMode.getValue(),
       );
       const $wtcdContainer = document.createElement('div');

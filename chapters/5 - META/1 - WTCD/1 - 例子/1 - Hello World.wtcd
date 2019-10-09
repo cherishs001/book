@@ -1,5 +1,5 @@
 WTCD 1.0
-section helloWorld then null
+section helloWorld then exit
 
 ---<<< helloWorld >>>---
-Hello **World**!
+# Hello World!

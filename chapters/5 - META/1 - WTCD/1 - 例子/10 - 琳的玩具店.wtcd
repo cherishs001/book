@@ -59,19 +59,19 @@ section exitShop then (!vibrator && !vaginalDildo && !analDildo)
     ? goto belted
     : goto unbelted
 
-section beltedDry then null
-section dry then null
-section belted then null
-section unbelted then null
+section beltedDry then exit
+section dry then exit
+section belted then exit
+section unbelted then exit
 
 
 ---<<< shop@1 >>>---
 你走进了琳的玩具店。货架上摆满了各式各样的玩具。你身上还有 <$ money $> 元钱。你想要买什么呢？
 
----<<< shop@1- >>>---
+---<<< shop@2- >>>---
 你继续在琳的玩具店内闲逛着。你身上还有 <$ money $> 元钱。你想要买什么呢？
 
----<<< shop@1- >>>---
+---<<< shop@2- >>>---
 看着包里剩下的 <$ money $> 元钱，你继续在琳的玩具店内走着。买点什么呢？
 
 ---<<< purchaseAphrodisiac@1 >>>---

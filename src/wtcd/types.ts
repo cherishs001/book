@@ -178,4 +178,13 @@ export interface WTCDRoot {
   sections: Array<Section>;
 }
 
+export type WTCDParseResult = {
+  error: false;
+  wtcdRoot: WTCDRoot;
+} | {
+  error: true;
+  message: string;
+  internalStack: string;
+};
+
 export type RegisterName = 'yield' | 'return';

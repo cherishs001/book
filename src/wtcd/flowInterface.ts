@@ -8,13 +8,13 @@ interface Data {
 }
 
 export class FlowInterface {
-  private interpreter: Interpreter;
-  private iterator: Iterator<ContentOutput, ContentOutput, number>;
+  private interpreter!: Interpreter;
+  private iterator!: Iterator<ContentOutput, ContentOutput, number>;
   private storageKey: string;
   private data: Data;
   private target!: HTMLElement;
-  private currentDecisionIndex: number = 0;
-  private buttons: Array<Array<HTMLDivElement>> = [];
+  private currentDecisionIndex!: number;
+  private buttons!: Array<Array<HTMLDivElement>>;
   /**
    * Verify and parse data stored in localStorage.
    */
@@ -43,9 +43,18 @@ export class FlowInterface {
   private persist() {
     window.localStorage.setItem(this.storageKey, JSON.stringify(this.data));
   }
+  public reset() {
+    this.interpreter = new Interpreter(JSON.parse(this.wtcdRoot), new Random(this.data.random));
+    this.iterator = this.interpreter.start();
+    this.currentDecisionIndex = 0;
+    this.buttons = [];
+    if (this.target !== undefined) {
+      this.target.innerHTML = '';
+    }
+  }
   public constructor(
     docIdentifier: string,
-    wtcdRoot: any,
+    private wtcdRoot: string,
     private debug: boolean = false,
   ) {
     this.storageKey = `wtcd.${docIdentifier}`;
@@ -53,14 +62,10 @@ export class FlowInterface {
       random: String(Math.random()),
       decisions: [],
     };
-    this.interpreter = new Interpreter(
-      wtcdRoot,
-      new Random(this.data.random),
-    );
-    this.iterator = this.interpreter.start();
+    this.reset();
   }
 
-  private decide(decision: number) {
+  private decide(decision: number, replay: boolean = false) {
     this.buttons[this.currentDecisionIndex].forEach(($button, choiceIndex) => {
       if ($button.classList.contains('disabled')) {
         return;
@@ -72,8 +77,13 @@ export class FlowInterface {
         $button.classList.add('unselected');
       }
     });
+    if (!replay) {
+      this.data.decisions.push(decision);
+    }
     this.currentDecisionIndex++;
-    this.handleOutput(this.iterator.next(decision).value);
+    const yieldValue = this.iterator.next(decision);
+    this.handleOutput(yieldValue.value);
+    return yieldValue.done;
   }
 
   private handleOutput(output: ContentOutput) {
@@ -88,6 +98,12 @@ export class FlowInterface {
       } else {
         $button.classList.add('candidate');
         $button.addEventListener('click', () => {
+          if (this.data.decisions[decisionIndex] === choiceIndex) {
+            this.reset();
+            this.data.decisions = this.data.decisions.slice(0, decisionIndex);
+            this.replay();
+            return;
+          }
           if (this.currentDecisionIndex !== decisionIndex) {
             return;
           }
@@ -108,9 +124,7 @@ export class FlowInterface {
       if (done) {
         throw new Error('Replay failed: WTCD ended before decisions are all executed.');
       }
-      const yieldValue = this.iterator.next(decision);
-      done = yieldValue.done;
-      this.handleOutput(yieldValue.value);
+      done = this.decide(decision, true);
     }
   }
 

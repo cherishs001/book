@@ -49,7 +49,7 @@
 		},
 		"keywords": {
 			"name": "keyword.control.wtcd",
-			"match": "\\b(number|boolean|string|action|then|selection|choice|yield)\\b"
+			"match": "\\b(number|boolean|string|action|then|selection|choice|yield|exit)\\b"
 		},
 		"languageConstants": {
 			"patterns": [{
