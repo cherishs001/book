@@ -152,12 +152,23 @@ const commentsUrlEnd = ')';
 
     console.info(`Start parsing WTCD for ${node.sourceRelativePath}`);
     const logger = new PrefixedConsole('WTCD:', console);
-    const wtcdRoot = parse(source, mdi, logger);
     const htmlPath = resolve(distChapters, htmlRelativePath);
-
     await mkdirp(dirname(htmlPath));
 
-    await writeFile(htmlPath, JSON.stringify(wtcdRoot));
+    let content: string;
+    try {
+      const wtcdRoot = parse(source, mdi, logger);
+      content = JSON.stringify(wtcdRoot);
+    } catch (error) {
+      console.info(`WTCD parsing failed. Error: `, error.stack);
+      content = JSON.stringify({
+        error: true,
+        message: error.message,
+        stack: error.stack,
+      });
+    }
+    await writeFile(htmlPath, content);
+
     console.info(`${node.sourceRelativePath} (${node.displayName}) parsed to ${htmlPath}.`);
 
     return {

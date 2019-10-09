@@ -110,7 +110,7 @@ function opAssignment<T0 extends RuntimeValueType, T1 extends RuntimeValueType>(
   return (expr, evaluator, resolveVariableReference) => {
     if (expr.arg0.type !== 'variableReference') {
         throw WTCDError.atLocation(expr, `Left side of binary operator "${expr.operator}" ` +
-          `has to be a variable reference.`);
+          `has to be a variable reference`);
     }
     const varRef = resolveVariableReference(expr.arg0.variableName);
     if (varRef.type !== arg0Type) {
@@ -156,7 +156,7 @@ export const binaryOperators = new Map<string, BinaryOperatorDefinition>([
     fn: (expr, evaluator, resolveVariableReference) => {
       if (expr.arg0.type !== 'variableReference') {
         throw WTCDError.atLocation(expr, `Left side of binary operator "+=" ` +
-          `has to be a variable reference.`);
+          `has to be a variable reference`);
       }
       const varRef = resolveVariableReference(expr.arg0.variableName);
       if (varRef.type !== 'string' && varRef.type !== 'number') {

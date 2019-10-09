@@ -2,7 +2,7 @@ import * as MDI from 'markdown-it';
 import { BinaryOperator, binaryOperators, conditionalOperatorPrecedence, UnaryOperator, unaryOperators } from './operators';
 import { SimpleIdGenerator } from './SimpleIdGenerator';
 import { Token, TokenStream } from './TokenStream';
-import { BinaryExpression, BlockExpression, BooleanLiteral, ChoiceExpression, ConditionalExpression, DeclarationStatement, Expression, ExpressionStatement, GotoAction, NullLiteral, NumberLiteral, OneVariableDeclaration, OptionalLocationInfo, RegisterName, ReturnStatement, Section, Selection, SetReturnStatement, SetYieldStatement, SingleSectionContent, Statement, StringLiteral, UnaryExpression, VariableReference, VariableType, WTCDRoot, YieldStatement } from './types';
+import { BinaryExpression, BlockExpression, BooleanLiteral, ChoiceExpression, ConditionalExpression, DeclarationStatement, ExitAction, Expression, ExpressionStatement, GotoAction, NullLiteral, NumberLiteral, OneVariableDeclaration, OptionalLocationInfo, RegisterName, ReturnStatement, Section, Selection, SetReturnStatement, SetYieldStatement, SingleSectionContent, Statement, StringLiteral, UnaryExpression, VariableReference, VariableType, WTCDRoot, YieldStatement } from './types';
 import { WTCDError } from './WTCDError';
 
 const CURRENT_MAJOR_VERSION = 1;
@@ -81,6 +81,7 @@ class LogicParser {
   private initStatements: Array<Statement> = [];
   private postChecks: Array<() => void | never> = [];
   private sections: Array<Section> = [];
+  private rootDeclarations: Set<string> = new Set();
   public constructor(
     source: string,
     private readonly logger: SimpleLogger,
@@ -143,6 +144,7 @@ class LogicParser {
    * - selection
    * - choices
    * - goto actions
+   * - exit actions
    * - groups
    * - variables
    * - block expressions
@@ -201,6 +203,13 @@ class LogicParser {
     // Goto actions
     if (this.tokenStream.isNext('keyword',  'goto')) {
       return this.parseGotoAction();
+    }
+
+    // Exit actions
+    if (this.tokenStream.isNext('keyword', 'exit')) {
+      return this.attachLocationInfo<ExitAction>(this.tokenStream.peek(), {
+        type: 'exitAction',
+      });
     }
 
     // Group
@@ -275,7 +284,7 @@ class LogicParser {
     if (!this.lexicalScopeProvider.hasRegister(registerName)) {
       throw WTCDError.atLocation(
         token,
-        `Cannot locate lexical scope for ${registerName} register.`,
+        `Cannot locate lexical scope for ${registerName} register`,
       );
     }
   }
@@ -424,7 +433,7 @@ class LogicParser {
       if (this.lexicalScopeProvider.currentScopeHasVariable(variableNameToken.content)) {
         throw WTCDError.atLocation(
           typeToken,
-          `Variable "${variableNameToken.content}" has already been declared within the same lexical scope.`,
+          `Variable "${variableNameToken.content}" has already been declared within the same lexical scope`,
         );
       }
     }
@@ -485,10 +494,18 @@ class LogicParser {
   private parseRootBlock() {
     this.tokenStream.assertNext('keyword', ['declare', 'section']);
     if (this.tokenStream.isNext('keyword', 'declare')) {
-      this.initStatements.push(this.parseDeclaration());
+      const declarationStatement = this.parseDeclaration();
+      for (const declaration of declarationStatement.declarations) {
+        this.rootDeclarations.add(declaration.variableName);
+      }
+      this.initStatements.push(declarationStatement);
     } else if (this.tokenStream.isNext('keyword', 'section')) {
       this.sections.push(this.parseSection());
     }
+  }
+
+  public hasRootDeclaration(variableName: string) {
+    return this.rootDeclarations.has(variableName);
   }
 
   /**
@@ -597,6 +614,9 @@ export function parse(source: string, mdi: MDI, logger: SimpleLogger): WTCDRoot 
      * spans with unique classes.
      */
     const sectionParameterizedHTML = sectionHTML.replace(/&lt;\$\s+([a-zA-Z_][a-zA-Z_0-9]*)\s+\$&gt;/g, (_, variableName) => {
+      if (!logicParser.hasRootDeclaration(variableName)) {
+        throw WTCDError.atUnknown(`Cannot resolve variable reference "${variableName}" in section "${sectionFullName}"`);
+      }
       const elementClass = 'wtcd-variable-' + sig.next();
       variables.push({
         elementClass,
@@ -611,8 +631,8 @@ export function parse(source: string, mdi: MDI, logger: SimpleLogger): WTCDRoot 
     if (sectionBound !== undefined) {
       if (sectionBound.includes('-')) {
         const split = sectionBound.split('-');
-        lowerBound = Number(split[0]);
-        upperBound = Number(split[1]);
+        lowerBound = split[0] === '' ? undefined : Number(split[0]);
+        upperBound = split[1] === '' ? undefined : Number(split[1]);
       } else {
         lowerBound = upperBound = Number(sectionBound);
       }
@@ -631,7 +651,7 @@ export function parse(source: string, mdi: MDI, logger: SimpleLogger): WTCDRoot 
     }
     // Currently, location data for content sections are not available
     throw WTCDError.atUnknown(`Cannot find a logic declaration for ` +
-      `section content ${sectionFullName}.`);
+      `section content ${sectionFullName}`);
   }
 
   return wtcdRoot;

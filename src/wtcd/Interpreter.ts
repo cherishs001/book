@@ -1,4 +1,4 @@
-import { getMaybePooled, nullValue, booleanValue } from './constantsPool';
+import { booleanValue, getMaybePooled, nullValue } from './constantsPool';
 import { binaryOperators, unaryOperators } from './operators';
 import { Random } from './Random';
 import { Action, BlockExpression, ChoiceExpression, ConditionalExpression, DeclarationStatement, Expression, RegisterName, Section, Selection, Statement, WTCDRoot } from './types';
@@ -32,11 +32,14 @@ export interface NullValue {
   type: 'null';
   value: null;
 }
+
 export interface ActionValue {
   type: 'action';
   value: {
     action: 'goto';
     target: Array<string>;
+  } | {
+    action: 'exit';
   };
 }
 export interface ChoiceValue {
@@ -79,6 +82,7 @@ class BubbleSignal extends Error {
     public readonly type: BubbleSignalType,
   ) {
     super('Uncaught Bubble Signal.');
+    Object.setPrototypeOf(this, new.target.prototype);
   }
 }
 
@@ -191,7 +195,7 @@ export class Interpreter {
     }
     throw WTCDError.atUnknown(`Cannot resolve register reference "${registerName}". ` +
       `This is mostly likely caused by WTCD compiler's error or the compiled output ` +
-      `has been modified.`);
+      `has been modified`);
   }
   private getCurrentScope(): RuntimeScope {
     return this.scopes[this.scopes.length - 1];
@@ -256,7 +260,7 @@ export class Interpreter {
             break;
           default:
             throw WTCDError.atLocation(expr, `Variable type ${singleDeclaration.variableType} ` +
-              `does not have a default initial value.`);
+              `does not have a default initial value`);
         }
       }
       if (value.type !== singleDeclaration.variableType) {
@@ -296,7 +300,7 @@ export class Interpreter {
     for (let i = 0; i < choices.length; i++) {
       if (choices[i].type !== 'choice') {
         throw WTCDError.atLocation(expr.choices[i], `Choice at index ${i} is expected to be a choice, ` +
-          `received ${describe(choices[i])}.`);
+          `received ${describe(choices[i])}`);
       }
     }
     return {
@@ -335,6 +339,13 @@ export class Interpreter {
             target: expr.sections,
           },
         };
+      case 'exitAction':
+        return {
+          type: 'action',
+          value: {
+            action: 'exit',
+          },
+        };
       case 'selection':
         return this.evaluateSelectionExpression(expr);
       case 'variableReference':
@@ -357,8 +368,9 @@ export class Interpreter {
         throw new BubbleSignal(BubbleSignalType.YIELD); // Bubble up
       case 'setYield':
         this.setRegister('yield', this.evaluator(statement.value));
+        return;
       default:
-        throw WTCDError.atLocation(statement, 'Not implemented.');
+        throw WTCDError.atLocation(statement, 'Not implemented');
     }
   }
 
@@ -373,9 +385,15 @@ export class Interpreter {
   }
 
   private executeAction(action: ActionValue) {
-    // Always type = goto
-    for (let i = action.value.target.length - 1; i >= 0; i--) {
-      this.addToSectionStack(action.value.target[i]);
+    switch (action.value.action) {
+      case 'goto':
+        for (let i = action.value.target.length - 1; i >= 0; i--) {
+          this.addToSectionStack(action.value.target[i]);
+        }
+        break;
+      case 'exit':
+        // Clears the section stack so the scripts end immediately
+        this.sectionStack.length = 0;
     }
   }
 
@@ -413,8 +431,6 @@ export class Interpreter {
         $host.innerHTML = selectedContent.html;
         // Parameterize
         for (const variable of selectedContent.variables) {
-          console.info(variable.variableName);
-          console.info(this.resolveVariableReference(variable.variableName));
           ($host.getElementsByClassName(variable.elementClass)[0] as HTMLSpanElement)
             .innerText = String(this.resolveVariableReference(variable.variableName).value);
         }
@@ -427,6 +443,7 @@ export class Interpreter {
         }
       }
       const then = this.evaluator(currentSection.then);
+      // The part after then has to be a selection or an action
       if (then.type === 'selection') {
         const choices: Array<SingleChoice> = then.value.choices.map(choice => ({
           content: choice.value.text,
@@ -437,17 +454,18 @@ export class Interpreter {
           choices,
         };
         this.currentlyBuilding = [];
-        const playerChoiceId = yield yieldValue;
-        const playerChoice = then.value.choices[playerChoiceId];
+        // Hands over control so player can make decision
+        const playerChoiceIndex = yield yieldValue;
+        const playerChoice = then.value.choices[playerChoiceIndex];
         if (playerChoice === undefined || playerChoice.value.action.type === 'null') {
-          throw new InvalidChoiceError(playerChoiceId);
+          throw new InvalidChoiceError(playerChoiceIndex);
         }
         this.executeAction(playerChoice.value.action);
       } else if (then.type === 'action') {
         this.executeAction(then);
       } else if (then.type !== 'null') {
         throw WTCDError.atLocation(currentSection.then, `Expression after then is expected to return ` +
-          `selection, action, or null. Received: ${describe(then)}.`);
+          `selection, action, or null. Received: ${describe(then)}`);
       }
     }
     return {

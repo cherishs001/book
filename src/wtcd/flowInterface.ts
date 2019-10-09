@@ -1,5 +1,6 @@
 import { ContentOutput, Interpreter } from './Interpreter';
 import { Random } from './Random';
+import { WTCDRoot } from './types';
 
 interface Data {
   random: string;
@@ -44,7 +45,7 @@ export class FlowInterface {
   }
   public constructor(
     docIdentifier: string,
-    wtcdRoot: string,
+    wtcdRoot: any,
     private debug: boolean = false,
   ) {
     this.storageKey = `wtcd.${docIdentifier}`;
@@ -53,7 +54,7 @@ export class FlowInterface {
       decisions: [],
     };
     this.interpreter = new Interpreter(
-      JSON.parse(wtcdRoot),
+      wtcdRoot,
       new Random(this.data.random),
     );
     this.iterator = this.interpreter.start();

@@ -177,9 +177,8 @@ const keywords = new Set([
   'false',
   'selection',
   'choice',
-  'true',
-  'false',
   'yield',
+  'exit',
 
   // Reserved
   'return',

@@ -82,6 +82,11 @@ export interface GotoAction extends OptionalLocationInfo {
   sections: Array<string>;
 }
 
+/** e.g. exit */
+export interface ExitAction extends OptionalLocationInfo {
+  type: 'exitAction';
+}
+
 /** e.g.
  * selection [
  *   choice "A" goto a
@@ -147,7 +152,7 @@ export type Literal = NumberLiteral | BooleanLiteral | StringLiteral | NullLiter
 
 export type OperatorExpression = BinaryExpression | UnaryExpression | ConditionalExpression;
 
-export type Action = GotoAction;
+export type Action = GotoAction | ExitAction;
 
 export type Expression = Literal | OperatorExpression | Selection | Action | BlockExpression | ChoiceExpression | VariableReference;
 

@@ -13,13 +13,9 @@ a {
   color: inherit;
 }
 p {
-  text-align: justify;
-
   line-height: 1.6em;
 }
 li {
-  text-align: justify;
-
   line-height: 1.6em;
 }
 table {
@@ -680,7 +676,7 @@ body.animation-enabled .wtcd-button {
 }
 .wtcd-button.disabled {
   color: var(--key-opacity-05);
-  background: repeating-linear-gradient(45deg, var(--key-opacity-007), var(--key-opacity-007) 15px, rgba(0,0,0,0) 15px, rgba(0,0,0,0) 30px);
+  background: repeating-linear-gradient(45deg, var(--key-opacity-004), var(--key-opacity-004) 15px, rgba(0,0,0,0) 15px, rgba(0,0,0,0) 30px);
   box-shadow: none;
 }
 .wtcd-button.candidate {

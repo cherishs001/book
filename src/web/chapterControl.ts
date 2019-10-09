@@ -10,6 +10,7 @@ import { SwipeDirection, swipeEvent } from './gestures';
 import { updateHistory } from './history';
 import { ArrowKey, arrowKeyPressEvent } from './keyboard';
 import { loadingText } from './loadingText';
+import { WTCD_ERROR_MESSAGE, WTCD_ERROR_STACK, WTCD_FAILED_TO_COMPILE_TITLE } from './messages';
 import { RectMode, setRectMode } from './RectMode';
 import { developerMode, earlyAccess, gestureSwitchChapter } from './settings';
 import { Selection, state } from './state';
@@ -221,6 +222,23 @@ arrowKeyPressEvent.on(arrowKey => {
   }
 });
 
+function attachWTCDCompileErrorMessage($target: HTMLElement, message: string, stack: string) {
+  const $header = document.createElement('h1');
+  $header.innerText = WTCD_FAILED_TO_COMPILE_TITLE;
+  $target.appendChild($header);
+  const $message = document.createElement('p');
+  $message.innerText = WTCD_ERROR_MESSAGE + message;
+  $target.appendChild($message);
+  const $stackTitle = document.createElement('h2');
+  $stackTitle.innerText = WTCD_ERROR_STACK;
+  $target.appendChild($stackTitle);
+  const $pre = document.createElement('pre');
+  const $code = document.createElement('code');
+  $code.innerText = stack;
+  $pre.appendChild($code);
+  $target.appendChild($pre);
+}
+
 function insertContent($target: HTMLDivElement, content: string, chapter: Chapter) {
   switch (chapter.type) {
     case 'Markdown':
@@ -228,9 +246,14 @@ function insertContent($target: HTMLDivElement, content: string, chapter: Chapte
       break;
     case 'WTCD': {
       $target.innerHTML = '';
+      const wtcdRoot = JSON.parse(content);
+      if (wtcdRoot.error === true) {
+        attachWTCDCompileErrorMessage($target, wtcdRoot.message, wtcdRoot.stack);
+        break;
+      }
       const flowInterface = new FlowInterface(
         chapter.htmlRelativePath,
-        content,
+        wtcdRoot,
         developerMode.getValue(),
       );
       const $wtcdContainer = document.createElement('div');
