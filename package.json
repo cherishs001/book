@@ -7,7 +7,7 @@
         "compileTypeScriptOnce": "tsc",
         "buildChapters": "node ts-out/builder/index.js",
         "buildWebScript": "browserify ts-out/web/index.js -o dist/bundle.max.js",
-        "minifyWebScript": "uglifyjs dist/bundle.max.js --compress --mangle -o dist/bundle.js",
+        "minifyWebScript": "terser dist/bundle.max.js --compress --mangle -o dist/bundle.js",
         "build": "run-s compileTypeScriptOnce buildChapters buildWebScript minifyWebScript",
         "buildChaptersDebug": "node ts-out/builder/index.js --debug",
         "dev-watch-staticServer": "cd dist && static-server -p 2333 -o --no-cache",
@@ -29,6 +29,7 @@
         "fs-extra": "^8.1.0",
         "markdown-it": "^9.0.0",
         "markdown-it-replace-link": "^1.0.1",
+        "terser": "^4.3.8",
         "typescript": "^3.2.4",
         "uglify-js": "^3.4.9"
     },

@@ -1,12 +1,12 @@
 {
   "compilerOptions": {
     "downlevelIteration": true,
-    "lib": [ "es7", "dom" ],
+    "lib": [ "es2016", "dom" ],
     "module": "commonjs",
     "noImplicitAny": true,
     "outDir": "ts-out",
     "rootDir": "src",
     "strict": true,
-    "target": "es5"
+    "target": "es2016"
   }
 }
