@@ -13,8 +13,9 @@ export class FlowInterface {
   private storageKey: string;
   private data: Data;
   private target!: HTMLElement;
-  private currentDecisionIndex!: number;
-  private buttons!: Array<Array<HTMLDivElement>>;
+  private currentDecisionIndex: number = 0;
+  private buttons: Array<Array<HTMLDivElement>> = [];
+  private contents: Array<HTMLDivElement> = [];
   /**
    * Verify and parse data stored in localStorage.
    */
@@ -43,14 +44,9 @@ export class FlowInterface {
   private persist() {
     window.localStorage.setItem(this.storageKey, JSON.stringify(this.data));
   }
-  public reset() {
+  public resetInterpreter() {
     this.interpreter = new Interpreter(JSON.parse(this.wtcdRoot), new Random(this.data.random));
     this.iterator = this.interpreter.start();
-    this.currentDecisionIndex = 0;
-    this.buttons = [];
-    if (this.target !== undefined) {
-      this.target.innerHTML = '';
-    }
   }
   public constructor(
     docIdentifier: string,
@@ -62,7 +58,7 @@ export class FlowInterface {
       random: String(Math.random()),
       decisions: [],
     };
-    this.reset();
+    this.resetInterpreter();
   }
 
   private decide(decision: number, replay: boolean = false) {
@@ -86,8 +82,32 @@ export class FlowInterface {
     return yieldValue.done;
   }
 
+  private undecide(decisionIndex: number) {
+    this.resetInterpreter();
+
+    this.data.decisions.splice(decisionIndex);
+    this.buttons.splice(decisionIndex + 1);
+    this.contents.splice(decisionIndex + 1).forEach($deletedContent => $deletedContent.remove());
+
+    // Replay
+    this.iterator.next();
+    for (const decision of this.data.decisions) {
+      this.iterator.next(decision);
+    }
+
+    this.buttons[decisionIndex].forEach($button => {
+      if (!$button.classList.contains('disabled')) {
+        $button.classList.remove('selected', 'unselected');
+        $button.classList.add('candidate');
+      }
+    });
+
+    this.currentDecisionIndex = decisionIndex;
+  }
+
   private handleOutput(output: ContentOutput) {
-    output.content.forEach($element => this.target.appendChild($element));
+    const $container = document.createElement('div');
+    output.content.forEach($element => $container.appendChild($element));
     const decisionIndex = this.currentDecisionIndex;
     this.buttons.push(output.choices.map((choice, choiceIndex) => {
       const $button = document.createElement('div');
@@ -99,33 +119,18 @@ export class FlowInterface {
         $button.classList.add('candidate');
         $button.addEventListener('click', () => {
           if (this.data.decisions[decisionIndex] === choiceIndex) {
-            this.reset();
-            this.data.decisions = this.data.decisions.slice(0, decisionIndex);
-            this.replay();
-            return;
+            this.undecide(decisionIndex);
+          } else if (this.currentDecisionIndex === decisionIndex) {
+            this.decide(choiceIndex);
           }
-          if (this.currentDecisionIndex !== decisionIndex) {
-            return;
-          }
-          this.decide(choiceIndex);
         });
       }
-      this.target.appendChild($button);
+      $container.appendChild($button);
       return $button;
     }));
-  }
 
-  /** Replay all decisions stored in data */
-  private replay() {
-    const init  = this.iterator.next();
-    let done = init.done;
-    this.handleOutput(init.value);
-    for (const decision of this.data.decisions) {
-      if (done) {
-        throw new Error('Replay failed: WTCD ended before decisions are all executed.');
-      }
-      done = this.decide(decision, true);
-    }
+    this.contents.push($container);
+    this.target.appendChild($container);
   }
 
   private started: boolean = false;
@@ -135,6 +140,15 @@ export class FlowInterface {
     }
     this.started = true;
     this.target = target;
-    this.replay();
+
+    const init  = this.iterator.next();
+    let done = init.done;
+    this.handleOutput(init.value);
+    for (const decision of this.data.decisions) {
+      if (done) {
+        throw new Error('Replay failed: WTCD ended before decisions are all executed.');
+      }
+      done = this.decide(decision, true);
+    }
   }
 }
