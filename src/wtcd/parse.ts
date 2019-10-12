@@ -268,6 +268,7 @@ class LogicParser {
   private parseBlockExpression() {
     const firstBraceToken = this.tokenStream.assertAndSkipNext('punctuation', '{');
     this.lexicalScopeProvider.enterScope();
+    this.lexicalScopeProvider.addRegisterToCurrentScope('yield');
     const expressions: Array<Statement> = [];
     while (!this.tokenStream.isNext('punctuation', '}')) {
       expressions.push(this.parseStatement());
@@ -291,6 +292,7 @@ class LogicParser {
 
   private parseYieldOrSetYieldExpression(): YieldStatement | SetYieldStatement {
     const yieldToken = this.tokenStream.assertAndSkipNext('keyword', 'yield');
+    this.assertHasRegister('yield', yieldToken);
     if (this.tokenStream.isNext('operator', '=')) {
       // Set yield
       this.tokenStream.next();
@@ -309,6 +311,7 @@ class LogicParser {
 
   private parseReturnOrSetReturnStatement(): ReturnStatement | SetReturnStatement {
     const returnToken = this.tokenStream.assertAndSkipNext('keyword', 'return');
+    this.assertHasRegister('return', returnToken);
     if (this.tokenStream.isNext('operator', '=')) {
       // Set return
       this.tokenStream.next();

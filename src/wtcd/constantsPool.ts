@@ -1,7 +1,7 @@
 import { BooleanValue, NullValue, NumberValue, RuntimeValue, RuntimeValueRaw, RuntimeValueType } from './Interpreter';
 
 // Your typical immature optimization
-// Cache null values, boolean values, and small integers to somewhat reduce GC
+// Caches null values, boolean values, and small integers to somewhat reduce GC
 
 export const nullValue: NullValue = { type: 'null', value: null };
 export const trueValue: BooleanValue = { type: 'boolean', value: true };

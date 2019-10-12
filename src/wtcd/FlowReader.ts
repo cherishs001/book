@@ -2,19 +2,42 @@ import { ContentOutput, Interpreter } from './Interpreter';
 import { Random } from './Random';
 import { WTCDRoot } from './types';
 
+/** Data persisted in the localStorage */
 interface Data {
   random: string;
   decisions: Array<number>;
 }
 
-export class FlowInterface {
-  private interpreter!: Interpreter;
-  private iterator!: Iterator<ContentOutput, ContentOutput, number>;
+/**
+ * This is one of the possible implementation of a WTCD reader.
+ *
+ * In this implementation, all new content and buttons are appended to a single
+ * HTML element. The user is expected to continuously scroll down the page in
+ * order to read more, thus the name "flow reader".
+ *
+ * This reader implementation persists data via memorizing all users' decisions.
+ * When restoring a previous session, it replays all decisions.
+ *
+ * Since all decisions are recorded, this implementation allows the user to undo
+ * decisions, in which case, it resets the interpreter and replay all decisions
+ * until the decision that is being undone. This means, however, if the logic of
+ * WTCD section is extremely complicated and takes a long time to compute, it
+ * will potentially lag user's interface every time the user undoes a decision.
+ */
+export class FlowReader {
+  /** The iterator of the interpreter */
+  private interpreterIterator!: Iterator<ContentOutput, ContentOutput, number>;
+  /** Key in local storage */
   private storageKey: string;
+  /** Persisted data */
   private data: Data;
+  /** Where to render the output */
   private target!: HTMLElement;
+  /** Which decision the current buttons are for */
   private currentDecisionIndex: number = 0;
+  /** Buttons for each group of output */
   private buttons: Array<Array<HTMLDivElement>> = [];
+  /** Content output after each decision */
   private contents: Array<HTMLDivElement> = [];
   /**
    * Verify and parse data stored in localStorage.
@@ -44,16 +67,17 @@ export class FlowInterface {
   private persist() {
     window.localStorage.setItem(this.storageKey, JSON.stringify(this.data));
   }
+  /** Restart the interpreter and reset the interpreterIterator */
   public resetInterpreter() {
-    this.interpreter = new Interpreter(JSON.parse(this.wtcdRoot), new Random(this.data.random));
-    this.iterator = this.interpreter.start();
+    const interpreter = new Interpreter(this.wtcdRoot, new Random(this.data.random));
+    this.interpreterIterator = interpreter.start();
   }
   public constructor(
     docIdentifier: string,
-    private wtcdRoot: string,
+    private wtcdRoot: WTCDRoot,
     private debug: boolean = false,
   ) {
-    this.storageKey = `wtcd.${docIdentifier}`;
+    this.storageKey = `wtcd.fr.${docIdentifier}`;
     this.data = this.parseData(window.localStorage.getItem(this.storageKey)) || {
       random: String(Math.random()),
       decisions: [],
@@ -61,6 +85,13 @@ export class FlowInterface {
     this.resetInterpreter();
   }
 
+  /**
+   * Make a decision at currentDecisionIndex and update buttons accordingly
+   *
+   * @param decision the index of choice to be made
+   * @param replay whether this is during a replay; If true, the decision will
+   * not be added to data.
+   */
   private decide(decision: number, replay: boolean = false) {
     this.buttons[this.currentDecisionIndex].forEach(($button, choiceIndex) => {
       if ($button.classList.contains('disabled')) {
@@ -76,25 +107,36 @@ export class FlowInterface {
     if (!replay) {
       this.data.decisions.push(decision);
     }
+    // Advance current decision index
     this.currentDecisionIndex++;
-    const yieldValue = this.iterator.next(decision);
+    const yieldValue = this.interpreterIterator.next(decision);
     this.handleOutput(yieldValue.value);
     return yieldValue.done;
   }
 
+  /**
+   * Undo a decision made previously; It also removes every decision after the
+   * specified decision.
+   *
+   * @param decisionIndex which decision to be undone
+   */
   private undecide(decisionIndex: number) {
     this.resetInterpreter();
 
+    // Clear those no longer needed content
     this.data.decisions.splice(decisionIndex);
     this.buttons.splice(decisionIndex + 1);
-    this.contents.splice(decisionIndex + 1).forEach($deletedContent => $deletedContent.remove());
+    this.contents.splice(decisionIndex + 1)
+      .forEach($deletedContent => $deletedContent.remove());
 
     // Replay
-    this.iterator.next();
+    this.interpreterIterator.next();
     for (const decision of this.data.decisions) {
-      this.iterator.next(decision);
+      this.interpreterIterator.next(decision);
     }
 
+    // Update current decision's buttons so they become available to click
+    // again.
     this.buttons[decisionIndex].forEach($button => {
       if (!$button.classList.contains('disabled')) {
         $button.classList.remove('selected', 'unselected');
@@ -105,7 +147,14 @@ export class FlowInterface {
     this.currentDecisionIndex = decisionIndex;
   }
 
+  /**
+   * Handle an instance of output from the interpreter. This will add the
+   * content output and buttons to target.
+   *
+   * @param output the content output to be added
+   */
   private handleOutput(output: ContentOutput) {
+    // Create a container for all elements involved so deletion will be easier.
     const $container = document.createElement('div');
     output.content.forEach($element => $container.appendChild($element));
     const decisionIndex = this.currentDecisionIndex;
@@ -120,8 +169,10 @@ export class FlowInterface {
         $button.addEventListener('click', () => {
           if (this.data.decisions[decisionIndex] === choiceIndex) {
             this.undecide(decisionIndex);
+            this.persist();
           } else if (this.currentDecisionIndex === decisionIndex) {
             this.decide(choiceIndex);
+            this.persist();
           }
         });
       }
@@ -141,7 +192,7 @@ export class FlowInterface {
     this.started = true;
     this.target = target;
 
-    const init  = this.iterator.next();
+    const init  = this.interpreterIterator.next();
     let done = init.done;
     this.handleOutput(init.value);
     for (const decision of this.data.decisions) {

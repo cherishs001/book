@@ -413,13 +413,19 @@ export class Interpreter {
     const $host = document.createElement('div');
     while (this.sectionStack.length !== 0) {
       const currentSection = this.sectionStack.pop()!;
+
+      // Evaluate the executes clause
       if (currentSection.executes !== null) {
         this.evaluator(currentSection.executes);
       }
+
+      /** Times this section has been entered including this time */
       const enterTime = this.sectionEnterTimes.has(currentSection.name)
         ? this.sectionEnterTimes.get(currentSection.name)! + 1
         : 1;
       this.sectionEnterTimes.set(currentSection.name, enterTime);
+
+      /** Content that fits within the bounds */
       const eligibleSectionContents = currentSection.content.filter(
         content => (content.lowerBound === undefined || content.lowerBound <= enterTime) &&
           (content.upperBound === undefined || content.upperBound >= enterTime),
@@ -429,6 +435,7 @@ export class Interpreter {
           this.random.nextInt(0, eligibleSectionContents.length)
         ];
         $host.innerHTML = selectedContent.html;
+
         // Parameterize
         for (const variable of selectedContent.variables) {
           ($host.getElementsByClassName(variable.elementClass)[0] as HTMLSpanElement)
@@ -454,7 +461,7 @@ export class Interpreter {
           choices,
         };
         this.currentlyBuilding = [];
-        // Hands over control so player can make decision
+        // Hands over control so player can make a decision
         const playerChoiceIndex = yield yieldValue;
         const playerChoice = then.value.choices[playerChoiceIndex];
         if (playerChoice === undefined || playerChoice.value.action.type === 'null') {

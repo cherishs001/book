@@ -39,6 +39,24 @@ th {
 td, th {
   line-height: 1.6em;
 }
+h1 {
+  font-size: 2.2em;
+}
+h2 {
+  font-size: 1.8em;
+}
+h3 {
+  font-size: 1.55em;
+}
+h4 {
+  font-size: 1.4em;
+}
+h5 {
+  font-size: 1.25em;
+}
+h6 {
+  font-size: 1.1em;
+}
 @media (min-width: 901px) {
   td, th {
     padding: 0 1em;
@@ -106,7 +124,7 @@ body.animation-enabled .warning-backdrop {
   left: 50%;
 
   width: 800px;
-  max-width: calc(100vw - 6vw);
+  max-width: calc(85vw);
   margin: 0 auto 0 auto;
 
   transform: translate(-50%, -50%);
@@ -131,7 +149,7 @@ body.animation-enabled .warning-backdrop {
   color: white;
 
   font-size: 4vh;
-  line-height: 4vh;
+  line-height: 1.2em;
 }
 .warning-container .disable {
   text-align: center;
