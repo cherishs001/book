@@ -2,7 +2,37 @@ import * as MDI from 'markdown-it';
 import { BinaryOperator, binaryOperators, conditionalOperatorPrecedence, UnaryOperator, unaryOperators } from './operators';
 import { SimpleIdGenerator } from './SimpleIdGenerator';
 import { Token, TokenStream } from './TokenStream';
-import { BinaryExpression, BlockExpression, BooleanLiteral, ChoiceExpression, ConditionalExpression, DeclarationStatement, ExitAction, Expression, ExpressionStatement, GotoAction, NullLiteral, NumberLiteral, OneVariableDeclaration, OptionalLocationInfo, RegisterName, ReturnStatement, Section, Selection, SetReturnStatement, SetYieldStatement, SingleSectionContent, Statement, StringLiteral, UnaryExpression, VariableReference, VariableType, WTCDParseResult, WTCDRoot, YieldStatement } from './types';
+import {
+  BinaryExpression,
+  BlockExpression,
+  BooleanLiteral,
+  ChoiceExpression,
+  ConditionalExpression,
+  DeclarationStatement,
+  ExitAction,
+  Expression,
+  ExpressionStatement,
+  GotoAction,
+  NullLiteral,
+  NumberLiteral,
+  OneVariableDeclaration,
+  OptionalLocationInfo,
+  RegisterName,
+  ReturnStatement,
+  Section,
+  Selection,
+  SetReturnStatement,
+  SetYieldStatement,
+  SingleSectionContent,
+  Statement,
+  StringLiteral,
+  UnaryExpression,
+  VariableReference,
+  VariableType,
+  WTCDParseResult,
+  WTCDRoot,
+  YieldStatement,
+} from './types';
 import { WTCDError } from './WTCDError';
 
 const CURRENT_MAJOR_VERSION = 1;
@@ -350,15 +380,19 @@ class LogicParser {
    * - For conditional operator (?), parse a expression (between "?" and ":"),
    *   then read in ":". Last, do the same thing as with the binary case.
    * @param left expression on the left of next operator
-   * @param precedenceThreshold minimum (exclusive) precedence required in order
+   * @param precedenceMin minimum (exclusive) precedence required in order
+   * to bind with left
+   * @param precedenceMax minimum (inclusive) precedence required in order
    * to bind with left
    */
   private parseExpression: (
     left?: Expression,
-    precedenceThreshold?: number,
+    precedenceMin?: number,
+    precedenceMax?: number,
   ) => Expression = (
     left = this.parseAtom(),
-    precedenceThreshold = 0,
+    precedenceMin = 0,
+    precedenceMax = Infinity,
   ) => {
     if (!this.tokenStream.isNext('operator')) {
       return left;
@@ -371,21 +405,22 @@ class LogicParser {
     const nextPrecedence = isConditional
       ? conditionalOperatorPrecedence
       : binaryOperators.get(operatorToken.content)!.precedence;
-    if (nextPrecedence <= precedenceThreshold) {
+    if (nextPrecedence <= precedenceMin || nextPrecedence > precedenceMax) {
       return left;
     }
     this.tokenStream.next(); // Read in operator
     if (isConditional) {
+      // Implementation here might contain bug. It works for all my cases though.
       const then = this.parseExpression();
       this.tokenStream.assertAndSkipNext('operator', ':');
-      const otherwise = this.parseExpression(this.parseAtom(), nextPrecedence);
+      const otherwise = this.parseExpression(this.parseAtom(), 0, nextPrecedence);
       const conditional = this.attachLocationInfo<ConditionalExpression>(operatorToken, {
         type: 'conditionalExpression',
         condition: left,
         then,
         otherwise,
       });
-      return this.parseExpression(conditional, precedenceThreshold);
+      return this.parseExpression(conditional, precedenceMin, precedenceMax);
     } else {
       const right = this.parseExpression(this.parseAtom(), nextPrecedence);
       const binary = this.attachLocationInfo<BinaryExpression>(operatorToken, {
@@ -394,7 +429,7 @@ class LogicParser {
         arg0: left,
         arg1: right,
       });
-      return this.parseExpression(binary, precedenceThreshold);
+      return this.parseExpression(binary, precedenceMin, precedenceMax);
     }
   }
 
@@ -420,7 +455,7 @@ class LogicParser {
   }
 
   private parseOneDeclaration: () => OneVariableDeclaration = () => {
-    const typeToken = this.tokenStream.assertAndSkipNext('identifier', [
+    const typeToken = this.tokenStream.assertAndSkipNext('keyword', [
       'number',
       'boolean',
       'string',
@@ -561,13 +596,11 @@ function identity<T>(input: T) {
 
 /**
  * Parse the given WTCD document.
- * @param source The content of WTCD
- * @param mdi An instance of markdown-it
- * @param logger A logging function
  */
-export function parse({ source, mdi, logger = console, markdownPreProcessor = identity, htmlPostProcessor = identity }: {
+export function parse({ source, mdi, sourceMap = false, logger = console, markdownPreProcessor = identity, htmlPostProcessor = identity }: {
   source: string;
   mdi: MDI;
+  sourceMap?: boolean;
   logger?: SimpleLogger;
   markdownPreProcessor?: (markdown: string) => string;
   htmlPostProcessor?: (html: string) => string;
@@ -600,7 +633,7 @@ export function parse({ source, mdi, logger = console, markdownPreProcessor = id
     const logicParser = new LogicParser(
       sectionMarkdowns.shift()!,
       logger,
-      false,
+      sourceMap,
     );
 
     const wtcdRoot: WTCDRoot = logicParser.parse();

@@ -14,7 +14,7 @@ export class WTCDError<TLocationInfo extends boolean> extends Error {
       + `is not available for this type of error)`, null, null);
   }
   public static atLineColumn(line: number, column: number, message: string) {
-    return new WTCDError<true>(message + ` at ${line}:${column}`, line, column);
+    return new WTCDError<true>(message + ` at ${line}:${column}.`, line, column);
   }
   public static atLocation(location: OptionalLocationInfo, message: string) {
     if (location.line === undefined) {

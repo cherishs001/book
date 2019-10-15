@@ -38,7 +38,7 @@ export class FlowReader {
   /** Buttons for each group of output */
   private buttons: Array<Array<HTMLDivElement>> = [];
   /** Content output after each decision */
-  private contents: Array<HTMLDivElement> = [];
+  private contents: Array<HTMLElement> = [];
   /**
    * Verify and parse data stored in localStorage.
    */
@@ -67,6 +67,25 @@ export class FlowReader {
   private persist() {
     window.localStorage.setItem(this.storageKey, JSON.stringify(this.data));
   }
+  /**
+   * Calls this.interpreterIterator.next() and handles error.
+   */
+  private next(decision?: number): IteratorResult<ContentOutput, ContentOutput> {
+    try {
+      return this.interpreterIterator.next(decision as any);
+    } catch (error) {
+      const $errorMessage = this.errorMessageCreator(error);
+      this.target.appendChild($errorMessage);
+      this.contents.push($errorMessage);
+      return {
+        done: true,
+        value: {
+          choices: [],
+          content: [],
+        },
+      };
+    }
+  }
   /** Restart the interpreter and reset the interpreterIterator */
   public resetInterpreter() {
     const interpreter = new Interpreter(this.wtcdRoot, new Random(this.data.random));
@@ -75,7 +94,7 @@ export class FlowReader {
   public constructor(
     docIdentifier: string,
     private wtcdRoot: WTCDRoot,
-    private debug: boolean = false,
+    private errorMessageCreator: (error: Error) => HTMLElement,
   ) {
     this.storageKey = `wtcd.fr.${docIdentifier}`;
     this.data = this.parseData(window.localStorage.getItem(this.storageKey)) || {
@@ -109,7 +128,7 @@ export class FlowReader {
     }
     // Advance current decision index
     this.currentDecisionIndex++;
-    const yieldValue = this.interpreterIterator.next(decision);
+    const yieldValue = this.next(decision);
     this.handleOutput(yieldValue.value);
     return yieldValue.done;
   }
@@ -130,9 +149,9 @@ export class FlowReader {
       .forEach($deletedContent => $deletedContent.remove());
 
     // Replay
-    this.interpreterIterator.next();
+    this.next();
     for (const decision of this.data.decisions) {
-      this.interpreterIterator.next(decision);
+      this.next(decision);
     }
 
     // Update current decision's buttons so they become available to click
@@ -185,19 +204,19 @@ export class FlowReader {
   }
 
   private started: boolean = false;
-  public renderTo(target: HTMLElement) {
+  public renderTo($target: HTMLElement) {
     if (this.started) {
       throw new Error('Flow Interface already started.');
     }
     this.started = true;
-    this.target = target;
+    this.target = $target;
 
-    const init  = this.interpreterIterator.next();
+    const init  = this.next();
     let done = init.done;
     this.handleOutput(init.value);
     for (const decision of this.data.decisions) {
       if (done) {
-        throw new Error('Replay failed: WTCD ended before decisions are all executed.');
+        return;
       }
       done = this.decide(decision, true);
     }

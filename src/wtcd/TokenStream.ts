@@ -140,7 +140,7 @@ function isIdentifierBody(char: string | undefined) {
 }
 
 function isOperatorPart(char: string | undefined) {
-  return includes('+-*/^&|=><!?:%', char);
+  return includes('+-*/^&|=><!?:%~', char);
 }
 
 function isPunctuation(char: string | undefined) {
@@ -175,8 +175,12 @@ const keywords = new Set([
   'null',
   'true',
   'false',
-  'selection',
+  'number',
+  'boolean',
+  'string',
+  'action',
   'choice',
+  'selection',
   'yield',
   'exit',
 
@@ -194,6 +198,11 @@ const keywords = new Set([
   'in',
   'of',
   'enum',
+  'list',
+  'dict',
+  'dictionary',
+  'const',
+  'mixed',
 ]);
 
 const escapeMap = new Map([

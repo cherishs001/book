@@ -99,7 +99,12 @@ export function describe(rv: RuntimeValue): string {
     case 'choice':
       return `a choice for action ${describe(rv.value.action)} with label "${rv.value.text}"`;
     case 'action':
-      return `an action for goto to ${rv.value.action}`;
+      switch (rv.value.action) {
+        case 'goto':
+          return `an action for goto to ${rv.value.target}`;
+        case 'exit':
+          return `an action for exiting`;
+      }
     case 'null':
       return 'null';
     case 'selection':
@@ -406,74 +411,81 @@ export class Interpreter {
     }
     this.started = true;
 
-    // Initialization
-    for (const statement of this.wtcdRoot.initStatements) {
-      this.executeStatement(statement);
-    }
-    const $host = document.createElement('div');
-    while (this.sectionStack.length !== 0) {
-      const currentSection = this.sectionStack.pop()!;
-
-      // Evaluate the executes clause
-      if (currentSection.executes !== null) {
-        this.evaluator(currentSection.executes);
+    try {
+      // Initialization
+      for (const statement of this.wtcdRoot.initStatements) {
+        this.executeStatement(statement);
       }
+      const $host = document.createElement('div');
+      while (this.sectionStack.length !== 0) {
+        const currentSection = this.sectionStack.pop()!;
 
-      /** Times this section has been entered including this time */
-      const enterTime = this.sectionEnterTimes.has(currentSection.name)
-        ? this.sectionEnterTimes.get(currentSection.name)! + 1
-        : 1;
-      this.sectionEnterTimes.set(currentSection.name, enterTime);
-
-      /** Content that fits within the bounds */
-      const eligibleSectionContents = currentSection.content.filter(
-        content => (content.lowerBound === undefined || content.lowerBound <= enterTime) &&
-          (content.upperBound === undefined || content.upperBound >= enterTime),
-      );
-      if (eligibleSectionContents.length !== 0) {
-        const selectedContent = eligibleSectionContents[
-          this.random.nextInt(0, eligibleSectionContents.length)
-        ];
-        $host.innerHTML = selectedContent.html;
-
-        // Parameterize
-        for (const variable of selectedContent.variables) {
-          ($host.getElementsByClassName(variable.elementClass)[0] as HTMLSpanElement)
-            .innerText = String(this.resolveVariableReference(variable.variableName).value);
+        // Evaluate the executes clause
+        if (currentSection.executes !== null) {
+          this.evaluator(currentSection.executes);
         }
-        let $current = $host.firstChild;
-        while ($current !== null) {
-          if ($current instanceof HTMLElement) {
-            this.currentlyBuilding.push($current);
+
+        /** Times this section has been entered including this time */
+        const enterTime = this.sectionEnterTimes.has(currentSection.name)
+          ? this.sectionEnterTimes.get(currentSection.name)! + 1
+          : 1;
+        this.sectionEnterTimes.set(currentSection.name, enterTime);
+
+        /** Content that fits within the bounds */
+        const eligibleSectionContents = currentSection.content.filter(
+          content => (content.lowerBound === undefined || content.lowerBound <= enterTime) &&
+            (content.upperBound === undefined || content.upperBound >= enterTime),
+        );
+        if (eligibleSectionContents.length !== 0) {
+          const selectedContent = eligibleSectionContents[
+            this.random.nextInt(0, eligibleSectionContents.length)
+          ];
+          $host.innerHTML = selectedContent.html;
+
+          // Parameterize
+          for (const variable of selectedContent.variables) {
+            ($host.getElementsByClassName(variable.elementClass)[0] as HTMLSpanElement)
+              .innerText = String(this.resolveVariableReference(variable.variableName).value);
           }
-          $current = $current.nextSibling;
+          let $current = $host.firstChild;
+          while ($current !== null) {
+            if ($current instanceof HTMLElement) {
+              this.currentlyBuilding.push($current);
+            }
+            $current = $current.nextSibling;
+          }
+        }
+        const then = this.evaluator(currentSection.then);
+        // The part after then has to be a selection or an action
+        if (then.type === 'selection') {
+          const choices: Array<SingleChoice> = then.value.choices.map(choice => ({
+            content: choice.value.text,
+            disabled: choice.value.action.type === 'null',
+          }));
+          const yieldValue: ContentOutput = {
+            content: this.currentlyBuilding,
+            choices,
+          };
+          this.currentlyBuilding = [];
+          // Hands over control so player can make a decision
+          const playerChoiceIndex = yield yieldValue;
+          const playerChoice = then.value.choices[playerChoiceIndex];
+          if (playerChoice === undefined || playerChoice.value.action.type === 'null') {
+            throw new InvalidChoiceError(playerChoiceIndex);
+          }
+          this.executeAction(playerChoice.value.action);
+        } else if (then.type === 'action') {
+          this.executeAction(then);
+        } else if (then.type !== 'null') {
+          throw WTCDError.atLocation(currentSection.then, `Expression after then is expected to return ` +
+            `selection, action, or null. Received: ${describe(then)}`);
         }
       }
-      const then = this.evaluator(currentSection.then);
-      // The part after then has to be a selection or an action
-      if (then.type === 'selection') {
-        const choices: Array<SingleChoice> = then.value.choices.map(choice => ({
-          content: choice.value.text,
-          disabled: choice.value.action.type === 'null',
-        }));
-        const yieldValue: ContentOutput = {
-          content: this.currentlyBuilding,
-          choices,
-        };
-        this.currentlyBuilding = [];
-        // Hands over control so player can make a decision
-        const playerChoiceIndex = yield yieldValue;
-        const playerChoice = then.value.choices[playerChoiceIndex];
-        if (playerChoice === undefined || playerChoice.value.action.type === 'null') {
-          throw new InvalidChoiceError(playerChoiceIndex);
-        }
-        this.executeAction(playerChoice.value.action);
-      } else if (then.type === 'action') {
-        this.executeAction(then);
-      } else if (then.type !== 'null') {
-        throw WTCDError.atLocation(currentSection.then, `Expression after then is expected to return ` +
-          `selection, action, or null. Received: ${describe(then)}`);
+    } catch (error) {
+      if (error instanceof BubbleSignal) {
+        throw WTCDError.atUnknown(`Uncaught BubbleSignal with type "${error.type}".`);
       }
+      throw error;
     }
     return {
       content: this.currentlyBuilding,

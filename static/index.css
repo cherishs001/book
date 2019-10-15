@@ -276,7 +276,7 @@ body.animation-enabled .rect>div {
     opacity: 1;
   }
 }
-.rect>div *:first-child, .rect>div .block+* {
+.rect>div>:first-child, .rect>div>:first-child>:first-child, .rect>div>:first-child>:first-child>:first-child, .rect>div .block+*, .rect>div .block+*>:first-child, .rect>div .block+*>:first-child>:first-child {
   margin-top: 0;
 }
 .rect>.content code {

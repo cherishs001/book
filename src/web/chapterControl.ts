@@ -1,6 +1,7 @@
-import { Chapter, ChapterType } from '../Data';
+import { Chapter } from '../Data';
 import { FlowReader } from '../wtcd/FlowReader';
 import { WTCDParseResult } from '../wtcd/types';
+import { WTCDError } from '../wtcd/WTCDError';
 import { hideComments, loadComments } from './commentsControl';
 import { ContentBlockType } from './ContentBlockType';
 import { relativePathLookUpMap } from './data';
@@ -11,9 +12,9 @@ import { SwipeDirection, swipeEvent } from './gestures';
 import { updateHistory } from './history';
 import { ArrowKey, arrowKeyPressEvent } from './keyboard';
 import { loadingText } from './loadingText';
-import { WTCD_ERROR_MESSAGE, WTCD_ERROR_STACK, WTCD_FAILED_TO_COMPILE_TITLE } from './messages';
+import { WTCD_ERROR_COMPILE_TITLE, WTCD_ERROR_INTERNAL_DESC, WTCD_ERROR_INTERNAL_STACK_DESC, WTCD_ERROR_INTERNAL_STACK_TITLE, WTCD_ERROR_INTERNAL_TITLE, WTCD_ERROR_MESSAGE, WTCD_ERROR_RUNTIME_DESC, WTCD_ERROR_RUNTIME_TITLE } from './messages';
 import { RectMode, setRectMode } from './RectMode';
-import { developerMode, earlyAccess, gestureSwitchChapter } from './settings';
+import { earlyAccess, gestureSwitchChapter } from './settings';
 import { Selection, state } from './state';
 
 const debugLogger = new DebugLogger('chapterControl');
@@ -223,21 +224,57 @@ arrowKeyPressEvent.on(arrowKey => {
   }
 });
 
-function attachWTCDCompileErrorMessage($target: HTMLElement, message: string, stack: string) {
-  const $header = document.createElement('h1');
-  $header.innerText = WTCD_FAILED_TO_COMPILE_TITLE;
-  $target.appendChild($header);
+enum ErrorType {
+  COMPILE,
+  RUNTIME,
+  INTERNAL,
+}
+
+function createWTCDErrorMessage({
+  errorType,
+  message,
+  stack,
+}: {
+  errorType: ErrorType;
+  message: string;
+  stack: string | undefined;
+}): HTMLElement {
+  const $target = document.createElement('div');
+  const $title = document.createElement('h1');
+  const $desc = document.createElement('p');
+  switch (errorType) {
+    case ErrorType.COMPILE:
+      $title.innerText = WTCD_ERROR_COMPILE_TITLE;
+      $desc.innerText = WTCD_ERROR_COMPILE_TITLE;
+      break;
+    case ErrorType.RUNTIME:
+      $title.innerText = WTCD_ERROR_RUNTIME_TITLE;
+      $desc.innerText = WTCD_ERROR_RUNTIME_DESC;
+      break;
+    case ErrorType.INTERNAL:
+      $title.innerText = WTCD_ERROR_INTERNAL_TITLE;
+      $desc.innerText = WTCD_ERROR_INTERNAL_DESC;
+      break;
+  }
+  $target.appendChild($title);
+  $target.appendChild($desc);
   const $message = document.createElement('p');
   $message.innerText = WTCD_ERROR_MESSAGE + message;
   $target.appendChild($message);
-  const $stackTitle = document.createElement('h2');
-  $stackTitle.innerText = WTCD_ERROR_STACK;
-  $target.appendChild($stackTitle);
-  const $pre = document.createElement('pre');
-  const $code = document.createElement('code');
-  $code.innerText = stack;
-  $pre.appendChild($code);
-  $target.appendChild($pre);
+  if (stack !== undefined) {
+    const $stackTitle = document.createElement('h2');
+    $stackTitle.innerText = WTCD_ERROR_INTERNAL_STACK_TITLE;
+    $target.appendChild($stackTitle);
+    const $stackDesc = document.createElement('p');
+    $stackDesc.innerText = WTCD_ERROR_INTERNAL_STACK_DESC;
+    $target.appendChild($stackDesc);
+    const $pre = document.createElement('pre');
+    const $code = document.createElement('code');
+    $code.innerText = stack;
+    $pre.appendChild($code);
+    $target.appendChild($pre);
+  }
+  return $target;
 }
 
 function insertContent($target: HTMLDivElement, content: string, chapter: Chapter) {
@@ -249,13 +286,23 @@ function insertContent($target: HTMLDivElement, content: string, chapter: Chapte
       $target.innerHTML = '';
       const wtcdParseResult: WTCDParseResult = JSON.parse(content);
       if (wtcdParseResult.error === true) {
-        attachWTCDCompileErrorMessage($target, wtcdParseResult.message, wtcdParseResult.internalStack);
+        $target.appendChild(createWTCDErrorMessage({
+          errorType: ErrorType.COMPILE,
+          message: wtcdParseResult.message,
+          stack: wtcdParseResult.internalStack,
+        }));
         break;
       }
       const flowInterface = new FlowReader(
         chapter.htmlRelativePath,
         wtcdParseResult.wtcdRoot,
-        developerMode.getValue(),
+        error => createWTCDErrorMessage({
+          errorType: (error instanceof WTCDError)
+            ? ErrorType.RUNTIME
+            : ErrorType.INTERNAL,
+          message: error.message,
+          stack: error.stack,
+        }),
       );
       const $wtcdContainer = document.createElement('div');
       flowInterface.renderTo($wtcdContainer);

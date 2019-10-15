@@ -2,6 +2,7 @@ import { copy, copyFile, ensureDir, mkdirp, readdir, readFile, stat, writeFile }
 import * as MDI from 'markdown-it';
 import * as mdiReplaceLinkPlugin from 'markdown-it-replace-link';
 import { basename, dirname, posix, relative, resolve } from 'path';
+import yargs = require('yargs');
 import { Chapter, Data, Folder, Node } from '../Data';
 import { parse } from '../wtcd/parse';
 import { countCertainWord } from './countCertainWord';
@@ -16,6 +17,10 @@ const { join } = posix;
 const earlyAccessFlag = '# 编写中';
 const commentsUrlBegin = '[评论](';
 const commentsUrlEnd = ')';
+
+const argv = yargs.options({
+  debug: { type: 'boolean', default: false },
+}).argv;
 
 (async () => {
   const rootDir = resolve(__dirname, '../..');
@@ -157,7 +162,7 @@ const commentsUrlEnd = ')';
 
     let chapterCharCount = 0;
 
-    const wtcdParseResult = parse({ source, mdi, logger, markdownPreProcessor: markdown => {
+    const wtcdParseResult = parse({ source, mdi, logger, sourceMap: argv.debug, markdownPreProcessor: markdown => {
       chapterCharCount += countChars(markdown);
       keywords.forEach(keyword => {
         const count = countCertainWord(markdown, keyword);

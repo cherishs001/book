@@ -39,7 +39,7 @@ export const unaryOperators = new Map<string, UnaryOperatorDefinition>([
   }],
 ]);
 
-export type BinaryOperator = '+' | '-' | '*' | '/' | '//' | '%' | '=' | '+=' | '-=' | '*=' | '/=' | '//=' | '%=';
+export type BinaryOperator = '+' | '-' | '*' | '/' | '~/' | '%' | '=' | '+=' | '-=' | '*=' | '/=' | '~/=' | '%=';
 
 type ResolveVariableReferenceFn = (variableName: string) => RuntimeValueMutable;
 
@@ -185,7 +185,7 @@ export const binaryOperators = new Map<string, BinaryOperatorDefinition>([
     precedence: 3,
     fn: opAssignment('number', 'number', (arg0Raw, arg1Raw) => arg0Raw / arg1Raw),
   }],
-  ['//=', {
+  ['~/=', {
     precedence: 3,
     fn: opAssignment('number', 'number', (arg0Raw, arg1Raw) => Math.trunc(arg0Raw / arg1Raw)),
   }],
@@ -293,7 +293,7 @@ export const binaryOperators = new Map<string, BinaryOperatorDefinition>([
     precedence: 14,
     fn: autoEvaluatedSameTypeArg('number', 'number', (arg0Raw, arg1Raw) => arg0Raw / arg1Raw),
   }],
-  ['//', {
+  ['~/', {
     precedence: 14,
     fn: autoEvaluatedSameTypeArg('number', 'number', (arg0Raw, arg1Raw) => Math.trunc(arg0Raw / arg1Raw)),
   }],
