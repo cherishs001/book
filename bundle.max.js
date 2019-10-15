@@ -1,120 +1,76 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 "use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 Object.defineProperty(exports, "__esModule", { value: true });
-var commentBlockControl_1 = require("./commentBlockControl");
-var Menu_1 = require("./Menu");
-var messages_1 = require("./messages");
-var BlockMenu = /** @class */ (function (_super) {
-    __extends(BlockMenu, _super);
-    function BlockMenu(parent) {
-        var _this = _super.call(this, '屏蔽用户评论管理', parent) || this;
-        _this.update();
-        commentBlockControl_1.blockedUserUpdateEvent.on(_this.update.bind(_this));
-        return _this;
-    }
-    BlockMenu.prototype.update = function () {
-        var _this = this;
+const commentBlockControl_1 = require("./commentBlockControl");
+const Menu_1 = require("./Menu");
+const messages_1 = require("./messages");
+class BlockMenu extends Menu_1.Menu {
+    update() {
         this.clearItems();
-        var blockedUsers = commentBlockControl_1.getBlockedUsers();
+        const blockedUsers = commentBlockControl_1.getBlockedUsers();
         if (blockedUsers.length === 0) {
             this.addItem(messages_1.NO_BLOCKED_USERS, { small: true });
         }
         else {
             this.addItem(messages_1.CLICK_TO_UNBLOCK, { small: true });
         }
-        blockedUsers.forEach(function (userName) {
-            _this.addItem(userName, { small: true, button: true })
-                .onClick(function () {
+        blockedUsers.forEach(userName => {
+            this.addItem(userName, { small: true, button: true })
+                .onClick(() => {
                 commentBlockControl_1.unblockUser(userName);
             });
         });
-    };
-    return BlockMenu;
-}(Menu_1.Menu));
+    }
+    constructor(parent) {
+        super('屏蔽用户评论管理', parent);
+        this.update();
+        commentBlockControl_1.blockedUserUpdateEvent.on(this.update.bind(this));
+    }
+}
 exports.BlockMenu = BlockMenu;
 
 },{"./Menu":8,"./commentBlockControl":16,"./messages":26}],2:[function(require,module,exports){
 "use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __values = (this && this.__values) || function(o) {
-    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
-    if (m) return m.call(o);
-    if (o && typeof o.length === "number") return {
-        next: function () {
-            if (o && i >= o.length) o = void 0;
-            return { value: o && o[i++], done: !o };
-        }
-    };
-    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-var chapterControl_1 = require("./chapterControl");
-var data_1 = require("./data");
-var history_1 = require("./history");
-var Menu_1 = require("./Menu");
-var shortNumber_1 = require("./shortNumber");
-var chapterSelectionButtonsMap = new Map();
-var currentLastReadLabelAt = null;
+const chapterControl_1 = require("./chapterControl");
+const data_1 = require("./data");
+const history_1 = require("./history");
+const Menu_1 = require("./Menu");
+const shortNumber_1 = require("./shortNumber");
+const chapterSelectionButtonsMap = new Map();
+let currentLastReadLabelAt = null;
 function attachLastReadLabelTo(button, htmlRelativePath) {
     currentLastReadLabelAt = button.append('[上次阅读]');
 }
-chapterControl_1.loadChapterEvent.on(function (newChapterHtmlRelativePath) {
+chapterControl_1.loadChapterEvent.on(newChapterHtmlRelativePath => {
     if (currentLastReadLabelAt !== null) {
         currentLastReadLabelAt.remove();
     }
     attachLastReadLabelTo(chapterSelectionButtonsMap.get(newChapterHtmlRelativePath), newChapterHtmlRelativePath);
 });
-var ChaptersMenu = /** @class */ (function (_super) {
-    __extends(ChaptersMenu, _super);
-    function ChaptersMenu(parent, folder) {
-        var e_1, _a, e_2, _b;
-        var _this = this;
+function getDecorationForChapterType(chapterType) {
+    switch (chapterType) {
+        case 'Markdown': return Menu_1.ItemDecoration.ICON_FILE;
+        case 'WTCD': return Menu_1.ItemDecoration.ICON_GAME;
+    }
+}
+class ChaptersMenu extends Menu_1.Menu {
+    constructor(parent, folder) {
         if (folder === undefined) {
             folder = data_1.data.chapterTree;
         }
-        _this = _super.call(this, folder.isRoot ? '章节选择' : folder.displayName, parent) || this;
-        try {
-            for (var _c = __values(folder.subFolders), _d = _c.next(); !_d.done; _d = _c.next()) {
-                var subfolder = _d.value;
-                var handle = _this.addLink(new ChaptersMenu(_this, subfolder), true, Menu_1.ItemDecoration.ICON_FOLDER);
-                handle.append("[" + shortNumber_1.shortNumber(subfolder.folderCharCount) + "]", 'char-count');
-            }
+        super(folder.isRoot ? '章节选择' : folder.displayName, parent);
+        for (const subfolder of folder.subFolders) {
+            const handle = this.addLink(new ChaptersMenu(this, subfolder), true, Menu_1.ItemDecoration.ICON_FOLDER);
+            handle.append(`[${shortNumber_1.shortNumber(subfolder.folderCharCount)}]`, 'char-count');
         }
-        catch (e_1_1) { e_1 = { error: e_1_1 }; }
-        finally {
-            try {
-                if (_d && !_d.done && (_a = _c.return)) _a.call(_c);
-            }
-            finally { if (e_1) throw e_1.error; }
-        }
-        var _loop_1 = function (chapter) {
-            var handle = this_1.addItem(chapter.displayName, { small: true, button: true })
-                .onClick(function () {
+        for (const chapter of folder.chapters) {
+            const handle = this.addItem(chapter.displayName, {
+                small: true,
+                button: true,
+                decoration: getDecorationForChapterType(chapter.type),
+            })
+                .onClick(() => {
                 chapterControl_1.loadChapter(chapter.htmlRelativePath);
                 history_1.updateHistory(true);
             });
@@ -122,95 +78,63 @@ var ChaptersMenu = /** @class */ (function (_super) {
                 handle.prepend('[编写中]');
                 handle.addClass('early-access');
             }
-            handle.append("[" + shortNumber_1.shortNumber(chapter.chapterCharCount) + "]", 'char-count');
-            var lastRead = window.localStorage.getItem('lastRead');
+            handle.append(`[${shortNumber_1.shortNumber(chapter.chapterCharCount)}]`, 'char-count');
+            const lastRead = window.localStorage.getItem('lastRead');
             if (lastRead === chapter.htmlRelativePath) {
                 attachLastReadLabelTo(handle, chapter.htmlRelativePath);
             }
             chapterSelectionButtonsMap.set(chapter.htmlRelativePath, handle);
-        };
-        var this_1 = this;
-        try {
-            for (var _e = __values(folder.chapters), _f = _e.next(); !_f.done; _f = _e.next()) {
-                var chapter = _f.value;
-                _loop_1(chapter);
-            }
         }
-        catch (e_2_1) { e_2 = { error: e_2_1 }; }
-        finally {
-            try {
-                if (_f && !_f.done && (_b = _e.return)) _b.call(_e);
-            }
-            finally { if (e_2) throw e_2.error; }
-        }
-        return _this;
     }
-    return ChaptersMenu;
-}(Menu_1.Menu));
+}
 exports.ChaptersMenu = ChaptersMenu;
 
 },{"./Menu":8,"./chapterControl":15,"./data":18,"./history":22,"./shortNumber":28}],3:[function(require,module,exports){
 "use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 Object.defineProperty(exports, "__esModule", { value: true });
-var Menu_1 = require("./Menu");
-var ContactMenu = /** @class */ (function (_super) {
-    __extends(ContactMenu, _super);
-    function ContactMenu(parent) {
-        var _this = _super.call(this, '订阅/讨论组', parent) || this;
-        _this.addItem('Telegram 更新推送频道', {
+const Menu_1 = require("./Menu");
+class ContactMenu extends Menu_1.Menu {
+    constructor(parent) {
+        super('订阅/讨论组', parent);
+        this.addItem('Telegram 更新推送频道', {
             small: true,
             button: true,
             link: 'https://t.me/joinchat/AAAAAEpkRVwZ-3s5V3YHjA',
             decoration: Menu_1.ItemDecoration.ICON_LINK,
         });
-        _this.addItem('Telegram 讨论组', {
+        this.addItem('Telegram 讨论组', {
             small: true,
             button: true,
             link: 'https://t.me/joinchat/Dt8_WlJnmEwYNbjzlnLyNA',
             decoration: Menu_1.ItemDecoration.ICON_LINK,
         });
-        _this.addItem('GitHub Repo', {
+        this.addItem('GitHub Repo', {
             small: true,
             button: true,
             link: 'https://github.com/SCLeoX/Wearable-Technology',
             decoration: Menu_1.ItemDecoration.ICON_LINK,
         });
-        _this.addItem('原始 Google Docs', {
+        this.addItem('原始 Google Docs', {
             small: true,
             button: true,
             link: 'https://docs.google.com/document/d/1Pp5CtO8c77DnWGqbXg-3e7w9Q3t88P35FOl6iIJvMfo/edit?usp=sharing',
             decoration: Menu_1.ItemDecoration.ICON_LINK,
         });
-        return _this;
     }
-    return ContactMenu;
-}(Menu_1.Menu));
+}
 exports.ContactMenu = ContactMenu;
 
 },{"./Menu":8}],4:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var DebugLogger_1 = require("./DebugLogger");
+const DebugLogger_1 = require("./DebugLogger");
 function id(id) {
     return document.getElementById(id);
 }
 exports.id = id;
 function getTextNodes(parent, initArray) {
-    var textNodes = initArray || [];
-    var pointer = parent.firstChild;
+    const textNodes = initArray || [];
+    let pointer = parent.firstChild;
     while (pointer !== null) {
         if (pointer instanceof HTMLElement) {
             getTextNodes(pointer, textNodes);
@@ -223,11 +147,11 @@ function getTextNodes(parent, initArray) {
     return textNodes;
 }
 exports.getTextNodes = getTextNodes;
-var selectNodeDebugLogger = new DebugLogger_1.DebugLogger('selectNode');
+const selectNodeDebugLogger = new DebugLogger_1.DebugLogger('selectNode');
 function selectNode(node) {
     try {
-        var selection = window.getSelection();
-        var range = document.createRange();
+        const selection = window.getSelection();
+        const range = document.createRange();
         range.selectNodeContents(node);
         selection.removeAllRanges();
         selection.addRange(range);
@@ -240,72 +164,63 @@ exports.selectNode = selectNode;
 
 },{"./DebugLogger":5}],5:[function(require,module,exports){
 "use strict";
-var __read = (this && this.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
-var __spread = (this && this.__spread) || function () {
-    for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
-    return ar;
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-var settings_1 = require("./settings");
+const settings_1 = require("./settings");
 function simpleToString(value) {
     switch (typeof value) {
         case 'string':
-            return "\"" + value + "\"";
+            return `"${value}"`;
         default:
             return String(value);
     }
 }
-var DebugLogger = /** @class */ (function () {
-    function DebugLogger(name, parameters) {
-        if (parameters === void 0) { parameters = {}; }
+class DebugLogger {
+    constructor(name, parameters = {}) {
         this.prefix = name + '('
-            + Object.keys(parameters).map(function (key) { return key + "=" + simpleToString(parameters[key]); }).join(',')
+            + Object.keys(parameters).map(key => `${key}=${simpleToString(parameters[key])}`).join(',')
             + ')';
     }
-    DebugLogger.prototype.log = function () {
-        var stuff = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            stuff[_i] = arguments[_i];
-        }
-        if (!settings_1.debugLogging.getValue()) {
+    log(...stuff) {
+        if (!settings_1.developerMode.getValue()) {
             return;
         }
-        console.info.apply(console, __spread([this.prefix], stuff));
-    };
-    return DebugLogger;
-}());
+        console.info(this.prefix, ...stuff);
+    }
+    info(...stuff) {
+        if (!settings_1.developerMode.getValue()) {
+            return;
+        }
+        console.info(this.prefix, ...stuff);
+    }
+    warn(...stuff) {
+        if (!settings_1.developerMode.getValue()) {
+            return;
+        }
+        console.warn(this.prefix, ...stuff);
+    }
+    error(...stuff) {
+        if (!settings_1.developerMode.getValue()) {
+            return;
+        }
+        console.error(this.prefix, ...stuff);
+    }
+}
 exports.DebugLogger = DebugLogger;
 
 },{"./settings":27}],6:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var Event = /** @class */ (function () {
-    function Event() {
+class Event {
+    constructor() {
         this.listeners = null;
         this.onceListeners = null;
         this.isEmitting = false;
         this.queue = [];
     }
-    Event.prototype.on = function (listener) {
-        var _this = this;
+    on(listener) {
         if (this.isEmitting) {
-            this.queue.push(function () {
-                _this.on(listener);
+            this.queue.push(() => {
+                this.on(listener);
             });
             return listener;
         }
@@ -314,12 +229,11 @@ var Event = /** @class */ (function () {
         }
         this.listeners.add(listener);
         return listener;
-    };
-    Event.prototype.off = function (listener) {
-        var _this = this;
+    }
+    off(listener) {
         if (this.isEmitting) {
-            this.queue.push(function () {
-                _this.off(listener);
+            this.queue.push(() => {
+                this.off(listener);
             });
             return;
         }
@@ -327,12 +241,11 @@ var Event = /** @class */ (function () {
             return;
         }
         this.listeners.delete(listener);
-    };
-    Event.prototype.once = function (onceListener) {
-        var _this = this;
+    }
+    once(onceListener) {
         if (this.isEmitting) {
-            this.queue.push(function () {
-                _this.once(onceListener);
+            this.queue.push(() => {
+                this.once(onceListener);
             });
             return onceListener;
         }
@@ -341,120 +254,81 @@ var Event = /** @class */ (function () {
         }
         this.onceListeners.push(onceListener);
         return onceListener;
-    };
-    Event.prototype.expect = function (filter) {
-        var _this = this;
+    }
+    expect(filter) {
         if (this.isEmitting) {
-            return new Promise(function (resolve) {
-                _this.queue.push(function () {
-                    _this.expect(filter).then(resolve);
+            return new Promise(resolve => {
+                this.queue.push(() => {
+                    this.expect(filter).then(resolve);
                 });
             });
         }
         if (filter === undefined) {
-            return new Promise(function (resolve) { return _this.once(resolve); });
+            return new Promise(resolve => this.once(resolve));
         }
-        return new Promise(function (resolve) {
-            var listener = _this.on(function (arg) {
+        return new Promise(resolve => {
+            const listener = this.on(arg => {
                 if (!filter(arg)) {
                     return;
                 }
-                _this.off(listener);
+                this.off(listener);
                 resolve(arg);
             });
         });
-    };
-    Event.prototype.emit = function (arg) {
-        var _this = this;
+    }
+    emit(arg) {
         if (this.isEmitting) {
-            this.queue.push(function () {
-                _this.emit(arg);
+            this.queue.push(() => {
+                this.emit(arg);
             });
             return;
         }
         this.isEmitting = true;
         if (this.listeners !== null) {
-            this.listeners.forEach(function (listener) { return listener(arg); });
+            this.listeners.forEach(listener => listener(arg));
         }
         if (this.onceListeners !== null) {
-            this.onceListeners.forEach(function (onceListener) { return onceListener(arg); });
+            this.onceListeners.forEach(onceListener => onceListener(arg));
             this.onceListeners.length = 0;
         }
         this.isEmitting = false;
         while (this.queue.length >= 1) {
             this.queue.shift()();
         }
-    };
-    return Event;
-}());
+    }
+}
 exports.Event = Event;
 
 },{}],7:[function(require,module,exports){
 "use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 Object.defineProperty(exports, "__esModule", { value: true });
-var ChaptersMenu_1 = require("./ChaptersMenu");
-var ContactMenu_1 = require("./ContactMenu");
-var Menu_1 = require("./Menu");
-var SettingsMenu_1 = require("./SettingsMenu");
-var StatsMenu_1 = require("./StatsMenu");
-var StyleMenu_1 = require("./StyleMenu");
-var ThanksMenu_1 = require("./ThanksMenu");
-var MainMenu = /** @class */ (function (_super) {
-    __extends(MainMenu, _super);
-    function MainMenu() {
-        var _this = _super.call(this, '', null) || this;
-        _this.addLink(new ChaptersMenu_1.ChaptersMenu(_this));
-        _this.addLink(new ThanksMenu_1.ThanksMenu(_this));
-        _this.addLink(new StyleMenu_1.StyleMenu(_this));
-        _this.addLink(new ContactMenu_1.ContactMenu(_this));
-        _this.addItem('源代码', { button: true, link: 'https://github.com/SCLeoX/Wearable-Technology' });
-        _this.addLink(new SettingsMenu_1.SettingsMenu(_this));
-        _this.addLink(new StatsMenu_1.StatsMenu(_this));
-        return _this;
+const ChaptersMenu_1 = require("./ChaptersMenu");
+const ContactMenu_1 = require("./ContactMenu");
+const Menu_1 = require("./Menu");
+const SettingsMenu_1 = require("./SettingsMenu");
+const StatsMenu_1 = require("./StatsMenu");
+const StyleMenu_1 = require("./StyleMenu");
+const ThanksMenu_1 = require("./ThanksMenu");
+class MainMenu extends Menu_1.Menu {
+    constructor() {
+        super('', null);
+        this.addLink(new ChaptersMenu_1.ChaptersMenu(this));
+        this.addLink(new ThanksMenu_1.ThanksMenu(this));
+        this.addLink(new StyleMenu_1.StyleMenu(this));
+        this.addLink(new ContactMenu_1.ContactMenu(this));
+        this.addItem('源代码', { button: true, link: 'https://github.com/SCLeoX/Wearable-Technology' });
+        this.addLink(new SettingsMenu_1.SettingsMenu(this));
+        this.addLink(new StatsMenu_1.StatsMenu(this));
     }
-    return MainMenu;
-}(Menu_1.Menu));
+}
 exports.MainMenu = MainMenu;
 
 },{"./ChaptersMenu":2,"./ContactMenu":3,"./Menu":8,"./SettingsMenu":10,"./StatsMenu":12,"./StyleMenu":13,"./ThanksMenu":14}],8:[function(require,module,exports){
 "use strict";
-var __read = (this && this.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
-var __spread = (this && this.__spread) || function () {
-    for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
-    return ar;
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-var DebugLogger_1 = require("./DebugLogger");
-var Event_1 = require("./Event");
-var RectMode_1 = require("./RectMode");
+const DebugLogger_1 = require("./DebugLogger");
+const Event_1 = require("./Event");
+const RectMode_1 = require("./RectMode");
 var ItemDecoration;
 (function (ItemDecoration) {
     ItemDecoration[ItemDecoration["SELECTABLE"] = 0] = "SELECTABLE";
@@ -462,92 +336,85 @@ var ItemDecoration;
     ItemDecoration[ItemDecoration["ICON_FOLDER"] = 2] = "ICON_FOLDER";
     ItemDecoration[ItemDecoration["ICON_LINK"] = 3] = "ICON_LINK";
     ItemDecoration[ItemDecoration["ICON_EQUALIZER"] = 4] = "ICON_EQUALIZER";
+    ItemDecoration[ItemDecoration["ICON_FILE"] = 5] = "ICON_FILE";
+    ItemDecoration[ItemDecoration["ICON_GAME"] = 6] = "ICON_GAME";
 })(ItemDecoration = exports.ItemDecoration || (exports.ItemDecoration = {}));
-function createSpan(text) {
-    var _a;
-    var classNames = [];
-    for (var _i = 1; _i < arguments.length; _i++) {
-        classNames[_i - 1] = arguments[_i];
-    }
-    var $span = document.createElement('span');
+function createSpan(text, ...classNames) {
+    const $span = document.createElement('span');
     $span.innerText = text;
-    (_a = $span.classList).add.apply(_a, __spread(classNames));
+    $span.classList.add(...classNames);
     return $span;
 }
-var ItemHandle = /** @class */ (function () {
-    function ItemHandle(menu, element) {
+class ItemHandle {
+    constructor(menu, element) {
         this.menu = menu;
         this.element = element;
         this.$prependSpan = null;
         this.$appendSpan = null;
     }
-    ItemHandle.prototype.setSelected = function (selected) {
+    setSelected(selected) {
         this.element.classList.toggle('selected', selected);
         return this;
-    };
-    ItemHandle.prototype.onClick = function (handler) {
-        var _this = this;
-        this.element.addEventListener('click', function () {
-            handler(_this.element);
+    }
+    onClick(handler) {
+        this.element.addEventListener('click', () => {
+            handler(this.element);
         });
         return this;
-    };
-    ItemHandle.prototype.linkTo = function (targetMenu) {
-        var _this = this;
-        this.onClick(function () {
-            _this.menu.navigateTo(targetMenu);
+    }
+    linkTo(targetMenu) {
+        this.onClick(() => {
+            this.menu.navigateTo(targetMenu);
         });
         return this;
-    };
-    ItemHandle.prototype.setInnerText = function (innerText) {
+    }
+    setInnerText(innerText) {
         this.element.innerText = innerText;
         return this;
-    };
-    ItemHandle.prototype.addClass = function (className) {
+    }
+    addClass(className) {
         this.element.classList.add(className);
         return this;
-    };
-    ItemHandle.prototype.removeClass = function (className) {
+    }
+    removeClass(className) {
         this.element.classList.remove(className);
         return this;
-    };
-    ItemHandle.prototype.prepend = function (text, className) {
+    }
+    prepend(text, className) {
         if (this.$prependSpan === null) {
             this.$prependSpan = createSpan('', 'prepend');
             this.element.prepend(this.$prependSpan);
         }
-        var $span = createSpan(text, 'item-side');
+        const $span = createSpan(text, 'item-side');
         if (className !== undefined) {
             $span.classList.add(className);
         }
         this.$prependSpan.prepend($span);
         return $span;
-    };
-    ItemHandle.prototype.append = function (text, className) {
+    }
+    append(text, className) {
         if (this.$appendSpan === null) {
             this.$appendSpan = createSpan('', 'append');
             this.element.appendChild(this.$appendSpan);
         }
-        var $span = createSpan(text, 'item-side');
+        const $span = createSpan(text, 'item-side');
         if (className !== undefined) {
             $span.classList.add(className);
         }
         this.$appendSpan.appendChild($span);
         return $span;
-    };
-    return ItemHandle;
-}());
+    }
+}
 exports.ItemHandle = ItemHandle;
-var Menu = /** @class */ (function () {
-    function Menu(name, parent, rectMode) {
-        var _this = this;
-        if (rectMode === void 0) { rectMode = RectMode_1.RectMode.OFF; }
+class Menu {
+    constructor(name, parent, rectMode = RectMode_1.RectMode.OFF) {
         this.name = name;
         this.parent = parent;
         this.rectMode = rectMode;
+        this.active = false;
         this.clearableElements = [];
         this.activateEvent = new Event_1.Event();
-        this.debugLogger = new DebugLogger_1.DebugLogger('Menu', { name: name });
+        this.debugLogger = new DebugLogger_1.DebugLogger('Menu', { name });
         this.fullPath = parent === null ? [] : parent.fullPath.slice();
         if (name !== '') {
             this.fullPath.push(name);
@@ -555,7 +422,7 @@ var Menu = /** @class */ (function () {
         this.container = document.createElement('div');
         this.container.classList.add('menu', 'hidden');
         if (this.fullPath.length >= 1) {
-            var path = document.createElement('div');
+            const path = document.createElement('div');
             path.classList.add('path');
             path.innerText = this.fullPath.join(' > ');
             this.container.appendChild(path);
@@ -566,44 +433,43 @@ var Menu = /** @class */ (function () {
         }
         document.body.appendChild(this.container);
         // 当显示模式变化时
-        RectMode_1.rectModeChangeEvent.on(function (_a) {
-            var newRectMode = _a.newRectMode;
+        RectMode_1.rectModeChangeEvent.on(({ newRectMode }) => {
             // 如果自己是当前激活的菜单并且显示模式正在变化为全屏阅读器
-            if (_this.active && newRectMode === RectMode_1.RectMode.MAIN) {
+            if (this.active && newRectMode === RectMode_1.RectMode.MAIN) {
                 // 设置自己为非激活模式
-                _this.setActive(false);
+                this.setActive(false);
                 // 等待显示模式再次变化时
-                RectMode_1.rectModeChangeEvent.expect().then(function () {
+                RectMode_1.rectModeChangeEvent.expect().then(() => {
                     // 设置自己为激活模式
-                    _this.setActive(true);
+                    this.setActive(true);
                 });
             }
         });
     }
-    Menu.prototype.navigateTo = function (targetMenu) {
+    navigateTo(targetMenu) {
         this.setActive(false);
         targetMenu.setActive(true);
         RectMode_1.setRectMode(targetMenu.rectMode);
-    };
-    Menu.prototype.exit = function () {
+    }
+    exit() {
         if (this.parent === null) {
             throw new Error('Cannot exit the root menu.');
         }
         this.navigateTo(this.parent);
-    };
-    Menu.prototype.setActive = function (active) {
-        this.debugLogger.log("setActive(" + active + ")");
+    }
+    setActive(active) {
+        this.debugLogger.log(`setActive(${active})`);
         if (!this.active && active) {
             this.activateEvent.emit();
         }
         this.active = active;
         this.container.classList.toggle('hidden', !active);
-    };
-    Menu.prototype.isActive = function () {
+    }
+    isActive() {
         return this.active;
-    };
-    Menu.prototype.addItem = function (title, options) {
-        var $element;
+    }
+    addItem(title, options) {
+        let $element;
         if (options.button && options.link !== undefined) {
             $element = document.createElement('a');
             $element.href = options.link;
@@ -634,6 +500,11 @@ var Menu = /** @class */ (function () {
                 case ItemDecoration.ICON_EQUALIZER:
                     $element.classList.add('icon', 'equalizer');
                     break;
+                case ItemDecoration.ICON_FILE:
+                    $element.classList.add('icon', 'file');
+                    break;
+                case ItemDecoration.ICON_GAME:
+                    $element.classList.add('icon', 'game');
             }
         }
         this.container.appendChild($element);
@@ -641,37 +512,36 @@ var Menu = /** @class */ (function () {
             this.clearableElements.push($element);
         }
         return new ItemHandle(this, $element);
-    };
-    Menu.prototype.clearItems = function () {
-        this.clearableElements.forEach(function ($element) { return $element.remove(); });
+    }
+    clearItems() {
+        this.clearableElements.forEach($element => $element.remove());
         this.clearableElements = [];
-    };
-    Menu.prototype.addLink = function (menu, smallButton, decoration) {
-        return this.addItem(menu.name, { small: smallButton, button: true, decoration: decoration })
+    }
+    addLink(menu, smallButton, decoration) {
+        return this.addItem(menu.name, { small: smallButton, button: true, decoration })
             .linkTo(menu);
-    };
-    return Menu;
-}());
+    }
+}
 exports.Menu = Menu;
 
 },{"./DebugLogger":5,"./Event":6,"./RectMode":9}],9:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var DebugLogger_1 = require("./DebugLogger");
-var DOM_1 = require("./DOM");
-var Event_1 = require("./Event");
+const DebugLogger_1 = require("./DebugLogger");
+const DOM_1 = require("./DOM");
+const Event_1 = require("./Event");
 var RectMode;
 (function (RectMode) {
     RectMode[RectMode["SIDE"] = 0] = "SIDE";
     RectMode[RectMode["MAIN"] = 1] = "MAIN";
     RectMode[RectMode["OFF"] = 2] = "OFF";
 })(RectMode = exports.RectMode || (exports.RectMode = {}));
-var $rect = DOM_1.id('rect');
-var debugLogger = new DebugLogger_1.DebugLogger('RectMode');
+const $rect = DOM_1.id('rect');
+const debugLogger = new DebugLogger_1.DebugLogger('RectMode');
 exports.rectModeChangeEvent = new Event_1.Event();
-var rectMode = RectMode.OFF;
+let rectMode = RectMode.OFF;
 function setRectMode(newRectMode) {
-    debugLogger.log(RectMode[rectMode] + " -> " + RectMode[newRectMode]);
+    debugLogger.log(`${RectMode[rectMode]} -> ${RectMode[newRectMode]}`);
     if (rectMode === newRectMode) {
         return;
     }
@@ -698,7 +568,7 @@ function setRectMode(newRectMode) {
     }
     exports.rectModeChangeEvent.emit({
         previousRectMode: rectMode,
-        newRectMode: newRectMode,
+        newRectMode,
     });
     rectMode = newRectMode;
 }
@@ -706,41 +576,27 @@ exports.setRectMode = setRectMode;
 
 },{"./DOM":4,"./DebugLogger":5,"./Event":6}],10:[function(require,module,exports){
 "use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 Object.defineProperty(exports, "__esModule", { value: true });
-var BlockMenu_1 = require("./BlockMenu");
-var commentsControl_1 = require("./commentsControl");
-var DOM_1 = require("./DOM");
-var Menu_1 = require("./Menu");
-var RectMode_1 = require("./RectMode");
-var settings_1 = require("./settings");
-var stylePreviewArticle_1 = require("./stylePreviewArticle");
-var EnumSettingMenu = /** @class */ (function (_super) {
-    __extends(EnumSettingMenu, _super);
-    function EnumSettingMenu(parent, label, setting, usePreview) {
-        var _this = _super.call(this, label + "\u8BBE\u7F6E", parent, usePreview ? RectMode_1.RectMode.SIDE : RectMode_1.RectMode.MAIN) || this;
-        var currentHandle;
+const BlockMenu_1 = require("./BlockMenu");
+const commentsControl_1 = require("./commentsControl");
+const DOM_1 = require("./DOM");
+const Menu_1 = require("./Menu");
+const RectMode_1 = require("./RectMode");
+const settings_1 = require("./settings");
+const stylePreviewArticle_1 = require("./stylePreviewArticle");
+class EnumSettingMenu extends Menu_1.Menu {
+    constructor(parent, label, setting, usePreview) {
+        super(`${label}设置`, parent, usePreview ? RectMode_1.RectMode.SIDE : RectMode_1.RectMode.MAIN);
+        let currentHandle;
         if (usePreview) {
-            _this.activateEvent.on(function () {
+            this.activateEvent.on(() => {
                 commentsControl_1.hideComments();
                 DOM_1.id('content').innerHTML = stylePreviewArticle_1.stylePreviewArticle;
             });
         }
-        setting.options.forEach(function (valueName, value) {
-            var handle = _this.addItem(valueName, { small: true, button: true, decoration: Menu_1.ItemDecoration.SELECTABLE })
-                .onClick(function () {
+        setting.options.forEach((valueName, value) => {
+            const handle = this.addItem(valueName, { small: true, button: true, decoration: Menu_1.ItemDecoration.SELECTABLE })
+                .onClick(() => {
                 currentHandle.setSelected(false);
                 handle.setSelected(true);
                 setting.setValue(value);
@@ -751,227 +607,138 @@ var EnumSettingMenu = /** @class */ (function (_super) {
                 handle.setSelected(true);
             }
         });
-        return _this;
     }
-    return EnumSettingMenu;
-}(Menu_1.Menu));
+}
 exports.EnumSettingMenu = EnumSettingMenu;
-var SettingsMenu = /** @class */ (function (_super) {
-    __extends(SettingsMenu, _super);
-    function SettingsMenu(parent) {
-        var _this = _super.call(this, '设置', parent) || this;
-        _this.addBooleanSetting('NSFW 警告', settings_1.warning);
-        _this.addBooleanSetting('使用动画', settings_1.animation);
-        _this.addBooleanSetting('显示编写中章节', settings_1.earlyAccess);
-        _this.addBooleanSetting('显示评论', settings_1.useComments);
-        _this.addBooleanSetting('手势切换章节（仅限手机）', settings_1.gestureSwitchChapter);
-        _this.addEnumSetting('字体', settings_1.fontFamily, true);
-        _this.addBooleanSetting('显示每个章节的字数', settings_1.charCount);
-        _this.addBooleanSetting('开发人员模式', settings_1.debugLogging);
-        _this.addLink(new BlockMenu_1.BlockMenu(_this), true);
-        return _this;
+class SettingsMenu extends Menu_1.Menu {
+    constructor(parent) {
+        super('设置', parent);
+        this.addBooleanSetting('NSFW 警告', settings_1.warning);
+        this.addBooleanSetting('使用动画', settings_1.animation);
+        this.addBooleanSetting('显示编写中章节', settings_1.earlyAccess);
+        this.addBooleanSetting('显示评论', settings_1.useComments);
+        this.addBooleanSetting('手势切换章节（仅限手机）', settings_1.gestureSwitchChapter);
+        this.addEnumSetting('字体', settings_1.fontFamily, true);
+        this.addBooleanSetting('显示每个章节的字数', settings_1.charCount);
+        this.addBooleanSetting('开发人员模式', settings_1.developerMode);
+        this.addLink(new BlockMenu_1.BlockMenu(this), true);
     }
-    SettingsMenu.prototype.addBooleanSetting = function (label, setting) {
-        var getText = function () { return label + "\uFF1A" + (setting.getValue() ? '开' : '关'); };
-        var handle = this.addItem(getText(), { small: true, button: true })
-            .onClick(function () {
+    addBooleanSetting(label, setting) {
+        const getText = () => `${label}：${setting.getValue() ? '开' : '关'}`;
+        const handle = this.addItem(getText(), { small: true, button: true })
+            .onClick(() => {
             setting.toggle();
             handle.setInnerText(getText());
         });
-    };
-    SettingsMenu.prototype.addEnumSetting = function (label, setting, usePreview) {
-        var _this = this;
-        var getText = function () { return label + "\uFF1A" + setting.getValueName(); };
-        var handle = this.addItem(getText(), { small: true, button: true });
-        var enumSettingMenu = new EnumSettingMenu(this, label, setting, usePreview === true);
-        handle.linkTo(enumSettingMenu).onClick(function () {
-            _this.activateEvent.once(function () {
+    }
+    addEnumSetting(label, setting, usePreview) {
+        const getText = () => `${label}：${setting.getValueName()}`;
+        const handle = this.addItem(getText(), { small: true, button: true });
+        const enumSettingMenu = new EnumSettingMenu(this, label, setting, usePreview === true);
+        handle.linkTo(enumSettingMenu).onClick(() => {
+            this.activateEvent.once(() => {
                 handle.setInnerText(getText());
             });
         });
-    };
-    return SettingsMenu;
-}(Menu_1.Menu));
+    }
+}
 exports.SettingsMenu = SettingsMenu;
 
 },{"./BlockMenu":1,"./DOM":4,"./Menu":8,"./RectMode":9,"./commentsControl":17,"./settings":27,"./stylePreviewArticle":30}],11:[function(require,module,exports){
 "use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __read = (this && this.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-var data_1 = require("./data");
-var Menu_1 = require("./Menu");
-var StatsKeywordsCountMenu = /** @class */ (function (_super) {
-    __extends(StatsKeywordsCountMenu, _super);
-    function StatsKeywordsCountMenu(parent) {
-        var _this = _super.call(this, '关键词统计', parent) || this;
-        _this.addItem('添加其他关键词', {
+const data_1 = require("./data");
+const Menu_1 = require("./Menu");
+class StatsKeywordsCountMenu extends Menu_1.Menu {
+    constructor(parent) {
+        super('关键词统计', parent);
+        this.addItem('添加其他关键词', {
             small: true,
             button: true,
             link: 'https://github.com/SCLeoX/Wearable-Technology/edit/master/src/builder/keywords.ts',
             decoration: Menu_1.ItemDecoration.ICON_LINK,
         });
-        data_1.data.keywordsCount.forEach(function (_a) {
-            var _b = __read(_a, 2), keyword = _b[0], count = _b[1];
-            _this.addItem(keyword + "\uFF1A" + count, { small: true });
+        data_1.data.keywordsCount.forEach(([keyword, count]) => {
+            this.addItem(`${keyword}：${count}`, { small: true });
         });
-        return _this;
     }
-    return StatsKeywordsCountMenu;
-}(Menu_1.Menu));
+}
 exports.StatsKeywordsCountMenu = StatsKeywordsCountMenu;
 
 },{"./Menu":8,"./data":18}],12:[function(require,module,exports){
 "use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 Object.defineProperty(exports, "__esModule", { value: true });
-var data_1 = require("./data");
-var Menu_1 = require("./Menu");
-var StatsKeywordsCountMenu_1 = require("./StatsKeywordsCountMenu");
-var StatsMenu = /** @class */ (function (_super) {
-    __extends(StatsMenu, _super);
-    function StatsMenu(parent) {
-        var _this = _super.call(this, '统计', parent) || this;
-        _this.addItem('统计数据由构建脚本自动生成', { small: true });
-        _this.addLink(new StatsKeywordsCountMenu_1.StatsKeywordsCountMenu(_this), true, Menu_1.ItemDecoration.ICON_EQUALIZER);
-        _this.addItem("\u603B\u5B57\u6570\uFF1A" + data_1.data.charsCount, { small: true });
-        _this.addItem("\u603B\u6BB5\u843D\u6570\uFF1A" + data_1.data.paragraphsCount, { small: true });
-        return _this;
+const data_1 = require("./data");
+const Menu_1 = require("./Menu");
+const StatsKeywordsCountMenu_1 = require("./StatsKeywordsCountMenu");
+class StatsMenu extends Menu_1.Menu {
+    constructor(parent) {
+        super('统计', parent);
+        this.addItem('统计数据由构建脚本自动生成', { small: true });
+        this.addLink(new StatsKeywordsCountMenu_1.StatsKeywordsCountMenu(this), true, Menu_1.ItemDecoration.ICON_EQUALIZER);
+        this.addItem(`总字数：${data_1.data.charsCount}`, { small: true });
+        this.addItem(`总段落数：${data_1.data.paragraphsCount}`, { small: true });
     }
-    return StatsMenu;
-}(Menu_1.Menu));
+}
 exports.StatsMenu = StatsMenu;
 
 },{"./Menu":8,"./StatsKeywordsCountMenu":11,"./data":18}],13:[function(require,module,exports){
 "use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
-var __values = (this && this.__values) || function(o) {
-    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
-    if (m) return m.call(o);
-    if (o && typeof o.length === "number") return {
-        next: function () {
-            if (o && i >= o.length) o = void 0;
-            return { value: o && o[i++], done: !o };
-        }
-    };
-    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-var commentsControl_1 = require("./commentsControl");
-var DebugLogger_1 = require("./DebugLogger");
-var DOM_1 = require("./DOM");
-var Menu_1 = require("./Menu");
-var RectMode_1 = require("./RectMode");
-var stylePreviewArticle_1 = require("./stylePreviewArticle");
-var Style = /** @class */ (function () {
-    function Style(name, def) {
+const commentsControl_1 = require("./commentsControl");
+const DebugLogger_1 = require("./DebugLogger");
+const DOM_1 = require("./DOM");
+const Menu_1 = require("./Menu");
+const RectMode_1 = require("./RectMode");
+const stylePreviewArticle_1 = require("./stylePreviewArticle");
+class Style {
+    constructor(name, def) {
         this.name = name;
         this.def = def;
         this.styleSheet = null;
-        this.debugLogger = new DebugLogger_1.DebugLogger('Style', { name: name });
+        this.debugLogger = new DebugLogger_1.DebugLogger('Style', { name });
     }
-    Style.prototype.injectStyleSheet = function () {
-        var _this = this;
-        var $style = document.createElement('style');
+    injectStyleSheet() {
+        const $style = document.createElement('style');
         document.head.appendChild($style);
-        var sheet = $style.sheet;
+        const sheet = $style.sheet;
         sheet.disabled = true;
-        var attemptInsertRule = function (rule) {
+        const attemptInsertRule = (rule) => {
             try {
                 sheet.insertRule(rule);
             }
             catch (error) {
-                _this.debugLogger.log("Failed to inject rule \"" + rule + "\".", error);
+                this.debugLogger.error(`Failed to inject rule "${rule}".`, error);
             }
         };
-        attemptInsertRule(".container { color: " + this.def.textColor + "; }");
-        attemptInsertRule(".menu { color: " + this.def.textColor + "; }");
-        attemptInsertRule(".menu .button:active::after { background-color: " + this.def.textColor + "; }");
-        attemptInsertRule(".button::after { background-color: " + this.def.textColor + "; }");
-        attemptInsertRule("body { background-color: " + this.def.paperBgColor + "; }");
-        attemptInsertRule(".rect { background-color: " + this.def.rectBgColor + "; }");
-        attemptInsertRule(".rect.reading>div { background-color: " + this.def.paperBgColor + "; }");
-        attemptInsertRule(".rect.reading>div { color: " + this.def.textColor + "; }");
-        attemptInsertRule(".rect.reading>.content a { color: " + this.def.linkColor + "; }");
-        attemptInsertRule(".rect.reading>.content a:hover { color: " + this.def.linkHoverColor + "; }");
-        attemptInsertRule(".rect.reading>.content a:active { color: " + this.def.linkActiveColor + "; }");
-        attemptInsertRule(".rect.reading>.content>.earlyAccess.block { background-color: " + this.def.contentBlockEarlyAccessColor + "; }");
-        attemptInsertRule(".rect>.comments>div { background-color: " + this.def.commentColor + "; }");
-        attemptInsertRule("@media (min-width: 901px) { ::-webkit-scrollbar-thumb { background-color: " + this.def.paperBgColor + "; } }");
-        attemptInsertRule("@media (min-width: 901px) { ::-webkit-scrollbar-thumb:hover { background-color: " + this.def.linkColor + "; } }");
-        attemptInsertRule("@media (min-width: 901px) { ::-webkit-scrollbar-thumb:active { background-color: " + this.def.linkActiveColor + "; } }");
-        var key = this.def.keyIsDark ? 'black' : 'white';
-        var keyComponent = this.def.keyIsDark ? 0 : 255;
-        attemptInsertRule(".rect>.comments>.create-comment::before { background-color: " + key + "; }");
-        attemptInsertRule(":root { --key-opacity-01: rgba(" + keyComponent + "," + keyComponent + "," + keyComponent + ",0.1); } ");
-        attemptInsertRule(":root { --key-opacity-05: rgba(" + keyComponent + "," + keyComponent + "," + keyComponent + ",0.5); } ");
+        const key = `rgb(${this.def.keyColor.join(',')})`;
+        const keyAlpha = (alpha) => `rgba(${this.def.keyColor.join(',')},${alpha})`;
+        attemptInsertRule(`.container { color: ${key}; }`);
+        attemptInsertRule(`.menu { color: ${key}; }`);
+        attemptInsertRule(`.menu .button:active::after { background-color: ${key}; }`);
+        attemptInsertRule(`.button::after { background-color: ${key}; }`);
+        attemptInsertRule(`body { background-color: ${this.def.paperBgColor}; }`);
+        attemptInsertRule(`.rect { background-color: ${this.def.rectBgColor}; }`);
+        attemptInsertRule(`.rect.reading>div { background-color: ${this.def.paperBgColor}; }`);
+        attemptInsertRule(`.rect.reading>div { color: ${key}; }`);
+        attemptInsertRule(`.rect.reading>.content a { color: ${this.def.linkColor}; }`);
+        attemptInsertRule(`.rect.reading>.content a:hover { color: ${this.def.linkHoverColor}; }`);
+        attemptInsertRule(`.rect.reading>.content a:active { color: ${this.def.linkActiveColor}; }`);
+        attemptInsertRule(`.rect.reading>.content>.earlyAccess.block { background-color: ${this.def.contentBlockEarlyAccessColor}; }`);
+        attemptInsertRule(`.rect>.comments>div { background-color: ${this.def.commentColor}; }`);
+        attemptInsertRule(`@media (min-width: 901px) { ::-webkit-scrollbar-thumb { background-color: ${this.def.paperBgColor}; } }`);
+        attemptInsertRule(`.rect>.comments>.create-comment::before { background-color: ${key}; }`);
+        attemptInsertRule(`:root { --key: ${key}; }`);
+        attemptInsertRule(`:root { --key-opacity-01: ${keyAlpha(0.1)}; }`);
+        attemptInsertRule(`:root { --key-opacity-05: ${keyAlpha(0.5)}; }`);
+        attemptInsertRule(`:root { --key-opacity-007: ${keyAlpha(0.07)}; }`);
+        attemptInsertRule(`:root { --key-opacity-004: ${keyAlpha(0.04)}; }`);
+        attemptInsertRule(`:root { --button-color: ${this.def.commentColor}; }`);
         this.styleSheet = sheet;
-    };
-    Style.prototype.active = function () {
+    }
+    active() {
         if (Style.currentlyEnabled !== null) {
-            var currentlyEnabled = Style.currentlyEnabled;
+            const currentlyEnabled = Style.currentlyEnabled;
             if (currentlyEnabled.styleSheet !== null) {
                 currentlyEnabled.styleSheet.disabled = true;
             }
@@ -984,173 +751,93 @@ var Style = /** @class */ (function () {
         this.itemHandle.setSelected(true);
         window.localStorage.setItem('style', this.name);
         Style.currentlyEnabled = this;
-    };
-    Style.currentlyEnabled = null;
-    return Style;
-}());
-var darkKeyLinkColors = {
+    }
+}
+Style.currentlyEnabled = null;
+const darkKeyLinkColors = {
     linkColor: '#00E',
     linkHoverColor: '#F00',
     linkActiveColor: '#00E',
 };
-var lightKeyLinkColors = {
+const lightKeyLinkColors = {
     linkColor: '#88F',
     linkHoverColor: '#F33',
     linkActiveColor: '#88F',
 };
-var styles = [
-    new Style('可穿戴科技（默认）', __assign(__assign({ rectBgColor: '#444', paperBgColor: '#333', textColor: '#DDD' }, lightKeyLinkColors), { contentBlockEarlyAccessColor: '#E65100', commentColor: '#444', keyIsDark: false })),
-    new Style('白纸', __assign(__assign({ rectBgColor: '#EFEFED', paperBgColor: '#FFF', textColor: '#000' }, darkKeyLinkColors), { contentBlockEarlyAccessColor: '#FFE082', commentColor: '#F5F5F5', keyIsDark: true })),
-    new Style('夜间', __assign(__assign({ rectBgColor: '#272B36', paperBgColor: '#38404D', textColor: '#DDD' }, lightKeyLinkColors), { contentBlockEarlyAccessColor: '#E65100', commentColor: '#272B36', keyIsDark: false })),
-    new Style('羊皮纸', __assign(__assign({ rectBgColor: '#D8D4C9', paperBgColor: '#F8F4E9', textColor: '#552830' }, darkKeyLinkColors), { contentBlockEarlyAccessColor: '#FFE082', commentColor: '#F9EFD7', keyIsDark: true })),
-    new Style('巧克力', __assign(__assign({ rectBgColor: '#2E1C11', paperBgColor: '#3A2519', textColor: '#DDAF99' }, lightKeyLinkColors), { contentBlockEarlyAccessColor: '#E65100', commentColor: '#2C1C11', keyIsDark: false })),
+const styles = [
+    new Style('可穿戴科技（默认）', Object.assign(Object.assign({ rectBgColor: '#444', paperBgColor: '#333', keyColor: [221, 221, 221] }, lightKeyLinkColors), { contentBlockEarlyAccessColor: '#E65100', commentColor: '#444', keyIsDark: false })),
+    new Style('白纸', Object.assign(Object.assign({ rectBgColor: '#EFEFED', paperBgColor: '#FFF', keyColor: [0, 0, 0] }, darkKeyLinkColors), { contentBlockEarlyAccessColor: '#FFE082', commentColor: '#F5F5F5', keyIsDark: true })),
+    new Style('夜间', Object.assign(Object.assign({ rectBgColor: '#272B36', paperBgColor: '#38404D', keyColor: [221, 221, 221] }, lightKeyLinkColors), { contentBlockEarlyAccessColor: '#E65100', commentColor: '#272B36', keyIsDark: false })),
+    new Style('羊皮纸', Object.assign(Object.assign({ rectBgColor: '#D8D4C9', paperBgColor: '#F8F4E9', keyColor: [85, 40, 48] }, darkKeyLinkColors), { contentBlockEarlyAccessColor: '#FFE082', commentColor: '#F9EFD7', keyIsDark: true })),
+    new Style('巧克力', Object.assign(Object.assign({ rectBgColor: '#2E1C11', paperBgColor: '#3A2519', keyColor: [221, 175, 153] }, lightKeyLinkColors), { contentBlockEarlyAccessColor: '#E65100', commentColor: '#2C1C11', keyIsDark: false })),
 ];
-var StyleMenu = /** @class */ (function (_super) {
-    __extends(StyleMenu, _super);
-    function StyleMenu(parent) {
-        var e_1, _a, e_2, _b;
-        var _this = _super.call(this, '阅读器样式', parent, RectMode_1.RectMode.SIDE) || this;
-        var _loop_1 = function (style) {
-            style.itemHandle = this_1.addItem(style.name, { small: true, button: true, decoration: Menu_1.ItemDecoration.SELECTABLE })
-                .onClick(function () {
+class StyleMenu extends Menu_1.Menu {
+    constructor(parent) {
+        super('阅读器样式', parent, RectMode_1.RectMode.SIDE);
+        for (const style of styles) {
+            style.itemHandle = this.addItem(style.name, { small: true, button: true, decoration: Menu_1.ItemDecoration.SELECTABLE })
+                .onClick(() => {
                 style.active();
             });
-        };
-        var this_1 = this;
-        try {
-            for (var styles_1 = __values(styles), styles_1_1 = styles_1.next(); !styles_1_1.done; styles_1_1 = styles_1.next()) {
-                var style = styles_1_1.value;
-                _loop_1(style);
-            }
         }
-        catch (e_1_1) { e_1 = { error: e_1_1 }; }
-        finally {
-            try {
-                if (styles_1_1 && !styles_1_1.done && (_a = styles_1.return)) _a.call(styles_1);
+        const usedStyle = window.localStorage.getItem('style');
+        let flag = false;
+        for (const style of styles) {
+            if (usedStyle === style.name) {
+                style.active();
+                flag = true;
+                break;
             }
-            finally { if (e_1) throw e_1.error; }
-        }
-        var usedStyle = window.localStorage.getItem('style');
-        var flag = false;
-        try {
-            for (var styles_2 = __values(styles), styles_2_1 = styles_2.next(); !styles_2_1.done; styles_2_1 = styles_2.next()) {
-                var style = styles_2_1.value;
-                if (usedStyle === style.name) {
-                    style.active();
-                    flag = true;
-                    break;
-                }
-            }
-        }
-        catch (e_2_1) { e_2 = { error: e_2_1 }; }
-        finally {
-            try {
-                if (styles_2_1 && !styles_2_1.done && (_b = styles_2.return)) _b.call(styles_2);
-            }
-            finally { if (e_2) throw e_2.error; }
         }
         if (!flag) {
             styles[0].active();
         }
-        _this.activateEvent.on(function () {
+        this.activateEvent.on(() => {
             commentsControl_1.hideComments();
             DOM_1.id('content').innerHTML = stylePreviewArticle_1.stylePreviewArticle;
         });
-        return _this;
     }
-    return StyleMenu;
-}(Menu_1.Menu));
+}
 exports.StyleMenu = StyleMenu;
 
 },{"./DOM":4,"./DebugLogger":5,"./Menu":8,"./RectMode":9,"./commentsControl":17,"./stylePreviewArticle":30}],14:[function(require,module,exports){
 "use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __values = (this && this.__values) || function(o) {
-    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
-    if (m) return m.call(o);
-    if (o && typeof o.length === "number") return {
-        next: function () {
-            if (o && i >= o.length) o = void 0;
-            return { value: o && o[i++], done: !o };
-        }
-    };
-    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-var Menu_1 = require("./Menu");
-var thanks_1 = require("./thanks");
-var ThanksMenu = /** @class */ (function (_super) {
-    __extends(ThanksMenu, _super);
-    function ThanksMenu(parent) {
-        var e_1, _a;
-        var _this = _super.call(this, '鸣谢列表', parent) || this;
-        try {
-            for (var thanks_2 = __values(thanks_1.thanks), thanks_2_1 = thanks_2.next(); !thanks_2_1.done; thanks_2_1 = thanks_2.next()) {
-                var person = thanks_2_1.value;
-                _this.addItem(person.name, person.link === undefined
-                    ? { small: true }
-                    : { small: true, button: true, link: person.link, decoration: Menu_1.ItemDecoration.ICON_LINK });
-            }
+const Menu_1 = require("./Menu");
+const thanks_1 = require("./thanks");
+class ThanksMenu extends Menu_1.Menu {
+    constructor(parent) {
+        super('鸣谢列表', parent);
+        for (const person of thanks_1.thanks) {
+            this.addItem(person.name, person.link === undefined
+                ? { small: true }
+                : { small: true, button: true, link: person.link, decoration: Menu_1.ItemDecoration.ICON_LINK });
         }
-        catch (e_1_1) { e_1 = { error: e_1_1 }; }
-        finally {
-            try {
-                if (thanks_2_1 && !thanks_2_1.done && (_a = thanks_2.return)) _a.call(thanks_2);
-            }
-            finally { if (e_1) throw e_1.error; }
-        }
-        return _this;
     }
-    return ThanksMenu;
-}(Menu_1.Menu));
+}
 exports.ThanksMenu = ThanksMenu;
 
 },{"./Menu":8,"./thanks":31}],15:[function(require,module,exports){
 "use strict";
-var __read = (this && this.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-var commentsControl_1 = require("./commentsControl");
-var data_1 = require("./data");
-var DebugLogger_1 = require("./DebugLogger");
-var DOM_1 = require("./DOM");
-var Event_1 = require("./Event");
-var gestures_1 = require("./gestures");
-var history_1 = require("./history");
-var keyboard_1 = require("./keyboard");
-var loadingText_1 = require("./loadingText");
-var RectMode_1 = require("./RectMode");
-var settings_1 = require("./settings");
-var state_1 = require("./state");
-var debugLogger = new DebugLogger_1.DebugLogger('chapterControl');
-var $content = DOM_1.id('content');
-var chaptersCache = new Map();
+const FlowReader_1 = require("../wtcd/FlowReader");
+const WTCDError_1 = require("../wtcd/WTCDError");
+const commentsControl_1 = require("./commentsControl");
+const data_1 = require("./data");
+const DebugLogger_1 = require("./DebugLogger");
+const DOM_1 = require("./DOM");
+const Event_1 = require("./Event");
+const gestures_1 = require("./gestures");
+const history_1 = require("./history");
+const keyboard_1 = require("./keyboard");
+const loadingText_1 = require("./loadingText");
+const messages_1 = require("./messages");
+const RectMode_1 = require("./RectMode");
+const settings_1 = require("./settings");
+const state_1 = require("./state");
+const debugLogger = new DebugLogger_1.DebugLogger('chapterControl');
+const $content = DOM_1.id('content');
+const chaptersCache = new Map();
 exports.loadChapterEvent = new Event_1.Event();
 function closeChapter() {
     RectMode_1.setRectMode(RectMode_1.RectMode.OFF);
@@ -1159,110 +846,108 @@ function closeChapter() {
     state_1.state.chapterTextNodes = null;
 }
 exports.closeChapter = closeChapter;
-var select = function (_a) {
-    var _b = __read(_a, 4), anchorNodeIndex = _b[0], anchorOffset = _b[1], focusNodeIndex = _b[2], focusOffset = _b[3];
+const select = ([anchorNodeIndex, anchorOffset, focusNodeIndex, focusOffset,]) => {
     if (state_1.state.chapterTextNodes === null) {
         return;
     }
-    var anchorNode = state_1.state.chapterTextNodes[anchorNodeIndex];
-    var focusNode = state_1.state.chapterTextNodes[focusNodeIndex];
+    const anchorNode = state_1.state.chapterTextNodes[anchorNodeIndex];
+    const focusNode = state_1.state.chapterTextNodes[focusNodeIndex];
     if (anchorNode === undefined || focusNode === undefined) {
         return;
     }
     document.getSelection().setBaseAndExtent(anchorNode, anchorOffset, focusNode, focusOffset);
-    var element = anchorNode.parentElement;
+    const element = anchorNode.parentElement;
     if (element !== null && (typeof element.scrollIntoView) === 'function') {
         element.scrollIntoView();
     }
 };
-var getFlexOneSpan = function () {
-    var $span = document.createElement('span');
+const getFlexOneSpan = () => {
+    const $span = document.createElement('span');
     $span.style.flex = '1';
     return $span;
 };
-var canChapterShown = function (chapter) {
-    return settings_1.earlyAccess.getValue() || !chapter.isEarlyAccess;
-};
-var createContentBlock = function (type, title, text) {
-    var $block = document.createElement('div');
+const canChapterShown = (chapter) => settings_1.earlyAccess.getValue() || !chapter.isEarlyAccess;
+const createContentBlock = (type, title, text) => {
+    const $block = document.createElement('div');
     $block.classList.add('block', type);
-    var $title = document.createElement('h1');
+    const $title = document.createElement('h1');
     $title.innerText = title;
     $block.appendChild($title);
-    var $text = document.createElement('p');
+    const $text = document.createElement('p');
     $text.innerText = text;
     $block.appendChild($text);
     return $block;
 };
 function loadPrevChapter() {
-    var chapterCtx = state_1.state.currentChapter;
+    const chapterCtx = state_1.state.currentChapter;
     if (chapterCtx === null) {
         return;
     }
-    var chapterIndex = chapterCtx.inFolderIndex;
+    const chapterIndex = chapterCtx.inFolderIndex;
     if (chapterIndex >= 1 && canChapterShown(chapterCtx.folder.chapters[chapterIndex - 1])) {
-        var prevChapter = chapterCtx.folder.chapters[chapterIndex - 1].htmlRelativePath;
+        const prevChapter = chapterCtx.folder.chapters[chapterIndex - 1].htmlRelativePath;
         loadChapter(prevChapter);
         history_1.updateHistory(true);
     }
 }
 exports.loadPrevChapter = loadPrevChapter;
 function loadNextChapter() {
-    var chapterCtx = state_1.state.currentChapter;
+    const chapterCtx = state_1.state.currentChapter;
     if (chapterCtx === null) {
         return;
     }
-    var chapterIndex = chapterCtx.inFolderIndex;
+    const chapterIndex = chapterCtx.inFolderIndex;
     if (chapterIndex < chapterCtx.folder.chapters.length - 1 && canChapterShown(chapterCtx.folder.chapters[chapterIndex + 1])) {
-        var nextChapter = chapterCtx.folder.chapters[chapterIndex + 1].htmlRelativePath;
+        const nextChapter = chapterCtx.folder.chapters[chapterIndex + 1].htmlRelativePath;
         loadChapter(nextChapter);
         history_1.updateHistory(true);
     }
 }
 exports.loadNextChapter = loadNextChapter;
-var finalizeChapterLoading = function (selection) {
+const finalizeChapterLoading = (selection) => {
     state_1.state.chapterTextNodes = DOM_1.getTextNodes($content);
     if (selection !== undefined) {
         if (DOM_1.id('warning') === null) {
             select(selection);
         }
         else {
-            DOM_1.id('warning').addEventListener('click', function () {
+            DOM_1.id('warning').addEventListener('click', () => {
                 select(selection);
             });
         }
     }
-    Array.from($content.getElementsByTagName('a')).forEach(function ($anchor) { return $anchor.target = '_blank'; });
-    Array.from($content.getElementsByTagName('code')).forEach(function ($code) { return $code.addEventListener('dblclick', function () {
+    Array.from($content.getElementsByTagName('a')).forEach($anchor => $anchor.target = '_blank');
+    Array.from($content.getElementsByTagName('code')).forEach($code => $code.addEventListener('dblclick', () => {
         DOM_1.selectNode($code);
-    }); });
-    Array.from($content.getElementsByTagName('img')).forEach(function ($image) {
-        var src = $image.src;
-        var lastDotIndex = src.lastIndexOf('.');
-        var pathNoExtension = src.substr(0, lastDotIndex);
+    }));
+    Array.from($content.getElementsByTagName('img')).forEach($image => {
+        const src = $image.src;
+        const lastDotIndex = src.lastIndexOf('.');
+        const pathNoExtension = src.substr(0, lastDotIndex);
         if (pathNoExtension.endsWith('_low')) {
-            var extension_1 = src.substr(lastDotIndex + 1);
-            var pathNoLowNoExtension_1 = pathNoExtension.substr(0, pathNoExtension.length - 4);
+            const extension = src.substr(lastDotIndex + 1);
+            const pathNoLowNoExtension = pathNoExtension.substr(0, pathNoExtension.length - 4);
             $image.style.cursor = 'zoom-in';
-            $image.addEventListener('click', function () { return window.open(pathNoLowNoExtension_1 + '.' + extension_1); });
+            $image.addEventListener('click', () => window.open(pathNoLowNoExtension + '.' + extension));
         }
     });
-    var chapterCtx = state_1.state.currentChapter;
-    var chapterIndex = chapterCtx.inFolderIndex;
+    const chapterCtx = state_1.state.currentChapter;
+    const chapterIndex = chapterCtx.inFolderIndex;
     if (chapterCtx.chapter.isEarlyAccess) {
-        var $block = createContentBlock('earlyAccess', '编写中章节', '请注意，本文正在编写中，因此可能会含有未完成的句子或是尚未更新的信息。');
+        const $block = createContentBlock('earlyAccess', '编写中章节', '请注意，本文正在编写中，因此可能会含有未完成的句子或是尚未更新的信息。');
         $content.prepend($block);
     }
-    var $div = document.createElement('div');
+    const $div = document.createElement('div');
     $div.style.display = 'flex';
+    $div.style.marginTop = '2vw';
     if (chapterIndex >= 1 && canChapterShown(chapterCtx.folder.chapters[chapterIndex - 1])) {
-        var prevChapter = chapterCtx.folder.chapters[chapterIndex - 1].htmlRelativePath;
-        var $prevLink = document.createElement('a');
+        const prevChapter = chapterCtx.folder.chapters[chapterIndex - 1].htmlRelativePath;
+        const $prevLink = document.createElement('a');
         $prevLink.innerText = '上一章';
-        $prevLink.href = window.location.pathname + "#" + prevChapter;
+        $prevLink.href = `${window.location.pathname}#${prevChapter}`;
         $prevLink.style.textAlign = 'left';
         $prevLink.style.flex = '1';
-        $prevLink.addEventListener('click', function (event) {
+        $prevLink.addEventListener('click', event => {
             event.preventDefault();
             loadPrevChapter();
         });
@@ -1271,25 +956,25 @@ var finalizeChapterLoading = function (selection) {
     else {
         $div.appendChild(getFlexOneSpan());
     }
-    var $menuLink = document.createElement('a');
+    const $menuLink = document.createElement('a');
     $menuLink.innerText = '返回菜单';
     $menuLink.href = window.location.pathname;
     $menuLink.style.textAlign = 'center';
     $menuLink.style.flex = '1';
-    $menuLink.addEventListener('click', function (event) {
+    $menuLink.addEventListener('click', event => {
         event.preventDefault();
         closeChapter();
         history_1.updateHistory(true);
     });
     $div.appendChild($menuLink);
     if (chapterIndex < chapterCtx.folder.chapters.length - 1 && canChapterShown(chapterCtx.folder.chapters[chapterIndex + 1])) {
-        var nextChapter = chapterCtx.folder.chapters[chapterIndex + 1].htmlRelativePath;
-        var $nextLink = document.createElement('a');
+        const nextChapter = chapterCtx.folder.chapters[chapterIndex + 1].htmlRelativePath;
+        const $nextLink = document.createElement('a');
         $nextLink.innerText = '下一章';
-        $nextLink.href = window.location.pathname + "#" + nextChapter;
+        $nextLink.href = `${window.location.pathname}#${nextChapter}`;
         $nextLink.style.textAlign = 'right';
         $nextLink.style.flex = '1';
-        $nextLink.addEventListener('click', function (event) {
+        $nextLink.addEventListener('click', event => {
             event.preventDefault();
             loadNextChapter();
         });
@@ -1302,18 +987,18 @@ var finalizeChapterLoading = function (selection) {
     commentsControl_1.loadComments(chapterCtx.chapter.commentsUrl);
     // fix for stupid scrolling issues under iOS
     DOM_1.id('rect').style.overflow = 'hidden';
-    setTimeout(function () {
+    setTimeout(() => {
         DOM_1.id('rect').style.overflow = '';
         if (selection === undefined) {
             DOM_1.id('rect').scrollTo(0, 0);
         }
     }, 1);
     // Re-focus the rect so it is arrow-scrollable
-    setTimeout(function () {
+    setTimeout(() => {
         DOM_1.id('rect').focus();
     }, 1);
 };
-gestures_1.swipeEvent.on(function (direction) {
+gestures_1.swipeEvent.on(direction => {
     if (!settings_1.gestureSwitchChapter.getValue()) {
         return;
     }
@@ -1326,7 +1011,7 @@ gestures_1.swipeEvent.on(function (direction) {
         loadNextChapter();
     }
 });
-keyboard_1.arrowKeyPressEvent.on(function (arrowKey) {
+keyboard_1.arrowKeyPressEvent.on(arrowKey => {
     if (arrowKey === keyboard_1.ArrowKey.LEFT) {
         loadPrevChapter();
     }
@@ -1334,31 +1019,105 @@ keyboard_1.arrowKeyPressEvent.on(function (arrowKey) {
         loadNextChapter();
     }
 });
+var ErrorType;
+(function (ErrorType) {
+    ErrorType[ErrorType["COMPILE"] = 0] = "COMPILE";
+    ErrorType[ErrorType["RUNTIME"] = 1] = "RUNTIME";
+    ErrorType[ErrorType["INTERNAL"] = 2] = "INTERNAL";
+})(ErrorType || (ErrorType = {}));
+function createWTCDErrorMessage({ errorType, message, stack, }) {
+    const $target = document.createElement('div');
+    const $title = document.createElement('h1');
+    const $desc = document.createElement('p');
+    switch (errorType) {
+        case ErrorType.COMPILE:
+            $title.innerText = messages_1.WTCD_ERROR_COMPILE_TITLE;
+            $desc.innerText = messages_1.WTCD_ERROR_COMPILE_TITLE;
+            break;
+        case ErrorType.RUNTIME:
+            $title.innerText = messages_1.WTCD_ERROR_RUNTIME_TITLE;
+            $desc.innerText = messages_1.WTCD_ERROR_RUNTIME_DESC;
+            break;
+        case ErrorType.INTERNAL:
+            $title.innerText = messages_1.WTCD_ERROR_INTERNAL_TITLE;
+            $desc.innerText = messages_1.WTCD_ERROR_INTERNAL_DESC;
+            break;
+    }
+    $target.appendChild($title);
+    $target.appendChild($desc);
+    const $message = document.createElement('p');
+    $message.innerText = messages_1.WTCD_ERROR_MESSAGE + message;
+    $target.appendChild($message);
+    if (stack !== undefined) {
+        const $stackTitle = document.createElement('h2');
+        $stackTitle.innerText = messages_1.WTCD_ERROR_INTERNAL_STACK_TITLE;
+        $target.appendChild($stackTitle);
+        const $stackDesc = document.createElement('p');
+        $stackDesc.innerText = messages_1.WTCD_ERROR_INTERNAL_STACK_DESC;
+        $target.appendChild($stackDesc);
+        const $pre = document.createElement('pre');
+        const $code = document.createElement('code');
+        $code.innerText = stack;
+        $pre.appendChild($code);
+        $target.appendChild($pre);
+    }
+    return $target;
+}
+function insertContent($target, content, chapter) {
+    switch (chapter.type) {
+        case 'Markdown':
+            $target.innerHTML = content;
+            break;
+        case 'WTCD': {
+            $target.innerHTML = '';
+            const wtcdParseResult = JSON.parse(content);
+            if (wtcdParseResult.error === true) {
+                $target.appendChild(createWTCDErrorMessage({
+                    errorType: ErrorType.COMPILE,
+                    message: wtcdParseResult.message,
+                    stack: wtcdParseResult.internalStack,
+                }));
+                break;
+            }
+            const flowInterface = new FlowReader_1.FlowReader(chapter.htmlRelativePath, wtcdParseResult.wtcdRoot, error => createWTCDErrorMessage({
+                errorType: (error instanceof WTCDError_1.WTCDError)
+                    ? ErrorType.RUNTIME
+                    : ErrorType.INTERNAL,
+                message: error.message,
+                stack: error.stack,
+            }));
+            const $wtcdContainer = document.createElement('div');
+            flowInterface.renderTo($wtcdContainer);
+            $content.appendChild($wtcdContainer);
+            break;
+        }
+    }
+}
 function loadChapter(chapterHtmlRelativePath, selection) {
     debugLogger.log('Load chapter', chapterHtmlRelativePath, 'selection', selection);
     commentsControl_1.hideComments();
     exports.loadChapterEvent.emit(chapterHtmlRelativePath);
     window.localStorage.setItem('lastRead', chapterHtmlRelativePath);
     RectMode_1.setRectMode(RectMode_1.RectMode.MAIN);
-    var chapterCtx = data_1.relativePathLookUpMap.get(chapterHtmlRelativePath);
+    const chapterCtx = data_1.relativePathLookUpMap.get(chapterHtmlRelativePath);
     state_1.state.currentChapter = chapterCtx;
     if (chaptersCache.has(chapterHtmlRelativePath)) {
         if (chaptersCache.get(chapterHtmlRelativePath) === null) {
             $content.innerText = loadingText_1.loadingText;
         }
         else {
-            $content.innerHTML = chaptersCache.get(chapterHtmlRelativePath);
+            insertContent($content, chaptersCache.get(chapterHtmlRelativePath), chapterCtx.chapter);
             finalizeChapterLoading(selection);
         }
     }
     else {
         $content.innerText = loadingText_1.loadingText;
-        fetch("./chapters/" + chapterHtmlRelativePath)
-            .then(function (response) { return response.text(); })
-            .then(function (text) {
+        fetch(`./chapters/${chapterHtmlRelativePath}`)
+            .then(response => response.text())
+            .then(text => {
             chaptersCache.set(chapterHtmlRelativePath, text);
             if (chapterCtx === state_1.state.currentChapter) {
-                $content.innerHTML = text;
+                insertContent($content, text, chapterCtx.chapter);
                 finalizeChapterLoading(selection);
             }
         });
@@ -1367,11 +1126,11 @@ function loadChapter(chapterHtmlRelativePath, selection) {
 }
 exports.loadChapter = loadChapter;
 
-},{"./DOM":4,"./DebugLogger":5,"./Event":6,"./RectMode":9,"./commentsControl":17,"./data":18,"./gestures":21,"./history":22,"./keyboard":24,"./loadingText":25,"./settings":27,"./state":29}],16:[function(require,module,exports){
+},{"../wtcd/FlowReader":33,"../wtcd/WTCDError":36,"./DOM":4,"./DebugLogger":5,"./Event":6,"./RectMode":9,"./commentsControl":17,"./data":18,"./gestures":21,"./history":22,"./keyboard":24,"./loadingText":25,"./messages":26,"./settings":27,"./state":29}],16:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var Event_1 = require("./Event");
-var blockedUsers = new Set(JSON.parse(window.localStorage.getItem('blockedUsers') || '[]'));
+const Event_1 = require("./Event");
+const blockedUsers = new Set(JSON.parse(window.localStorage.getItem('blockedUsers') || '[]'));
 exports.blockedUserUpdateEvent = new Event_1.Event();
 function saveBlockedUsers() {
     window.localStorage.setItem('blockedUsers', JSON.stringify(Array.from(blockedUsers)));
@@ -1399,59 +1158,59 @@ exports.getBlockedUsers = getBlockedUsers;
 },{"./Event":6}],17:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var commentBlockControl_1 = require("./commentBlockControl");
-var DOM_1 = require("./DOM");
-var formatTime_1 = require("./formatTime");
-var messages_1 = require("./messages");
-var settings_1 = require("./settings");
-var $comments = DOM_1.id('comments');
-var $commentsStatus = DOM_1.id('comments-status');
-var $createComment = DOM_1.id('create-comment');
-var getApiUrlRegExp = /^https:\/\/github\.com\/([a-zA-Z0-9-_]+)\/([a-zA-Z0-9-_]+)\/issues\/([1-9][0-9]*)$/;
+const commentBlockControl_1 = require("./commentBlockControl");
+const DOM_1 = require("./DOM");
+const formatTime_1 = require("./formatTime");
+const messages_1 = require("./messages");
+const settings_1 = require("./settings");
+const $comments = DOM_1.id('comments');
+const $commentsStatus = DOM_1.id('comments-status');
+const $createComment = DOM_1.id('create-comment');
+const getApiUrlRegExp = /^https:\/\/github\.com\/([a-zA-Z0-9-_]+)\/([a-zA-Z0-9-_]+)\/issues\/([1-9][0-9]*)$/;
 function getApiUrl(issueUrl) {
     // Input sample: https://github.com/SCLeoX/Wearable-Technology/issues/1
     // Output sample: https://api.github.com/repos/SCLeoX/Wearable-Technology/issues/1/comments
-    var result = getApiUrlRegExp.exec(issueUrl);
+    const result = getApiUrlRegExp.exec(issueUrl);
     if (result === null) {
-        throw new Error("Bad issue url: " + issueUrl + ".");
+        throw new Error(`Bad issue url: ${issueUrl}.`);
     }
-    return "https://api.github.com/repos/" + result[1] + "/" + result[2] + "/issues/" + result[3] + "/comments";
+    return `https://api.github.com/repos/${result[1]}/${result[2]}/issues/${result[3]}/comments`;
 }
-var nextRequestId = 1;
-var currentRequestId = 0;
-var currentCreateCommentLinkUrl = '';
-$createComment.addEventListener('click', function () {
+let nextRequestId = 1;
+let currentRequestId = 0;
+let currentCreateCommentLinkUrl = '';
+$createComment.addEventListener('click', () => {
     window.open(currentCreateCommentLinkUrl, '_blank');
 });
 function createCommentElement(userAvatarUrl, userName, userUrl, createTime, updateTime, content) {
-    var $comment = document.createElement('div');
+    const $comment = document.createElement('div');
     $comment.classList.add('comment');
-    var $avatar = document.createElement('img');
+    const $avatar = document.createElement('img');
     $avatar.classList.add('avatar');
     $avatar.src = userAvatarUrl;
     $comment.appendChild($avatar);
-    var $author = document.createElement('a');
+    const $author = document.createElement('a');
     $author.classList.add('author');
     $author.innerText = userName;
     $author.target = '_blank';
     $author.href = userUrl;
     $comment.appendChild($author);
-    var $time = document.createElement('div');
+    const $time = document.createElement('div');
     $time.classList.add('time');
     $time.innerText = createTime === updateTime
         ? formatTime_1.formatTime(new Date(createTime))
-        : formatTime_1.formatTime(new Date(createTime)) + "\uFF08\u6700\u540E\u4FEE\u6539\u4E8E " + formatTime_1.formatTime(new Date(updateTime)) + "\uFF09";
+        : `${formatTime_1.formatTime(new Date(createTime))}（最后修改于 ${formatTime_1.formatTime(new Date(updateTime))}）`;
     $comment.appendChild($time);
-    var $blockUser = document.createElement('a');
+    const $blockUser = document.createElement('a');
     $blockUser.classList.add('block-user');
     $blockUser.innerText = '屏蔽此人';
-    $blockUser.onclick = function () {
+    $blockUser.onclick = () => {
         commentBlockControl_1.blockUser(userName);
         $comment.remove();
     };
     $comment.appendChild($blockUser);
-    content.split('\n\n').forEach(function (paragraph) {
-        var $p = document.createElement('p');
+    content.split('\n\n').forEach(paragraph => {
+        const $p = document.createElement('p');
         $p.innerText = paragraph;
         $comment.appendChild($p);
     });
@@ -1467,7 +1226,7 @@ function loadComments(issueUrl) {
     if (settings_1.useComments.getValue() === false) {
         return;
     }
-    Array.from($comments.getElementsByClassName('comment')).forEach(function ($element) { return $element.remove(); });
+    Array.from($comments.getElementsByClassName('comment')).forEach($element => $element.remove());
     $comments.classList.toggle('display-none', false);
     $createComment.classList.toggle('display-none', true);
     if (issueUrl === null) {
@@ -1475,17 +1234,17 @@ function loadComments(issueUrl) {
         return;
     }
     currentCreateCommentLinkUrl = issueUrl;
-    var requestId = currentRequestId = nextRequestId++;
-    var apiUrl = getApiUrl(issueUrl);
+    const requestId = currentRequestId = nextRequestId++;
+    const apiUrl = getApiUrl(issueUrl);
     $commentsStatus.innerText = messages_1.COMMENTS_LOADING;
     fetch(apiUrl)
-        .then(function (response) { return response.json(); })
-        .then(function (data) {
+        .then(response => response.json())
+        .then(data => {
         if (requestId !== currentRequestId) {
             return;
         }
         $commentsStatus.innerText = messages_1.COMMENTS_LOADED;
-        data.forEach(function (comment) {
+        data.forEach((comment) => {
             if (commentBlockControl_1.isUserBlocked(comment.user.login)) {
                 return;
             }
@@ -1502,13 +1261,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.data = window.DATA;
 exports.relativePathLookUpMap = new Map();
 function iterateFolder(folder) {
-    folder.subFolders.forEach(function (subFolder) {
+    folder.subFolders.forEach(subFolder => {
         iterateFolder(subFolder);
     });
-    folder.chapters.forEach(function (chapter, index) {
+    folder.chapters.forEach((chapter, index) => {
         exports.relativePathLookUpMap.set(chapter.htmlRelativePath, {
-            folder: folder,
-            chapter: chapter,
+            folder,
+            chapter,
             inFolderIndex: index,
         });
     });
@@ -1518,13 +1277,13 @@ iterateFolder(exports.data.chapterTree);
 },{}],19:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var chapterControl_1 = require("./chapterControl");
-var data_1 = require("./data");
-var history_1 = require("./history");
-var state_1 = require("./state");
+const chapterControl_1 = require("./chapterControl");
+const data_1 = require("./data");
+const history_1 = require("./history");
+const state_1 = require("./state");
 function followQuery() {
-    var chapterHtmlRelativePath = decodeURIComponent(window.location.hash.substr(1)); // Ignore the # in the result
-    var chapterCtx = data_1.relativePathLookUpMap.get(chapterHtmlRelativePath);
+    const chapterHtmlRelativePath = decodeURIComponent(window.location.hash.substr(1)); // Ignore the # in the result
+    const chapterCtx = data_1.relativePathLookUpMap.get(chapterHtmlRelativePath);
     if (chapterCtx === undefined) {
         if (state_1.state.currentChapter !== null) {
             chapterControl_1.closeChapter();
@@ -1537,12 +1296,12 @@ function followQuery() {
             chapterControl_1.loadChapter(chapterHtmlRelativePath);
         }
         else {
-            var query = new URLSearchParams(window.location.search);
-            var selectionQuery = query.get('selection');
-            var selection = selectionQuery !== null
-                ? selectionQuery.split(',').map(function (str) { return +str; })
+            const query = new URLSearchParams(window.location.search);
+            const selectionQuery = query.get('selection');
+            const selection = selectionQuery !== null
+                ? selectionQuery.split(',').map(str => +str)
                 : [];
-            if (selection.length !== 4 || !selection.every(function (num) { return (num >= 0) && (num % 1 === 0) && (!Number.isNaN(num)) && (Number.isFinite(num)); })) {
+            if (selection.length !== 4 || !selection.every(num => (num >= 0) && (num % 1 === 0) && (!Number.isNaN(num)) && (Number.isFinite(num)))) {
                 chapterControl_1.loadChapter(chapterHtmlRelativePath);
             }
             else {
@@ -1557,34 +1316,34 @@ exports.followQuery = followQuery;
 },{"./chapterControl":15,"./data":18,"./history":22,"./state":29}],20:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var SECOND = 1000;
-var MINUTE = 60 * SECOND;
-var HOUR = 60 * MINUTE;
-var DAY = 24 * HOUR;
-var MAX_RELATIVE_TIME = 7 * DAY;
+const SECOND = 1000;
+const MINUTE = 60 * SECOND;
+const HOUR = 60 * MINUTE;
+const DAY = 24 * HOUR;
+const MAX_RELATIVE_TIME = 7 * DAY;
 function formatTime(time) {
-    var relativeTime = Date.now() - time.getTime();
+    const relativeTime = Date.now() - time.getTime();
     if (relativeTime > MAX_RELATIVE_TIME) {
-        return time.getFullYear() + "/" + (time.getMonth() + 1) + "/" + time.getDate();
+        return `${time.getFullYear()}/${time.getMonth() + 1}/${time.getDate()}`;
     }
     if (relativeTime > DAY) {
-        return Math.floor(relativeTime / DAY) + " \u5929\u524D";
+        return `${Math.floor(relativeTime / DAY)} 天前`;
     }
     if (relativeTime > HOUR) {
-        return Math.floor(relativeTime / HOUR) + " \u5C0F\u65F6\u524D";
+        return `${Math.floor(relativeTime / HOUR)} 小时前`;
     }
     if (relativeTime > MINUTE) {
-        return Math.floor(relativeTime / MINUTE) + " \u5206\u949F\u524D";
+        return `${Math.floor(relativeTime / MINUTE)} 分钟前`;
     }
-    return Math.floor(relativeTime / SECOND) + " \u79D2\u524D";
+    return `${Math.floor(relativeTime / SECOND)} 秒前`;
 }
 exports.formatTime = formatTime;
 
 },{}],21:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var DebugLogger_1 = require("./DebugLogger");
-var Event_1 = require("./Event");
+const DebugLogger_1 = require("./DebugLogger");
+const Event_1 = require("./Event");
 var SwipeDirection;
 (function (SwipeDirection) {
     SwipeDirection[SwipeDirection["TO_TOP"] = 0] = "TO_TOP";
@@ -1592,17 +1351,17 @@ var SwipeDirection;
     SwipeDirection[SwipeDirection["TO_BOTTOM"] = 2] = "TO_BOTTOM";
     SwipeDirection[SwipeDirection["TO_LEFT"] = 3] = "TO_LEFT";
 })(SwipeDirection = exports.SwipeDirection || (exports.SwipeDirection = {}));
-var gestureMinWidth = 900;
+const gestureMinWidth = 900;
 exports.swipeEvent = new Event_1.Event();
-var horizontalMinXProportion = 0.17;
-var horizontalMaxYProportion = 0.1;
-var verticalMinYProportion = 0.1;
-var verticalMaxPropotyion = 0.1;
-var swipeTimeThreshold = 500;
-var startX = 0;
-var startY = 0;
-var startTime = 0;
-window.addEventListener('touchstart', function (event) {
+const horizontalMinXProportion = 0.17;
+const horizontalMaxYProportion = 0.1;
+const verticalMinYProportion = 0.1;
+const verticalMaxPropotyion = 0.1;
+const swipeTimeThreshold = 500;
+let startX = 0;
+let startY = 0;
+let startTime = 0;
+window.addEventListener('touchstart', event => {
     // Only listen for first touch starts
     if (event.touches.length !== 1) {
         return;
@@ -1611,7 +1370,7 @@ window.addEventListener('touchstart', function (event) {
     startY = event.touches[0].clientY;
     startTime = Date.now();
 });
-window.addEventListener('touchend', function (event) {
+window.addEventListener('touchend', event => {
     // Only listen for last touch ends
     if (event.touches.length !== 0) {
         return;
@@ -1623,10 +1382,10 @@ window.addEventListener('touchend', function (event) {
     if (window.innerWidth > gestureMinWidth) {
         return;
     }
-    var deltaX = event.changedTouches[0].clientX - startX;
-    var deltaY = event.changedTouches[0].clientY - startY;
-    var xProportion = Math.abs(deltaX / window.innerWidth);
-    var yProportion = Math.abs(deltaY / window.innerHeight);
+    const deltaX = event.changedTouches[0].clientX - startX;
+    const deltaY = event.changedTouches[0].clientY - startY;
+    const xProportion = Math.abs(deltaX / window.innerWidth);
+    const yProportion = Math.abs(deltaY / window.innerHeight);
     if (xProportion > horizontalMinXProportion && yProportion < horizontalMaxYProportion) {
         // Horizontal swipe detected
         if (deltaX > 0) {
@@ -1646,17 +1405,17 @@ window.addEventListener('touchend', function (event) {
         }
     }
 });
-var swipeEventDebugLogger = new DebugLogger_1.DebugLogger('swipeEvent');
-exports.swipeEvent.on(function (direction) {
+const swipeEventDebugLogger = new DebugLogger_1.DebugLogger('swipeEvent');
+exports.swipeEvent.on(direction => {
     swipeEventDebugLogger.log(SwipeDirection[direction]);
 });
 
 },{"./DebugLogger":5,"./Event":6}],22:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var state_1 = require("./state");
+const state_1 = require("./state");
 function getTitle() {
-    var title = '可穿戴科技';
+    let title = '可穿戴科技';
     if (state_1.state.currentChapter !== null) {
         title += ' - ' + state_1.state.currentChapter.chapter.displayName;
     }
@@ -1664,15 +1423,15 @@ function getTitle() {
 }
 exports.getTitle = getTitle;
 function updateHistory(push) {
-    var method = push ? window.history.pushState : window.history.replaceState;
-    var query = window.location.pathname;
+    const method = push ? window.history.pushState : window.history.replaceState;
+    let query = window.location.pathname;
     if (state_1.state.currentChapter !== null) {
         if (state_1.state.chapterSelection !== null) {
-            query += "?selection=" + state_1.state.chapterSelection.join(',');
+            query += `?selection=${state_1.state.chapterSelection.join(',')}`;
         }
         query += '#' + state_1.state.currentChapter.chapter.htmlRelativePath;
     }
-    var title = getTitle();
+    const title = getTitle();
     document.title = title;
     method.call(window.history, null, title, query);
 }
@@ -1681,18 +1440,18 @@ exports.updateHistory = updateHistory;
 },{"./state":29}],23:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var data_1 = require("./data");
-var DOM_1 = require("./DOM");
-var followQuery_1 = require("./followQuery");
-var MainMenu_1 = require("./MainMenu");
-var settings_1 = require("./settings");
-var updateSelection_1 = require("./updateSelection");
-var $warning = DOM_1.id('warning');
+const data_1 = require("./data");
+const DOM_1 = require("./DOM");
+const followQuery_1 = require("./followQuery");
+const MainMenu_1 = require("./MainMenu");
+const settings_1 = require("./settings");
+const updateSelection_1 = require("./updateSelection");
+const $warning = DOM_1.id('warning');
 if ($warning !== null) {
-    $warning.addEventListener('click', function () {
+    $warning.addEventListener('click', () => {
         $warning.style.opacity = '0';
         if (settings_1.animation.getValue()) {
-            $warning.addEventListener('transitionend', function () {
+            $warning.addEventListener('transitionend', () => {
                 $warning.remove();
             });
         }
@@ -1701,13 +1460,13 @@ if ($warning !== null) {
         }
     });
 }
-var $buildNumber = DOM_1.id('build-number');
-$buildNumber.innerText = "Build " + data_1.data.buildNumber;
+const $buildNumber = DOM_1.id('build-number');
+$buildNumber.innerText = `Build ${data_1.data.buildNumber}`;
 new MainMenu_1.MainMenu().setActive(true);
-document.addEventListener('selectionchange', function () {
+document.addEventListener('selectionchange', () => {
     updateSelection_1.updateSelection();
 });
-window.addEventListener('popstate', function () {
+window.addEventListener('popstate', () => {
     followQuery_1.followQuery();
 });
 followQuery_1.followQuery();
@@ -1715,8 +1474,8 @@ followQuery_1.followQuery();
 },{"./DOM":4,"./MainMenu":7,"./data":18,"./followQuery":19,"./settings":27,"./updateSelection":32}],24:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var DebugLogger_1 = require("./DebugLogger");
-var Event_1 = require("./Event");
+const DebugLogger_1 = require("./DebugLogger");
+const Event_1 = require("./Event");
 var ArrowKey;
 (function (ArrowKey) {
     ArrowKey[ArrowKey["LEFT"] = 0] = "LEFT";
@@ -1725,7 +1484,7 @@ var ArrowKey;
     ArrowKey[ArrowKey["DOWN"] = 3] = "DOWN";
 })(ArrowKey = exports.ArrowKey || (exports.ArrowKey = {}));
 exports.arrowKeyPressEvent = new Event_1.Event();
-document.addEventListener('keyup', function (event) {
+document.addEventListener('keyup', event => {
     switch (event.keyCode) {
         case 37:
             exports.arrowKeyPressEvent.emit(ArrowKey.LEFT);
@@ -1741,8 +1500,8 @@ document.addEventListener('keyup', function (event) {
             break;
     }
 });
-var arrowEventDebugLogger = new DebugLogger_1.DebugLogger('arrowKeyEvent');
-exports.arrowKeyPressEvent.on(function (arrowKey) {
+const arrowEventDebugLogger = new DebugLogger_1.DebugLogger('arrowKeyEvent');
+exports.arrowKeyPressEvent.on(arrowKey => {
     arrowEventDebugLogger.log(ArrowKey[arrowKey]);
 });
 
@@ -1759,14 +1518,22 @@ exports.COMMENTS_LOADING = '评论加载中...';
 exports.COMMENTS_LOADED = '以下为本章节的评论区。（您可以在设置中禁用评论）';
 exports.NO_BLOCKED_USERS = '没有用户的评论被屏蔽';
 exports.CLICK_TO_UNBLOCK = '(点击用户名以解除屏蔽)';
+exports.WTCD_ERROR_COMPILE_TITLE = 'WTCD 编译失败';
+exports.WTCD_ERROR_COMPILE_DESC = '该 WTCD 文档在编译时发生了错误。请检查是否有语法错误或是其他基本错误。';
+exports.WTCD_ERROR_RUNTIME_TITLE = 'WTCD 运行时错误';
+exports.WTCD_ERROR_RUNTIME_DESC = '该 WTCD 文档在运行时发生了错误。请检查是否有逻辑错误。';
+exports.WTCD_ERROR_INTERNAL_TITLE = 'WTCD 内部错误';
+exports.WTCD_ERROR_INTERNAL_DESC = 'WTCD 解释器在解释执行该 WTCD 文档时崩溃了。请务必告诉琳你做了什么好让她来修。';
+exports.WTCD_ERROR_MESSAGE = '错误信息：';
+exports.WTCD_ERROR_INTERNAL_STACK_TITLE = '内部调用栈';
+exports.WTCD_ERROR_INTERNAL_STACK_DESC = '内部调用栈记录了出现该错误时编译器或是解释器的状态。请注意内部调用栈通常只在调试 WTCD 编译器或是解释器时有用。内部调用栈通常对调试 WTCD 文档没有作用。';
 
 },{}],27:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var noop = function () { };
-var BooleanSetting = /** @class */ (function () {
-    function BooleanSetting(key, defaultValue, onUpdate) {
-        if (onUpdate === void 0) { onUpdate = noop; }
+const noop = () => { };
+class BooleanSetting {
+    constructor(key, defaultValue, onUpdate = noop) {
         this.key = key;
         this.onUpdate = onUpdate;
         if (defaultValue) {
@@ -1778,89 +1545,87 @@ var BooleanSetting = /** @class */ (function () {
         this.updateLocalStorage();
         this.onUpdate(this.value);
     }
-    BooleanSetting.prototype.updateLocalStorage = function () {
+    updateLocalStorage() {
         window.localStorage.setItem(this.key, String(this.value));
-    };
-    BooleanSetting.prototype.getValue = function () {
+    }
+    getValue() {
         return this.value;
-    };
-    BooleanSetting.prototype.setValue = function (newValue) {
+    }
+    setValue(newValue) {
         if (newValue !== this.value) {
             this.onUpdate(newValue);
         }
         this.value = newValue;
         this.updateLocalStorage();
-    };
-    BooleanSetting.prototype.toggle = function () {
+    }
+    toggle() {
         this.setValue(!this.value);
-    };
-    return BooleanSetting;
-}());
+    }
+}
 exports.BooleanSetting = BooleanSetting;
-var EnumSetting = /** @class */ (function () {
-    function EnumSetting(key, options, defaultValue, onUpdate) {
-        if (onUpdate === void 0) { onUpdate = noop; }
+class EnumSetting {
+    constructor(key, options, defaultValue, onUpdate = noop) {
         this.key = key;
         this.options = options;
         this.defaultValue = defaultValue;
         this.onUpdate = onUpdate;
         if (!this.isCorrectValue(defaultValue)) {
-            throw new Error("Default value " + defaultValue + " is not correct.");
+            throw new Error(`Default value ${defaultValue} is not correct.`);
         }
         this.value = +(window.localStorage.getItem(key) || defaultValue);
         this.correctValue();
         this.onUpdate(this.value, this.options[this.value]);
     }
-    EnumSetting.prototype.isCorrectValue = function (value) {
+    isCorrectValue(value) {
         return !(Number.isNaN(value) || value % 1 !== 0 || value < 0 || value >= this.options.length);
-    };
-    EnumSetting.prototype.correctValue = function () {
+    }
+    correctValue() {
         if (!this.isCorrectValue(this.value)) {
             this.value = this.defaultValue;
         }
-    };
-    EnumSetting.prototype.updateLocalStorage = function () {
+    }
+    updateLocalStorage() {
         window.localStorage.setItem(this.key, String(this.value));
-    };
-    EnumSetting.prototype.getValue = function () {
+    }
+    getValue() {
         return this.value;
-    };
-    EnumSetting.prototype.getValueName = function () {
+    }
+    getValueName() {
         return this.options[this.value];
-    };
-    EnumSetting.prototype.setValue = function (newValue) {
+    }
+    setValue(newValue) {
         if (newValue !== this.value) {
             this.onUpdate(newValue, this.options[newValue]);
         }
         this.value = newValue;
         this.updateLocalStorage();
-    };
-    return EnumSetting;
-}());
+    }
+}
 exports.EnumSetting = EnumSetting;
-exports.animation = new BooleanSetting('animation', true, function (value) {
-    setTimeout(function () {
+exports.animation = new BooleanSetting('animation', true, value => {
+    setTimeout(() => {
         document.body.classList.toggle('animation-enabled', value);
     }, 1);
 });
 exports.warning = new BooleanSetting('warning', false);
-exports.earlyAccess = new BooleanSetting('earlyAccess', false, function (value) {
+exports.earlyAccess = new BooleanSetting('earlyAccess', false, value => {
     document.body.classList.toggle('early-access-disabled', !value);
 });
 exports.useComments = new BooleanSetting('useComments', true);
 exports.gestureSwitchChapter = new BooleanSetting('gestureSwitchChapter', true);
 // https://github.com/zenozeng/fonts.css
-var fontFamilyCssValues = [
+const fontFamilyCssValues = [
     '-apple-system, "Noto Sans", "Helvetica Neue", Helvetica, "Nimbus Sans L", Arial, "Liberation Sans", "PingFang SC", "Hiragino Sans GB", "Noto Sans CJK SC", "Source Han Sans SC", "Source Han Sans CN", "Microsoft YaHei", "Wenquanyi Micro Hei", "WenQuanYi Zen Hei", "ST Heiti", SimHei, "WenQuanYi Zen Hei Sharp", sans-serif',
     'Baskerville, Georgia, "Liberation Serif", "Kaiti SC", STKaiti, "AR PL UKai CN", "AR PL UKai HK", "AR PL UKai TW", "AR PL UKai TW MBE", "AR PL KaitiM GB", KaiTi, KaiTi_GB2312, DFKai-SB, "TW\-Kai", serif',
     'Georgia, "Nimbus Roman No9 L", "Songti SC", "Noto Serif CJK SC", "Source Han Serif SC", "Source Han Serif CN", STSong, "AR PL New Sung", "AR PL SungtiL GB", NSimSun, SimSun, "TW\-Sung", "WenQuanYi Bitmap Song", "AR PL UMing CN", "AR PL UMing HK", "AR PL UMing TW", "AR PL UMing TW MBE", PMingLiU, MingLiU, serif',
     'Baskerville, "Times New Roman", "Liberation Serif", STFangsong, FangSong, FangSong_GB2312, "CWTEX\-F", serif',
 ];
-exports.fontFamily = new EnumSetting('fontFamily', ['黑体', '楷体', '宋体', '仿宋'], 0, function (fontFamilyIndex) {
+exports.fontFamily = new EnumSetting('fontFamily', ['黑体', '楷体', '宋体', '仿宋'], 0, (fontFamilyIndex) => {
     document.documentElement.style.setProperty('--font-family', fontFamilyCssValues[fontFamilyIndex]);
+    document.documentElement.style.setProperty('--font-family-mono', '"Fira Code", ' + fontFamilyCssValues[fontFamilyIndex]);
 });
-exports.debugLogging = new BooleanSetting('debugLogging', false);
-exports.charCount = new BooleanSetting('charCount', true, function (value) {
+exports.developerMode = new BooleanSetting('developerMode', false);
+exports.charCount = new BooleanSetting('charCount', true, value => {
     document.body.classList.toggle('char-count-disabled', !value);
 });
 
@@ -1890,7 +1655,35 @@ exports.state = {
 },{}],30:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.stylePreviewArticle = "<h1>\u5348\u996D</h1>\n<p><em>\u4F5C\u8005\uFF1A\u53CB\u4EBA\u266AB</em></p>\n<p>\u201C\u5348\u996D\uFF0C\u5348\u996D\u266A\u201D</p>\n<p>\u9633\u4F1E\u4E0B\u7684\u7433\uFF0C\u5F88\u662F\u671F\u5F85\u4ECA\u5929\u7684\u5348\u996D\u3002</p>\n<p>\u6216\u8BB8\u662F\u4F53\u8D28\u548C\u522B\u7684\u8840\u65CF\u4E0D\u592A\u4E00\u6837\uFF0C\u7433\u80FD\u591F\u611F\u77E5\u5230\u98DF\u7269\u7684\u5473\u9053\uFF0C\u4F3C\u4E4E\u4E5F\u4FDD\u6709\u7740\u751F\u7269\u5BF9\u98DF\u7269\u7684\u559C\u7231\u3002</p>\n<p>\u867D\u7136\u5979\u5E76\u4E0D\u80FD\u4ECE\u8FD9\u4E9B\u98DF\u7269\u4E2D\u83B7\u53D6\u80FD\u91CF\u5C31\u662F\u3002</p>\n<p>\u5B66\u6821\u98DF\u5802\u7684\u590F\u5B63\u9650\u5B9A\u751C\u70B9\u4ECA\u5929\u4E5F\u5F88\u662F\u62A2\u624B\uFF0C\u8FD9\u70B9\u4ECE\u961F\u4F0D\u7684\u957F\u5EA6\u5C31\u80FD\u770B\u51FA\u6765\u2014\u2014\u961F\u4F0D\u9669\u4E9B\u5C31\u8981\u8D85\u51FA\u98DF\u5802\u7684\u8303\u56F4\u4E86\u3002</p>\n<p>\u201C\u4F60\u8BF4\u6211\u8981\u6709\u94B1\u591A\u597D\u2014\u2014\u201D</p>\n<p>\u5DF2\u7ECF\u4ECE\u9694\u58C1\u7A97\u53E3\u4E70\u4E0B\u4E86\u666E\u901A\uFF0C\u4F46\u662F\u5F88\u4FBF\u5B9C\u7684\u8425\u517B\u9910\u7684\u79CB\u955C\u60AC\uFF0C\u770B\u7740\u961F\u4F0D\u4E2D\u5174\u81F4\u52C3\u52C3\u7684\u7433\u3002</p>\n<p>\u5176\u5B9E\u5979\u5E76\u4E0D\u662F\u7F3A\u94B1\uFF0C\u5927\u7EA6\u662F\u541D\u556C\u3002</p>\n<p>\u8FD9\u5F97\u602A\u5979\u5A18\uFF0C\u7A77\u517B\u79CB\u955C\u60AC\u517B\u4E60\u60EF\u4E86\uFF0C\u73B0\u5728\u5979\u5149\u81EA\u5DF1\u9664\u7075\u9000\u9B54\u6323\u6765\u7684\u5916\u5FEB\u90FD\u591F\u5979\u5962\u4F88\u4E0A\u4E00\u628A\u4E86\uFF0C\u53EF\u5374\u8FD8\u4FDD\u7559\u7740\u80FD\u4E0D\u82B1\u94B1\u7EDD\u5BF9\u4E0D\u82B1\uFF0C\u5FC5\u987B\u82B1\u94B1\u8D8A\u5C11\u8D8A\u597D\u7684\u541D\u556C\u4E60\u60EF\u3002</p>\n<p>\u5C11\u9877\uFF0C\u7433\u5DF2\u7ECF\u5E26\u7740\u5979\u7684\u751C\u54C1\u5EFA\u7B51\u2014\u2014\u6BCF\u5757\u7816\u5934\u90FD\u662F\u4E00\u5757\u86CB\u7CD5\uFF0C\u5806\u6210\u4E00\u4E2A\u8BE1\u5F02\u7684\u706B\u67F4\u76D2\u2014\u2014\u6765\u5230\u4E86\u684C\u524D\u3002</p>\n<p>\u201C\uFF08\u5403\u4E0D\u80D6\u771F\u597D\uFF0C\u6709\u94B1\u771F\u597D\u2026\u2026\u201D</p>\n<p>\u8840\u65CF\u7684\u542C\u89C9\u81EA\u7136\u662F\u6355\u6349\u5230\u4E86\u79CB\u955C\u60AC\u7684\u5600\u5495\uFF0C\u7433\u653E\u4E0B\u76D8\u5B50\uFF0C\u6084\u54AA\u54AA\u5730\u5C06\u7259\u8D34\u4E0A\u4E86\u79CB\u955C\u60AC\u7684\u8116\u9888\u3002</p>\n<p>\u201C\u563B\u563B\u266A\u201D</p>\n<p>\u201C\u545C\u2014\u2014\u201D</p>\n<p>\u76EF\u2014\u2014</p>\n<p>\u79CB\u955C\u60AC\u770B\u4E86\u770B\u76D8\u4E2D\u5269\u4E0B\u7684\u4E00\u5757\u6BDB\u8840\u65FA\uFF0C\u4F3C\u662F\u8054\u7CFB\u5230\u4E86\u4EC0\u4E48\uFF0C\u5C06\u76EE\u5149\u8F6C\u5411\u4E86\u7433\u7684\u7259\u3002</p>\n<p>\u6B63\u5728\u4EAB\u7528\u86CB\u7CD5\u76DB\u5BB4\u7684\u7433\u4EE5\u4F59\u5149\u77A5\u89C1\u4E86\u5979\u7684\u89C6\u7EBF\uFF0C</p>\n<p>\u201C\u76EF\u7740\u672C\u5C0F\u59D0\u662F\u8981\u505A\u4EC0\u4E48\u5462\uFF1F\u201D</p>\n<p>\u201C\u554A\uFF0C\u6CA1\uFF0C\u6CA1\u4EC0\u4E48\u2026\u2026\u201D</p>\n<p>\u79CB\u955C\u60AC\u652F\u652F\u543E\u543E\u7684\u8BF4\u7740\uFF0C</p>\n<p>\u201C\u5C31\u662F\u597D\u5947\u4E00\u4E2A\u95EE\u9898\uFF0C\u8840\u65CF\u4E3A\u4EC0\u4E48\u4E0D\u5403\u6BDB\u8840\u65FA\u2026\u2026\u201D</p>\n<p>\u201C\u5662\u2606\u6BDB\u8840\u65FA\u5C31\u662F\u90A3\u4E2A\u716E\u719F\u7684\u8840\u5757\u662F\u5427\uFF1F\u592A\u6CA1\u6709\u7F8E\u611F\u4E86\u8FD9\u79CD\u8840\uFF01\u800C\u4E14\u5403\u4E86\u4E5F\u6CA1\u6CD5\u513F\u6062\u590D\u80FD\u91CF\uFF0C\u7B80\u76F4\u5C31\u662F\u8840\u6DB2\u7684\u7EDD\u4F73\u6D6A\u8D39\u2606\uFF01\u201D</p>\n<p>\u7433\u53D1\u51FA\u4E86\u5BF9\u8FD9\u6837\u7F8E\u98DF\u7684\u9119\u89C6\uFF0C\u4E0D\u8FC7\u8FD9\u79CD\u9119\u89C6\u5927\u7EA6\u53EA\u6709\u8840\u65CF\u548C\u868A\u5B50\u4F1A\u51FA\u73B0\u5427\u2026\u2026</p>\n<p>\u201C\u8840\u65CF\u9700\u8981\u6444\u5165\u8840\uFF0C\u662F\u56E0\u4E3A\u8840\u6240\u5177\u6709\u7684\u751F\u547D\u80FD\u91CF\uFF0C\u5982\u679C\u716E\u719F\u4E86\u7684\u8BDD\uFF0C\u8D85\u8FC7\u4E5D\u6210\u7684\u80FD\u91CF\u90FD\u88AB\u8F6C\u5316\u6210\u5176\u4ED6\u7684\u4E1C\u897F\u4E86\uFF0C\u5BF9\u6211\u4EEC\u6765\u8BF4\u5B9E\u5728\u662F\u6CA1\u4EC0\u4E48\u7528\u5904\uFF0C\u8FD8\u767D\u767D\u6D6A\u8D39\u4E86\u4F5C\u4E3A\u539F\u6599\u7684\u8840\uFF0C\u8FD9\u79CD\u4E1C\u897F\u672C\u5C0F\u59D0\u624D\u4E0D\u5403\u54A7\u2718\uFF01\u997F\u6B7B\uFF0C\u6B7B\u5916\u8FB9\uFF0C\u4ECE\u8FD9\u8FB9\u8DF3\u4E0B\u53BB\u4E5F\u4E0D\u5403\u2718\uFF01\u201D</p>\n<p>\u201C\u6B38\uFF0C\u522B\u8FD9\u4E48\u8BF4\u561B\uFF0C\u4F60\u80FD\u5C1D\u5F97\u5230\u5473\u9053\u7684\u5427\uFF0C\u5403\u4E00\u5757\u8BD5\u8BD5\u5457\uFF1F\u201D</p>\n<p>\u201C\u771F\u2026\u2026\u771F\u9999\u266A\u201D</p>\n<p>\u5F53\u665A\uFF0C\u56E0\u4E3A\u89E6\u53D1\u4E86\u771F\u9999\u5B9A\u5F8B\u800C\u611F\u5230\u5F88\u706B\u5927\u7684\u7433\uFF0C\u628A\u79CB\u955C\u60AC\u4E22\u8FDB\u4E86\u81EA\u5DF1\u7684\u9AD8\u7EF4\u7A7A\u95F4\u91CC\u5934\u653E\u7F6E\u4E86\u4E00\u665A\u4E0A\uFF08\u9AD8\u7EF4\u65F6\u95F4\u4E09\u5929\uFF09\u6CC4\u6124\u3002</p>";
+exports.stylePreviewArticle = `<h1>午饭</h1>
+<p><em>作者：友人♪B</em></p>
+<p>“午饭，午饭♪”</p>
+<p>阳伞下的琳，很是期待今天的午饭。</p>
+<p>或许是体质和别的血族不太一样，琳能够感知到食物的味道，似乎也保有着生物对食物的喜爱。</p>
+<p>虽然她并不能从这些食物中获取能量就是。</p>
+<p>学校食堂的夏季限定甜点今天也很是抢手，这点从队伍的长度就能看出来——队伍险些就要超出食堂的范围了。</p>
+<p>“你说我要有钱多好——”</p>
+<p>已经从隔壁窗口买下了普通，但是很便宜的营养餐的秋镜悬，看着队伍中兴致勃勃的琳。</p>
+<p>其实她并不是缺钱，大约是吝啬。</p>
+<p>这得怪她娘，穷养秋镜悬养习惯了，现在她光自己除灵退魔挣来的外快都够她奢侈上一把了，可却还保留着能不花钱绝对不花，必须花钱越少越好的吝啬习惯。</p>
+<p>少顷，琳已经带着她的甜品建筑——每块砖头都是一块蛋糕，堆成一个诡异的火柴盒——来到了桌前。</p>
+<p>“（吃不胖真好，有钱真好……”</p>
+<p>血族的听觉自然是捕捉到了秋镜悬的嘀咕，琳放下盘子，悄咪咪地将牙贴上了秋镜悬的脖颈。</p>
+<p>“嘻嘻♪”</p>
+<p>“呜——”</p>
+<p>盯——</p>
+<p>秋镜悬看了看盘中剩下的一块毛血旺，似是联系到了什么，将目光转向了琳的牙。</p>
+<p>正在享用蛋糕盛宴的琳以余光瞥见了她的视线，</p>
+<p>“盯着本小姐是要做什么呢？”</p>
+<p>“啊，没，没什么……”</p>
+<p>秋镜悬支支吾吾的说着，</p>
+<p>“就是好奇一个问题，血族为什么不吃毛血旺……”</p>
+<p>“噢☆毛血旺就是那个煮熟的血块是吧？太没有美感了这种血！而且吃了也没法儿恢复能量，简直就是血液的绝佳浪费☆！”</p>
+<p>琳发出了对这样美食的鄙视，不过这种鄙视大约只有血族和蚊子会出现吧……</p>
+<p>“血族需要摄入血，是因为血所具有的生命能量，如果煮熟了的话，超过九成的能量都被转化成其他的东西了，对我们来说实在是没什么用处，还白白浪费了作为原料的血，这种东西本小姐才不吃咧✘！饿死，死外边，从这边跳下去也不吃✘！”</p>
+<p>“欸，别这么说嘛，你能尝得到味道的吧，吃一块试试呗？”</p>
+<p>“真……真香♪”</p>
+<p>当晚，因为触发了真香定律而感到很火大的琳，把秋镜悬丢进了自己的高维空间里头放置了一晚上（高维时间三天）泄愤。</p>`;
 
 },{}],31:[function(require,module,exports){
 "use strict";
@@ -1923,31 +1716,31 @@ exports.thanks = [
     { name: '重水时雨', link: 'https://t.me/boatmasteronD2O' },
     { name: '神楽坂 紫' },
     { name: 'Runian Lee', link: 'https://t.me/Runian' },
-].sort(function () { return Math.random() - 0.5; });
+].sort(() => Math.random() - 0.5);
 
 },{}],32:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var history_1 = require("./history");
-var state_1 = require("./state");
+const history_1 = require("./history");
+const state_1 = require("./state");
 function updateSelection() {
     if (state_1.state.chapterTextNodes === null) {
         return;
     }
-    var before = String(state_1.state.chapterSelection);
-    var selection = document.getSelection();
+    const before = String(state_1.state.chapterSelection);
+    const selection = document.getSelection();
     if (selection === null) {
         state_1.state.chapterSelection = null;
     }
     else {
-        var anchor = ((selection.anchorNode instanceof HTMLElement)
+        const anchor = ((selection.anchorNode instanceof HTMLElement)
             ? selection.anchorNode.firstChild
             : selection.anchorNode);
-        var anchorNodeIndex = state_1.state.chapterTextNodes.indexOf(anchor);
-        var focus_1 = ((selection.focusNode instanceof HTMLElement)
+        const anchorNodeIndex = state_1.state.chapterTextNodes.indexOf(anchor);
+        const focus = ((selection.focusNode instanceof HTMLElement)
             ? selection.focusNode.firstChild
             : selection.focusNode);
-        var focusNodeIndex = state_1.state.chapterTextNodes.indexOf(focus_1);
+        const focusNodeIndex = state_1.state.chapterTextNodes.indexOf(focus);
         if ((anchorNodeIndex === -1) || (focusNodeIndex === -1) ||
             (anchorNodeIndex === focusNodeIndex && selection.anchorOffset === selection.focusOffset)) {
             state_1.state.chapterSelection = null;
@@ -1978,4 +1771,988 @@ function updateSelection() {
 }
 exports.updateSelection = updateSelection;
 
-},{"./history":22,"./state":29}]},{},[23]);
+},{"./history":22,"./state":29}],33:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const Interpreter_1 = require("./Interpreter");
+const Random_1 = require("./Random");
+/**
+ * This is one of the possible implementation of a WTCD reader.
+ *
+ * In this implementation, all new content and buttons are appended to a single
+ * HTML element. The user is expected to continuously scroll down the page in
+ * order to read more, thus the name "flow reader".
+ *
+ * This reader implementation persists data via memorizing all users' decisions.
+ * When restoring a previous session, it replays all decisions.
+ *
+ * Since all decisions are recorded, this implementation allows the user to undo
+ * decisions, in which case, it resets the interpreter and replay all decisions
+ * until the decision that is being undone. This means, however, if the logic of
+ * WTCD section is extremely complicated and takes a long time to compute, it
+ * will potentially lag user's interface every time the user undoes a decision.
+ */
+class FlowReader {
+    constructor(docIdentifier, wtcdRoot, errorMessageCreator) {
+        this.wtcdRoot = wtcdRoot;
+        this.errorMessageCreator = errorMessageCreator;
+        /** Which decision the current buttons are for */
+        this.currentDecisionIndex = 0;
+        /** Buttons for each group of output */
+        this.buttons = [];
+        /** Content output after each decision */
+        this.contents = [];
+        this.started = false;
+        this.storageKey = `wtcd.fr.${docIdentifier}`;
+        this.data = this.parseData(window.localStorage.getItem(this.storageKey)) || {
+            random: String(Math.random()),
+            decisions: [],
+        };
+        this.resetInterpreter();
+    }
+    /**
+     * Verify and parse data stored in localStorage.
+     */
+    parseData(data) {
+        if (typeof data !== 'string') {
+            return null;
+        }
+        let obj;
+        try {
+            obj = JSON.parse(data);
+        }
+        catch (error) {
+            return null;
+        }
+        if (typeof obj.random !== 'string') {
+            return null;
+        }
+        if (!Array.isArray(obj.decisions)) {
+            return null;
+        }
+        if (obj.decisions.some((decision) => typeof decision !== 'number')) {
+            return null;
+        }
+        return obj;
+    }
+    /** Fancy name for "save" */
+    persist() {
+        window.localStorage.setItem(this.storageKey, JSON.stringify(this.data));
+    }
+    /**
+     * Calls this.interpreterIterator.next() and handles error.
+     */
+    next(decision) {
+        try {
+            return this.interpreterIterator.next(decision);
+        }
+        catch (error) {
+            const $errorMessage = this.errorMessageCreator(error);
+            this.target.appendChild($errorMessage);
+            this.contents.push($errorMessage);
+            return {
+                done: true,
+                value: {
+                    choices: [],
+                    content: [],
+                },
+            };
+        }
+    }
+    /** Restart the interpreter and reset the interpreterIterator */
+    resetInterpreter() {
+        const interpreter = new Interpreter_1.Interpreter(this.wtcdRoot, new Random_1.Random(this.data.random));
+        this.interpreterIterator = interpreter.start();
+    }
+    /**
+     * Make a decision at currentDecisionIndex and update buttons accordingly
+     *
+     * @param decision the index of choice to be made
+     * @param replay whether this is during a replay; If true, the decision will
+     * not be added to data.
+     */
+    decide(decision, replay = false) {
+        this.buttons[this.currentDecisionIndex].forEach(($button, choiceIndex) => {
+            if ($button.classList.contains('disabled')) {
+                return;
+            }
+            $button.classList.remove('candidate');
+            if (choiceIndex === decision) {
+                $button.classList.add('selected');
+            }
+            else {
+                $button.classList.add('unselected');
+            }
+        });
+        if (!replay) {
+            this.data.decisions.push(decision);
+        }
+        // Advance current decision index
+        this.currentDecisionIndex++;
+        const yieldValue = this.next(decision);
+        this.handleOutput(yieldValue.value);
+        return yieldValue.done;
+    }
+    /**
+     * Undo a decision made previously; It also removes every decision after the
+     * specified decision.
+     *
+     * @param decisionIndex which decision to be undone
+     */
+    undecide(decisionIndex) {
+        this.resetInterpreter();
+        // Clear those no longer needed content
+        this.data.decisions.splice(decisionIndex);
+        this.buttons.splice(decisionIndex + 1);
+        this.contents.splice(decisionIndex + 1)
+            .forEach($deletedContent => $deletedContent.remove());
+        // Replay
+        this.next();
+        for (const decision of this.data.decisions) {
+            this.next(decision);
+        }
+        // Update current decision's buttons so they become available to click
+        // again.
+        this.buttons[decisionIndex].forEach($button => {
+            if (!$button.classList.contains('disabled')) {
+                $button.classList.remove('selected', 'unselected');
+                $button.classList.add('candidate');
+            }
+        });
+        this.currentDecisionIndex = decisionIndex;
+    }
+    /**
+     * Handle an instance of output from the interpreter. This will add the
+     * content output and buttons to target.
+     *
+     * @param output the content output to be added
+     */
+    handleOutput(output) {
+        // Create a container for all elements involved so deletion will be easier.
+        const $container = document.createElement('div');
+        output.content.forEach($element => $container.appendChild($element));
+        const decisionIndex = this.currentDecisionIndex;
+        this.buttons.push(output.choices.map((choice, choiceIndex) => {
+            const $button = document.createElement('div');
+            $button.classList.add('wtcd-button');
+            $button.innerText = choice.content;
+            if (choice.disabled) {
+                $button.classList.add('disabled');
+            }
+            else {
+                $button.classList.add('candidate');
+                $button.addEventListener('click', () => {
+                    if (this.data.decisions[decisionIndex] === choiceIndex) {
+                        this.undecide(decisionIndex);
+                        this.persist();
+                    }
+                    else if (this.currentDecisionIndex === decisionIndex) {
+                        this.decide(choiceIndex);
+                        this.persist();
+                    }
+                });
+            }
+            $container.appendChild($button);
+            return $button;
+        }));
+        this.contents.push($container);
+        this.target.appendChild($container);
+    }
+    renderTo($target) {
+        if (this.started) {
+            throw new Error('Flow Interface already started.');
+        }
+        this.started = true;
+        this.target = $target;
+        const init = this.next();
+        let done = init.done;
+        this.handleOutput(init.value);
+        for (const decision of this.data.decisions) {
+            if (done) {
+                return;
+            }
+            done = this.decide(decision, true);
+        }
+    }
+}
+exports.FlowReader = FlowReader;
+
+},{"./Interpreter":34,"./Random":35}],34:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const constantsPool_1 = require("./constantsPool");
+const operators_1 = require("./operators");
+const WTCDError_1 = require("./WTCDError");
+var BubbleSignalType;
+(function (BubbleSignalType) {
+    BubbleSignalType[BubbleSignalType["YIELD"] = 0] = "YIELD";
+    BubbleSignalType[BubbleSignalType["RETURN"] = 1] = "RETURN";
+})(BubbleSignalType || (BubbleSignalType = {}));
+/**
+ * Bubble signal is used for traversing upward the call stack. It is implemented
+ * with JavaScript's Error. Such signal might be yield or return.
+ */
+class BubbleSignal extends Error {
+    constructor(type) {
+        super('Uncaught Bubble Signal.');
+        this.type = type;
+        Object.setPrototypeOf(this, new.target.prototype);
+    }
+}
+/**
+ * Create a string describing a runtime value including its type and value.
+ */
+function describe(rv) {
+    switch (rv.type) {
+        case 'number':
+        case 'boolean':
+            return `${rv.type} ${rv.value}`;
+        case 'string':
+            return `string "${rv.value}"`;
+        case 'choice':
+            return `a choice for action ${describe(rv.value.action)} with label "${rv.value.text}"`;
+        case 'action':
+            switch (rv.value.action) {
+                case 'goto':
+                    return `an action for goto to ${rv.value.target}`;
+                case 'exit':
+                    return `an action for exiting`;
+            }
+        case 'null':
+            return 'null';
+        case 'selection':
+            return `a selection among the following choices: [${rv.value.choices.map(describe).join(', ')}]`;
+    }
+}
+exports.describe = describe;
+class RuntimeScope {
+    constructor() {
+        this.variables = new Map();
+        this.registers = null;
+    }
+    /**
+     * Attempt to resolve the given variable name within this scope. If variable
+     * is not found, return null.
+     *
+     * @param variableName
+     * @returns
+     */
+    resolveVariableReference(variableName) {
+        return this.variables.get(variableName) || null;
+    }
+    addVariable(variableName, type, value) {
+        this.variables.set(variableName, { type, value });
+    }
+    addRegister(registerName) {
+        if (this.registers === null) {
+            this.registers = new Map();
+        }
+        this.registers.set(registerName, constantsPool_1.getMaybePooled('null', null));
+    }
+    /**
+     * If a register with given name exists on this scope, set the value of it and
+     * return true. Otherwise, return false.
+     *
+     * @param registerName name of register
+     * @param value value to set to
+     * @returns whether the requested register is found
+     */
+    setRegisterIfExist(registerName, value) {
+        if (this.registers === null) {
+            return false;
+        }
+        if (!this.registers.has(registerName)) {
+            return false;
+        }
+        this.registers.set(registerName, value);
+        return true;
+    }
+    getRegister(registerName) {
+        return this.registers && this.registers.get(registerName) || null;
+    }
+}
+class InvalidChoiceError extends Error {
+    constructor(choiceId) {
+        super(`Invalid choice ${choiceId}.`);
+        this.choiceId = choiceId;
+    }
+}
+exports.InvalidChoiceError = InvalidChoiceError;
+class Interpreter {
+    constructor(wtcdRoot, random) {
+        this.wtcdRoot = wtcdRoot;
+        this.random = random;
+        this.scopes = [new RuntimeScope()];
+        this.sectionStack = [];
+        this.resolveVariableReference = (variableName) => {
+            for (let i = this.scopes.length - 1; i >= 0; i--) {
+                const variable = this.scopes[i].resolveVariableReference(variableName);
+                if (variable !== null) {
+                    return variable;
+                }
+            }
+            throw WTCDError_1.WTCDError.atUnknown(`Cannot resolve variable reference "${variableName}". ` +
+                `This is most likely caused by WTCD compiler's error or the compiled output ` +
+                `has been modified`);
+        };
+        this.evaluator = (expr) => {
+            switch (expr.type) {
+                case 'unaryExpression':
+                    return operators_1.unaryOperators.get(expr.operator).fn(expr, this.evaluator);
+                case 'binaryExpression':
+                    return operators_1.binaryOperators.get(expr.operator).fn(expr, this.evaluator, this.resolveVariableReference);
+                case 'booleanLiteral':
+                    return constantsPool_1.getMaybePooled('boolean', expr.value);
+                case 'numberLiteral':
+                    return constantsPool_1.getMaybePooled('number', expr.value);
+                case 'stringLiteral':
+                    return constantsPool_1.getMaybePooled('string', expr.value);
+                case 'nullLiteral':
+                    return constantsPool_1.getMaybePooled('null', null);
+                case 'choiceExpression':
+                    return this.evaluateChoiceExpression(expr);
+                case 'conditionalExpression':
+                    return this.evaluateConditionalExpression(expr);
+                case 'block':
+                    return this.evaluateBlockExpression(expr);
+                case 'gotoAction':
+                    return {
+                        type: 'action',
+                        value: {
+                            action: 'goto',
+                            target: expr.sections,
+                        },
+                    };
+                case 'exitAction':
+                    return {
+                        type: 'action',
+                        value: {
+                            action: 'exit',
+                        },
+                    };
+                case 'selection':
+                    return this.evaluateSelectionExpression(expr);
+                case 'variableReference':
+                    // RuntimeValues are immutable by nature so we don't need to worry about
+                    // anything changing the values of our variables.
+                    return this.resolveVariableReference(expr.variableName);
+            }
+        };
+        this.started = false;
+        this.sectionEnterTimes = new Map();
+        this.currentlyBuilding = [];
+        this.sectionStack.push(this.wtcdRoot.sections[0]);
+    }
+    /**
+     * Iterate through the scopes and set the first register with registerName to
+     * given value.
+     *
+     * @param registerName The name of register to look for
+     * @param value The value to set to
+     */
+    setRegister(registerName, value) {
+        for (let i = this.scopes.length - 1; i >= 0; i--) {
+            if (this.scopes[i].setRegisterIfExist(registerName, value)) {
+                return;
+            }
+        }
+        throw WTCDError_1.WTCDError.atUnknown(`Cannot resolve register reference "${registerName}". ` +
+            `This is mostly likely caused by WTCD compiler's error or the compiled output ` +
+            `has been modified`);
+    }
+    getCurrentScope() {
+        return this.scopes[this.scopes.length - 1];
+    }
+    pushScope() {
+        const scope = new RuntimeScope();
+        this.scopes.push(scope);
+        return scope;
+    }
+    popScope() {
+        this.scopes.pop();
+    }
+    evaluateChoiceExpression(expr) {
+        const text = this.evaluator(expr.text);
+        if (text.type !== 'string') {
+            throw WTCDError_1.WTCDError.atLocation(expr, `First argument of choice is expected to be a string, ` +
+                `received: ${describe(text)}`);
+        }
+        const action = this.evaluator(expr.action);
+        if (action.type !== 'action' && action.type !== 'null') {
+            throw WTCDError_1.WTCDError.atLocation(expr, `First argument of choice is expected to be an action ` +
+                `or null, received: ${describe(text)}`);
+        }
+        return {
+            type: 'choice',
+            value: {
+                text: text.value,
+                action,
+            },
+        };
+    }
+    evaluateConditionalExpression(expr) {
+        const condition = this.evaluator(expr.condition);
+        if (condition.type !== 'boolean') {
+            throw WTCDError_1.WTCDError.atLocation(expr, `First argument of a conditional expression is expected to ` +
+                `be a boolean, received: ${describe(condition)}`);
+        }
+        // Only evaluate the necessary branch
+        if (condition.value) {
+            return this.evaluator(expr.then);
+        }
+        else {
+            return this.evaluator(expr.otherwise);
+        }
+    }
+    executeDeclarationStatement(expr) {
+        for (const singleDeclaration of expr.declarations) {
+            let value;
+            if (singleDeclaration.initialValue !== null) {
+                value = this.evaluator(singleDeclaration.initialValue);
+            }
+            else {
+                switch (singleDeclaration.variableType) {
+                    case 'boolean':
+                        value = constantsPool_1.getMaybePooled('boolean', false);
+                        break;
+                    case 'number':
+                        value = constantsPool_1.getMaybePooled('number', 0);
+                        break;
+                    case 'string':
+                        value = constantsPool_1.getMaybePooled('string', '');
+                        break;
+                    default:
+                        throw WTCDError_1.WTCDError.atLocation(expr, `Variable type ${singleDeclaration.variableType} ` +
+                            `does not have a default initial value`);
+                }
+            }
+            if (value.type !== singleDeclaration.variableType) {
+                throw WTCDError_1.WTCDError.atLocation(expr, `The type of variable ${singleDeclaration.variableName} is ` +
+                    `${singleDeclaration.variableType}, thus cannot hold ${describe(value)}`);
+            }
+            this.getCurrentScope().addVariable(singleDeclaration.variableName, singleDeclaration.variableType, value.value);
+        }
+    }
+    evaluateBlockExpression(expr) {
+        const scope = this.pushScope();
+        scope.addRegister('yield');
+        try {
+            for (const statement of expr.statements) {
+                this.executeStatement(statement);
+            }
+            return scope.getRegister('yield');
+        }
+        catch (error) {
+            if ((error instanceof BubbleSignal) && (error.type === BubbleSignalType.YIELD)) {
+                return scope.getRegister('yield');
+            }
+            throw error;
+        }
+        finally {
+            this.popScope();
+        }
+    }
+    evaluateSelectionExpression(expr) {
+        const choices = expr.choices
+            .map(choiceExpr => this.evaluator(choiceExpr))
+            .filter(choice => choice.type !== 'null');
+        for (let i = 0; i < choices.length; i++) {
+            if (choices[i].type !== 'choice') {
+                throw WTCDError_1.WTCDError.atLocation(expr.choices[i], `Choice at index ${i} is expected to be a choice, ` +
+                    `received ${describe(choices[i])}`);
+            }
+        }
+        return {
+            type: 'selection',
+            value: {
+                choices: choices,
+            },
+        };
+    }
+    executeStatement(statement) {
+        switch (statement.type) {
+            case 'declaration':
+                this.executeDeclarationStatement(statement);
+                return;
+            case 'expression':
+                this.evaluator(statement.expression);
+                return;
+            case 'yield':
+                this.setRegister('yield', this.evaluator(statement.value));
+                throw new BubbleSignal(BubbleSignalType.YIELD); // Bubble up
+            case 'setYield':
+                this.setRegister('yield', this.evaluator(statement.value));
+                return;
+            default:
+                throw WTCDError_1.WTCDError.atLocation(statement, 'Not implemented');
+        }
+    }
+    addToSectionStack(sectionName) {
+        for (const section of this.wtcdRoot.sections) {
+            if (section.name === sectionName) {
+                this.sectionStack.push(section);
+                return;
+            }
+        }
+        throw WTCDError_1.WTCDError.atUnknown(`Unknown section "${sectionName}"`);
+    }
+    executeAction(action) {
+        switch (action.value.action) {
+            case 'goto':
+                for (let i = action.value.target.length - 1; i >= 0; i--) {
+                    this.addToSectionStack(action.value.target[i]);
+                }
+                break;
+            case 'exit':
+                // Clears the section stack so the scripts end immediately
+                this.sectionStack.length = 0;
+        }
+    }
+    *start() {
+        if (this.started) {
+            throw new Error('Interpretation has already started.');
+        }
+        this.started = true;
+        try {
+            // Initialization
+            for (const statement of this.wtcdRoot.initStatements) {
+                this.executeStatement(statement);
+            }
+            const $host = document.createElement('div');
+            while (this.sectionStack.length !== 0) {
+                const currentSection = this.sectionStack.pop();
+                // Evaluate the executes clause
+                if (currentSection.executes !== null) {
+                    this.evaluator(currentSection.executes);
+                }
+                /** Times this section has been entered including this time */
+                const enterTime = this.sectionEnterTimes.has(currentSection.name)
+                    ? this.sectionEnterTimes.get(currentSection.name) + 1
+                    : 1;
+                this.sectionEnterTimes.set(currentSection.name, enterTime);
+                /** Content that fits within the bounds */
+                const eligibleSectionContents = currentSection.content.filter(content => (content.lowerBound === undefined || content.lowerBound <= enterTime) &&
+                    (content.upperBound === undefined || content.upperBound >= enterTime));
+                if (eligibleSectionContents.length !== 0) {
+                    const selectedContent = eligibleSectionContents[this.random.nextInt(0, eligibleSectionContents.length)];
+                    $host.innerHTML = selectedContent.html;
+                    // Parameterize
+                    for (const variable of selectedContent.variables) {
+                        $host.getElementsByClassName(variable.elementClass)[0]
+                            .innerText = String(this.resolveVariableReference(variable.variableName).value);
+                    }
+                    let $current = $host.firstChild;
+                    while ($current !== null) {
+                        if ($current instanceof HTMLElement) {
+                            this.currentlyBuilding.push($current);
+                        }
+                        $current = $current.nextSibling;
+                    }
+                }
+                const then = this.evaluator(currentSection.then);
+                // The part after then has to be a selection or an action
+                if (then.type === 'selection') {
+                    const choices = then.value.choices.map(choice => ({
+                        content: choice.value.text,
+                        disabled: choice.value.action.type === 'null',
+                    }));
+                    const yieldValue = {
+                        content: this.currentlyBuilding,
+                        choices,
+                    };
+                    this.currentlyBuilding = [];
+                    // Hands over control so player can make a decision
+                    const playerChoiceIndex = yield yieldValue;
+                    const playerChoice = then.value.choices[playerChoiceIndex];
+                    if (playerChoice === undefined || playerChoice.value.action.type === 'null') {
+                        throw new InvalidChoiceError(playerChoiceIndex);
+                    }
+                    this.executeAction(playerChoice.value.action);
+                }
+                else if (then.type === 'action') {
+                    this.executeAction(then);
+                }
+                else if (then.type !== 'null') {
+                    throw WTCDError_1.WTCDError.atLocation(currentSection.then, `Expression after then is expected to return ` +
+                        `selection, action, or null. Received: ${describe(then)}`);
+                }
+            }
+        }
+        catch (error) {
+            if (error instanceof BubbleSignal) {
+                throw WTCDError_1.WTCDError.atUnknown(`Uncaught BubbleSignal with type "${error.type}".`);
+            }
+            throw error;
+        }
+        return {
+            content: this.currentlyBuilding,
+            choices: [],
+        };
+    }
+}
+exports.Interpreter = Interpreter;
+
+},{"./WTCDError":36,"./constantsPool":37,"./operators":38}],35:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+/**
+ * Convert a string to 32 bit hash
+ * https://stackoverflow.com/a/47593316
+ */
+function xmur3(strSeed) {
+    let h = 1779033703 ^ strSeed.length;
+    for (let i = 0; i < strSeed.length; i++) {
+        h = Math.imul(h ^ strSeed.charCodeAt(i), 3432918353),
+            h = h << 13 | h >>> 19;
+    }
+    return () => {
+        h = Math.imul(h ^ h >>> 16, 2246822507);
+        h = Math.imul(h ^ h >>> 13, 3266489909);
+        return (h ^= h >>> 16) >>> 0;
+    };
+}
+/**
+ * Create a seeded random number generator using the four passed in 32 bit
+ * number as seeds.
+ * https://stackoverflow.com/a/47593316
+ *
+ * @param a seed
+ * @param b seed
+ * @param c seed
+ * @param d seed
+ * @returns seeded random number generator
+ */
+function sfc32(a, b, c, d) {
+    return () => {
+        a >>>= 0;
+        b >>>= 0;
+        c >>>= 0;
+        d >>>= 0;
+        let t = (a + b) | 0;
+        a = b ^ b >>> 9;
+        b = c + (c << 3) | 0;
+        c = (c << 21 | c >>> 11);
+        d = d + 1 | 0;
+        t = t + d | 0;
+        c = c + t | 0;
+        return (t >>> 0) / 4294967296;
+    };
+}
+class Random {
+    constructor(seed) {
+        const seedFn = xmur3(seed);
+        this.rng = sfc32(seedFn(), seedFn(), seedFn(), seedFn());
+    }
+    next(low = 0, high = 1) {
+        return this.rng() * (high - low) + low;
+    }
+    nextBool() {
+        return this.rng() < 0.5;
+    }
+    nextInt(low = 0, high = 1) {
+        return Math.floor(this.next(low, high));
+    }
+}
+exports.Random = Random;
+
+},{}],36:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+class WTCDError extends Error {
+    constructor(message, line, column) {
+        super(message);
+        this.line = line;
+        this.column = column;
+        this.name = 'WTCDError';
+    }
+    static atUnknown(message) {
+        return new WTCDError(message + ` at unknown location. (Location info `
+            + `is not available for this type of error)`, null, null);
+    }
+    static atLineColumn(line, column, message) {
+        return new WTCDError(message + ` at ${line}:${column}.`, line, column);
+    }
+    static atLocation(location, message) {
+        if (location.line === undefined) {
+            return new WTCDError(message + ' at unknown location. (Try recompile in '
+                + 'debug mode to enable source map)', null, null);
+        }
+        else {
+            return this.atLineColumn(location.line, location.column, message);
+        }
+    }
+}
+exports.WTCDError = WTCDError;
+
+},{}],37:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+// Your typical immature optimization
+// Caches null values, boolean values, and small integers to somewhat reduce GC
+exports.nullValue = { type: 'null', value: null };
+exports.trueValue = { type: 'boolean', value: true };
+exports.falseValue = { type: 'boolean', value: false };
+exports.smallIntegers = [];
+for (let i = 0; i <= 100; i++) {
+    exports.smallIntegers.push({
+        type: 'number',
+        value: i,
+    });
+}
+function booleanValue(value) {
+    return value ? exports.trueValue : exports.falseValue;
+}
+exports.booleanValue = booleanValue;
+function getMaybePooled(type, value) {
+    if (type === 'null') {
+        return exports.nullValue;
+    }
+    if (type === 'boolean') {
+        return booleanValue(value);
+    }
+    if (type === 'number' && value >= 0 && value <= 100) {
+        return exports.smallIntegers[value];
+    }
+    return {
+        type,
+        value,
+    };
+}
+exports.getMaybePooled = getMaybePooled;
+
+},{}],38:[function(require,module,exports){
+"use strict";
+// This file defines all infix and prefix operators in WTCD.
+Object.defineProperty(exports, "__esModule", { value: true });
+const constantsPool_1 = require("./constantsPool");
+const Interpreter_1 = require("./Interpreter");
+const WTCDError_1 = require("./WTCDError");
+exports.unaryOperators = new Map([
+    ['-', {
+            precedence: 16,
+            fn: (expr, evaluator) => {
+                const arg = evaluator(expr.arg);
+                if (arg.type !== 'number') {
+                    throw WTCDError_1.WTCDError.atLocation(expr, `Unary operator "-" can only be applied ` +
+                        `to a number. Received: ${Interpreter_1.describe(arg)}`);
+                }
+                return constantsPool_1.getMaybePooled('number', -arg.value);
+            },
+        }],
+    ['!', {
+            precedence: 16,
+            fn: (expr, evaluator) => {
+                const arg = evaluator(expr.arg);
+                if (arg.type !== 'boolean') {
+                    throw WTCDError_1.WTCDError.atLocation(expr, `Unary operator "!" can only be applied ` +
+                        `to a boolean. Received: ${Interpreter_1.describe(arg)}`);
+                }
+                return constantsPool_1.getMaybePooled('boolean', !arg.value);
+            },
+        }],
+]);
+function autoEvaluated(fn) {
+    return (expr, evaluator, resolveVariableReference) => {
+        const arg0 = evaluator(expr.arg0);
+        const arg1 = evaluator(expr.arg1);
+        return fn(arg0, arg1, expr, evaluator, resolveVariableReference);
+    };
+}
+function autoEvaluatedSameTypeArg(argType, returnType, fn) {
+    return autoEvaluated((arg0, arg1, expr, evaluator, resolveVariableReference) => {
+        if (arg0.type === argType && arg1.type === argType) {
+            // TypeScript is not smart enough to do the conversion here
+            return constantsPool_1.getMaybePooled(returnType, fn(arg0.value, arg1.value, expr, evaluator, resolveVariableReference));
+        }
+        else {
+            throw WTCDError_1.WTCDError.atLocation(expr, `Binary operator "${expr.operator}" can only be ` +
+                `applied to two ${argType}s. Received: ${Interpreter_1.describe(arg0)} (left) and ` +
+                `${Interpreter_1.describe(arg1)} (right)`);
+        }
+    });
+}
+function opAssignment(arg0Type, // Type of the variable
+arg1Type, fn) {
+    return (expr, evaluator, resolveVariableReference) => {
+        if (expr.arg0.type !== 'variableReference') {
+            throw WTCDError_1.WTCDError.atLocation(expr, `Left side of binary operator "${expr.operator}" ` +
+                `has to be a variable reference`);
+        }
+        const varRef = resolveVariableReference(expr.arg0.variableName);
+        if (varRef.type !== arg0Type) {
+            throw WTCDError_1.WTCDError.atLocation(expr, `Left side of binary operator "${expr.operator}" has to be a ` +
+                `variable of type ${arg0Type}, actual type: ${varRef.type}`);
+        }
+        const arg1 = evaluator(expr.arg1);
+        if (arg1.type !== arg1Type) {
+            throw WTCDError_1.WTCDError.atLocation(expr, `Right side of binary operator "${expr.operator}" ` +
+                ` has to be a ${arg1Type}. Received: ${Interpreter_1.describe(arg1)}`);
+        }
+        const newValue = fn(varRef.value, arg1.value, expr, evaluator, resolveVariableReference);
+        varRef.value = newValue;
+        return constantsPool_1.getMaybePooled(arg0Type, newValue);
+    };
+}
+exports.binaryOperators = new Map([
+    ['=', {
+            precedence: 3,
+            fn: (expr, evaluator, resolveVariableReference) => {
+                if (expr.arg0.type !== 'variableReference') {
+                    throw WTCDError_1.WTCDError.atLocation(expr, `Left side of binary operator "=" has to be a ` +
+                        `variable reference`);
+                }
+                const varRef = resolveVariableReference(expr.arg0.variableName);
+                const arg1 = evaluator(expr.arg1);
+                if (arg1.type !== varRef.type) {
+                    throw WTCDError_1.WTCDError.atLocation(expr, `Variable "${expr.arg0.variableName}" can only hold ` +
+                        `values of type ${varRef.type}. Received ${Interpreter_1.describe(arg1)}`);
+                }
+                varRef.value = arg1.value;
+                return arg1;
+            },
+        }],
+    ['+=', {
+            precedence: 3,
+            fn: (expr, evaluator, resolveVariableReference) => {
+                if (expr.arg0.type !== 'variableReference') {
+                    throw WTCDError_1.WTCDError.atLocation(expr, `Left side of binary operator "+=" ` +
+                        `has to be a variable reference`);
+                }
+                const varRef = resolveVariableReference(expr.arg0.variableName);
+                if (varRef.type !== 'string' && varRef.type !== 'number') {
+                    throw WTCDError_1.WTCDError.atLocation(expr, `Left side of binary operator "+=" has to be a ` +
+                        `variable of type number or string, actual type: ${varRef.type}`);
+                }
+                const arg1 = evaluator(expr.arg1);
+                if (arg1.type !== varRef.type) {
+                    throw WTCDError_1.WTCDError.atLocation(expr, `Right side of binary operator "+=" has to ` +
+                        ` be a ${varRef.type}. Received: ${Interpreter_1.describe(arg1)}`);
+                }
+                const newValue = varRef.value + arg1.value;
+                varRef.value = newValue;
+                return constantsPool_1.getMaybePooled(varRef.type, newValue);
+            },
+        }],
+    ['-=', {
+            precedence: 3,
+            fn: opAssignment('number', 'number', (arg0Raw, arg1Raw) => arg0Raw - arg1Raw),
+        }],
+    ['*=', {
+            precedence: 3,
+            fn: opAssignment('number', 'number', (arg0Raw, arg1Raw) => arg0Raw * arg1Raw),
+        }],
+    ['/=', {
+            precedence: 3,
+            fn: opAssignment('number', 'number', (arg0Raw, arg1Raw) => arg0Raw / arg1Raw),
+        }],
+    ['~/=', {
+            precedence: 3,
+            fn: opAssignment('number', 'number', (arg0Raw, arg1Raw) => Math.trunc(arg0Raw / arg1Raw)),
+        }],
+    ['%=', {
+            precedence: 3,
+            fn: opAssignment('number', 'number', (arg0Raw, arg1Raw) => arg0Raw % arg1Raw),
+        }],
+    ['||', {
+            precedence: 5,
+            fn: (expr, evaluator) => {
+                const arg0 = evaluator(expr.arg0);
+                if (arg0.type !== 'boolean') {
+                    throw WTCDError_1.WTCDError.atLocation(expr, `Left side of binary operator "||" has to be a boolean. ` +
+                        `Received ${Interpreter_1.describe(arg0)}`);
+                }
+                if (arg0.value === true) {
+                    return constantsPool_1.getMaybePooled('boolean', true);
+                }
+                const arg1 = evaluator(expr.arg1); // Short-circuit evaluation
+                if (arg1.type !== 'boolean') {
+                    throw WTCDError_1.WTCDError.atLocation(expr, `Right side of binary operator "||" has to be a boolean. ` +
+                        `Received ${Interpreter_1.describe(arg1)}`);
+                }
+                return constantsPool_1.getMaybePooled('boolean', arg1.value);
+            },
+        }],
+    ['&&', {
+            precedence: 6,
+            fn: (expr, evaluator) => {
+                const arg0 = evaluator(expr.arg0);
+                if (arg0.type !== 'boolean') {
+                    throw WTCDError_1.WTCDError.atLocation(expr, `Left side of binary operator "&&" has to be a boolean. ` +
+                        `Received ${Interpreter_1.describe(arg0)}`);
+                }
+                if (arg0.value === false) {
+                    return constantsPool_1.getMaybePooled('boolean', false);
+                }
+                const arg1 = evaluator(expr.arg1); // Short-circuit evaluation
+                if (arg1.type !== 'boolean') {
+                    throw WTCDError_1.WTCDError.atLocation(expr, `Right side of binary operator "&&" has to be a boolean. ` +
+                        `Received ${Interpreter_1.describe(arg1)}`);
+                }
+                return constantsPool_1.getMaybePooled('boolean', arg1.value);
+            },
+        }],
+    ['==', {
+            precedence: 10,
+            fn: autoEvaluated((arg0, arg1) => (constantsPool_1.getMaybePooled('boolean', (arg0.type === arg1.type) && (arg0.value === arg1.value)))),
+        }],
+    ['!=', {
+            precedence: 10,
+            fn: autoEvaluated((arg0, arg1) => (constantsPool_1.getMaybePooled('boolean', (arg0.type !== arg1.type) || (arg0.value !== arg1.value)))),
+        }],
+    ['<', {
+            precedence: 11,
+            fn: autoEvaluatedSameTypeArg('number', 'boolean', (arg0Raw, arg1Raw) => arg0Raw < arg1Raw),
+        }],
+    ['<=', {
+            precedence: 11,
+            fn: autoEvaluatedSameTypeArg('number', 'boolean', (arg0Raw, arg1Raw) => arg0Raw <= arg1Raw),
+        }],
+    ['>', {
+            precedence: 11,
+            fn: autoEvaluatedSameTypeArg('number', 'boolean', (arg0Raw, arg1Raw) => arg0Raw > arg1Raw),
+        }],
+    ['>=', {
+            precedence: 11,
+            fn: autoEvaluatedSameTypeArg('number', 'boolean', (arg0Raw, arg1Raw) => arg0Raw >= arg1Raw),
+        }],
+    ['+', {
+            precedence: 13,
+            fn: autoEvaluated((arg0, arg1, expr) => {
+                if (arg0.type === 'number' && arg1.type === 'number') {
+                    return constantsPool_1.getMaybePooled('number', arg0.value + arg1.value);
+                }
+                else if (arg0.type === 'string' && arg1.type === 'string') {
+                    return constantsPool_1.getMaybePooled('string', arg0.value + arg1.value);
+                }
+                else {
+                    throw WTCDError_1.WTCDError.atLocation(expr, `Binary operator "+" can only be applied to two ` +
+                        `strings or two numbers. Received: ${Interpreter_1.describe(arg0)} (left) and ` +
+                        `${Interpreter_1.describe(arg1)} (right)`);
+                }
+            }),
+        }],
+    ['-', {
+            precedence: 13,
+            fn: autoEvaluatedSameTypeArg('number', 'number', (arg0Raw, arg1Raw) => arg0Raw + arg1Raw),
+        }],
+    ['*', {
+            precedence: 14,
+            fn: autoEvaluatedSameTypeArg('number', 'number', (arg0Raw, arg1Raw) => arg0Raw * arg1Raw),
+        }],
+    ['/', {
+            precedence: 14,
+            fn: autoEvaluatedSameTypeArg('number', 'number', (arg0Raw, arg1Raw) => arg0Raw / arg1Raw),
+        }],
+    ['~/', {
+            precedence: 14,
+            fn: autoEvaluatedSameTypeArg('number', 'number', (arg0Raw, arg1Raw) => Math.trunc(arg0Raw / arg1Raw)),
+        }],
+    ['%', {
+            precedence: 14,
+            fn: autoEvaluatedSameTypeArg('number', 'number', (arg0Raw, arg1Raw) => arg0Raw % arg1Raw),
+        }],
+]);
+exports.conditionalOperatorPrecedence = 4;
+exports.operators = new Set([...exports.unaryOperators.keys(), ...exports.binaryOperators.keys(), '?', ':']);
+
+},{"./Interpreter":34,"./WTCDError":36,"./constantsPool":37}]},{},[23]);

@@ -11,6 +11,7 @@ window.DATA={
         "displayIndex": 99999,
         "name": "99999 - 出场人员名单",
         "sourceRelativePath": "99999 - 出场人员名单.md",
+        "type": "Markdown",
         "isEarlyAccess": true,
         "commentsUrl": null,
         "htmlRelativePath": "出场人员名单.html",
@@ -30,6 +31,7 @@ window.DATA={
             "displayIndex": 0,
             "name": "0",
             "sourceRelativePath": "1 - 主线/0.md",
+            "type": "Markdown",
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/7",
             "htmlRelativePath": "主线/第-0-章.html",
@@ -40,6 +42,7 @@ window.DATA={
             "displayIndex": 1,
             "name": "1",
             "sourceRelativePath": "1 - 主线/1.md",
+            "type": "Markdown",
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/8",
             "htmlRelativePath": "主线/第-1-章.html",
@@ -50,6 +53,7 @@ window.DATA={
             "displayIndex": 2,
             "name": "2",
             "sourceRelativePath": "1 - 主线/2.md",
+            "type": "Markdown",
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/9",
             "htmlRelativePath": "主线/第-2-章.html",
@@ -60,6 +64,7 @@ window.DATA={
             "displayIndex": 3,
             "name": "3",
             "sourceRelativePath": "1 - 主线/3.md",
+            "type": "Markdown",
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/10",
             "htmlRelativePath": "主线/第-3-章.html",
@@ -70,6 +75,7 @@ window.DATA={
             "displayIndex": 4,
             "name": "4",
             "sourceRelativePath": "1 - 主线/4.md",
+            "type": "Markdown",
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/11",
             "htmlRelativePath": "主线/第-4-章.html",
@@ -80,6 +86,7 @@ window.DATA={
             "displayIndex": 5,
             "name": "5",
             "sourceRelativePath": "1 - 主线/5.md",
+            "type": "Markdown",
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/12",
             "htmlRelativePath": "主线/第-5-章.html",
@@ -90,6 +97,7 @@ window.DATA={
             "displayIndex": 6,
             "name": "6",
             "sourceRelativePath": "1 - 主线/6.md",
+            "type": "Markdown",
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/13",
             "htmlRelativePath": "主线/第-6-章.html",
@@ -100,6 +108,7 @@ window.DATA={
             "displayIndex": 7,
             "name": "7",
             "sourceRelativePath": "1 - 主线/7.md",
+            "type": "Markdown",
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/14",
             "htmlRelativePath": "主线/第-7-章.html",
@@ -110,6 +119,7 @@ window.DATA={
             "displayIndex": 8,
             "name": "8",
             "sourceRelativePath": "1 - 主线/8.md",
+            "type": "Markdown",
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/15",
             "htmlRelativePath": "主线/第-8-章.html",
@@ -120,6 +130,7 @@ window.DATA={
             "displayIndex": 9,
             "name": "9",
             "sourceRelativePath": "1 - 主线/9.md",
+            "type": "Markdown",
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/16",
             "htmlRelativePath": "主线/第-9-章.html",
@@ -130,6 +141,7 @@ window.DATA={
             "displayIndex": 10,
             "name": "10",
             "sourceRelativePath": "1 - 主线/10.md",
+            "type": "Markdown",
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/17",
             "htmlRelativePath": "主线/第-10-章.html",
@@ -140,6 +152,7 @@ window.DATA={
             "displayIndex": 11,
             "name": "11",
             "sourceRelativePath": "1 - 主线/11.md",
+            "type": "Markdown",
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/18",
             "htmlRelativePath": "主线/第-11-章.html",
@@ -150,6 +163,7 @@ window.DATA={
             "displayIndex": 12,
             "name": "12",
             "sourceRelativePath": "1 - 主线/12.md",
+            "type": "Markdown",
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/19",
             "htmlRelativePath": "主线/第-12-章.html",
@@ -160,6 +174,7 @@ window.DATA={
             "displayIndex": 13,
             "name": "13",
             "sourceRelativePath": "1 - 主线/13.md",
+            "type": "Markdown",
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/20",
             "htmlRelativePath": "主线/第-13-章.html",
@@ -170,6 +185,7 @@ window.DATA={
             "displayIndex": 14,
             "name": "14",
             "sourceRelativePath": "1 - 主线/14.md",
+            "type": "Markdown",
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/48",
             "htmlRelativePath": "主线/第-14-章.html",
@@ -180,6 +196,7 @@ window.DATA={
             "displayIndex": 15,
             "name": "15",
             "sourceRelativePath": "1 - 主线/15.md",
+            "type": "Markdown",
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/55",
             "htmlRelativePath": "主线/第-15-章.html",
@@ -201,6 +218,7 @@ window.DATA={
             "displayIndex": 1,
             "name": "1 - 特别篇 公主殿下",
             "sourceRelativePath": "2 - 支线/1 - 特别篇 公主殿下.md",
+            "type": "Markdown",
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/22",
             "htmlRelativePath": "支线/特别篇-公主殿下.html",
@@ -211,6 +229,7 @@ window.DATA={
             "displayIndex": 2,
             "name": "2 - 新能源",
             "sourceRelativePath": "2 - 支线/2 - 新能源.md",
+            "type": "Markdown",
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/21",
             "htmlRelativePath": "支线/新能源.html",
@@ -232,6 +251,7 @@ window.DATA={
             "displayIndex": 1,
             "name": "1 - 琳的“足疗馆”",
             "sourceRelativePath": "3 - 小作品/1 - 琳的“足疗馆”.md",
+            "type": "Markdown",
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/27",
             "htmlRelativePath": "小作品/琳的“足疗馆”.html",
@@ -242,6 +262,7 @@ window.DATA={
             "displayIndex": 2,
             "name": "2 - 戴着可穿戴科技参加 AP 考试",
             "sourceRelativePath": "3 - 小作品/2 - 戴着可穿戴科技参加 AP 考试.md",
+            "type": "Markdown",
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/28",
             "htmlRelativePath": "小作品/戴着可穿戴科技参加-AP-考试.html",
@@ -263,6 +284,7 @@ window.DATA={
             "displayIndex": 0,
             "name": "0 - 概述",
             "sourceRelativePath": "4 - 道具集/0 - 概述.md",
+            "type": "Markdown",
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/36",
             "htmlRelativePath": "道具集/概述.html",
@@ -273,6 +295,7 @@ window.DATA={
             "displayIndex": 24,
             "name": "24 - mWatch",
             "sourceRelativePath": "4 - 道具集/24 - mWatch.md",
+            "type": "Markdown",
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/47",
             "htmlRelativePath": "道具集/mWatch.html",
@@ -283,6 +306,7 @@ window.DATA={
             "displayIndex": 50,
             "name": "50 - 强制灌食器",
             "sourceRelativePath": "4 - 道具集/50 - 强制灌食器.md",
+            "type": "Markdown",
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/37",
             "htmlRelativePath": "道具集/强制灌食器.html",
@@ -293,6 +317,7 @@ window.DATA={
             "displayIndex": 79,
             "name": "79 - 充电宝少女捕获器",
             "sourceRelativePath": "4 - 道具集/79 - 充电宝少女捕获器.md",
+            "type": "Markdown",
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/54",
             "htmlRelativePath": "道具集/充电宝少女捕获器.html",
@@ -303,6 +328,7 @@ window.DATA={
             "displayIndex": 100,
             "name": "100 - 现代女仆管理系统",
             "sourceRelativePath": "4 - 道具集/100 - 现代女仆管理系统.md",
+            "type": "Markdown",
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/39",
             "htmlRelativePath": "道具集/现代女仆管理系统.html",
@@ -313,6 +339,7 @@ window.DATA={
             "displayIndex": 150,
             "name": "150 - 载人风筝",
             "sourceRelativePath": "4 - 道具集/150 - 载人风筝.md",
+            "type": "Markdown",
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/58",
             "htmlRelativePath": "道具集/载人风筝.html",
@@ -323,6 +350,7 @@ window.DATA={
             "displayIndex": 200,
             "name": "200 - 强奸体验机",
             "sourceRelativePath": "4 - 道具集/200 - 强奸体验机.md",
+            "type": "Markdown",
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/63",
             "htmlRelativePath": "道具集/强奸体验机.html",
@@ -333,6 +361,7 @@ window.DATA={
             "displayIndex": 10086,
             "name": "10086 - 家庭 SM 套件",
             "sourceRelativePath": "4 - 道具集/10086 - 家庭 SM 套件.md",
+            "type": "Markdown",
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/60",
             "htmlRelativePath": "道具集/家庭-SM-套件.html",
@@ -354,14 +383,127 @@ window.DATA={
             "displayIndex": 1,
             "name": "1 - 人名请求",
             "sourceRelativePath": "5 - META/1 - 人名请求.md",
+            "type": "Markdown",
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/64",
             "htmlRelativePath": "META/人名请求.html",
             "chapterCharCount": 415
           }
         ],
-        "subFolders": [],
-        "folderCharCount": 415
+        "subFolders": [
+          {
+            "displayName": "WTCD",
+            "displayIndex": 1,
+            "name": "1 - WTCD",
+            "sourceRelativePath": "5 - META/1 - WTCD",
+            "isRoot": false,
+            "chapters": [
+              {
+                "displayName": "1. 概述",
+                "displayIndex": 1,
+                "name": "1 - 1. 概述",
+                "sourceRelativePath": "5 - META/1 - WTCD/1 - 1. 概述.md",
+                "type": "Markdown",
+                "isEarlyAccess": false,
+                "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/71",
+                "htmlRelativePath": "META/WTCD/1.-概述.html",
+                "chapterCharCount": 2915
+              },
+              {
+                "displayName": "2. 变量、表达式及语句",
+                "displayIndex": 2,
+                "name": "2 - 2. 变量、表达式及语句",
+                "sourceRelativePath": "5 - META/1 - WTCD/2 - 2. 变量、表达式及语句.md",
+                "type": "Markdown",
+                "isEarlyAccess": false,
+                "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/72",
+                "htmlRelativePath": "META/WTCD/2.-变量、表达式及语句.html",
+                "chapterCharCount": 5018
+              },
+              {
+                "displayName": "3. Section",
+                "displayIndex": 3,
+                "name": "3 - 3. Section",
+                "sourceRelativePath": "5 - META/1 - WTCD/3 - 3. Section.md",
+                "type": "Markdown",
+                "isEarlyAccess": false,
+                "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/73",
+                "htmlRelativePath": "META/WTCD/3.-Section.html",
+                "chapterCharCount": 5512
+              },
+              {
+                "displayName": "计划功能",
+                "displayIndex": 9999,
+                "name": "9999 - 计划功能",
+                "sourceRelativePath": "5 - META/1 - WTCD/9999 - 计划功能.md",
+                "type": "Markdown",
+                "isEarlyAccess": false,
+                "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/74",
+                "htmlRelativePath": "META/WTCD/计划功能.html",
+                "chapterCharCount": 1686
+              }
+            ],
+            "subFolders": [
+              {
+                "displayName": "例子",
+                "displayIndex": 1,
+                "name": "1 - 例子",
+                "sourceRelativePath": "5 - META/1 - WTCD/1 - 例子",
+                "isRoot": false,
+                "chapters": [
+                  {
+                    "displayName": "Hello World",
+                    "displayIndex": 1,
+                    "name": "1 - Hello World",
+                    "sourceRelativePath": "5 - META/1 - WTCD/1 - 例子/1 - Hello World.wtcd",
+                    "type": "WTCD",
+                    "isEarlyAccess": false,
+                    "commentsUrl": null,
+                    "htmlRelativePath": "META/WTCD/例子/Hello-World.html",
+                    "chapterCharCount": 11
+                  },
+                  {
+                    "displayName": "稍微复杂点的涉及粉红色遥控器的例子",
+                    "displayIndex": 2,
+                    "name": "2 - 稍微复杂点的涉及粉红色遥控器的例子",
+                    "sourceRelativePath": "5 - META/1 - WTCD/1 - 例子/2 - 稍微复杂点的涉及粉红色遥控器的例子.wtcd",
+                    "type": "WTCD",
+                    "isEarlyAccess": false,
+                    "commentsUrl": null,
+                    "htmlRelativePath": "META/WTCD/例子/稍微复杂点的涉及粉红色遥控器的例子.html",
+                    "chapterCharCount": 254
+                  },
+                  {
+                    "displayName": "Goto 入栈",
+                    "displayIndex": 3,
+                    "name": "3 - Goto 入栈",
+                    "sourceRelativePath": "5 - META/1 - WTCD/1 - 例子/3 - Goto 入栈.wtcd",
+                    "type": "WTCD",
+                    "isEarlyAccess": false,
+                    "commentsUrl": null,
+                    "htmlRelativePath": "META/WTCD/例子/Goto-入栈.html",
+                    "chapterCharCount": 12
+                  },
+                  {
+                    "displayName": "琳的玩具店",
+                    "displayIndex": 10,
+                    "name": "10 - 琳的玩具店",
+                    "sourceRelativePath": "5 - META/1 - WTCD/1 - 例子/10 - 琳的玩具店.wtcd",
+                    "type": "WTCD",
+                    "isEarlyAccess": false,
+                    "commentsUrl": null,
+                    "htmlRelativePath": "META/WTCD/例子/琳的玩具店.html",
+                    "chapterCharCount": 2992
+                  }
+                ],
+                "subFolders": [],
+                "folderCharCount": 3269
+              }
+            ],
+            "folderCharCount": 18400
+          }
+        ],
+        "folderCharCount": 18815
       },
       {
         "displayName": "杂项",
@@ -375,6 +517,7 @@ window.DATA={
             "displayIndex": 1,
             "name": "1 - 业余女装照欣赏指南",
             "sourceRelativePath": "10 - 杂项/1 - 业余女装照欣赏指南.md",
+            "type": "Markdown",
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/24",
             "htmlRelativePath": "杂项/业余女装照欣赏指南.html",
@@ -385,26 +528,26 @@ window.DATA={
         "folderCharCount": 1361
       }
     ],
-    "folderCharCount": 124180
+    "folderCharCount": 142580
   },
-  "charsCount": 124180,
-  "paragraphsCount": 2538,
+  "charsCount": 142580,
+  "paragraphsCount": 2781,
   "keywordsCount": [
     [
       "高潮",
-      329
+      339
     ],
     [
       "按摩棒",
-      182
+      194
     ],
     [
       "贞操带",
-      137
+      156
     ],
     [
       "陈志鹏",
-      53
+      57
     ],
     [
       "陈变态",
@@ -459,5 +602,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "292"
+  "buildNumber": "296"
 };

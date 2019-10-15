@@ -1,0 +1,217 @@
+<h1>3. Section</h1>
+<h2>3.1 概述</h2>
+<p>每个 WTCD 文档都是由若干个 Section 组成的。本章节将会介绍如何定义 section 和互相连接 section。</p>
+<p>每一个 Section 都由一个<strong>逻辑块</strong>和任意自然数个<strong>内容块</strong>组成。</p>
+<p>比如说，在上一章节给出的例子里就有以下 Sections：</p>
+<ul>
+<li><code>start</code></li>
+<li><code>press</code></li>
+<li><code>doNotPress</code></li>
+<li><code>walkHome</code></li>
+<li><code>czpClimax</code></li>
+<li><code>czpGotoGrandmasHouse</code></li>
+</ul>
+<p>这些 Sections 被连接在一起形成如下结构：</p>
+<p><img src="chapters/META/WTCD/sectionDiagram.svg" alt=""></p>
+<h2>3.2 Section 逻辑</h2>
+<p>若要创建一个 Section，<strong>逻辑块</strong>是必不可少的。<strong>逻辑块</strong>决定了当运行到这个 Sections 时在输出正文内容前和输出正文内容后需要做什么。所有的<strong>逻辑块</strong>定义都必须在所有<strong>内容块</strong>之前。</p>
+<h3>3.2.1 逻辑块的基本结构</h3>
+<p>Section 的定义使用如下结构：</p>
+<pre><code class="language-wtcd">section &lt;Section 名字&gt; [先行表达式] then &lt;后发表达式&gt;
+</code></pre>
+<p>举个例子，给出如下定义：</p>
+<pre><code class="language-wtcd">section example {
+  a += 1
+} then {
+  a += 2
+}
+</code></pre>
+<p>其中 Section 名字是 <code>example</code>。其先行表达式为 <code>{ a += 1 }</code>，后发表达式为 <code>{ a += 2 }</code>。也就是说，当需要进入 <code>example</code> 这个 section 时，WTCD 解释器会:</p>
+<ol>
+<li>对 <code>{ a += 1 }</code> 求值。这个过程会让变量 a 的值加 1。</li>
+<li>根据<strong>内容块</strong>的定义输出。（见 3.3）</li>
+<li>对 <code>{ a += 2 }</code> 求值。这个过程会让变量 a 的值加 2。</li>
+<li>根据 <code>{ a += 2 }</code> 的返回结果决定接下来怎么做。但是因为 <code>{ a += 2 }</code> 没有指定返回值，那么就会采用默认返回值 <code>null</code>。在这里，若后发表达式返回值为 <code>null</code>，WTCD 就会什么也不做，如果此时 Section 栈（见 3.2.3）为空的话，就会结束运行。</li>
+</ol>
+<p>先行表达式是可选的，如果不提供先行表达式，那么就意味着在需要执行先行表达式的时候，什么也不做。</p>
+<h3>3.2.2 逻辑块的互相连接</h3>
+<p>WTCD 永远从第一个定义的 Section 开始运行。</p>
+<p>WTCD 会根据每一个逻辑块的后发表达式运算结果来决定需要做什么。后发表达式的返回值必须是 <code>action</code>（见 3.2.2.1），<code>selection</code>（见 3.2.2.2），或者 <code>null</code>（见 3.2.2.1.2）。如果类型是 <code>action</code>，那么这个 <code>action</code> 就会被执行。如果类型是 <code>selection</code>，那么 WTCD 就会让用户做出选择，然后执行用户选择相对应的 <code>action</code>。如果是 <code>null</code>，则会什么也不做。</p>
+<h4>3.2.2.1 Action</h4>
+<p>Action 指的是可以立刻完成的操作。目前 WTCD 支持 2 种 action：<code>goto</code> 和 <code>exit</code>。</p>
+<h5>3.2.2.1.1 Exit</h5>
+<p>因为 <code>exit</code> 比较简单，那么先介绍 <code>exit</code>。</p>
+<p><code>exit</code> 被执行时，会立刻终止 WTCD 的运行。举个例子：</p>
+<pre><code class="language-wtcd">section test then exit
+</code></pre>
+<p>在这个例子中，无论因为什么原因进入 <code>section test</code> 以后，WTCD 都会停止运行。</p>
+<h5>3.2.2.1.2 Goto</h5>
+<p>通常来说 <code>goto</code> 也不复杂。因为当 <code>goto</code> 后面提供一个 Section 名的时候，执行 <code>goto</code> 的作用基本就是跳转到指定的 section：</p>
+<pre><code class="language-wtcd">section a then goto b
+section b then exit
+</code></pre>
+<p>在这个例子中，当进入并执行 <code>section a</code> 之后，WTCD 会自动跳转到 <code>section b</code>。因为 <code>section b</code> 的 <code>then</code> 后面跟的是 <code>exit</code>，所以 <code>section b</code> 执行后就会停止运行。</p>
+<p>然而，复杂的是，<code>goto</code> 允许在后面提供多个 Section。<code>goto</code> 严格来说应该被理解为“将这些 Sections 以相反顺序入栈”。或者换句话说：“依次执行这几个 Section”。现在举个提供多个 Section 的 <code>goto</code> 的例子：</p>
+<pre><code class="language-wtcd">section main then goto [ a1 b1 ]
+
+section a1 then goto a2
+section a2 then null
+
+section b1 then goto b2
+section b2 then null
+</code></pre>
+<p><a href="#META/WTCD/%E4%BE%8B%E5%AD%90/Goto-%E5%85%A5%E6%A0%88.html">执行效果</a></p>
+<p>首先需要先了解，如果 <code>then</code> 之后的表达式返回的是 <code>null</code>，那么就代表什么也不做。</p>
+<p>在上述例子中，可以看到各个 Section 的执行顺序为：<code>main -&gt; a1 -&gt; a2 -&gt; b1 -&gt; b2</code>。下面给出原因：</p>
+<ol>
+<li>WTCD 从第一个 Section 开始运行，所以执行 <code>main</code>。</li>
+<li><code>main</code> 的后发表达式返回 <code>goto [ a1 b1 ]</code>，所以入栈 <code>b1</code> 和 <code>a1</code>。此时栈的状态为：<code>[ b1 a1 ]</code>。</li>
+<li>从栈中取出最后一项，是 <code>a1</code>，因此运行 <code>a1</code>。此时栈的状态为：<code>[ b1 ]</code>。</li>
+<li><code>a1</code> 的返回值是 <code>goto a2</code>，因此入栈 <code>a2</code>。此时栈的状态为：<code>[ b1 a2 ]</code>。</li>
+<li>从栈中取出最后一项，是 <code>a2</code>，因此运行 <code>a2</code>。此时栈的状态为：<code>[ b1 ]</code>。</li>
+<li><code>a2</code> 的返回值是 <code>null</code>，因此什么也不做。此时栈的状态为：<code>[ b1 ]</code>。</li>
+<li>从栈中取出最后一项，是 <code>b1</code>，因此运行 <code>b1</code>。此时栈的状态为：<code>[ ]</code>。</li>
+<li><code>b1</code> 的返回值是 <code>goto b2</code>，因此入栈 <code>b2</code>。此时栈的状态为：<code>[ b2 ]</code>。</li>
+<li>从栈中取出最后一项，是 <code>b2</code>，因此运行 <code>b2</code>。此时栈的状态为：<code>[ ]</code>。</li>
+<li><code>b2</code> 的返回值是 <code>null</code>，因此什么也不做。此时栈的状态为：<code>[ ]</code>。</li>
+<li>栈空，停止运行。</li>
+</ol>
+<p>或者，另一个解释方式是，<code>goto</code> 在 WTCD 里相当于是“函数调用”。<code>goto a1</code> 相当于是调用“函数” <code>a1</code>。然而，由于所有的 <code>goto</code> 都会在 Section 的最后执行，因此 WTCD 可以在入栈目标函数前出栈，相当于是强制进行了尾递归优化。</p>
+<p>如果还是不能理解，这边有一个 JavaScript 的类比函数你可以参考下。</p>
+<pre><code class="language-javascript">function main() {
+  console.info('main');
+  a1();
+  b1();
+}
+function a1() {
+  console.info('a1');
+  a2();
+}
+function a2() {
+  console.info('a2');
+}
+function b1() {
+  console.info('b1')
+  b2();
+}
+function b2() {
+  console.info('b2');
+}
+main();
+</code></pre>
+<h4>3.2.2.2 Selection</h4>
+<p>除了自动执行固定的 Action 外，WTCD 允许在每一个 Section 后暂停运行，并要求由用户做出选择。若要等待用户作出选择，就需要在 <code>then</code> 后提供一个 Selection。</p>
+<h5>3.2.2.2.1 创建 Selection 和 Choice</h5>
+<p>若要创建一个 Selection，则需要使用 <code>selection</code> 关键词和 <code>choice</code> 关键词。</p>
+<p>其中，<code>selection</code> 使用如下格式：</p>
+<pre><code class="language-wtcd">selection &lt;选项列表&gt;
+</code></pre>
+<p><code>choice</code> 用于创建一个选项。若要使用则需要使用如下格式：</p>
+<pre><code class="language-wtcd">choice &lt;选项显示文本&gt; &lt;被选择后执行的 Action&gt;
+</code></pre>
+<p>例如：</p>
+<pre><code class="language-wtcd">section start then selection [
+  choice &quot;去 A&quot; then goto a
+  choice &quot;去 B&quot; then goto b
+]
+section a then exit
+section b then exit
+</code></pre>
+<p>在上述例子中，WTCD 会先执行 <code>start</code>。随后因为 <code>then</code> 之后遇到了 <code>selection</code>，脚本会停止运行，并输出两个选项供用户选择。若用户选择了“去 A”，则 Action <code>goto a</code> 会被执行，因此会跳转到 <code>section a</code>。相反，若用户选择了“去 B”，则 Action <code>goto b</code> 会被执行，因此会跳转到 <code>section b</code>。</p>
+<h5>3.2.2.2.2 关于使用 <code>null</code></h5>
+<p>在 Selection 的选项列表里面，可以提供 <code>null</code>。所有这些 <code>null</code> 都会被忽略。举个例子：</p>
+<pre><code class="language-wtcd">section main then selection [
+  null
+  choice &quot;A&quot; goto a
+  null
+  choice &quot;B&quot; goto b
+  null
+]
+</code></pre>
+<p>和</p>
+<pre><code class="language-wtcd">section main then selection [
+  choice &quot;A&quot; goto a
+  choice &quot;B&quot; goto b
+]
+</code></pre>
+<p>是等效的。</p>
+<p>至于这个特性有什么用，请看 3.2.2.3。</p>
+<p>此外，<strong>需要注意区分的是</strong>，每一个 Choice 的 Action 也可以是 <code>null</code>。一旦一个 Choice 的 Action 是 <code>null</code>，那么这个按钮就是不可选的按钮。请看下述例子：</p>
+<pre><code class="language-wtcd">section main then selection [
+  choice &quot;Choice A&quot; goto a
+  choice &quot;Choice B&quot; null // 这个按钮连点都点不了
+]
+</code></pre>
+<h4>3.2.2.3 Action，Choice 和 Selection 作为值</h4>
+<p>这里需要注意的是，Action，Choice，和 Selection 都是可以存储的值。它们各自的类型分别是：<code>action</code>，<code>choice</code>，和 <code>selection</code>。</p>
+<p>举个例子：</p>
+<pre><code class="language-wtcd">declare [
+  // 定义一个存储 Action 的变量 someAction 并初始化为 goto b
+  action someAction = goto b
+
+  // 定义一个存储 Choice 的变量 someChoice1，其被选择后使用的 Action 用变量表示
+  choice someChoice1 = choice &quot;choice 1&quot; someAction 
+
+  // 定义一个存储字符串的变量 someString
+  string someString = &quot;Some text&quot; 
+
+  // 定义一个存储 Choice 的变量 someChoice2，choice 的显示文本使用一个涉及之前定义的字符串变量的表达式
+  choice someChoice2 = choice someString + &quot; wow!&quot; exit
+
+  // 定义一个存储 Selection 的变量 someSelection，它的选项由之前的变量定义
+  selection someSelection = selection [ someChoice1 someChoice2 ]
+]
+
+// 定义一个 section 的 then 使用变量 someSelection
+section main then someSelection
+</code></pre>
+<p>因为其实说到底 <code>action</code>，<code>choice</code>，或者 <code>selection</code> 都只不过是和 <code>number</code> 或是 <code>boolean</code> 一样的值，所以它们也可以被用在表达式里。</p>
+<p>举个例子，你可以使用逻辑选择操作符来选择性隐藏一个选项：</p>
+<pre><code class="language-wtcd">section main then selection [
+  condition ? choice &quot;text&quot; goto a : null
+]
+</code></pre>
+<p>上述例子中，选项“text”只有在 <code>condition</code> 为 <code>true</code> 的时候才会显示。</p>
+<p>同时，你也可以选择性禁用一个选项：</p>
+<pre><code class="language-wtcd">section main then selection [
+  choice &quot;text&quot; condition ? goto a : null
+]
+</code></pre>
+<p>上述例子中，选项“text”都会显示，但是只有在 <code>condition</code> 为 <code>true</code> 的时候才可以被选择。</p>
+<h2>3.3 Section 内容</h2>
+<p>定义 Section 的内容相比逻辑而言就简单多了 。Section 的内容由<strong>内容块</strong>定义。所有的<strong>内容块</strong>都必须在所有<strong>逻辑块</strong>以下。</p>
+<h3>3.3.1 基本格式</h3>
+<p>通常来说，定义一个 Section 的固定输出内容非常简单：</p>
+<pre><code class="language-wtcd">section a then b
+section b then exit
+
+---&lt;&lt;&lt; a &gt;&gt;&gt;---
+# Title
+Hello A
+
+---&lt;&lt;&lt; b &gt;&gt;&gt;---
+# Another Title
+Hello B
+</code></pre>
+<p>可以看到，在 <code>---&lt;&lt;&lt; a &gt;&gt;&gt;---</code> 以下，<code>---&lt;&lt;&lt; b &gt;&gt;&gt;---</code> 以上的就是运行 <code>a</code> 时会输出的内容。同时，在 <code>---&lt;&lt;&lt; b &gt;&gt;&gt;---</code> 以下的则是在运行 <code>b</code> 时输出的内容。需要注意的是，内容支持 Markdown，因此可以输出粗体，链接，图片等等。</p>
+<h3>3.3.2 多个内容块</h3>
+<p>其实每个 Section 可以对应零到无数个内容块。每一个内容块可以定义“边界”，即在第几次访问的时候这个内容块可能会出现。</p>
+<p>若要定义一个边界，则需要在内容块的 Section 名后写上  <code>@&lt;边界&gt;</code>。其中边界可以是：</p>
+<ul>
+<li>一个数字。例如 <code>main@3</code> 代表只有在第三次进入 <code>main</code> 时，这个内容块才会被使用。</li>
+<li>一个数字加短横。例如 <code>main@3-</code> 代表只有在第三次及以后进入 <code>main</code> 时，这个内容块才会被使用。</li>
+<li>短横加一个数字。例如 <code>main@-3</code> 代表只有在第三次及以前进入 <code>main</code> 时，这个内容块才会被使用。</li>
+<li>一个数字，一个短横，再加一个数字。例如 <code>main@5-10</code> 代表只有在第五次到第十次进入 <code>main</code> 时，这个内容块才会被使用。</li>
+</ul>
+<p>如果符合条件的内容块只有一个，那么这个内容块就会被选择。</p>
+<p>如果没有符合条件的内容块，则不会输出任何内容。</p>
+<p>如果有超过一个的符合条件的内容块，则会随机选择一个作为输出的内容块。</p>
+<h3>3.3.3 插值</h3>
+<p>WTCD 的内容块允许插入变量。插入格式为：<code>&lt;$ 变量名 $&gt;</code>。比如：</p>
+<pre><code class="language-wtcd">declare number money = 100
+section main then exit
+
+---&lt;&lt;&lt; main &gt;&gt;&gt;---
+你有 &lt;$ money $&gt; 元钱。
+</code></pre>
+<p>需要注意的是，插值仅允许使用全局变量。并不允许使用表达式或者局部变量。</p>
