@@ -31,7 +31,7 @@
 - kookxiang
 - 櫻川 紗良
 - Skimige
-- [TenmaHiltonWhat](https://tenmahw.com)
+- [TExL](http://texas.penguin-logistics.cn/)（TenmaHiltonWhat）
 - 路人乙
 - [pokemonchw](https://github.com/pokemonchw)
 - [帕蒂卡](https://github.com/Patika-ailemait)
