@@ -1,0 +1,357 @@
+WTCD 1.0
+declare [
+  number money = 100
+  number arousal = 0
+  number sensitivity = 30
+  number aphrodisiac = 0
+  boolean vibrator = false
+  boolean vaginalDildo = false
+  boolean analDildo = false
+  boolean chastityBelt = false
+  number orgasm = 0
+]
+
+section start then goto shop
+
+section shop then selection [
+  // 春药可以无限购买 —— 只要有钱
+  choice "购买春药（20 元）" money >= 20 ? goto purchaseAphrodisiac : null
+  vibrator ? null
+    : choice "购买跳蛋（15 元）" (!chastityBelt && money >= 15) ? goto purchaseVibrator : null
+  vaginalDildo ? null
+    : choice "购买阴道按摩棒（25 元）" (!chastityBelt && money >= 25) ? goto purchaseVaginalDildo : null
+  analDildo ? null
+    : choice "购买肛门按摩棒（20 元）" (!chastityBelt && money >= 20) ? goto purchaseAnalDildo : null
+  chastityBelt ? null
+    : choice "购买贞操带（40 元）" money >= 40 ? goto purchaseChastityBelt : null
+  choice "离开商店" goto exitShop
+]
+
+section purchaseAphrodisiac {
+  money -= 20
+  aphrodisiac += 1
+  sensitivity += (aphrodisiac == 5)
+    ? 300 // 第五瓶春药是内服的。
+    : 10
+} then goto shop
+
+section purchaseVibrator {
+  money -= 15
+  vibrator = true
+} then goto shop
+
+section purchaseVaginalDildo {
+  money -= 25
+  vaginalDildo = true
+} then goto shop
+
+section purchaseAnalDildo {
+  money -= 20
+  analDildo = true
+} then goto shop
+
+section purchaseChastityBelt {
+  money -= 40
+  chastityBelt = true
+} then goto shop
+
+section toysProcCheck then goto [
+  vibratorProcCheck
+  vaginalDildoProcCheck
+  analDildoProcCheck
+]
+section vibratorProcCheck then vibrator ? goto vibratorProc : null
+section vibratorProc {
+  arousal += sensitivity * 10
+} then goto orgasmCheck
+section vaginalDildoProcCheck then vaginalDildo ? goto vaginalDildoProc : null
+section vaginalDildoProc {
+  arousal += sensitivity * 20
+} then goto orgasmCheck
+section analDildoProcCheck then analDildo ? goto analDildoProc : null
+section analDildoProc {
+  arousal += sensitivity * 15
+} then goto orgasmCheck
+section orgasmCheck then (arousal >= 1000) ? goto orgasm : null
+section orgasm {
+  arousal -= 1000
+  orgasm += 1
+} then goto orgasmCheck // 检查是否能再高潮一次
+
+section exitShop then (!vibrator && !vaginalDildo && !analDildo)
+  ? chastityBelt
+    ? (aphrodisiac == 0)
+      ? goto beltedWithNothing
+      : goto beltedAphrodisiacOnly
+    : (aphrodisiac == 0)
+      ? goto exitWithNothing
+      : goto unbeltedAphrodisiacOnly
+  : chastityBelt
+    ? goto belted
+    : goto unbelted
+
+declare selection confirmKeepWalking = selection [
+  choice "继续向前走" goto []
+]
+
+section exitWithNothing then goto end
+section unbeltedAphrodisiacOnly {
+  orgasm += sensitivity ~/ 20 
+} then goto end
+section beltedWithNothing then goto begRin
+section beltedAphrodisiacOnly then goto begRin
+section belted then goto [ toysProcCheck beltedWalk toysProcCheck beltedWalk toysProcCheck begRin ]
+section unbelted then goto [ toysProcCheck unbeltedWalk toysProcCheck takeOff ]
+section beltedWalk then confirmKeepWalking
+section unbeltedWalk then confirmKeepWalking
+section takeOff then goto end
+section begRin {
+  orgasm *= 127 // 这个月可高潮了不少呢~
+} then goto end
+section end then exit
+
+---<<< start >>>---
+# WTCD 功能演示 —— 琳的玩具店
+
+---<<< shop@1 >>>---
+你走进了琳的玩具店。货架上摆满了各式各样的玩具。你身上还有 <$ money $> 元钱。你想要买什么呢？
+
+---<<< shop@2- >>>---
+你继续在琳的玩具店内闲逛着。你身上还有 <$ money $> 元钱。你想要买什么呢？
+
+---<<< shop@2- >>>---
+看着包里剩下的 <$ money $> 元钱，你继续在琳的玩具店内走着。买点什么呢？
+
+---<<< purchaseAphrodisiac@1 >>>---
+你忐忑不安地从货架上取下了一个装着紫色液体的小瓶子。将其交给店员并支付了 20 元后，你迫不及待地走进了卫生间，将紫色的液体均匀地涂抹在了你的阴蒂上。顿时，一股清凉的瘙痒感传便了全身。
+
+> 你的敏感度上升了
+
+---<<< purchaseAphrodisiac@2 >>>---
+显然，一瓶春药并不能满足你饥渴的身体。你又从货架上取下了一瓶春药，付钱后将其涂抹在了乳头上。你那早已挺立的乳头顿时变得更硬了。
+
+> 你的敏感度上升了
+
+---<<< purchaseAphrodisiac@3 >>>---
+你买下了第 3 瓶春药，并将其抹在了手指上，并缓缓插入了下体。一种火辣辣的感觉从你的体内传出。
+
+> 你的敏感度上升了
+
+---<<< purchaseAphrodisiac@4 >>>---
+然而你还是没有满足，你又买了一瓶春药。你熟练地打开了瓶盖，将春药涂在了自己微微收缩的菊花上。
+
+> 你的敏感度上升了
+
+---<<< purchaseAphrodisiac@5 >>>---
+早已因为春药失去理性的你，用最后剩下的钱买了第 5 瓶春药。尽管瓶子上明确写着外敷使用，被快感冲昏了头脑的你拧开了盖子，一口气将瓶子内的紫色液体喝了个精光。
+
+刹那间，一股火热传遍了全身。尽管没有任何外界刺激，你情不自禁地叫出了声。
+
+> 你的敏感度显著上升了
+
+---<<< purchaseVibrator >>>---
+你花了 15 元购买了货架上的粉红色跳蛋。你迫不及待地打开了跳蛋的塑料包装，然后将跳蛋安装在了自己的阴蒂上。
+
+> 跳蛋已安装
+
+---<<< purchaseVaginalDildo >>>---
+你花了 25 元买下了货架上紫色的阴道按摩棒。你打开了它的包装然后轻轻地将它插入了你那早已微微湿润的阴道内。
+
+> 阴道按摩棒已安装
+
+---<<< purchaseAnalDildo >>>---
+你花了 20 元买入了货架上粉红色的肛门按摩棒。你从包装中取出了按摩棒，然后对准了你早已为了这一时刻清洗得干干净净的肛门，然后缓缓地插了进去。
+
+> 肛门按摩棒已安装
+
+---<<< purchaseChastityBelt >>>---
+突然，一个奇怪的念头划过你的心头 —— 如果用贞操带把自己锁起来会怎样？
+
+你伸手从货架上拿下了一条银白色的钢制贞操带。支付了 40 元后，你迫不及待地脱下了内裤，然后将贞操带牢牢地锁在了身上。
+
+只不过你这时候才发现，这条贞操带上并没有配钥匙。
+
+然而为时已晚 —— 你已经无法在你的下体安装任何东西了。
+
+> 贞操带已安装
+
+---<<< exitShop >>>---
+你走出了琳的玩具店，朝家中走去。
+
+---<<< toysProcCheck@1 >>>---
+突然，你感觉到你下体的玩具开始活动了起来。
+
+---<<< toysProcCheck@2 >>>---
+你下体的玩具继续活动着。
+
+---<<< toysProcCheck@3 >>>---
+你努力地想要阻止下体的玩具，但是它们依然无情地活动着。
+
+---<<< vibratorProc@1 >>>---
+你阴蒂上的跳蛋快速震动着，让你娇喘连连。
+
+---<<< vibratorProc@2 >>>---
+阴蒂上的跳蛋显然是增加了功率，越来越强的快感传遍了你的全身。
+
+---<<< vibratorProc@3 >>>---
+显然，阴蒂上的跳蛋丝毫没有放过你的意思。毫无止息的抖动猛烈地冲击着你的身体。
+
+---<<< vaginalDildoProc@1 >>>---
+体内的阴道按摩棒震动了起来，你的阴道开始情不自禁地随着震动而收缩。
+
+---<<< vaginalDildoProc@2 >>>---
+这时，你感觉到阴道内的按摩棒开始缓缓地转动起来。一种前所未有的快感涌上心头。随着按摩棒的旋转，你感觉到体内的液体慢慢的顺着按摩棒流了出来。
+
+---<<< vaginalDildoProc@3 >>>---
+阴道里的按摩棒旋转速度越来越快。快感一阵一阵地袭来。
+
+---<<< analDildoProc@1 >>>---
+这时，肛门按摩棒开始活动了起来，你感觉有一个什么东西在你的肛门里搅动着，一种说不出来的奇特感觉穿过了你的脑中。
+
+---<<< analDildoProc@2 >>>---
+肛门内的异物搅动幅度越来越大。尽管伴有疼痛，但是你仍然忍不住发出了可爱的声音。
+
+---<<< analDildoProc@3 >>>---
+肛门中搅动的按摩棒突然开始加速。对着突如其来的刺激，你不禁捂着肚子瘫倒在了地上。过了许久才能抵着刺激缓缓站起身来。
+
+---<<< orgasm@1 >>>---
+你终于抵不住刺激，扶着墙，满脸通红地迎来了第一次高潮。
+
+---<<< orgasm@2- >>>---
+快感在你的身体内堆积着。你感到你的整个身体在朝着某个极点缓缓移动。终于，随着一声早已预料到的娇喘，你再一次达到了高潮。
+
+---<<< orgasm@2- >>>---
+突然，爱液从你的下体喷涌而出。你颤抖着意识到自己又一次达到了高潮。
+
+---<<< orgasm@2- >>>---
+随着快感的堆积，你不禁紧紧抓住了身旁的栏杆，再一次达到了高潮。
+
+---<<< orgasm@2- >>>---
+“要去了... 要去了...”
+
+你一边抵御着快感一边达到了高潮...
+
+---<<< orgasm@2- >>>---
+"真的... 受不了了啊..."
+
+快感冲击着你的全身，直至你达到了高潮。
+
+---<<< orgasm@2- >>>---
+随着爱液粘稠液体顺着你的大腿流下，你再次达到了高潮。
+
+---<<< orgasm@2- >>>---
+“快停下...”
+
+你一边自言自语，一边达到了高潮。
+
+---<<< exitWithNothing >>>---
+好操作，你什么也没买就走出了琳的玩具店。
+
+---<<< unbeltedAphrodisiacOnly >>>---
+很快，春药就开始发挥作用。极强的性欲朝你涌来。
+
+你简单地确认了一下周围没有人后，你把手伸进了自己的内裤开始自慰了起来。
+
+“嗯、嗯、、啊——”
+
+伴随着一路的娇喘和爱液留下的痕迹，你总算是走到了家。
+
+---<<< beltedWithNothing >>>---
+你摸了摸那牢牢固定在你的腰上的金属贞操带，一边考虑着如何上厕所之类的，一边叹了口气，然后继续向前走去。
+
+然而，因为有专门设计的如厕孔，排泄出乎意料地完全不是问题。只不过，随着时间的推移，你的性欲慢慢提升了上来。
+
+12 天后...
+
+你趴在书桌上，满脑子都是色情内容。你用手轻轻地抚摸着贞操带上带锁的微微沾了少女体液的铁片，一边叹了口气。
+
+---<<< beltedAphrodisiacOnly >>>---
+因为春药的关系，你的性欲大大提升。还没走出几步，你就开始情不自禁地摸自己贞操带上那上锁的铁片。
+
+“呼... 这贞操带...”
+
+你感觉身体越来越热。一股强烈的自慰的愿望涌上心头。
+
+在自慰欲望的驱使下，你开始拉扯贞操带。然而，任凭你如何拉扯，贞操带牢牢地固定在你的腰上纹丝不动。
+
+你的头脑越来越热，性欲使你慢慢失去平衡...
+
+"啊... 这该死的东西..."
+
+你轻声咒骂着，又走了几步。然而，光是贞操带上的金属和你的阴蒂稍稍摩擦，你就感到快感如电流般划过全身。
+
+---<<< belted >>>---
+你清楚地感受到下体的玩具被那坚固的金属贞操带固定在你的身上。光是站着，你就感到贞操带压在你皮肤上带来的拘束感。你不自然地走了几步，就感受到了下体的玩具在你的私密部位上的微微位移。
+
+
+---<<< unbelted >>>---
+你的内裤将下体的玩具仅仅地固定在了体内。你不自然地走了几步，就感受到了下体的玩具在你的私密部位上的微微位移。
+
+---<<< beltedWalk@1 >>>---
+忍受着下体的快感，你艰难地向前走着。爱液从贞操带的缝隙中渗出，在你身后留下了一条水渍。
+
+---<<< beltedWalk@2 >>>---
+“受不了了...”
+
+这样想着，你的手情不自禁地去解锁在身上的贞操带。然而，贞操带牢牢地锁在你的腰上，任凭你扯动它都纹丝不动。
+
+---<<< unbeltedWalk >>>---
+忍受着下体的快感，你艰难地向前走着。爱液从你的内裤中渗出，在你身后留下了一条水渍。
+
+---<<< takeOff >>>---
+你终于受不了了。你跑进路边的一个公共卫生间，然后将玩具全部取了下来然后放进了包里。
+
+“呼... 总算是结束了...”
+
+你瘫坐在卫生间的地上，一边感受着高潮的余温，一边无力地翻起了手机。
+
+---<<< begRin >>>---
+“不行不行... 这样下去我要死的... 这玩意不可能要戴一辈子吧... 算了... 我去求琳解开吧...”
+
+这样想着，你起身朝琳的玩具店走去。
+
+好不容易来到了琳的玩具店，你刚进门，就发现琳似乎早已预料到你会回来般地站在柜台后看着你。
+
+“琳姐帮我解开吧...”
+
+你开口便说。
+
+“别这么急嘛、”
+
+说着，琳走到了你的身边，用手指敲了敲你的贞操带。
+
+“求、求你了...”
+
+“可是，我也没有钥匙啊...”
+
+“什么？你也没有钥匙？”
+
+“是啊... 谁让你穿上之前不检查有没有钥匙呢？而且这个贞操带的钥匙是特制的，一般的锁匠都打不开呢...”
+
+“啊？那、那怎么办？”
+
+“办法还是有的，我可以联系制作这个锁的人，只不过这样会很贵呢。”
+
+“欸？可是我已经没多少钱了呢...”
+
+“这简单，你看我有一个足疗馆，你来帮我做兼职吧。你做一个月的钱就够了呢。”
+
+“欸？”
+
+“不过呢，为了防止你跑掉，我只在你全部做完以后才帮你开锁噢~”
+
+“欸？！！我要戴这玩意戴一个月？”
+
+“是的呢~”
+
+这么说着，琳笑着递过来一份合同。
+
+“在这签字就好了。”
+
+没有别的选择，你拿起笔签了字。因为并没有仔细看合同，你只是记得合同的标题上写着 WT-309。
+
+---<<< end >>>---
+# 剧终
+《WTCD 功能演示 —— 琳的玩具店》到此结束。
+
+你总计高潮了 <$ orgasm $> 次。

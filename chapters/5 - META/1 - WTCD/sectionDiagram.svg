@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/PR-SVG-20010719/DTD/svg10.dtd">
+<svg width="27cm" height="7cm" viewBox="306 411 531 133" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <g>
+    <rect style="fill: #ffffff" x="308" y="463" width="47.6" height="38"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="308" y="463" width="47.6" height="38"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="331.8" y="486.8">
+      <tspan x="331.8" y="486.8">start</tspan>
+    </text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="419.074" y="417" width="51.85" height="38"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="419.074" y="417" width="51.85" height="38"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="444.999" y="440.8">
+      <tspan x="444.999" y="440.8">press</tspan>
+    </text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="417.176" y="505" width="85.65" height="38"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="417.176" y="505" width="85.65" height="38"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="460.001" y="528.8">
+      <tspan x="460.001" y="528.8">doNotPress</tspan>
+    </text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="540.674" y="458" width="80.65" height="38"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="540.674" y="458" width="80.65" height="38"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="580.999" y="481.8">
+      <tspan x="580.999" y="481.8">walkHome</tspan>
+    </text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="678.95" y="412" width="78.1" height="38"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="678.95" y="412" width="78.1" height="38"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="718" y="435.8">
+      <tspan x="718" y="435.8">czpClimax</tspan>
+    </text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="677.05" y="505" width="159.9" height="38"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="677.05" y="505" width="159.9" height="38"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="757" y="528.8">
+      <tspan x="757" y="528.8">czpGotoGrandmasHouse</tspan>
+    </text>
+  </g>
+  <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="757" y="524">
+    <tspan x="757" y="524"></tspan>
+  </text>
+  <g>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 409.429,436.119 A 61.3144,61.3144 0 0 0 355.6,482"/>
+    <polygon style="fill: #000000" points="416.843,435.852 406.533,440.177 409.359,435.354 407.197,430.199 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="416.843,435.852 406.533,440.177 409.359,435.354 407.197,430.199 "/>
+  </g>
+  <g>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 355.6,482 A 73.9165,73.9165 0 0 0 407.591,522.692"/>
+    <polygon style="fill: #000000" points="414.945,523.843 404.62,528.13 407.464,523.318 405.321,518.155 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="414.945,523.843 404.62,528.13 407.464,523.318 405.321,518.155 "/>
+  </g>
+  <g>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 533.871,470.061 A 137.21,137.21 0 0 0 470.926,436"/>
+    <polygon style="fill: #000000" points="539.166,475.349 528.73,471.337 534.108,469.811 536.114,464.593 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="539.166,475.349 528.73,471.337 534.108,469.811 536.114,464.593 "/>
+  </g>
+  <g>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 532.963,482.894 A 107.12,107.12 0 0 0 502.826,524"/>
+    <polygon style="fill: #000000" points="538.838,478.276 533.479,488.089 532.679,482.556 527.773,479.877 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="538.838,478.276 533.479,488.089 532.679,482.556 527.773,479.877 "/>
+  </g>
+  <g>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 669.509,433.113 A 74.3817,74.3817 0 0 0 621.324,477"/>
+    <polygon style="fill: #000000" points="676.741,431.345 667.633,437.83 669.331,432.504 666.088,427.95 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="676.741,431.345 667.633,437.83 669.331,432.504 666.088,427.95 "/>
+  </g>
+  <g>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 621.324,477 A 52.6233,52.6233 0 0 0 667.44,523.741"/>
+    <polygon style="fill: #000000" points="674.819,524.144 665.162,529.778 667.334,524.628 664.517,519.799 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="674.819,524.144 665.162,529.778 667.334,524.628 664.517,519.799 "/>
+  </g>
+</svg>

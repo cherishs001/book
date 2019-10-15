@@ -20,7 +20,8 @@
     "interface-name": false,
     "no-shadowed-variable": false,
     "no-conditional-assignment": false,
-    "max-line-length": false
+    "max-line-length": false,
+    "no-bitwise": false
   },
   "rulesDirectory": []
 }

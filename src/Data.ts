@@ -5,7 +5,12 @@ export interface Node {
   sourceRelativePath: string;
 }
 
+export type ChapterType
+  = 'Markdown' // Markdown based static chapter
+  | 'WTCD';   // WTCD based interactive chapter
+
 export interface Chapter extends Node {
+  type: ChapterType;
   isEarlyAccess: boolean;
   commentsUrl: string | null;
   htmlRelativePath: string;

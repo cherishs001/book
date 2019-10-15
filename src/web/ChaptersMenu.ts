@@ -1,4 +1,4 @@
-import { Folder } from '../Data';
+import { ChapterType, Folder } from '../Data';
 import { loadChapter, loadChapterEvent } from './chapterControl';
 import { data } from './data';
 import { updateHistory } from './history';
@@ -19,6 +19,13 @@ loadChapterEvent.on(newChapterHtmlRelativePath => {
   attachLastReadLabelTo(chapterSelectionButtonsMap.get(newChapterHtmlRelativePath)!, newChapterHtmlRelativePath);
 });
 
+function getDecorationForChapterType(chapterType: ChapterType) {
+  switch (chapterType) {
+    case 'Markdown': return ItemDecoration.ICON_FILE;
+    case 'WTCD': return ItemDecoration.ICON_GAME;
+  }
+}
+
 export class ChaptersMenu extends Menu {
   public constructor(parent: Menu, folder?: Folder) {
     if (folder === undefined) {
@@ -30,7 +37,11 @@ export class ChaptersMenu extends Menu {
       handle.append(`[${shortNumber(subfolder.folderCharCount)}]`, 'char-count');
     }
     for (const chapter of folder.chapters) {
-      const handle = this.addItem(chapter.displayName, { small: true, button: true })
+      const handle = this.addItem(chapter.displayName, {
+        small: true,
+        button: true,
+        decoration: getDecorationForChapterType(chapter.type),
+      })
         .onClick(() => {
           loadChapter(chapter.htmlRelativePath);
           updateHistory(true);

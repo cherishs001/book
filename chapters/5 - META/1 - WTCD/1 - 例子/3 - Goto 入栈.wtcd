@@ -1,0 +1,23 @@
+WTCD 1.0
+section main then goto [ a1 b1 ]
+
+section a1 then goto a2
+section a2 then null
+
+section b1 then goto b2
+section b2 then null
+
+---<<< main >>>---
+# Main
+
+---<<< a1 >>>---
+# a1
+
+---<<< a2 >>>---
+# a2
+
+---<<< b1 >>>---
+# b1
+
+---<<< b2 >>>---
+# b2

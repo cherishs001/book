@@ -1,4 +1,4 @@
-import { debugLogging } from './settings';
+import { developerMode } from './settings';
 
 function simpleToString(value: string | number | boolean) {
   switch (typeof value) {
@@ -20,9 +20,27 @@ export class DebugLogger {
      + ')';
   }
   public log(...stuff: any) {
-    if (!debugLogging.getValue()) {
+    if (!developerMode.getValue()) {
       return;
     }
     console.info(this.prefix, ...stuff);
+  }
+  public info(...stuff: any) {
+    if (!developerMode.getValue()) {
+      return;
+    }
+    console.info(this.prefix, ...stuff);
+  }
+  public warn(...stuff: any) {
+    if (!developerMode.getValue()) {
+      return;
+    }
+    console.warn(this.prefix, ...stuff);
+  }
+  public error(...stuff: any) {
+    if (!developerMode.getValue()) {
+      return;
+    }
+    console.error(this.prefix, ...stuff);
   }
 }
