@@ -3,7 +3,7 @@ import { hideComments } from './commentsControl';
 import { id } from './DOM';
 import { ItemDecoration, ItemHandle, Menu } from './Menu';
 import { RectMode } from './RectMode';
-import { animation, BooleanSetting, charCount, debugLogging, earlyAccess, EnumSetting, fontFamily, gestureSwitchChapter, useComments, warning } from './settings';
+import { animation, BooleanSetting, charCount, developerMode, earlyAccess, EnumSetting, fontFamily, gestureSwitchChapter, useComments, warning } from './settings';
 import { stylePreviewArticle } from './stylePreviewArticle';
 
 export class EnumSettingMenu extends Menu {
@@ -42,7 +42,7 @@ export class SettingsMenu extends Menu {
     this.addBooleanSetting('手势切换章节（仅限手机）', gestureSwitchChapter);
     this.addEnumSetting('字体', fontFamily, true);
     this.addBooleanSetting('显示每个章节的字数', charCount);
-    this.addBooleanSetting('开发人员模式', debugLogging);
+    this.addBooleanSetting('开发人员模式', developerMode);
     this.addLink(new BlockMenu(this), true);
   }
   public addBooleanSetting(label: string, setting: BooleanSetting) {

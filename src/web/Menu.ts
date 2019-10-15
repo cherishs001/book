@@ -8,6 +8,8 @@ export enum ItemDecoration {
   ICON_FOLDER,
   ICON_LINK,
   ICON_EQUALIZER,
+  ICON_FILE,
+  ICON_GAME,
 }
 
 type ItemOptions = {
@@ -91,7 +93,7 @@ export class ItemHandle {
 
 export class Menu {
   private container: HTMLDivElement;
-  private active: boolean;
+  private active = false;
   private fullPath: Array<string>;
   private clearableElements: Array<HTMLElement> = [];
   private debugLogger: DebugLogger;
@@ -192,6 +194,11 @@ export class Menu {
         case ItemDecoration.ICON_EQUALIZER:
           $element.classList.add('icon', 'equalizer');
           break;
+        case ItemDecoration.ICON_FILE:
+          $element.classList.add('icon', 'file');
+          break;
+        case ItemDecoration.ICON_GAME:
+          $element.classList.add('icon', 'game');
       }
     }
     this.container.appendChild($element);

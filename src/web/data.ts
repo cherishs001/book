@@ -1,4 +1,4 @@
-import { Chapter, Data, Folder } from './../Data';
+import { Chapter, ChapterType, Data, Folder } from './../Data';
 export const data = (window as any).DATA as Data;
 
 export interface ChapterContext {
