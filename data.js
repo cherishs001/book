@@ -15,7 +15,7 @@ window.DATA={
         "isEarlyAccess": true,
         "commentsUrl": null,
         "htmlRelativePath": "出场人员名单.html",
-        "chapterCharCount": 821
+        "chapterCharCount": 999
       }
     ],
     "subFolders": [
@@ -211,11 +211,11 @@ window.DATA={
             "isEarlyAccess": true,
             "commentsUrl": null,
             "htmlRelativePath": "主线/第-16-章.html",
-            "chapterCharCount": 3431
+            "chapterCharCount": 3450
           }
         ],
         "subFolders": [],
-        "folderCharCount": 85969
+        "folderCharCount": 85988
       },
       {
         "displayName": "支线",
@@ -368,6 +368,17 @@ window.DATA={
             "chapterCharCount": 1171
           },
           {
+            "displayName": "使人快乐的 PS4",
+            "displayIndex": 10010,
+            "name": "10010 - 使人快乐的 PS4",
+            "sourceRelativePath": "4 - 道具集/10010 - 使人快乐的 PS4.md",
+            "type": "Markdown",
+            "isEarlyAccess": false,
+            "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/77",
+            "htmlRelativePath": "道具集/使人快乐的-PS4.html",
+            "chapterCharCount": 1006
+          },
+          {
             "displayName": "家庭 SM 套件",
             "displayIndex": 10086,
             "name": "10086 - 家庭 SM 套件",
@@ -380,7 +391,7 @@ window.DATA={
           }
         ],
         "subFolders": [],
-        "folderCharCount": 22991
+        "folderCharCount": 23997
       },
       {
         "displayName": "META",
@@ -539,14 +550,14 @@ window.DATA={
         "folderCharCount": 1361
       }
     ],
-    "folderCharCount": 146015
+    "folderCharCount": 147218
   },
-  "charsCount": 146015,
-  "paragraphsCount": 2887,
+  "charsCount": 147218,
+  "paragraphsCount": 2914,
   "keywordsCount": [
     [
       "高潮",
-      339
+      340
     ],
     [
       "按摩棒",
@@ -613,5 +624,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "300"
+  "buildNumber": "303"
 };
