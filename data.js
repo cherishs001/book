@@ -178,7 +178,7 @@ window.DATA={
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/20",
             "htmlRelativePath": "主线/第-13-章.html",
-            "chapterCharCount": 5909
+            "chapterCharCount": 5913
           },
           {
             "displayName": "第 14 章",
@@ -201,10 +201,21 @@ window.DATA={
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/55",
             "htmlRelativePath": "主线/第-15-章.html",
             "chapterCharCount": 6913
+          },
+          {
+            "displayName": "第 16 章",
+            "displayIndex": 16,
+            "name": "16",
+            "sourceRelativePath": "1 - 主线/16.md",
+            "type": "Markdown",
+            "isEarlyAccess": true,
+            "commentsUrl": null,
+            "htmlRelativePath": "主线/第-16-章.html",
+            "chapterCharCount": 3431
           }
         ],
         "subFolders": [],
-        "folderCharCount": 82534
+        "folderCharCount": 85969
       },
       {
         "displayName": "支线",
@@ -528,10 +539,10 @@ window.DATA={
         "folderCharCount": 1361
       }
     ],
-    "folderCharCount": 142580
+    "folderCharCount": 146015
   },
-  "charsCount": 142580,
-  "paragraphsCount": 2781,
+  "charsCount": 146015,
+  "paragraphsCount": 2887,
   "keywordsCount": [
     [
       "高潮",
@@ -543,7 +554,7 @@ window.DATA={
     ],
     [
       "贞操带",
-      156
+      157
     ],
     [
       "陈志鹏",
@@ -551,15 +562,15 @@ window.DATA={
     ],
     [
       "陈变态",
-      31
+      32
     ],
     [
       "按摩器",
-      25
+      26
     ],
     [
       "仙女棒",
-      24
+      25
     ],
     [
       "姓陈的",
@@ -602,5 +613,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "299"
+  "buildNumber": "300"
 };
