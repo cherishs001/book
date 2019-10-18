@@ -9,8 +9,12 @@ export enum ArrowKey {
 }
 
 export const arrowKeyPressEvent = new Event<ArrowKey>();
+export const escapeKeyPressEvent = new Event();
 document.addEventListener('keyup', event => {
   switch (event.keyCode) {
+    case 27:
+      escapeKeyPressEvent.emit();
+      break;
     case 37:
       arrowKeyPressEvent.emit(ArrowKey.LEFT);
       break;

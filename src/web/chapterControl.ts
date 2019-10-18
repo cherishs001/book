@@ -10,7 +10,7 @@ import { getTextNodes, id, selectNode } from './DOM';
 import { Event } from './Event';
 import { SwipeDirection, swipeEvent } from './gestures';
 import { updateHistory } from './history';
-import { ArrowKey, arrowKeyPressEvent } from './keyboard';
+import { ArrowKey, arrowKeyPressEvent, escapeKeyPressEvent } from './keyboard';
 import { loadingText } from './loadingText';
 import { WTCD_ERROR_COMPILE_TITLE, WTCD_ERROR_INTERNAL_DESC, WTCD_ERROR_INTERNAL_STACK_DESC, WTCD_ERROR_INTERNAL_STACK_TITLE, WTCD_ERROR_INTERNAL_TITLE, WTCD_ERROR_MESSAGE, WTCD_ERROR_RUNTIME_DESC, WTCD_ERROR_RUNTIME_TITLE } from './messages';
 import { RectMode, setRectMode } from './RectMode';
@@ -222,6 +222,11 @@ arrowKeyPressEvent.on(arrowKey => {
   } else if (arrowKey === ArrowKey.RIGHT) {
     loadNextChapter();
   }
+});
+
+escapeKeyPressEvent.on(() => {
+  closeChapter();
+  updateHistory(true);
 });
 
 enum ErrorType {

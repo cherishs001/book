@@ -80,8 +80,7 @@ export class Event<T = void> {
       this.onceListeners.length = 0;
     }
     this.isEmitting = false;
-    while (this.queue.length >= 1) {
-      this.queue.shift()!();
-    }
+    this.queue.forEach(task => task());
+    this.queue.length = 0;
   }
 }
