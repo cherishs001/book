@@ -1,7 +1,7 @@
 import { blockUser, isUserBlocked } from './commentBlockControl';
 import { id } from './DOM';
 import { formatTime } from './formatTime';
-import { COMMENTS_LOADED, COMMENTS_LOADING, COMMENTS_UNAVAILABLE } from './messages';
+import { COMMENTS_FAILED, COMMENTS_LOADED, COMMENTS_LOADING, COMMENTS_UNAVAILABLE } from './messages';
 import { useComments } from './settings';
 
 const $comments = id('comments');
@@ -115,5 +115,8 @@ export function loadComments(issueUrl: string | null) {
         ));
       });
       $createComment.classList.toggle('display-none', false);
+    })
+    .catch(error => {
+      $commentsStatus.innerText = COMMENTS_FAILED;
     });
 }
