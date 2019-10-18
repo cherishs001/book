@@ -95,6 +95,7 @@ export class FlowReader {
     docIdentifier: string,
     private wtcdRoot: WTCDRoot,
     private errorMessageCreator: (error: Error) => HTMLElement,
+    private elementPreprocessor: ($element: HTMLElement) => void,
   ) {
     this.storageKey = `wtcd.fr.${docIdentifier}`;
     this.data = this.parseData(window.localStorage.getItem(this.storageKey)) || {
@@ -201,6 +202,7 @@ export class FlowReader {
 
     this.contents.push($container);
     this.target.appendChild($container);
+    this.elementPreprocessor($container);
   }
 
   private started: boolean = false;

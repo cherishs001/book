@@ -6,13 +6,14 @@ import { hideComments, loadComments } from './commentsControl';
 import { ContentBlockType } from './ContentBlockType';
 import { relativePathLookUpMap } from './data';
 import { DebugLogger } from './DebugLogger';
-import { getTextNodes, id, selectNode } from './DOM';
+import { getTextNodes, id } from './DOM';
 import { Event } from './Event';
 import { SwipeDirection, swipeEvent } from './gestures';
 import { updateHistory } from './history';
 import { ArrowKey, arrowKeyPressEvent, escapeKeyPressEvent } from './keyboard';
 import { loadingText } from './loadingText';
 import { WTCD_ERROR_COMPILE_TITLE, WTCD_ERROR_INTERNAL_DESC, WTCD_ERROR_INTERNAL_STACK_DESC, WTCD_ERROR_INTERNAL_STACK_TITLE, WTCD_ERROR_INTERNAL_TITLE, WTCD_ERROR_MESSAGE, WTCD_ERROR_RUNTIME_DESC, WTCD_ERROR_RUNTIME_TITLE } from './messages';
+import { processElements } from './processElements';
 import { RectMode, setRectMode } from './RectMode';
 import { earlyAccess, gestureSwitchChapter } from './settings';
 import { Selection, state } from './state';
@@ -116,21 +117,7 @@ const finalizeChapterLoading = (selection?: Selection) => {
     }
   }
 
-  Array.from($content.getElementsByTagName('a')).forEach($anchor => ($anchor as HTMLAnchorElement).target = '_blank');
-  Array.from($content.getElementsByTagName('code')).forEach($code => $code.addEventListener('dblclick', () => {
-    selectNode($code);
-  }));
-  Array.from($content.getElementsByTagName('img')).forEach($image => {
-    const src = $image.src;
-    const lastDotIndex = src.lastIndexOf('.');
-    const pathNoExtension = src.substr(0, lastDotIndex);
-    if (pathNoExtension.endsWith('_low')) {
-      const extension = src.substr(lastDotIndex + 1);
-      const pathNoLowNoExtension = pathNoExtension.substr(0, pathNoExtension.length - 4);
-      $image.style.cursor = 'zoom-in';
-      $image.addEventListener('click', () => window.open(pathNoLowNoExtension + '.' + extension));
-    }
-  });
+  processElements($content);
 
   const chapterCtx = state.currentChapter!;
   const chapterIndex = chapterCtx.inFolderIndex;
@@ -308,6 +295,7 @@ function insertContent($target: HTMLDivElement, content: string, chapter: Chapte
           message: error.message,
           stack: error.stack,
         }),
+        processElements,
       );
       const $wtcdContainer = document.createElement('div');
       flowInterface.renderTo($wtcdContainer);
