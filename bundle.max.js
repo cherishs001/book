@@ -161,6 +161,16 @@ function selectNode(node) {
     }
 }
 exports.selectNode = selectNode;
+function isAnyParent($element, predicate) {
+    while ($element !== null) {
+        if (predicate($element)) {
+            return true;
+        }
+        $element = $element.parentElement;
+    }
+    return false;
+}
+exports.isAnyParent = isAnyParent;
 
 },{"./DebugLogger":5}],5:[function(require,module,exports){
 "use strict";
@@ -1343,6 +1353,7 @@ exports.formatTime = formatTime;
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const DebugLogger_1 = require("./DebugLogger");
+const DOM_1 = require("./DOM");
 const Event_1 = require("./Event");
 var SwipeDirection;
 (function (SwipeDirection) {
@@ -1356,16 +1367,18 @@ exports.swipeEvent = new Event_1.Event();
 const horizontalMinXProportion = 0.17;
 const horizontalMaxYProportion = 0.1;
 const verticalMinYProportion = 0.1;
-const verticalMaxPropotyion = 0.1;
+const verticalMaxProportion = 0.1;
 const swipeTimeThreshold = 500;
 let startX = 0;
 let startY = 0;
 let startTime = 0;
+let startTarget = null;
 window.addEventListener('touchstart', event => {
     // Only listen for first touch starts
     if (event.touches.length !== 1) {
         return;
     }
+    startTarget = event.target;
     startX = event.touches[0].clientX;
     startY = event.touches[0].clientY;
     startTime = Date.now();
@@ -1388,6 +1401,11 @@ window.addEventListener('touchend', event => {
     const yProportion = Math.abs(deltaY / window.innerHeight);
     if (xProportion > horizontalMinXProportion && yProportion < horizontalMaxYProportion) {
         // Horizontal swipe detected
+        // Check for scrollable element
+        if (DOM_1.isAnyParent(startTarget, $element => ((window.getComputedStyle($element).getPropertyValue('overflow-x') !== 'hidden') &&
+            ($element.scrollWidth > $element.clientWidth)))) {
+            return;
+        }
         if (deltaX > 0) {
             exports.swipeEvent.emit(SwipeDirection.TO_RIGHT);
         }
@@ -1395,8 +1413,13 @@ window.addEventListener('touchend', event => {
             exports.swipeEvent.emit(SwipeDirection.TO_LEFT);
         }
     }
-    else if (yProportion > verticalMinYProportion && xProportion < verticalMaxPropotyion) {
+    else if (yProportion > verticalMinYProportion && xProportion < verticalMaxProportion) {
         // Vertical swipe detected
+        // Check for scrollable element
+        if (DOM_1.isAnyParent(startTarget, $element => ((window.getComputedStyle($element).getPropertyValue('overflow-y') !== 'hidden') &&
+            ($element.scrollHeight > $element.clientHeight)))) {
+            return;
+        }
         if (deltaY > 0) {
             exports.swipeEvent.emit(SwipeDirection.TO_BOTTOM);
         }
@@ -1410,7 +1433,7 @@ exports.swipeEvent.on(direction => {
     swipeEventDebugLogger.log(SwipeDirection[direction]);
 });
 
-},{"./DebugLogger":5,"./Event":6}],22:[function(require,module,exports){
+},{"./DOM":4,"./DebugLogger":5,"./Event":6}],22:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const state_1 = require("./state");
