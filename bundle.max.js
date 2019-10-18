@@ -89,7 +89,7 @@ class ChaptersMenu extends Menu_1.Menu {
 }
 exports.ChaptersMenu = ChaptersMenu;
 
-},{"./Menu":8,"./chapterControl":15,"./data":18,"./history":22,"./shortNumber":28}],3:[function(require,module,exports){
+},{"./Menu":8,"./chapterControl":15,"./data":18,"./history":22,"./shortNumber":29}],3:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const Menu_1 = require("./Menu");
@@ -217,7 +217,7 @@ class DebugLogger {
 }
 exports.DebugLogger = DebugLogger;
 
-},{"./settings":27}],6:[function(require,module,exports){
+},{"./settings":28}],6:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class Event {
@@ -302,9 +302,8 @@ class Event {
             this.onceListeners.length = 0;
         }
         this.isEmitting = false;
-        while (this.queue.length >= 1) {
-            this.queue.shift()();
-        }
+        this.queue.forEach(task => task());
+        this.queue.length = 0;
     }
 }
 exports.Event = Event;
@@ -654,7 +653,7 @@ class SettingsMenu extends Menu_1.Menu {
 }
 exports.SettingsMenu = SettingsMenu;
 
-},{"./BlockMenu":1,"./DOM":4,"./Menu":8,"./RectMode":9,"./commentsControl":17,"./settings":27,"./stylePreviewArticle":30}],11:[function(require,module,exports){
+},{"./BlockMenu":1,"./DOM":4,"./Menu":8,"./RectMode":9,"./commentsControl":17,"./settings":28,"./stylePreviewArticle":31}],11:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const data_1 = require("./data");
@@ -810,7 +809,7 @@ class StyleMenu extends Menu_1.Menu {
 }
 exports.StyleMenu = StyleMenu;
 
-},{"./DOM":4,"./DebugLogger":5,"./Menu":8,"./RectMode":9,"./commentsControl":17,"./stylePreviewArticle":30}],14:[function(require,module,exports){
+},{"./DOM":4,"./DebugLogger":5,"./Menu":8,"./RectMode":9,"./commentsControl":17,"./stylePreviewArticle":31}],14:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const Menu_1 = require("./Menu");
@@ -827,7 +826,7 @@ class ThanksMenu extends Menu_1.Menu {
 }
 exports.ThanksMenu = ThanksMenu;
 
-},{"./Menu":8,"./thanks":31}],15:[function(require,module,exports){
+},{"./Menu":8,"./thanks":32}],15:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const FlowReader_1 = require("../wtcd/FlowReader");
@@ -842,6 +841,7 @@ const history_1 = require("./history");
 const keyboard_1 = require("./keyboard");
 const loadingText_1 = require("./loadingText");
 const messages_1 = require("./messages");
+const processElements_1 = require("./processElements");
 const RectMode_1 = require("./RectMode");
 const settings_1 = require("./settings");
 const state_1 = require("./state");
@@ -926,21 +926,7 @@ const finalizeChapterLoading = (selection) => {
             });
         }
     }
-    Array.from($content.getElementsByTagName('a')).forEach($anchor => $anchor.target = '_blank');
-    Array.from($content.getElementsByTagName('code')).forEach($code => $code.addEventListener('dblclick', () => {
-        DOM_1.selectNode($code);
-    }));
-    Array.from($content.getElementsByTagName('img')).forEach($image => {
-        const src = $image.src;
-        const lastDotIndex = src.lastIndexOf('.');
-        const pathNoExtension = src.substr(0, lastDotIndex);
-        if (pathNoExtension.endsWith('_low')) {
-            const extension = src.substr(lastDotIndex + 1);
-            const pathNoLowNoExtension = pathNoExtension.substr(0, pathNoExtension.length - 4);
-            $image.style.cursor = 'zoom-in';
-            $image.addEventListener('click', () => window.open(pathNoLowNoExtension + '.' + extension));
-        }
-    });
+    processElements_1.processElements($content);
     const chapterCtx = state_1.state.currentChapter;
     const chapterIndex = chapterCtx.inFolderIndex;
     if (chapterCtx.chapter.isEarlyAccess) {
@@ -1029,6 +1015,10 @@ keyboard_1.arrowKeyPressEvent.on(arrowKey => {
         loadNextChapter();
     }
 });
+keyboard_1.escapeKeyPressEvent.on(() => {
+    closeChapter();
+    history_1.updateHistory(true);
+});
 var ErrorType;
 (function (ErrorType) {
     ErrorType[ErrorType["COMPILE"] = 0] = "COMPILE";
@@ -1095,7 +1085,7 @@ function insertContent($target, content, chapter) {
                     : ErrorType.INTERNAL,
                 message: error.message,
                 stack: error.stack,
-            }));
+            }), processElements_1.processElements);
             const $wtcdContainer = document.createElement('div');
             flowInterface.renderTo($wtcdContainer);
             $content.appendChild($wtcdContainer);
@@ -1136,7 +1126,7 @@ function loadChapter(chapterHtmlRelativePath, selection) {
 }
 exports.loadChapter = loadChapter;
 
-},{"../wtcd/FlowReader":33,"../wtcd/WTCDError":36,"./DOM":4,"./DebugLogger":5,"./Event":6,"./RectMode":9,"./commentsControl":17,"./data":18,"./gestures":21,"./history":22,"./keyboard":24,"./loadingText":25,"./messages":26,"./settings":27,"./state":29}],16:[function(require,module,exports){
+},{"../wtcd/FlowReader":34,"../wtcd/WTCDError":37,"./DOM":4,"./DebugLogger":5,"./Event":6,"./RectMode":9,"./commentsControl":17,"./data":18,"./gestures":21,"./history":22,"./keyboard":24,"./loadingText":25,"./messages":26,"./processElements":27,"./settings":28,"./state":30}],16:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const Event_1 = require("./Event");
@@ -1261,11 +1251,14 @@ function loadComments(issueUrl) {
             $comments.appendChild(createCommentElement(comment.user.avatar_url, comment.user.login, comment.user.html_url, comment.created_at, comment.updated_at, comment.body));
         });
         $createComment.classList.toggle('display-none', false);
+    })
+        .catch(error => {
+        $commentsStatus.innerText = messages_1.COMMENTS_FAILED;
     });
 }
 exports.loadComments = loadComments;
 
-},{"./DOM":4,"./commentBlockControl":16,"./formatTime":20,"./messages":26,"./settings":27}],18:[function(require,module,exports){
+},{"./DOM":4,"./commentBlockControl":16,"./formatTime":20,"./messages":26,"./settings":28}],18:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.data = window.DATA;
@@ -1323,7 +1316,7 @@ function followQuery() {
 }
 exports.followQuery = followQuery;
 
-},{"./chapterControl":15,"./data":18,"./history":22,"./state":29}],20:[function(require,module,exports){
+},{"./chapterControl":15,"./data":18,"./history":22,"./state":30}],20:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const SECOND = 1000;
@@ -1460,7 +1453,7 @@ function updateHistory(push) {
 }
 exports.updateHistory = updateHistory;
 
-},{"./state":29}],23:[function(require,module,exports){
+},{"./state":30}],23:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const data_1 = require("./data");
@@ -1494,7 +1487,7 @@ window.addEventListener('popstate', () => {
 });
 followQuery_1.followQuery();
 
-},{"./DOM":4,"./MainMenu":7,"./data":18,"./followQuery":19,"./settings":27,"./updateSelection":32}],24:[function(require,module,exports){
+},{"./DOM":4,"./MainMenu":7,"./data":18,"./followQuery":19,"./settings":28,"./updateSelection":33}],24:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const DebugLogger_1 = require("./DebugLogger");
@@ -1507,8 +1500,12 @@ var ArrowKey;
     ArrowKey[ArrowKey["DOWN"] = 3] = "DOWN";
 })(ArrowKey = exports.ArrowKey || (exports.ArrowKey = {}));
 exports.arrowKeyPressEvent = new Event_1.Event();
+exports.escapeKeyPressEvent = new Event_1.Event();
 document.addEventListener('keyup', event => {
     switch (event.keyCode) {
+        case 27:
+            exports.escapeKeyPressEvent.emit();
+            break;
         case 37:
             exports.arrowKeyPressEvent.emit(ArrowKey.LEFT);
             break;
@@ -1538,7 +1535,8 @@ exports.loadingText = '加载中...';
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.COMMENTS_UNAVAILABLE = '本文评论不可用。';
 exports.COMMENTS_LOADING = '评论加载中...';
-exports.COMMENTS_LOADED = '以下为本章节的评论区。（您可以在设置中禁用评论）';
+exports.COMMENTS_LOADED = '以下为本章节的评论区。';
+exports.COMMENTS_FAILED = '评论加载失败。';
 exports.NO_BLOCKED_USERS = '没有用户的评论被屏蔽';
 exports.CLICK_TO_UNBLOCK = '(点击用户名以解除屏蔽)';
 exports.WTCD_ERROR_COMPILE_TITLE = 'WTCD 编译失败';
@@ -1552,6 +1550,31 @@ exports.WTCD_ERROR_INTERNAL_STACK_TITLE = '内部调用栈';
 exports.WTCD_ERROR_INTERNAL_STACK_DESC = '内部调用栈记录了出现该错误时编译器或是解释器的状态。请注意内部调用栈通常只在调试 WTCD 编译器或是解释器时有用。内部调用栈通常对调试 WTCD 文档没有作用。';
 
 },{}],27:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const DOM_1 = require("./DOM");
+function processElements($parent) {
+    Array.from($parent.getElementsByTagName('a')).forEach($anchor => $anchor.target = '_blank');
+    Array.from($parent.getElementsByTagName('code')).forEach($code => $code.addEventListener('dblclick', () => {
+        if (!($code.parentNode instanceof HTMLPreElement)) {
+            DOM_1.selectNode($code);
+        }
+    }));
+    Array.from($parent.getElementsByTagName('img')).forEach($image => {
+        const src = $image.src;
+        const lastDotIndex = src.lastIndexOf('.');
+        const pathNoExtension = src.substr(0, lastDotIndex);
+        if (pathNoExtension.endsWith('_low')) {
+            const extension = src.substr(lastDotIndex + 1);
+            const pathNoLowNoExtension = pathNoExtension.substr(0, pathNoExtension.length - 4);
+            $image.style.cursor = 'zoom-in';
+            $image.addEventListener('click', () => window.open(pathNoLowNoExtension + '.' + extension));
+        }
+    });
+}
+exports.processElements = processElements;
+
+},{"./DOM":4}],28:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const noop = () => { };
@@ -1652,7 +1675,7 @@ exports.charCount = new BooleanSetting('charCount', true, value => {
     document.body.classList.toggle('char-count-disabled', !value);
 });
 
-},{}],28:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 function shortNumber(input) {
@@ -1666,7 +1689,7 @@ function shortNumber(input) {
 }
 exports.shortNumber = shortNumber;
 
-},{}],29:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.state = {
@@ -1675,7 +1698,7 @@ exports.state = {
     chapterTextNodes: null,
 };
 
-},{}],30:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.stylePreviewArticle = `<h1>午饭</h1>
@@ -1708,7 +1731,7 @@ exports.stylePreviewArticle = `<h1>午饭</h1>
 <p>“真……真香♪”</p>
 <p>当晚，因为触发了真香定律而感到很火大的琳，把秋镜悬丢进了自己的高维空间里头放置了一晚上（高维时间三天）泄愤。</p>`;
 
-},{}],31:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.thanks = [
@@ -1741,7 +1764,7 @@ exports.thanks = [
     { name: 'Runian Lee', link: 'https://t.me/Runian' },
 ].sort(() => Math.random() - 0.5);
 
-},{}],32:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const history_1 = require("./history");
@@ -1794,7 +1817,7 @@ function updateSelection() {
 }
 exports.updateSelection = updateSelection;
 
-},{"./history":22,"./state":29}],33:[function(require,module,exports){
+},{"./history":22,"./state":30}],34:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const Interpreter_1 = require("./Interpreter");
@@ -1816,9 +1839,10 @@ const Random_1 = require("./Random");
  * will potentially lag user's interface every time the user undoes a decision.
  */
 class FlowReader {
-    constructor(docIdentifier, wtcdRoot, errorMessageCreator) {
+    constructor(docIdentifier, wtcdRoot, errorMessageCreator, elementPreprocessor) {
         this.wtcdRoot = wtcdRoot;
         this.errorMessageCreator = errorMessageCreator;
+        this.elementPreprocessor = elementPreprocessor;
         /** Which decision the current buttons are for */
         this.currentDecisionIndex = 0;
         /** Buttons for each group of output */
@@ -1980,6 +2004,7 @@ class FlowReader {
         }));
         this.contents.push($container);
         this.target.appendChild($container);
+        this.elementPreprocessor($container);
     }
     renderTo($target) {
         if (this.started) {
@@ -2000,7 +2025,7 @@ class FlowReader {
 }
 exports.FlowReader = FlowReader;
 
-},{"./Interpreter":34,"./Random":35}],34:[function(require,module,exports){
+},{"./Interpreter":35,"./Random":36}],35:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const constantsPool_1 = require("./constantsPool");
@@ -2415,7 +2440,7 @@ class Interpreter {
 }
 exports.Interpreter = Interpreter;
 
-},{"./WTCDError":36,"./constantsPool":37,"./operators":38}],35:[function(require,module,exports){
+},{"./WTCDError":37,"./constantsPool":38,"./operators":39}],36:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 /**
@@ -2478,7 +2503,7 @@ class Random {
 }
 exports.Random = Random;
 
-},{}],36:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class WTCDError extends Error {
@@ -2507,7 +2532,7 @@ class WTCDError extends Error {
 }
 exports.WTCDError = WTCDError;
 
-},{}],37:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 // Your typical immature optimization
@@ -2543,7 +2568,7 @@ function getMaybePooled(type, value) {
 }
 exports.getMaybePooled = getMaybePooled;
 
-},{}],38:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 "use strict";
 // This file defines all infix and prefix operators in WTCD.
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -2778,4 +2803,4 @@ exports.binaryOperators = new Map([
 exports.conditionalOperatorPrecedence = 4;
 exports.operators = new Set([...exports.unaryOperators.keys(), ...exports.binaryOperators.keys(), '?', ':']);
 
-},{"./Interpreter":34,"./WTCDError":36,"./constantsPool":37}]},{},[23]);
+},{"./Interpreter":35,"./WTCDError":37,"./constantsPool":38}]},{},[23]);
