@@ -31,3 +31,13 @@ export function selectNode(node: Node) {
     selectNodeDebugLogger.log('Failed to select node: ', node, '; Error: ', error);
   }
 }
+
+export function isAnyParent($element: HTMLElement | null, predicate: (node: HTMLElement) => boolean) {
+  while ($element !== null) {
+    if (predicate($element)) {
+      return true;
+    }
+    $element = $element.parentElement;
+  }
+  return false;
+}
