@@ -1,6 +1,6 @@
 import { closeChapter, loadChapter } from './chapterControl';
 import { relativePathLookUpMap } from './data';
-import { getTitle } from './history';
+import { getTitle, updateHistory } from './history';
 import { state } from './state';
 
 export function followQuery() {
@@ -11,9 +11,7 @@ export function followQuery() {
       closeChapter();
       document.title = getTitle();
     }
-    return;
-  }
-  if (state.currentChapter !== chapterCtx) {
+  } else if (state.currentChapter !== chapterCtx) {
     if (typeof URLSearchParams !== 'function') {
       loadChapter(chapterHtmlRelativePath);
     } else {
@@ -32,4 +30,5 @@ export function followQuery() {
       document.title = getTitle();
     }
   }
+  updateHistory(false);
 }

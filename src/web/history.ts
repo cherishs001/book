@@ -16,7 +16,6 @@ export function updateHistory(push: boolean) {
       query += `?selection=${state.chapterSelection.join(',')}`;
     }
     query += '#' + state.currentChapter.chapter.htmlRelativePath;
-
   }
   const title = getTitle();
   document.title = title;
