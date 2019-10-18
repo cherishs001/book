@@ -1299,9 +1299,8 @@ function followQuery() {
             chapterControl_1.closeChapter();
             document.title = history_1.getTitle();
         }
-        return;
     }
-    if (state_1.state.currentChapter !== chapterCtx) {
+    else if (state_1.state.currentChapter !== chapterCtx) {
         if (typeof URLSearchParams !== 'function') {
             chapterControl_1.loadChapter(chapterHtmlRelativePath);
         }
@@ -1320,6 +1319,7 @@ function followQuery() {
             document.title = history_1.getTitle();
         }
     }
+    history_1.updateHistory(false);
 }
 exports.followQuery = followQuery;
 
