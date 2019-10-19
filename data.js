@@ -368,6 +368,17 @@ window.DATA={
             "chapterCharCount": 1171
           },
           {
+            "displayName": "末日病毒治疗仪器",
+            "displayIndex": 721,
+            "name": "721 - 末日病毒治疗仪器",
+            "sourceRelativePath": "4 - 道具集/721 - 末日病毒治疗仪器.md",
+            "type": "Markdown",
+            "isEarlyAccess": false,
+            "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/80",
+            "htmlRelativePath": "道具集/末日病毒治疗仪器.html",
+            "chapterCharCount": 7470
+          },
+          {
             "displayName": "使人快乐的 PS4",
             "displayIndex": 10010,
             "name": "10010 - 使人快乐的 PS4",
@@ -391,7 +402,7 @@ window.DATA={
           }
         ],
         "subFolders": [],
-        "folderCharCount": 23997
+        "folderCharCount": 31467
       },
       {
         "displayName": "META",
@@ -550,14 +561,14 @@ window.DATA={
         "folderCharCount": 1361
       }
     ],
-    "folderCharCount": 149836
+    "folderCharCount": 157306
   },
-  "charsCount": 149836,
-  "paragraphsCount": 3003,
+  "charsCount": 157306,
+  "paragraphsCount": 3192,
   "keywordsCount": [
     [
       "高潮",
-      340
+      343
     ],
     [
       "按摩棒",
@@ -624,5 +635,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "308"
+  "buildNumber": "309"
 };
