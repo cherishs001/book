@@ -208,14 +208,14 @@ window.DATA={
             "name": "16",
             "sourceRelativePath": "1 - 主线/16.md",
             "type": "Markdown",
-            "isEarlyAccess": true,
-            "commentsUrl": null,
+            "isEarlyAccess": false,
+            "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/79",
             "htmlRelativePath": "主线/第-16-章.html",
-            "chapterCharCount": 3450
+            "chapterCharCount": 6067
           }
         ],
         "subFolders": [],
-        "folderCharCount": 85988
+        "folderCharCount": 88605
       },
       {
         "displayName": "支线",
@@ -550,10 +550,10 @@ window.DATA={
         "folderCharCount": 1361
       }
     ],
-    "folderCharCount": 147218
+    "folderCharCount": 149835
   },
-  "charsCount": 147218,
-  "paragraphsCount": 2914,
+  "charsCount": 149835,
+  "paragraphsCount": 3003,
   "keywordsCount": [
     [
       "高潮",
@@ -624,5 +624,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "306"
+  "buildNumber": "307"
 };
