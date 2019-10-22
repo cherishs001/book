@@ -1,13 +1,15 @@
 // This file defines all infix and prefix operators in WTCD.
 
+import { autoEvaluated } from './autoEvaluated';
 import { getMaybePooled } from './constantsPool';
-import { describe, Evaluator, RuntimeValue, RuntimeValueMutable, RuntimeValueRaw, RuntimeValueType } from './Interpreter';
+import { describe, InterpreterHandle, RuntimeValue, RuntimeValueRaw, RuntimeValueType } from './Interpreter';
+import { pipelineInvocation, regularInvocation, reverseInvocation } from './invokeFunction';
 import { BinaryExpression, UnaryExpression } from './types';
 import { WTCDError } from './WTCDError';
 
 export type UnaryOperator = '-' | '!';
 
-type UnaryOperatorFn = (expr: UnaryExpression, evaluator: Evaluator) => RuntimeValue;
+type UnaryOperatorFn = (expr: UnaryExpression, interpreterHandle: InterpreterHandle) => RuntimeValue;
 
 export interface UnaryOperatorDefinition {
   precedence: number;
@@ -16,8 +18,8 @@ export interface UnaryOperatorDefinition {
 
 export const unaryOperators = new Map<string, UnaryOperatorDefinition>([
   ['-', {
-    precedence: 16,
-    fn: (expr, evaluator) => {
+    precedence: 17,
+    fn: (expr, { evaluator }) => {
       const arg = evaluator(expr.arg);
       if (arg.type !== 'number') {
         throw WTCDError.atLocation(expr, `Unary operator "-" can only be applied ` +
@@ -27,8 +29,8 @@ export const unaryOperators = new Map<string, UnaryOperatorDefinition>([
     },
   }],
   ['!', {
-    precedence: 16,
-    fn: (expr, evaluator) => {
+    precedence: 17,
+    fn: (expr, { evaluator }) => {
       const arg = evaluator(expr.arg);
       if (arg.type !== 'boolean') {
         throw WTCDError.atLocation(expr, `Unary operator "!" can only be applied ` +
@@ -41,29 +43,13 @@ export const unaryOperators = new Map<string, UnaryOperatorDefinition>([
 
 export type BinaryOperator = '+' | '-' | '*' | '/' | '~/' | '%' | '=' | '+=' | '-=' | '*=' | '/=' | '~/=' | '%=';
 
-type ResolveVariableReferenceFn = (variableName: string) => RuntimeValueMutable;
-
-type BinaryOperatorFn = (
+export type BinaryOperatorFn = (
   expr: BinaryExpression,
-  evaluator: Evaluator,
-  resolveVariableReference: ResolveVariableReferenceFn,
+  interpreterHandle: InterpreterHandle,
 ) => RuntimeValue;
 export interface BinaryOperatorDefinition {
   precedence: number;
   fn: BinaryOperatorFn;
-}
-function autoEvaluated(fn: (
-  arg0: RuntimeValue,
-  arg1: RuntimeValue,
-  expr: BinaryExpression,
-  evaluator: Evaluator,
-  resolveVariableReference: ResolveVariableReferenceFn,
-) => RuntimeValue): BinaryOperatorFn {
-  return (expr, evaluator, resolveVariableReference) => {
-    const arg0 = evaluator(expr.arg0);
-    const arg1 = evaluator(expr.arg1);
-    return fn(arg0, arg1, expr, evaluator, resolveVariableReference);
-  };
 }
 function autoEvaluatedSameTypeArg<TArg extends RuntimeValueType, TReturn extends RuntimeValueType>(
   argType: TArg,
@@ -72,11 +58,10 @@ function autoEvaluatedSameTypeArg<TArg extends RuntimeValueType, TReturn extends
     arg0Raw: RuntimeValueRaw<TArg>,
     arg1Raw: RuntimeValueRaw<TArg>,
     expr: BinaryExpression,
-    evaluator: Evaluator,
-    resolveVariableReference: ResolveVariableReferenceFn,
+    interpreterHandle: InterpreterHandle,
   ) => RuntimeValueRaw<TReturn>,
 ): BinaryOperatorFn {
-  return autoEvaluated((arg0, arg1, expr, evaluator, resolveVariableReference) => {
+  return autoEvaluated((arg0, arg1, expr, interpreterHandle) => {
     if (arg0.type === argType && arg1.type === argType) {
       // TypeScript is not smart enough to do the conversion here
       return getMaybePooled(
@@ -85,8 +70,7 @@ function autoEvaluatedSameTypeArg<TArg extends RuntimeValueType, TReturn extends
           arg0.value as RuntimeValueRaw<TArg>,
           arg1.value as RuntimeValueRaw<TArg>,
           expr,
-          evaluator,
-          resolveVariableReference,
+          interpreterHandle,
         ),
       );
     } else {
@@ -103,21 +87,20 @@ function opAssignment<T0 extends RuntimeValueType, T1 extends RuntimeValueType>(
     arg0Raw: RuntimeValueRaw<T0>,
     arg1Raw: RuntimeValueRaw<T1>,
     expr: BinaryExpression,
-    evaluator: Evaluator,
-    resolveVariableReference: ResolveVariableReferenceFn,
+    interpreterHandle: InterpreterHandle,
   ) => RuntimeValueRaw<T0>,
 ): BinaryOperatorFn {
-  return (expr, evaluator, resolveVariableReference) => {
+  return (expr, interpreterHandle) => {
     if (expr.arg0.type !== 'variableReference') {
         throw WTCDError.atLocation(expr, `Left side of binary operator "${expr.operator}" ` +
           `has to be a variable reference`);
     }
-    const varRef = resolveVariableReference(expr.arg0.variableName);
+    const varRef = interpreterHandle.resolveVariableReference(expr.arg0.variableName);
     if (varRef.type !== arg0Type) {
       throw WTCDError.atLocation(expr, `Left side of binary operator "${expr.operator}" has to be a ` +
         `variable of type ${arg0Type}, actual type: ${varRef.type}`);
     }
-    const arg1 = evaluator(expr.arg1);
+    const arg1 = interpreterHandle.evaluator(expr.arg1);
     if (arg1.type !== arg1Type) {
       throw WTCDError.atLocation(expr, `Right side of binary operator "${expr.operator}" ` +
         ` has to be a ${arg1Type}. Received: ${describe(arg1)}`);
@@ -126,8 +109,7 @@ function opAssignment<T0 extends RuntimeValueType, T1 extends RuntimeValueType>(
       varRef.value as RuntimeValueRaw<T0>,
       arg1.value as RuntimeValueRaw<T1>,
       expr,
-      evaluator,
-      resolveVariableReference,
+      interpreterHandle,
     );
     varRef.value = newValue;
     return getMaybePooled(arg0Type, newValue);
@@ -136,7 +118,7 @@ function opAssignment<T0 extends RuntimeValueType, T1 extends RuntimeValueType>(
 export const binaryOperators = new Map<string, BinaryOperatorDefinition>([
   ['=', {
     precedence: 3,
-    fn: (expr, evaluator, resolveVariableReference) => {
+    fn: (expr, { evaluator, resolveVariableReference }) => {
       if (expr.arg0.type !== 'variableReference') {
         throw WTCDError.atLocation(expr, `Left side of binary operator "=" has to be a ` +
           `variable reference`);
@@ -153,7 +135,7 @@ export const binaryOperators = new Map<string, BinaryOperatorDefinition>([
   }],
   ['+=', {
     precedence: 3,
-    fn: (expr, evaluator, resolveVariableReference) => {
+    fn: (expr, { evaluator, resolveVariableReference }) => {
       if (expr.arg0.type !== 'variableReference') {
         throw WTCDError.atLocation(expr, `Left side of binary operator "+=" ` +
           `has to be a variable reference`);
@@ -193,9 +175,17 @@ export const binaryOperators = new Map<string, BinaryOperatorDefinition>([
     precedence: 3,
     fn: opAssignment('number', 'number', (arg0Raw, arg1Raw) => arg0Raw % arg1Raw),
   }],
-  ['||', {
+  ['|>', {
     precedence: 5,
-    fn: (expr, evaluator) => {
+    fn: pipelineInvocation,
+  }],
+  ['|::', {
+    precedence: 5,
+    fn: reverseInvocation,
+  }],
+  ['||', {
+    precedence: 6,
+    fn: (expr, { evaluator }) => {
       const arg0 = evaluator(expr.arg0);
       if (arg0.type !== 'boolean') {
         throw WTCDError.atLocation(expr, `Left side of binary operator "||" has to be a boolean. ` +
@@ -213,8 +203,8 @@ export const binaryOperators = new Map<string, BinaryOperatorDefinition>([
     },
   }],
   ['&&', {
-    precedence: 6,
-    fn: (expr, evaluator) => {
+    precedence: 7,
+    fn: (expr, { evaluator }) => {
       const arg0 = evaluator(expr.arg0);
       if (arg0.type !== 'boolean') {
         throw WTCDError.atLocation(expr, `Left side of binary operator "&&" has to be a boolean. ` +
@@ -232,37 +222,37 @@ export const binaryOperators = new Map<string, BinaryOperatorDefinition>([
     },
   }],
   ['==', {
-    precedence: 10,
+    precedence: 11,
     fn: autoEvaluated((arg0, arg1) => (getMaybePooled(
       'boolean',
       (arg0.type === arg1.type) && (arg0.value === arg1.value),
     ))),
   }],
   ['!=', {
-    precedence: 10,
+    precedence: 11,
     fn: autoEvaluated((arg0, arg1) => (getMaybePooled(
       'boolean',
       (arg0.type !== arg1.type) || (arg0.value !== arg1.value),
     ))),
   }],
   ['<', {
-    precedence: 11,
+    precedence: 12,
     fn: autoEvaluatedSameTypeArg('number', 'boolean', (arg0Raw, arg1Raw) => arg0Raw < arg1Raw),
   }],
   ['<=', {
-    precedence: 11,
+    precedence: 12,
     fn: autoEvaluatedSameTypeArg('number', 'boolean', (arg0Raw, arg1Raw) => arg0Raw <= arg1Raw),
   }],
   ['>', {
-    precedence: 11,
+    precedence: 12,
     fn: autoEvaluatedSameTypeArg('number', 'boolean', (arg0Raw, arg1Raw) => arg0Raw > arg1Raw),
   }],
   ['>=', {
-    precedence: 11,
+    precedence: 12,
     fn: autoEvaluatedSameTypeArg('number', 'boolean', (arg0Raw, arg1Raw) => arg0Raw >= arg1Raw),
   }],
   ['+', {
-    precedence: 13,
+    precedence: 14,
     fn: autoEvaluated((arg0, arg1, expr) => {
       if (arg0.type === 'number' && arg1.type === 'number') {
         return getMaybePooled(
@@ -282,25 +272,30 @@ export const binaryOperators = new Map<string, BinaryOperatorDefinition>([
     }),
   }],
   ['-', {
-    precedence: 13,
-    fn: autoEvaluatedSameTypeArg('number', 'number', (arg0Raw, arg1Raw) => arg0Raw + arg1Raw),
+    precedence: 14,
+    fn: autoEvaluatedSameTypeArg('number', 'number', (arg0Raw, arg1Raw) => arg0Raw - arg1Raw),
   }],
   ['*', {
-    precedence: 14,
+    precedence: 15,
     fn: autoEvaluatedSameTypeArg('number', 'number', (arg0Raw, arg1Raw) => arg0Raw * arg1Raw),
   }],
   ['/', {
-    precedence: 14,
+    precedence: 15,
     fn: autoEvaluatedSameTypeArg('number', 'number', (arg0Raw, arg1Raw) => arg0Raw / arg1Raw),
   }],
   ['~/', {
-    precedence: 14,
+    precedence: 15,
     fn: autoEvaluatedSameTypeArg('number', 'number', (arg0Raw, arg1Raw) => Math.trunc(arg0Raw / arg1Raw)),
   }],
   ['%', {
-    precedence: 14,
+    precedence: 15,
     fn: autoEvaluatedSameTypeArg('number', 'number', (arg0Raw, arg1Raw) => arg0Raw % arg1Raw),
   }],
+  ['::', {
+    precedence: 20,
+    fn: regularInvocation,
+  }],
+
 ]);
 
 export const conditionalOperatorPrecedence = 4;

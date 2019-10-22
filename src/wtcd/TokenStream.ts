@@ -183,13 +183,13 @@ const keywords = new Set([
   'selection',
   'yield',
   'exit',
+  'function',
+  'return',
+  'switch',
 
   // Reserved
-  'return',
   'continue',
   'break',
-  'switch',
-  'function',
   'if',
   'else',
   'while',

@@ -1,3 +1,4 @@
+import { InterpreterHandle, RuntimeValue } from './Interpreter';
 import { BinaryOperator, UnaryOperator } from './operators';
 
 /**
@@ -148,15 +149,68 @@ export interface ExpressionStatement extends OptionalLocationInfo {
   expression: Expression;
 }
 
-export type Literal = NumberLiteral | BooleanLiteral | StringLiteral | NullLiteral;
+export interface FunctionArgument extends OptionalLocationInfo {
+  name: string;
+  type: VariableType;
+  defaultValue: Expression | null;
+}
 
-export type OperatorExpression = BinaryExpression | UnaryExpression | ConditionalExpression;
+export interface FunctionExpression extends OptionalLocationInfo {
+  type: 'function';
+  arguments: Array<FunctionArgument>;
+  captures: Array<string>;
+  expression: Expression;
+}
+
+export interface ListExpression extends OptionalLocationInfo {
+  type: 'list';
+  elements: Array<Expression>;
+}
+
+export interface SwitchCase extends OptionalLocationInfo {
+  matches: Expression;
+  returns: Expression;
+}
+
+export interface SwitchExpression extends OptionalLocationInfo {
+  type: 'switch';
+  expression: Expression;
+  cases: Array<SwitchCase>;
+  defaultCase: Expression | null;
+}
+
+export type Literal
+  = NumberLiteral
+  | BooleanLiteral
+  | StringLiteral
+  | NullLiteral;
+
+export type OperatorExpression
+  = BinaryExpression
+  | UnaryExpression
+  | ConditionalExpression;
 
 export type Action = GotoAction | ExitAction;
 
-export type Expression = Literal | OperatorExpression | Selection | Action | BlockExpression | ChoiceExpression | VariableReference;
+export type Expression
+  = Literal
+  | OperatorExpression
+  | Selection
+  | Action
+  | BlockExpression
+  | ChoiceExpression
+  | VariableReference
+  | FunctionExpression
+  | ListExpression
+  | SwitchExpression;
 
-export type Statement = DeclarationStatement | ReturnStatement | SetReturnStatement | YieldStatement | SetYieldStatement | ExpressionStatement;
+export type Statement
+  = DeclarationStatement
+  | ReturnStatement
+  | SetReturnStatement
+  | YieldStatement
+  | SetYieldStatement
+  | ExpressionStatement;
 
 export interface Section extends OptionalLocationInfo {
   name: string;
@@ -165,7 +219,15 @@ export interface Section extends OptionalLocationInfo {
   then: Expression;
 }
 
-export type VariableType = 'number' | 'boolean' | 'string' | 'action' | 'choice' | 'selection';
+export type VariableType
+  = 'number'
+  | 'boolean'
+  | 'string'
+  | 'action'
+  | 'choice'
+  | 'selection'
+  | 'list'
+  | 'function';
 
 export interface OneVariableDeclaration extends OptionalLocationInfo {
   variableName: string;
@@ -188,3 +250,8 @@ export type WTCDParseResult = {
 };
 
 export type RegisterName = 'yield' | 'return';
+
+export type NativeFunction = (
+  args: Array<RuntimeValue>,
+  interpreterHandle: InterpreterHandle,
+) => RuntimeValue;

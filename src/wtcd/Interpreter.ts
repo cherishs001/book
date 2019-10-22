@@ -1,7 +1,23 @@
-import { booleanValue, getMaybePooled, nullValue } from './constantsPool';
+import { clone, getMaybePooled } from './constantsPool';
 import { binaryOperators, unaryOperators } from './operators';
 import { Random } from './Random';
-import { Action, BlockExpression, ChoiceExpression, ConditionalExpression, DeclarationStatement, Expression, RegisterName, Section, Selection, Statement, WTCDRoot } from './types';
+import { stdFunctions } from './std';
+import {
+  BlockExpression,
+  ChoiceExpression,
+  ConditionalExpression,
+  DeclarationStatement,
+  Expression,
+  FunctionExpression,
+  ListExpression,
+  NativeFunction,
+  RegisterName,
+  Section,
+  Selection,
+  Statement,
+  SwitchExpression,
+  WTCDRoot,
+} from './types';
 import { WTCDError } from './WTCDError';
 
 // Dispatching code for the runtime of WTCD
@@ -33,6 +49,11 @@ export interface NullValue {
   value: null;
 }
 
+export interface ListValue {
+  type: 'list';
+  value: Array<RuntimeValue>;
+}
+
 export interface ActionValue {
   type: 'action';
   value: {
@@ -50,8 +71,6 @@ type: 'choice';
   };
 }
 
-type A = Readonly<ChoiceValue>;
-
 export interface SelectionValue {
   type: 'selection';
   value: {
@@ -59,16 +78,43 @@ export interface SelectionValue {
   };
 }
 
-export type RuntimeValueMutable = NumberValue | BooleanValue | StringValue | NullValue | ActionValue | ChoiceValue | SelectionValue;
+export interface FunctionValue {
+  type: 'function';
+  value: ({
+    builtIn: false;
+    expr: FunctionExpression;
+    captured: Array<{
+      name: string,
+      value: RuntimeValueMutable,
+    }>;
+  } | {
+    builtIn: true,
+    nativeFn: NativeFunction,
+  });
+}
+
+export type RuntimeValueMutable
+  = NumberValue
+  | BooleanValue
+  | StringValue
+  | NullValue
+  | ActionValue
+  | ChoiceValue
+  | SelectionValue
+  | ListValue
+  | FunctionValue;
 export type RuntimeValue = Readonly<RuntimeValueMutable>;
 
 export type RuntimeValueType = RuntimeValue['type'];
 
-export type RuntimeValueRaw<T extends RuntimeValueType> = Extract<RuntimeValue, { type: T }>['value'];
+export type RuntimeValueRaw<T extends RuntimeValueType> = Extract<
+  RuntimeValue,
+  { type: T }
+>['value'];
 
 export type Evaluator = (expr: Expression) => RuntimeValue;
 
-enum BubbleSignalType {
+export enum BubbleSignalType {
   YIELD,
   RETURN,
 }
@@ -77,7 +123,7 @@ enum BubbleSignalType {
  * Bubble signal is used for traversing upward the call stack. It is implemented
  * with JavaScript's Error. Such signal might be yield or return.
  */
-class BubbleSignal extends Error {
+export class BubbleSignal extends Error {
   public constructor(
     public readonly type: BubbleSignalType,
   ) {
@@ -93,22 +139,35 @@ export function describe(rv: RuntimeValue): string {
   switch (rv.type) {
     case 'number':
     case 'boolean':
-      return `${rv.type} ${rv.value}`;
+      return `${rv.type} (value = ${rv.value})`;
     case 'string':
-      return `string "${rv.value}"`;
+      return `string (value = "${rv.value}")`;
     case 'choice':
-      return `a choice for action ${describe(rv.value.action)} with label "${rv.value.text}"`;
+      return `choice (action = ${describe(rv.value.action)}, label = ` +
+        `"${rv.value.text}")`;
     case 'action':
       switch (rv.value.action) {
         case 'goto':
-          return `an action for goto to ${rv.value.target}`;
+          return `action (type = goto, target = ${rv.value.target})`;
         case 'exit':
-          return `an action for exiting`;
+          return `action (type = exit)`;
       }
     case 'null':
       return 'null';
     case 'selection':
-      return `a selection among the following choices: [${rv.value.choices.map(describe).join(', ')}]`;
+      return `selection (choices = [${rv.value.choices
+        .map(describe).join(', ')}])`;
+    case 'list':
+      return `list (elements = [${rv.value.map(describe).join(', ')}])`;
+    case 'function':
+      if (rv.value.builtIn) {
+        return `function (native ${rv.value.nativeFn.name})`;
+      } else {
+        return `function (arguments = [${rv.value.expr.arguments
+          .map(arg => arg.name)
+          .join(', ')
+        }])`;
+      }
   }
 }
 
@@ -125,8 +184,8 @@ class RuntimeScope {
   public resolveVariableReference(variableName: string): RuntimeValueMutable | null {
     return this.variables.get(variableName) || null;
   }
-  public addVariable<T extends RuntimeValueType>(variableName: string, type: T, value: RuntimeValueRaw<T>) {
-    this.variables.set(variableName, { type, value } as any);
+  public addVariable(variableName: string, value: RuntimeValue) {
+    this.variables.set(variableName, value);
   }
   public addRegister(registerName: RegisterName) {
     if (this.registers === null) {
@@ -165,16 +224,31 @@ export class InvalidChoiceError extends Error {
   }
 }
 
+export interface InterpreterHandle {
+  evaluator(expr: Expression): RuntimeValue;
+  pushScope(): RuntimeScope;
+  popScope(): RuntimeScope | undefined;
+  resolveVariableReference(variableName: string): RuntimeValueMutable;
+  getRandom(): Random;
+}
+
 export class Interpreter {
+  private interpreterHandle: InterpreterHandle = {
+    evaluator: this.evaluator.bind(this),
+    pushScope: this.pushScope.bind(this),
+    popScope: this.popScope.bind(this),
+    resolveVariableReference: this.resolveVariableReference.bind(this),
+    getRandom: () => this.random,
+  };
   public constructor(
     private wtcdRoot: WTCDRoot,
     private random: Random,
   ) {
     this.sectionStack.push(this.wtcdRoot.sections[0]);
   }
-  private scopes: Array<RuntimeScope> = [ new RuntimeScope() ];
+  private scopes: Array<RuntimeScope> = [];
   private sectionStack: Array<Section> = [];
-  private resolveVariableReference = (variableName: string): RuntimeValueMutable => {
+  private resolveVariableReference(variableName: string): RuntimeValueMutable {
     for (let i = this.scopes.length - 1; i >= 0; i--) {
       const variable = this.scopes[i].resolveVariableReference(variableName);
       if (variable !== null) {
@@ -205,13 +279,13 @@ export class Interpreter {
   private getCurrentScope(): RuntimeScope {
     return this.scopes[this.scopes.length - 1];
   }
-  private pushScope(): RuntimeScope {
+  private pushScope() {
     const scope = new RuntimeScope();
     this.scopes.push(scope);
     return scope;
   }
   private popScope() {
-    this.scopes.pop();
+    return this.scopes.pop();
   }
   private evaluateChoiceExpression(expr: ChoiceExpression): ChoiceValue {
     const text = this.evaluator(expr.text);
@@ -274,22 +348,24 @@ export class Interpreter {
       }
       this.getCurrentScope().addVariable(
         singleDeclaration.variableName,
-        singleDeclaration.variableType,
-        value.value,
+        { type: singleDeclaration.variableType, value: value.value } as any,
       );
     }
   }
 
   private evaluateBlockExpression(expr: BlockExpression): RuntimeValue {
     const scope = this.pushScope();
-    scope.addRegister('yield');
     try {
+      scope.addRegister('yield');
       for (const statement of expr.statements) {
         this.executeStatement(statement);
       }
       return scope.getRegister('yield')!;
     } catch (error) {
-      if ((error instanceof BubbleSignal) && (error.type === BubbleSignalType.YIELD)) {
+      if (
+        (error instanceof BubbleSignal) &&
+        (error.type === BubbleSignalType.YIELD)
+      ) {
         return scope.getRegister('yield')!;
       }
       throw error;
@@ -316,12 +392,130 @@ export class Interpreter {
     };
   }
 
-  private evaluator: (expr: Expression) => RuntimeValue = (expr: Expression) => {
+  private evaluateListExpression(expr: ListExpression): ListValue {
+    return {
+      type: 'list',
+      value: expr.elements.map(expr => this.evaluator(expr)),
+    };
+  }
+
+  private evaluateFunctionExpression(expr: FunctionExpression): FunctionValue {
+    return {
+      type: 'function',
+      value: {
+        builtIn: false,
+        expr,
+        captured: expr.captures.map(variableName => ({
+          name: variableName,
+          value: this.resolveVariableReference(variableName),
+        })),
+      },
+    };
+  }
+
+  private isEqual(v0: RuntimeValue, v1: RuntimeValue): boolean {
+    if (v0.type !== v1.type) {
+      return false;
+    }
+    switch (v0.type) {
+      case 'null':
+        return true;
+      case 'number':
+      case 'boolean':
+      case 'string':
+        return v0.value === v1.value;
+      case 'action':
+        if (v0.value.action !== (v1 as any).value.action) {
+          return false;
+        }
+        switch (v0.value.action) {
+          case 'exit':
+            return true;
+          case 'goto':
+            return v0.value.target === (v1 as any).value.target;
+        }
+        throw new Error('Shouldn\'t fall through.');
+      case 'choice':
+        return (
+          (v0.value.text === (v1 as any).value.text) &&
+          (this.isEqual(v0.value.action, (v1 as any).value.action))
+        );
+      case 'function':
+        if (v0.value.builtIn !== (v1 as FunctionValue).value.builtIn) {
+          return false;
+        }
+        if (v0.value.builtIn === true) {
+          return (v0.value.nativeFn === (v1 as any).value.nativeFn);
+        } else {
+          return (
+            // They refer to same expression
+            (v0.value.expr === (v1 as any).value.expr) &&
+            (v0.value.captured.every((v0Cap, index) => {
+              const v1Cap = (v1 as any).value.captured[index];
+              return (
+                (v0Cap.name === v1Cap.name) &&
+                // Reference equality to make sure they captured the same
+                // variable
+                (v0Cap.value === v1Cap.value)
+              );
+            }))
+          );
+        }
+      case 'list':
+        return (
+          (v0.value.length === (v1 as ListValue).value.length) &&
+          (v0.value.every((element, index) => this.isEqual(
+            element,
+            (v1 as ListValue).value[index]),
+          ))
+        );
+      case 'selection':
+        return (
+          (v0.value.choices.length
+            === (v1 as SelectionValue).value.choices.length) &&
+          (v0.value.choices.every((choice, index) => this.isEqual(
+            choice,
+            (v1 as SelectionValue).value.choices[index]),
+          ))
+        );
+    }
+  }
+
+  private evaluateSwitchExpression(expr: SwitchExpression): RuntimeValue {
+    const switchValue = this.evaluator(expr.expression);
+    for (const switchCase of expr.cases) {
+      const matches = this.evaluator(switchCase.matches);
+      if (matches.type !== 'list') {
+        throw WTCDError.atLocation(switchCase.matches, `Value to match for ` +
+          `each case is expected to be a list. Received: ` +
+          `${describe(matches)}`);
+      }
+      if (matches.value.some(oneMatch => this.isEqual(oneMatch, switchValue))) {
+        // Matched
+        return this.evaluator(switchCase.returns);
+      }
+    }
+    // Default
+    if (expr.defaultCase === null) {
+      throw WTCDError.atLocation(expr, `None of the cases matched and no ` +
+        `default case is provided`);
+    } else {
+      return this.evaluator(expr.defaultCase);
+    }
+  }
+
+  private evaluator(expr: Expression): RuntimeValue {
     switch (expr.type) {
       case 'unaryExpression':
-        return unaryOperators.get(expr.operator)!.fn(expr, this.evaluator);
+        return unaryOperators.get(expr.operator)!.fn(
+          expr,
+          this.interpreterHandle,
+        );
       case 'binaryExpression':
-        return binaryOperators.get(expr.operator)!.fn(expr, this.evaluator, this.resolveVariableReference);
+        return binaryOperators.get(expr.operator)!.fn(
+          expr,
+          this.interpreterHandle,
+        );
       case 'booleanLiteral':
         return getMaybePooled('boolean', expr.value);
       case 'numberLiteral':
@@ -330,6 +524,8 @@ export class Interpreter {
         return getMaybePooled('string', expr.value);
       case 'nullLiteral':
         return getMaybePooled('null', null);
+      case 'list':
+        return this.evaluateListExpression(expr);
       case 'choiceExpression':
         return this.evaluateChoiceExpression(expr);
       case 'conditionalExpression':
@@ -354,9 +550,11 @@ export class Interpreter {
       case 'selection':
         return this.evaluateSelectionExpression(expr);
       case 'variableReference':
-        // RuntimeValues are immutable by nature so we don't need to worry about
-        // anything changing the values of our variables.
-        return this.resolveVariableReference(expr.variableName);
+        return clone(this.resolveVariableReference(expr.variableName));
+      case 'function':
+        return this.evaluateFunctionExpression(expr);
+      case 'switch':
+        return this.evaluateSwitchExpression(expr);
     }
   }
 
@@ -373,6 +571,12 @@ export class Interpreter {
         throw new BubbleSignal(BubbleSignalType.YIELD); // Bubble up
       case 'setYield':
         this.setRegister('yield', this.evaluator(statement.value));
+        return;
+      case 'return':
+        this.setRegister('return', this.evaluator(statement.value));
+        throw new BubbleSignal(BubbleSignalType.RETURN);
+      case 'setReturn':
+        this.setRegister('return', this.evaluator(statement.value));
         return;
       default:
         throw WTCDError.atLocation(statement, 'Not implemented');
@@ -406,6 +610,20 @@ export class Interpreter {
   private sectionEnterTimes = new Map<string, number>();
   private currentlyBuilding: Array<HTMLElement> = [];
   public *start(): Generator<ContentOutput, ContentOutput, number> {
+    const stdScope = this.pushScope();
+    for (const stdFunction of stdFunctions) {
+      stdScope.addVariable(stdFunction.name, {
+        type: 'function',
+        value: {
+          builtIn: true,
+          nativeFn: stdFunction,
+        },
+      });
+    }
+
+    // Global scope
+    this.pushScope();
+
     if (this.started) {
       throw new Error('Interpretation has already started.');
     }

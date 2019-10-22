@@ -13,7 +13,9 @@
 		{ "include": "#blockExpressions" },
 		{ "include": "#operators" },
 		{ "include": "#strings" },
-		{ "include": "#variables" }
+		{ "include": "#stdFunctions" },
+		{ "include": "#variables" },
+		{ "include": "#semicolon" }
 	],
 	"repository": {
 		"contentSection": {
@@ -37,11 +39,21 @@
 			}
 		},
 		"goto": {
-			"name": "keyword.control.wtcd",
-			"match": "\\goto\\s+([a-zA-Z_][a-zA-Z_0-9]*)",
-			"captures": {
-				"1": { "name": "entity.name.type.class.section.wtcd" }
-			}
+		  "patterns": [{
+				"name": "keyword.control.wtcd",
+				"match": "\\bgoto\\s+([a-zA-Z_][a-zA-Z_0-9]*)",
+				"captures": {
+					"1": { "name": "entity.name.type.class.section.wtcd" }
+				}
+			}, {
+				"name": "keyword.control.wtcd",
+				"match": "\\bgoto\\s*(\\[)((?:\\s*[a-zA-Z_][a-zA-Z_0-9]*)*\\s*)(\\])",
+				"captures": {
+					"1": { "name": "meta.brace.wtcd" },
+					"2": { "name": "entity.name.type.class.section.wtcd" },
+					"3": { "name": "meta.brace.wtcd" }
+				}
+			}]
 		},
 		"declare": {
 			"name": "storage.type.class.declare.wtcd",
@@ -49,7 +61,7 @@
 		},
 		"keywords": {
 			"name": "keyword.control.wtcd",
-			"match": "\\b(number|boolean|string|action|then|selection|choice|yield|exit)\\b"
+			"match": "\\b(number|boolean|string|action|then|selection|choice|yield|exit|return|function|switch|list)\\b"
 		},
 		"languageConstants": {
 			"patterns": [{
@@ -87,9 +99,17 @@
 				}
 			]
 		},
+		"stdFunctions": {
+			"name": "support.function",
+			"match": "\\b(?:listSet|listForEach|listMap|listCreateFilled|print|random|randomInt|randomBoolean|randomBiased|min|max|stringLength)\\b"
+		},
 		"variables": {
 			"name": "variable.other.readwrite.wtcd",
 			"match": "\\b[a-zA-Z_][a-zA-Z_0-9]*\\b"
+		},
+		"semicolon": {
+			"name": "invalid.illegal",
+			"match": ";"
 		}
 	},
 	"scopeName": "source.wtcd"
