@@ -245,10 +245,21 @@ window.DATA={
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/21",
             "htmlRelativePath": "支线/新能源.html",
             "chapterCharCount": 11028
+          },
+          {
+            "displayName": "艾迦塔调教录像",
+            "displayIndex": 3,
+            "name": "3 - 艾迦塔调教录像",
+            "sourceRelativePath": "2 - 支线/3 - 艾迦塔调教录像.wtcd",
+            "type": "WTCD",
+            "isEarlyAccess": false,
+            "commentsUrl": null,
+            "htmlRelativePath": "支线/艾迦塔调教录像.html",
+            "chapterCharCount": 3893
           }
         ],
         "subFolders": [],
-        "folderCharCount": 15079
+        "folderCharCount": 18972
       },
       {
         "displayName": "小作品",
@@ -561,14 +572,14 @@ window.DATA={
         "folderCharCount": 1361
       }
     ],
-    "folderCharCount": 157306
+    "folderCharCount": 161199
   },
-  "charsCount": 157306,
-  "paragraphsCount": 3192,
+  "charsCount": 161199,
+  "paragraphsCount": 3352,
   "keywordsCount": [
     [
       "高潮",
-      343
+      345
     ],
     [
       "按摩棒",
@@ -635,5 +646,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "311"
+  "buildNumber": "313"
 };
