@@ -2558,7 +2558,7 @@ function getMaybePooled(type, value) {
     if (type === 'boolean') {
         return booleanValue(value);
     }
-    if (type === 'number' && value >= 0 && value <= 100) {
+    if (type === 'number' && value >= 0 && value <= 100 && (value % 1 === 0)) {
         return exports.smallIntegers[value];
     }
     return {
