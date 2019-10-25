@@ -15,11 +15,11 @@ export function assertArgsLength(
 ) {
   if (args.length < min) {
     throw new NativeFunctionError(`Too many arguments are provided. ` +
-    `Minimum number of arguments: ${min}. Received: ${args.length}`);
+    `Minimum number of arguments: ${min}, received: ${args.length}`);
   }
   if (args.length > max) {
     throw new NativeFunctionError(`Too many arguments are provided. ` +
-    `Maximum number of arguments: ${max}. Received: ${args.length}`);
+    `Maximum number of arguments: ${max}, received: ${args.length}`);
   }
 }
 
@@ -47,7 +47,7 @@ export function assertArgType<T extends RuntimeValueType>(
   }
   if (value.type !== type) {
     throw new NativeFunctionError(`The ${index}th argument of ` +
-      `invocation has wrong type. Expected: ${type}. Received: ` +
+      `invocation has wrong type. Expected: ${type}, received: ` +
       `${describe(value)}`);
   }
   return value.value as any;

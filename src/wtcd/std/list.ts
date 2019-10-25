@@ -1,8 +1,9 @@
-import { clone, getMaybePooled } from '../constantsPool';
+import { getMaybePooled } from '../constantsPool';
+import { ListValue } from '../Interpreter';
 import { FunctionInvocationError, invokeFunctionRaw } from '../invokeFunction';
 import { NativeFunction } from '../types';
-import { assertArgsLength, assertArgType, NativeFunctionError } from './utils';
 import { WTCDError } from '../WTCDError';
+import { assertArgsLength, assertArgType, NativeFunctionError } from './utils';
 
 export const listStdFunctions: Array<NativeFunction> = [
   function listSet(args) {
@@ -33,7 +34,10 @@ export const listStdFunctions: Array<NativeFunction> = [
     const fn = assertArgType(args, 1, 'function');
     list.forEach((element, index) => {
       try {
-        invokeFunctionRaw(fn, [ element ], interpreterHandle);
+        invokeFunctionRaw(fn, [
+          element,
+          getMaybePooled('number', index),
+        ], interpreterHandle);
       } catch (error) {
         if (error instanceof FunctionInvocationError) {
           throw new NativeFunctionError(`Failed to apply function to the ` +
@@ -52,7 +56,10 @@ export const listStdFunctions: Array<NativeFunction> = [
     const fn = assertArgType(args, 1, 'function');
     const result = list.map((element, index) => {
       try {
-        return invokeFunctionRaw(fn, [ element ], interpreterHandle);
+        return invokeFunctionRaw(fn, [
+          element,
+          getMaybePooled('number', index),
+        ], interpreterHandle);
       } catch (error) {
         if (error instanceof FunctionInvocationError) {
           throw new NativeFunctionError(`Failed to apply function to the ` +
@@ -84,6 +91,26 @@ export const listStdFunctions: Array<NativeFunction> = [
     return {
       type: 'list',
       value: list,
+    };
+  },
+  function listChunk(args) {
+    assertArgsLength(args, 2);
+    const list = assertArgType(args, 0, 'list');
+    const chunkSize = assertArgType(args, 1, 'number');
+    if (chunkSize % 1 !== 0 || chunkSize < 1) {
+      throw new NativeFunctionError(`Chunk size (${chunkSize} has to be a ` +
+        `positive integer.`);
+    }
+    const results: Array<ListValue> = [];
+    for (let i = 0; i < list.length; i += chunkSize) {
+      results.push({
+        type: 'list',
+        value: list.slice(i, i + chunkSize),
+      });
+    }
+    return {
+      type: 'list',
+      value: results,
     };
   },
 ];

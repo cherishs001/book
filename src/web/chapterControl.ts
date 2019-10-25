@@ -12,7 +12,7 @@ import { SwipeDirection, swipeEvent } from './gestures';
 import { updateHistory } from './history';
 import { ArrowKey, arrowKeyPressEvent, escapeKeyPressEvent } from './keyboard';
 import { loadingText } from './loadingText';
-import { WTCD_ERROR_COMPILE_TITLE, WTCD_ERROR_INTERNAL_DESC, WTCD_ERROR_INTERNAL_STACK_DESC, WTCD_ERROR_INTERNAL_STACK_TITLE, WTCD_ERROR_INTERNAL_TITLE, WTCD_ERROR_MESSAGE, WTCD_ERROR_RUNTIME_DESC, WTCD_ERROR_RUNTIME_TITLE } from './messages';
+import { WTCD_ERROR_COMPILE_TITLE, WTCD_ERROR_INTERNAL_DESC, WTCD_ERROR_INTERNAL_STACK_DESC, WTCD_ERROR_INTERNAL_STACK_TITLE, WTCD_ERROR_INTERNAL_TITLE, WTCD_ERROR_MESSAGE, WTCD_ERROR_RUNTIME_DESC, WTCD_ERROR_RUNTIME_TITLE, WTCD_ERROR_WTCD_STACK_DESC, WTCD_ERROR_WTCD_STACK_TITLE } from './messages';
 import { processElements } from './processElements';
 import { RectMode, setRectMode } from './RectMode';
 import { earlyAccess, gestureSwitchChapter } from './settings';
@@ -225,11 +225,13 @@ enum ErrorType {
 function createWTCDErrorMessage({
   errorType,
   message,
-  stack,
+  internalStack,
+  wtcdStack,
 }: {
   errorType: ErrorType;
   message: string;
-  stack: string | undefined;
+  internalStack?: string;
+  wtcdStack?: string;
 }): HTMLElement {
   const $target = document.createElement('div');
   const $title = document.createElement('h1');
@@ -253,7 +255,20 @@ function createWTCDErrorMessage({
   const $message = document.createElement('p');
   $message.innerText = WTCD_ERROR_MESSAGE + message;
   $target.appendChild($message);
-  if (stack !== undefined) {
+  if (wtcdStack !== undefined) {
+    const $stackTitle = document.createElement('h2');
+    $stackTitle.innerText = WTCD_ERROR_WTCD_STACK_TITLE;
+    $target.appendChild($stackTitle);
+    const $stackDesc = document.createElement('p');
+    $stackDesc.innerText = WTCD_ERROR_WTCD_STACK_DESC;
+    $target.appendChild($stackDesc);
+    const $pre = document.createElement('pre');
+    const $code = document.createElement('code');
+    $code.innerText = wtcdStack;
+    $pre.appendChild($code);
+    $target.appendChild($pre);
+  }
+  if (internalStack !== undefined) {
     const $stackTitle = document.createElement('h2');
     $stackTitle.innerText = WTCD_ERROR_INTERNAL_STACK_TITLE;
     $target.appendChild($stackTitle);
@@ -262,7 +277,7 @@ function createWTCDErrorMessage({
     $target.appendChild($stackDesc);
     const $pre = document.createElement('pre');
     const $code = document.createElement('code');
-    $code.innerText = stack;
+    $code.innerText = internalStack;
     $pre.appendChild($code);
     $target.appendChild($pre);
   }
@@ -281,7 +296,7 @@ function insertContent($target: HTMLDivElement, content: string, chapter: Chapte
         $target.appendChild(createWTCDErrorMessage({
           errorType: ErrorType.COMPILE,
           message: wtcdParseResult.message,
-          stack: wtcdParseResult.internalStack,
+          internalStack: wtcdParseResult.internalStack,
         }));
         break;
       }
@@ -293,7 +308,10 @@ function insertContent($target: HTMLDivElement, content: string, chapter: Chapte
             ? ErrorType.RUNTIME
             : ErrorType.INTERNAL,
           message: error.message,
-          stack: error.stack,
+          internalStack: error.stack,
+          wtcdStack: (error instanceof WTCDError)
+            ? error.wtcdStack
+            : undefined,
         }),
         processElements,
       );

@@ -127,6 +127,13 @@ function isNumberPart(char: string | undefined) {
   return includes('0123456789.', char);
 }
 
+function isAtNumberStart(charStream: CharStream) {
+  return includes('0123456789', charStream.peek()) || (
+    (charStream.peek() === '.') &&
+    (includes('0123456789', charStream.peekNextNChars(2)[1]))
+  );
+}
+
 function isSpace(char: string | undefined) {
   return includes(' \t\n', char);
 }
@@ -140,7 +147,7 @@ function isIdentifierBody(char: string | undefined) {
 }
 
 function isOperatorPart(char: string | undefined) {
-  return includes('+-*/^&|=><!?:%~', char);
+  return includes('+-*/^&|=><!?:%~.', char);
 }
 
 function isPunctuation(char: string | undefined) {
@@ -378,7 +385,7 @@ export class TokenStream extends ItemStream<Token> {
         type: keywords.has(identifier) ? 'keyword' : 'identifier',
         content: identifier,
       };
-    } else if (isNumberPart(this.charStream.peek())) {
+    } else if (isAtNumberStart(this.charStream)) {
       tokenContent = {
         type: 'number',
         content: this.readNumber(),

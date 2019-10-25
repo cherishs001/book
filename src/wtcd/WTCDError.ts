@@ -3,7 +3,7 @@ import { OptionalLocationInfo } from './types';
 const empty = {};
 
 export class WTCDError<TLocationInfo extends boolean> extends Error {
-  public readonly wtcdStack: Array<string> = [];
+  private readonly wtcdStackArray: Array<string> = [];
   private constructor(
     message: string,
     public readonly line: TLocationInfo extends true ? number : null,
@@ -12,8 +12,11 @@ export class WTCDError<TLocationInfo extends boolean> extends Error {
     super(message);
     this.name = 'WTCDError';
   }
+  public get wtcdStack() {
+    return this.message + '\n' + this.wtcdStackArray.join('\n');
+  }
   public pushWTCDStack(info: string, location: OptionalLocationInfo = empty) {
-    this.wtcdStack.push(`    at ${info}`
+    this.wtcdStackArray.push(`    at ${info}`
       + (location.line
         ? ':' + location.line
           + (location.column

@@ -2,8 +2,8 @@ import { getMaybePooled } from '../constantsPool';
 import { NativeFunction } from '../types';
 import { assertArgsLength, assertArgType } from './utils';
 
-export const numberStdFunctions: Array<NativeFunction> = [
-  function min(args) {
+export const mathStdFunctions: Array<NativeFunction> = [
+  function mathMin(args) {
     assertArgsLength(args, 1, Infinity);
     let min = Infinity;
     for (let i = 0; i < args.length; i++) {
@@ -14,7 +14,7 @@ export const numberStdFunctions: Array<NativeFunction> = [
     }
     return getMaybePooled('number', min);
   },
-  function max(args) {
+  function mathMax(args) {
     assertArgsLength(args, 1, Infinity);
     let max = -Infinity;
     for (let i = 0; i < args.length; i++) {
@@ -24,5 +24,12 @@ export const numberStdFunctions: Array<NativeFunction> = [
       }
     }
     return getMaybePooled('number', max);
+  },
+  function mathFloor(args) {
+    assertArgsLength(args, 1);
+    return getMaybePooled(
+      'number',
+      Math.floor(assertArgType(args, 0, 'number')),
+    );
   },
 ];

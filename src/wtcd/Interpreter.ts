@@ -18,6 +18,7 @@ import {
   SwitchExpression,
   WTCDRoot,
 } from './types';
+import { arrayEquals, flat } from './utils';
 import { WTCDError } from './WTCDError';
 
 // Dispatching code for the runtime of WTCD
@@ -111,6 +112,74 @@ export type RuntimeValueRaw<T extends RuntimeValueType> = Extract<
   RuntimeValue,
   { type: T }
 >['value'];
+
+export function isEqual(v0: RuntimeValue, v1: RuntimeValue): boolean {
+  if (v0.type !== v1.type) {
+    return false;
+  }
+  switch (v0.type) {
+    case 'null':
+      return true;
+    case 'number':
+    case 'boolean':
+    case 'string':
+      return v0.value === v1.value;
+    case 'action':
+      if (v0.value.action !== (v1 as any).value.action) {
+        return false;
+      }
+      switch (v0.value.action) {
+        case 'exit':
+          return true;
+        case 'goto':
+          return arrayEquals(v0.value.target, (v1 as any).value.target);
+      }
+      throw new Error('Shouldn\'t fall through.');
+    case 'choice':
+      return (
+        (v0.value.text === (v1 as any).value.text) &&
+        (isEqual(v0.value.action, (v1 as any).value.action))
+      );
+    case 'function':
+      if (v0.value.builtIn !== (v1 as FunctionValue).value.builtIn) {
+        return false;
+      }
+      if (v0.value.builtIn === true) {
+        return (v0.value.nativeFn === (v1 as any).value.nativeFn);
+      } else {
+        return (
+          // They refer to same expression
+          (v0.value.expr === (v1 as any).value.expr) &&
+          (v0.value.captured.every((v0Cap, index) => {
+            const v1Cap = (v1 as any).value.captured[index];
+            return (
+              (v0Cap.name === v1Cap.name) &&
+              // Reference equality to make sure they captured the same
+              // variable
+              (v0Cap.value === v1Cap.value)
+            );
+          }))
+        );
+      }
+    case 'list':
+      return (
+        (v0.value.length === (v1 as ListValue).value.length) &&
+        (v0.value.every((element, index) => isEqual(
+          element,
+          (v1 as ListValue).value[index]),
+        ))
+      );
+    case 'selection':
+      return (
+        (v0.value.choices.length
+          === (v1 as SelectionValue).value.choices.length) &&
+        (v0.value.choices.every((choice, index) => isEqual(
+          choice,
+          (v1 as SelectionValue).value.choices[index]),
+        ))
+      );
+  }
+}
 
 export type Evaluator = (expr: Expression) => RuntimeValue;
 
@@ -230,15 +299,20 @@ export interface InterpreterHandle {
   popScope(): RuntimeScope | undefined;
   resolveVariableReference(variableName: string): RuntimeValueMutable;
   getRandom(): Random;
+  pushContent($element: HTMLElement): void;
+  readonly timers: Map<string, number>;
 }
 
 export class Interpreter {
+  private timers: Map<string, number> = new Map();
   private interpreterHandle: InterpreterHandle = {
     evaluator: this.evaluator.bind(this),
     pushScope: this.pushScope.bind(this),
     popScope: this.popScope.bind(this),
     resolveVariableReference: this.resolveVariableReference.bind(this),
     getRandom: () => this.random,
+    pushContent: this.pushContent.bind(this),
+    timers: this.timers,
   };
   public constructor(
     private wtcdRoot: WTCDRoot,
@@ -295,7 +369,7 @@ export class Interpreter {
     }
     const action = this.evaluator(expr.action);
     if (action.type !== 'action' && action.type !== 'null') {
-      throw WTCDError.atLocation(expr, `First argument of choice is expected to be an action ` +
+      throw WTCDError.atLocation(expr, `Second argument of choice is expected to be an action ` +
         `or null, received: ${describe(text)}`);
     }
     return {
@@ -395,7 +469,17 @@ export class Interpreter {
   private evaluateListExpression(expr: ListExpression): ListValue {
     return {
       type: 'list',
-      value: expr.elements.map(expr => this.evaluator(expr)),
+      value: flat(expr.elements.map(expr => {
+        if (expr.type !== 'spread') {
+          return this.evaluator(expr);
+        }
+        const list = this.evaluator(expr.expression);
+        if (list.type !== 'list') {
+          throw WTCDError.atLocation(expr, `Spread operator "..." can be ` +
+            `used before a list, received: ${describe(list)}`);
+        }
+        return list.value;
+      })),
     };
   }
 
@@ -413,84 +497,16 @@ export class Interpreter {
     };
   }
 
-  private isEqual(v0: RuntimeValue, v1: RuntimeValue): boolean {
-    if (v0.type !== v1.type) {
-      return false;
-    }
-    switch (v0.type) {
-      case 'null':
-        return true;
-      case 'number':
-      case 'boolean':
-      case 'string':
-        return v0.value === v1.value;
-      case 'action':
-        if (v0.value.action !== (v1 as any).value.action) {
-          return false;
-        }
-        switch (v0.value.action) {
-          case 'exit':
-            return true;
-          case 'goto':
-            return v0.value.target === (v1 as any).value.target;
-        }
-        throw new Error('Shouldn\'t fall through.');
-      case 'choice':
-        return (
-          (v0.value.text === (v1 as any).value.text) &&
-          (this.isEqual(v0.value.action, (v1 as any).value.action))
-        );
-      case 'function':
-        if (v0.value.builtIn !== (v1 as FunctionValue).value.builtIn) {
-          return false;
-        }
-        if (v0.value.builtIn === true) {
-          return (v0.value.nativeFn === (v1 as any).value.nativeFn);
-        } else {
-          return (
-            // They refer to same expression
-            (v0.value.expr === (v1 as any).value.expr) &&
-            (v0.value.captured.every((v0Cap, index) => {
-              const v1Cap = (v1 as any).value.captured[index];
-              return (
-                (v0Cap.name === v1Cap.name) &&
-                // Reference equality to make sure they captured the same
-                // variable
-                (v0Cap.value === v1Cap.value)
-              );
-            }))
-          );
-        }
-      case 'list':
-        return (
-          (v0.value.length === (v1 as ListValue).value.length) &&
-          (v0.value.every((element, index) => this.isEqual(
-            element,
-            (v1 as ListValue).value[index]),
-          ))
-        );
-      case 'selection':
-        return (
-          (v0.value.choices.length
-            === (v1 as SelectionValue).value.choices.length) &&
-          (v0.value.choices.every((choice, index) => this.isEqual(
-            choice,
-            (v1 as SelectionValue).value.choices[index]),
-          ))
-        );
-    }
-  }
-
   private evaluateSwitchExpression(expr: SwitchExpression): RuntimeValue {
     const switchValue = this.evaluator(expr.expression);
     for (const switchCase of expr.cases) {
       const matches = this.evaluator(switchCase.matches);
       if (matches.type !== 'list') {
         throw WTCDError.atLocation(switchCase.matches, `Value to match for ` +
-          `each case is expected to be a list. Received: ` +
+          `each case is expected to be a list, received: ` +
           `${describe(matches)}`);
       }
-      if (matches.value.some(oneMatch => this.isEqual(oneMatch, switchValue))) {
+      if (matches.value.some(oneMatch => isEqual(oneMatch, switchValue))) {
         // Matched
         return this.evaluator(switchCase.returns);
       }
@@ -609,6 +625,9 @@ export class Interpreter {
   private started = false;
   private sectionEnterTimes = new Map<string, number>();
   private currentlyBuilding: Array<HTMLElement> = [];
+  private pushContent($element: HTMLElement) {
+    this.currentlyBuilding.push($element);
+  }
   public *start(): Generator<ContentOutput, ContentOutput, number> {
     const stdScope = this.pushScope();
     for (const stdFunction of stdFunctions) {
@@ -668,7 +687,7 @@ export class Interpreter {
           let $current = $host.firstChild;
           while ($current !== null) {
             if ($current instanceof HTMLElement) {
-              this.currentlyBuilding.push($current);
+              this.pushContent($current);
             }
             $current = $current.nextSibling;
           }
@@ -696,7 +715,7 @@ export class Interpreter {
           this.executeAction(then);
         } else if (then.type !== 'null') {
           throw WTCDError.atLocation(currentSection.then, `Expression after then is expected to return ` +
-            `selection, action, or null. Received: ${describe(then)}`);
+            `selection, action, or null, received: ${describe(then)}`);
         }
       }
     } catch (error) {

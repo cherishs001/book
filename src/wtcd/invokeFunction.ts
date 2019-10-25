@@ -37,12 +37,6 @@ export function invokeFunctionRaw(
   const scope = pushScope();
   try {
     scope.addRegister('return');
-    if (functionValue.expr.arguments.length < args.length) {
-      throw new FunctionInvocationError(`Too many arguments are provided. ` +
-        `Maximum number of arguments: ` +
-        `${functionValue.expr.arguments.length}. ` +
-        `Received: ${args.length}`);
-    }
     // Check and add arguments to the scope
     functionValue.expr.arguments.forEach((argument, index) => {
       let value = args[index];
@@ -57,7 +51,7 @@ export function invokeFunctionRaw(
       }
       if (value.type !== argument.type) {
         throw new FunctionInvocationError(`The ${index + 1}th argument of ` +
-          `invocation has wrong type. Expected: ${argument.type}. Received: ` +
+          `invocation has wrong type. Expected: ${argument.type}, received: ` +
           `${describe(value)}`);
       }
       scope.addVariable(
@@ -68,6 +62,16 @@ export function invokeFunctionRaw(
         } as any,
       );
     });
+    // Rest arg
+    if (functionValue.expr.restArgName !== null) {
+      scope.addVariable(
+        functionValue.expr.restArgName,
+        {
+          type: 'list',
+          value: args.slice(functionValue.expr.arguments.length),
+        },
+      );
+    }
     // Restore captured variables
     functionValue.captured.forEach(captured => {
       scope.addVariable(

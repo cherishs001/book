@@ -101,7 +101,7 @@
 		},
 		"stdFunctions": {
 			"name": "support.function",
-			"match": "\\b(?:listSet|listForEach|listMap|listCreateFilled|print|random|randomInt|randomBoolean|randomBiased|min|max|stringLength)\\b"
+			"match": "\\b(?:print|assert|timeStart|timeEnd|listSet|listForEach|listMap|listCreateFilled|listChunk|mathMin|mathMax|mathFloor|random|randomInt|randomBoolean|randomBiased|stringLength)\\b"
 		},
 		"variables": {
 			"name": "variable.other.readwrite.wtcd",

@@ -2,7 +2,7 @@
 
 import { autoEvaluated } from './autoEvaluated';
 import { getMaybePooled } from './constantsPool';
-import { describe, InterpreterHandle, RuntimeValue, RuntimeValueRaw, RuntimeValueType } from './Interpreter';
+import { describe, InterpreterHandle, isEqual, RuntimeValue, RuntimeValueRaw, RuntimeValueType } from './Interpreter';
 import { pipelineInvocation, regularInvocation, reverseInvocation } from './invokeFunction';
 import { BinaryExpression, UnaryExpression } from './types';
 import { WTCDError } from './WTCDError';
@@ -23,7 +23,7 @@ export const unaryOperators = new Map<string, UnaryOperatorDefinition>([
       const arg = evaluator(expr.arg);
       if (arg.type !== 'number') {
         throw WTCDError.atLocation(expr, `Unary operator "-" can only be applied ` +
-          `to a number. Received: ${describe(arg)}`);
+          `to a number, received: ${describe(arg)}`);
       }
       return getMaybePooled('number', -arg.value);
     },
@@ -34,7 +34,7 @@ export const unaryOperators = new Map<string, UnaryOperatorDefinition>([
       const arg = evaluator(expr.arg);
       if (arg.type !== 'boolean') {
         throw WTCDError.atLocation(expr, `Unary operator "!" can only be applied ` +
-          `to a boolean. Received: ${describe(arg)}`);
+          `to a boolean, received: ${describe(arg)}`);
       }
       return getMaybePooled('boolean', !arg.value);
     },
@@ -75,7 +75,7 @@ function autoEvaluatedSameTypeArg<TArg extends RuntimeValueType, TReturn extends
       );
     } else {
       throw WTCDError.atLocation(expr, `Binary operator "${expr.operator}" can only be ` +
-        `applied to two ${argType}s. Received: ${describe(arg0)} (left) and ` +
+        `applied to two ${argType}s, received: ${describe(arg0)} (left) and ` +
         `${describe(arg1)} (right)`);
     }
   });
@@ -103,7 +103,7 @@ function opAssignment<T0 extends RuntimeValueType, T1 extends RuntimeValueType>(
     const arg1 = interpreterHandle.evaluator(expr.arg1);
     if (arg1.type !== arg1Type) {
       throw WTCDError.atLocation(expr, `Right side of binary operator "${expr.operator}" ` +
-        ` has to be a ${arg1Type}. Received: ${describe(arg1)}`);
+        ` has to be a ${arg1Type}, received: ${describe(arg1)}`);
     }
     const newValue = fn(
       varRef.value as RuntimeValueRaw<T0>,
@@ -148,7 +148,7 @@ export const binaryOperators = new Map<string, BinaryOperatorDefinition>([
       const arg1 = evaluator(expr.arg1);
       if (arg1.type !== varRef.type) {
         throw WTCDError.atLocation(expr, `Right side of binary operator "+=" has to ` +
-          ` be a ${varRef.type}. Received: ${describe(arg1)}`);
+          ` be a ${varRef.type}, received: ${describe(arg1)}`);
       }
       const newValue = (varRef.value as any) + arg1.value;
       varRef.value = newValue;
@@ -223,9 +223,9 @@ export const binaryOperators = new Map<string, BinaryOperatorDefinition>([
   }],
   ['==', {
     precedence: 11,
-    fn: autoEvaluated((arg0, arg1) => (getMaybePooled(
+    fn: autoEvaluated((arg0, arg1, expr, interpreterHandle) => (getMaybePooled(
       'boolean',
-      (arg0.type === arg1.type) && (arg0.value === arg1.value),
+      isEqual(arg0, arg1),
     ))),
   }],
   ['!=', {
@@ -266,7 +266,7 @@ export const binaryOperators = new Map<string, BinaryOperatorDefinition>([
         );
       } else {
         throw WTCDError.atLocation(expr, `Binary operator "+" can only be applied to two ` +
-          `strings or two numbers. Received: ${describe(arg0)} (left) and ` +
+          `strings or two numbers, received: ${describe(arg0)} (left) and ` +
           `${describe(arg1)} (right)`);
       }
     }),
@@ -300,4 +300,4 @@ export const binaryOperators = new Map<string, BinaryOperatorDefinition>([
 
 export const conditionalOperatorPrecedence = 4;
 
-export const operators = new Set([...unaryOperators.keys(), ...binaryOperators.keys(), '?', ':']);
+export const operators = new Set([...unaryOperators.keys(), ...binaryOperators.keys(), '?', ':', '...']);

@@ -158,13 +158,20 @@ export interface FunctionArgument extends OptionalLocationInfo {
 export interface FunctionExpression extends OptionalLocationInfo {
   type: 'function';
   arguments: Array<FunctionArgument>;
+  restArgName: string | null;
   captures: Array<string>;
+  expression: Expression;
+}
+
+// NOTE: This is not an expression
+export interface SpreadExpression extends OptionalLocationInfo {
+  type: 'spread';
   expression: Expression;
 }
 
 export interface ListExpression extends OptionalLocationInfo {
   type: 'list';
-  elements: Array<Expression>;
+  elements: Array<Expression | SpreadExpression>;
 }
 
 export interface SwitchCase extends OptionalLocationInfo {

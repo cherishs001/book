@@ -28,6 +28,7 @@ import {
   SetReturnStatement,
   SetYieldStatement,
   SingleSectionContent,
+  SpreadExpression,
   Statement,
   StringLiteral,
   SwitchCase,
@@ -215,9 +216,18 @@ class LogicParser {
 
   private parseList() {
     const leftBracket = this.tokenStream.assertAndSkipNext('punctuation', '[');
-    const elements = [];
+    const elements: Array<Expression | SpreadExpression> = [];
     while (!this.tokenStream.isNext('punctuation', ']')) {
-      elements.push(this.parseExpression());
+      if (this.tokenStream.isNext('operator', '...')) {
+        elements.push(this.attachLocationInfo<SpreadExpression>(
+          this.tokenStream.next(), {
+            type: 'spread',
+            expression: this.parseExpression(),
+          },
+        ));
+      } else {
+        elements.push(this.parseExpression());
+      }
     }
     this.tokenStream.assertAndSkipNext('punctuation', ']');
     return this.attachLocationInfo<ListExpression>(leftBracket, {
@@ -229,13 +239,32 @@ class LogicParser {
   private parseFunctionCore(): FunctionExpression {
     this.tokenStream.assertAndSkipNext('punctuation', '[');
     const functionArguments: Array<FunctionArgument> = [];
+    const usedArgumentNames: Set<string> = new Set();
+    let restArgName: string | null = null;
     while (!this.tokenStream.isNext('punctuation', ']')) {
+      if (this.tokenStream.isNext('operator', '...')) {
+        this.tokenStream.next(); // Skip over ...
+        // Rest arguments
+        const restArgToken = this.tokenStream.assertAndSkipNext('identifier');
+        if (usedArgumentNames.has(restArgToken.content)) {
+          throw WTCDError.atLocation(restArgToken, `Argument ` +
+            `"${restArgToken.content}" already existed.`);
+        }
+        restArgName = restArgToken.content;
+        break; // Stop reading any more arguments
+      }
       const typeToken = this.tokenStream.assertAndSkipNext(
         'keyword',
         variableTypes,
       );
-      const variableNameToken
-        = this.tokenStream.assertAndSkipNext('identifier');
+      const argNameToken = this.tokenStream.assertAndSkipNext('identifier');
+
+      if (usedArgumentNames.has(argNameToken.content)) {
+        throw WTCDError.atLocation(argNameToken, `Argument ` +
+          `"${argNameToken.content}" already existed.`);
+      }
+      usedArgumentNames.add(argNameToken.content);
+
       let defaultValue: null | Expression = null;
       if (this.tokenStream.isNext('operator', '=')) {
         this.tokenStream.next();
@@ -244,7 +273,7 @@ class LogicParser {
       functionArguments.push(this.attachLocationInfo<FunctionArgument>(
         typeToken, {
           type: typeToken.content as any,
-          name: variableNameToken.content,
+          name: argNameToken.content,
           defaultValue,
         },
       ));
@@ -262,11 +291,15 @@ class LogicParser {
         argument.name,
       ),
     );
+    if (restArgName !== null) {
+      this.lexicalScopeProvider.addVariableToCurrentScope(restArgName);
+    }
     const expression = this.parseExpression();
     this.lexicalScopeProvider.exitScope();
     return {
       type: 'function',
       arguments: functionArguments,
+      restArgName,
       captures: Array.from(capturesSet),
       expression,
     };

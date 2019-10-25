@@ -1,0 +1,249 @@
+WTCD 1.1
+
+section main {
+  timeStart::[]
+
+  // Equality
+  assert::[true == true]
+  assert::[false == false]
+  assert::[1 == 1]
+  assert::[1000 == 1000]
+  assert::["asd" == "asd"]
+  assert::[[ 1 ] == [ 1 ]]
+  assert::[[ [ 1 ] true ] == [ [ 1 ] true ]]
+  assert::[[ 1 2 3 ] == [ 1 2 3 ]]
+  assert::[goto dummy1 == goto dummy1]
+  assert::[goto [ dummy1 dummy2 dummy1 ] == goto [ dummy1 dummy2 dummy1 ]]
+  assert::[exit == exit]
+  assert::[null == null]
+  assert::[(choice "a" goto dummy1) == (choice "a" goto dummy1)]
+  assert::[(choice "b" goto [ dummy1 dummy2 ]) == (choice "b" goto [ dummy1 dummy2 ])]
+  assert::[(selection [ choice "a" goto dummy1 choice "b" goto dummy2 choice "c" exit ]) == (selection [ choice "a" goto dummy1 choice "b" goto dummy2 choice "c" exit ])]
+
+  // Inequality
+  assert::[true != false]
+  assert::[false != true]
+  assert::[1 != 0]
+  assert::[1000 != 1]
+  assert::["asd" != "asd2"]
+  assert::[[ 1 2 ] != [ 1 ]]
+  assert::[[ 1 ] != [ 1 2 ]]
+  assert::[[ 1 2 ] != [ 1 3 ]]
+  assert::[[ [ 1 ] false ] != [ [ 1 ] true ]]
+  assert::[[ [ 1 ] true ] != [ [ 2 ] true ]]
+  assert::[goto dummy1 != goto dummy2]
+  assert::[goto [ dummy1 dummy2 dummy1 ] != goto [ dummy2 dummy1 dummy1 ]]
+  assert::[goto [ dummy1 dummy2 ] != goto [ dummy1 dummy2 dummy2 ]]
+  assert::[exit != goto dummy1]
+  assert::[null != 1]
+  assert::[(choice "a" goto dummy1) != (choice "b" goto dummy1)]
+  assert::[(choice "a" goto dummy1) != (choice "a" goto dummy2)]
+  assert::[(choice "b" goto [ dummy1 dummy2 ]) != (choice "b" goto [ dummy1 dummy1 ])]
+  assert::[(selection [ choice "a" goto dummy1 choice "b" goto dummy2 choice "c" exit ]) != (selection [ choice "a" goto dummy1 choice "b" goto dummy1 choice "c" exit ])]
+
+  // 简单算术
+  assert::[(1 + 1) == 2]
+  assert::[(2 - 1) == 1]
+  assert::[(2 * 5) == 10]
+  assert::[(8 / 2) == 4]
+
+  // 三元
+  assert::[(9 > 8
+    ? 9 > 8 
+      ? 1
+      : 2
+    : 9 > 8
+      ? 3
+      : 4) == 1 ]
+  assert::[(9 > 8
+    ? 9 < 8 
+      ? 1
+      : 2
+    : 9 < 8
+      ? 3
+      : 4) == 2 ]
+  assert::[(9 < 8
+    ? 9 > 8 
+      ? 1
+      : 2
+    : 9 > 8
+      ? 3
+      : 4) == 3 ]
+  assert::[(9 < 8
+    ? 9 < 8 
+      ? 1
+      : 2
+    : 9 < 8
+      ? 3
+      : 4) == 4 ]
+  
+  // operator assignment
+  {
+    declare number a = 10
+    assert::[(a += 5) == 15]
+    assert::[a == 15]
+    assert::[(a -= 10) == 5]
+    assert::[a == 5]
+    assert::[(a *= 5) == 25]
+    assert::[a == 25]
+    assert::[(a /= 5) == 5]
+    assert::[a == 5]
+  }
+
+  // yield
+  assert::[{
+    yield 2
+    yield 3
+  } == 2]
+
+  // set yield
+  assert::[{
+    yield = 2
+    yield = 3
+  } == 3]
+
+  // Defaults
+  {
+    declare number a
+    assert::[ a == 0 ]
+    declare boolean b
+    assert::[ b == false ]
+    declare string c
+    assert::[ c == "" ]
+  }
+
+  // Function equality
+  {
+    declare number a = 1
+    declare function fn[number b] b * a
+    declare function fn2[number b] b * a
+    assert::[fn == fn]
+    assert::[fn != fn2] // 函数不指向同一个就算不一样
+  }
+
+  // return + yield
+  {
+    declare function f1[number n] n * n
+    declare function f2[number n] {
+      yield n * n
+    }
+    declare function f3[number n] {
+      yield = "Wrong"
+      return = n * n // Return 优先
+    }
+    declare function f4[number n] {
+      {{{{{ return n * n }}}}}
+    }
+    assert[f1::[12] == 144]
+    assert[f2::[12] == 144]
+    assert[f3::[12] == 144]
+    assert[f4::[12] == 144]
+  }
+
+  // Function factory
+  {
+    declare function maker[number base] function[number inc] {
+      base += inc
+      return base
+    }
+    declare function f1 = maker::[10]
+    assert::[f1::[5] == 15]
+    assert::[f1::[5] == 20]
+    declare function f2 = maker::[1000]
+    assert::[f2::[5] == 1005]
+    assert::[f2::[5] == 1010]
+    declare function f1d = f1
+    assert::[f1 == f1]
+    assert::[f2 == f2]
+    assert::[f1 == f1d]
+    assert::[f1 != f2]
+    assert::[f1d != f2]
+  }
+
+  // Rest arguments
+  {
+    declare function rest[number a number b boolean c ...rest] {
+      assert::[a == 1]
+      assert::[b == 2]
+      assert::[c == false]
+      assert::[rest == [ 4 true "HA!" ]]
+    }
+    rest::[ 1 2 false 4 true "HA!" ]
+  }
+
+  // High order
+  {
+    declare function comp[function f function g] function[...rest] f::[g::rest]
+    declare function square[number input] input * input
+    declare function plusFive[number input] input + 5
+    declare function squareOPlusFive = comp::[square plusFive]
+    assert::[squareOPlusFive::[5] == 100]
+    declare function plusFiveOSquare = comp::[plusFive square]
+    assert::[plusFiveOSquare::[5] == 30]
+  }
+
+  // Array spread
+  assert::[[ 1 ...[ 2  3 ] 4 ] == [ 1 2 3 4 ]]
+  assert::[[ 1 ...[ ...[ ...[2] ] 3 ] 4 ] == [ 1 2 3 4 ]]
+  {
+    declare list l1 = [ 4 5 6 ]
+    assert::[[ 1 2 3 ...l1 7 8 9 ] == [ 1 2 3 4 5 6 7 8 9 ]]
+    assert::[[ 1 ...l1 ...l1 ...l1 1 ] == [ 1 4 5 6 4 5 6 4 5 6 1 ]]
+  }
+
+  // std listSet
+  {
+    declare list l1 = [ 0 1 2 3 4 5 ]
+    declare list l2 = listSet::[l1 3 "Nice"]
+    assert::[l1 == [ 0 1 2 3 4 5 ]]
+    assert::[l2 == [ 0 1 2 "Nice" 4 5 ]]
+  }
+
+  // std listForEach
+  {
+    declare number sum = 0
+    listForEach::[[ 1 2 3 4 5 ] function[number item] sum += item]
+    assert::[sum == 15]
+  }
+
+  // std listMap
+  {
+    declare list l1 = [ 0 1 2 4 20 ]
+    declare list l2 = listMap::[l1 function[number item] item * item]
+    assert::[l1 == [ 0 1 2 4 20 ]]
+    assert::[l2 == [ 0 1 4 16 400 ]]
+  }
+
+  // std listCreateFilled
+  {
+    declare list l1 = listCreateFilled::[ 5 ]
+    assert::[l1 == [ null null null null null ]]
+    declare list l2 = listCreateFilled::[ 5 8 ]
+    assert::[l2 == [ 8 8 8 8 8 ]]
+  }
+
+  // std listChunk
+  {
+    declare list l = listChunk::[[ 1 2 3 4 5 6 7 8 9 10 ] 3 ]
+    assert::[l == [ [ 1 2 3] [ 4 5 6 ] [ 7 8 9 ] [ 10 ] ]]
+  }
+
+  // std math*
+  assert::[mathMin::[ 10 1 2 3 4 ] == 1]
+  assert::[mathMax::[ 1 2 3 4 0 ] == 4]
+  assert::[mathFloor::[ 11.8 ] == 11]
+  assert::[mathFloor::[ -11.8 ] == -12]
+
+  // std string*
+  assert::[stringLength::["Hello~"] == 6]
+
+  timeEnd::[]
+} then exit
+
+section dummy1 then exit
+section dummy2 then exit
+
+
+---<<< main >>>---
+# 测试
+如果你看到这行字那么就代表所有测试都通过了。
