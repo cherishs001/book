@@ -484,7 +484,7 @@ window.DATA={
                 "isEarlyAccess": false,
                 "commentsUrl": null,
                 "htmlRelativePath": "META/WTCD/4.-Lists.html",
-                "chapterCharCount": 2118
+                "chapterCharCount": 2120
               },
               {
                 "displayName": "5. Functions",
@@ -654,10 +654,10 @@ window.DATA={
                 "folderCharCount": 3455
               }
             ],
-            "folderCharCount": 27821
+            "folderCharCount": 27823
           }
         ],
-        "folderCharCount": 28236
+        "folderCharCount": 28238
       },
       {
         "displayName": "杂项",
@@ -682,9 +682,9 @@ window.DATA={
         "folderCharCount": 1361
       }
     ],
-    "folderCharCount": 170620
+    "folderCharCount": 170622
   },
-  "charsCount": 170620,
+  "charsCount": 170622,
   "paragraphsCount": 3472,
   "keywordsCount": [
     [
@@ -756,5 +756,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "317"
+  "buildNumber": "318"
 };

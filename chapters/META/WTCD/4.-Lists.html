@@ -70,7 +70,7 @@ a = listSet::[a 2 &quot;Wow&quot;]
 <p><code>...</code> 允许用一个数组代替一个新的数组的一部分。</p>
 <p>举个例子：</p>
 <pre><code class="language-wtcd">declare list inner = [ 3 4 5 ]
-declare list outer = [ 1 2 ...inner 4 5 ] // [ 1 2 3 4 5 ]
+declare list outer = [ 1 2 ...inner 6 7 ] // [ 1 2 3 4 5 6 7 ]
 </code></pre>
 <p>使用 <code>...</code> 可以获得一个在一个列表的基础上加了若干元素的列表。（添加元素）</p>
 <pre><code>declare list a = [ 1 2 3 ]
