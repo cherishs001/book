@@ -36,16 +36,15 @@
 <p>先行表达式是可选的，如果不提供先行表达式，那么就意味着在需要执行先行表达式的时候，什么也不做。</p>
 <h3>3.2.2 逻辑块的互相连接</h3>
 <p>WTCD 永远从第一个定义的 Section 开始运行。</p>
-<p>WTCD 会根据每一个逻辑块的后发表达式运算结果来决定需要做什么。后发表达式的返回值必须是 <code>action</code>（见 3.2.2.1），<code>selection</code>（见 3.2.2.2），或者 <code>null</code>（见 3.2.2.1.2）。如果类型是 <code>action</code>，那么这个 <code>action</code> 就会被执行。如果类型是 <code>selection</code>，那么 WTCD 就会让用户做出选择，然后执行用户选择相对应的 <code>action</code>。如果是 <code>null</code>，则会什么也不做。</p>
-<h4>3.2.2.1 Action</h4>
-<p>Action 指的是可以立刻完成的操作。目前 WTCD 支持 2 种 action：<code>goto</code> 和 <code>exit</code>。</p>
-<h5>3.2.2.1.1 Exit</h5>
+<p>WTCD 会根据每一个逻辑块的后发表达式运算结果来决定需要做什么。后发表达式的返回值必须是 <code>action</code> 或者 <code>null</code>（见 3.2.2.2.2）。如果类型是 <code>action</code>，那么这个 <code>action</code> 就会被执行。如果是 <code>null</code>，则会什么也不做。</p>
+<p><code>action</code> 目前一共有 3 种：<code>exit</code>，<code>goto</code>，和 <code>selection</code>。下面来逐一介绍。</p>
+<h4>3.2.2.1 Exit</h4>
 <p>因为 <code>exit</code> 比较简单，那么先介绍 <code>exit</code>。</p>
 <p><code>exit</code> 被执行时，会立刻终止 WTCD 的运行。举个例子：</p>
 <pre><code class="language-wtcd">section test then exit
 </code></pre>
 <p>在这个例子中，无论因为什么原因进入 <code>section test</code> 以后，WTCD 都会停止运行。</p>
-<h5>3.2.2.1.2 Goto</h5>
+<h4>3.2.2.2 Goto</h4>
 <p>通常来说 <code>goto</code> 也不复杂。因为当 <code>goto</code> 后面提供一个 Section 名的时候，执行 <code>goto</code> 的作用基本就是跳转到指定的 section：</p>
 <pre><code class="language-wtcd">section a then goto b
 section b then exit
@@ -99,9 +98,9 @@ function b2() {
 }
 main();
 </code></pre>
-<h4>3.2.2.2 Selection</h4>
+<h4>3.2.2.3 Selection</h4>
 <p>除了自动执行固定的 Action 外，WTCD 允许在每一个 Section 后暂停运行，并要求由用户做出选择。若要等待用户作出选择，就需要在 <code>then</code> 后提供一个 Selection。</p>
-<h5>3.2.2.2.1 创建 Selection 和 Choice</h5>
+<h5>3.2.2.3.1 创建 Selection 和 Choice</h5>
 <p>若要创建一个 Selection，则需要使用 <code>selection</code> 关键词和 <code>choice</code> 关键词。</p>
 <p>其中，<code>selection</code> 使用如下格式：</p>
 <pre><code class="language-wtcd">selection &lt;选项列表&gt;
@@ -118,7 +117,7 @@ section a then exit
 section b then exit
 </code></pre>
 <p>在上述例子中，WTCD 会先执行 <code>start</code>。随后因为 <code>then</code> 之后遇到了 <code>selection</code>，脚本会停止运行，并输出两个选项供用户选择。若用户选择了“去 A”，则 Action <code>goto a</code> 会被执行，因此会跳转到 <code>section a</code>。相反，若用户选择了“去 B”，则 Action <code>goto b</code> 会被执行，因此会跳转到 <code>section b</code>。</p>
-<h5>3.2.2.2.2 关于使用 <code>null</code></h5>
+<h5>3.2.2.3.2 关于使用 <code>null</code></h5>
 <p>在 Selection 的选项列表里面，可以提供 <code>null</code>。所有这些 <code>null</code> 都会被忽略。举个例子：</p>
 <pre><code class="language-wtcd">section main then selection [
   null
@@ -142,8 +141,8 @@ section b then exit
   choice &quot;Choice B&quot; null // 这个按钮连点都点不了
 ]
 </code></pre>
-<h4>3.2.2.3 Action，Choice 和 Selection 作为值</h4>
-<p>这里需要注意的是，Action，Choice，和 Selection 都是可以存储的值。它们各自的类型分别是：<code>action</code>，<code>choice</code>，和 <code>selection</code>。</p>
+<h4>3.2.2.4 Action 和 Choice 作为值</h4>
+<p>这里需要注意的是，Action 和 Choice 都是可以存储的值。它们各自的类型分别是：<code>action</code> 和 <code>choice</code>。</p>
 <p>举个例子：</p>
 <pre><code class="language-wtcd">declare [
   // 定义一个存储 Action 的变量 someAction 并初始化为 goto b
@@ -159,7 +158,7 @@ section b then exit
   choice someChoice2 = choice someString + &quot; wow!&quot; exit
 
   // 定义一个存储 Selection 的变量 someSelection，它的选项由之前的变量定义
-  selection someSelection = selection [ someChoice1 someChoice2 ]
+  action someSelection = selection [ someChoice1 someChoice2 ]
 ]
 
 // 定义一个 section 的 then 使用变量 someSelection

@@ -1,0 +1,83 @@
+<h1>4. Lists</h1>
+<h2>4.1 概述</h2>
+<p>WTCD 允许存储有序不可变列表。其类型名为 <code>list</code>。</p>
+<p>WTCD 的列表内的元素可以有不同的类型，因此一个长度为 1 的 <code>list</code> 可以被视为是一个可以存储任何类型值的 WTCD 变量。</p>
+<h2>4.2 创建新的列表</h2>
+<p>若要创建一个新的列表，请使用 <code>[</code> 和 <code>]</code> 包裹这个列表里的元素。两个元素之间仅需要空格或是换行：</p>
+<pre><code class="language-wtcd">declare list a = [ 1 &quot;Hello&quot; 3 ]
+</code></pre>
+<p>此外，在定义变量时，若使用的类型是 <code>list</code>，并不提供初始值的话，将会默认创建一个空的列表。</p>
+<pre><code class="language-wtcd">declare list empty // []
+</code></pre>
+<p>需要注意的是，这里有一个坑。下述代码：</p>
+<pre><code class="language-wtcd">declare list a = [ 1 -2 3 ]
+</code></pre>
+<p>会被 WTCD 理解为 <code>[ (1 - 2) 3 ]</code>。若要解决这个问题，则需要使用：</p>
+<pre><code class="language-wtcd">declare list a = [ 1 (-2) 3 ]
+</code></pre>
+<h2>4.3 获得列表的一个成员</h2>
+<p>若要获得列表的一个成员，则需要使用成员访问操作符：<code>.</code>，<code>.?</code>，<code>?.</code>，<code>?.?</code>。</p>
+<h3>4.3.1 普通成员访问</h3>
+<p>通常来说，访问一个成员使用 <code>.</code> 操作符：</p>
+<pre><code class="language-wtcd">[ &quot;a0&quot; &quot;a1&quot; &quot;a2&quot; &quot;a3&quot; ] . 2 == &quot;a2&quot;
+[ &quot;a0&quot; &quot;a1&quot; &quot;a2&quot; &quot;a3&quot; ].(2) == &quot;a2&quot;
+</code></pre>
+<p>由于小数原因，WTCD 不允许直接写 <code>[ &quot;a0&quot; &quot;a1&quot; &quot;a2&quot; &quot;a3&quot; ].2</code>。点与数字之间必须要要用空格隔开，或者用括号把数字包起来。</p>
+<p>如果要访问的下标（Index）存在变量里，则可以直接写：</p>
+<pre><code class="language-wtcd">declare number index = 2
+[ &quot;a0&quot; &quot;a1&quot; &quot;a2&quot; &quot;a3&quot; ].index == &quot;a2&quot;
+</code></pre>
+<p>需要注意的是，WTCD 的设计提倡“错误尽早发现”，因此当下标不存在（Index out of bounds）或是不正确时，普通成员访问会直接报错。需要注意的是，报错只会在下标不存在时发生。以下例子会正常返回 <code>null</code>。</p>
+<pre><code class="language-wtcd">[ &quot;a0&quot; null &quot;a2&quot; ].(1) == null
+</code></pre>
+<p>而这个例子会报错：</p>
+<pre><code class="language-wtcd">[ &quot;a0&quot; &quot;a1&quot; ].(2) // List does not have an element at 2. If return null is desired, use &quot;.?&quot; instead. List contents: list (elements = [string (value = &quot;a0&quot;), string (value = &quot;a1&quot;)])
+</code></pre>
+<h3>4.3.2 越界即空成员访问</h3>
+<p>当然，有时候，确实会希望当下标不存在时返回 <code>null</code>。这时候可以使用 <code>.?</code> 来访问成员。</p>
+<pre><code class="language-wtcd">[ &quot;a0&quot; &quot;a1&quot; ].(2) == null
+</code></pre>
+<p>需要注意的是，只有下标越界的时候（<code>index &lt; 0</code> 或者 <code>index &gt;= listLength::[list]</code>），<code>.?</code> 才会返回 <code>null</code>。如果提供的下标不是整数依然会报错。（无论如何，你都不应该在下标种使用涉及浮点数运算的操作。）</p>
+<h3>4.3.3 可选成员访问</h3>
+<p>还有某些时候，列表本身也可能是 <code>null</code>。如果希望在这个情况下不报错而是直接返回 <code>null</code>，可以使用 <code>?.</code>。</p>
+<pre><code class="language-wtcd">null ?. 2 == null
+</code></pre>
+<p>需要注意的是，<code>?.</code> 是带有 short circuit 的。也就是说，如果左侧计算结果为 <code>null</code>，那么右侧的内容根本不会被计算。</p>
+<h3>4.3.4 可选越界即空成员访问</h3>
+<p>如果凑巧，不但你希望在下标越界时返回 <code>null</code>，而且在列表自己是 <code>null</code> 的时候也返回 <code>null</code>，你可以使用 <code>?.?</code>。</p>
+<pre><code class="language-wtcd">null ?.? 2 == null
+[ 0 1 2 ] ?.? 3 == null
+</code></pre>
+<h2>4.4 改变列表</h2>
+<p>简而言之，你不能改变列表。</p>
+<p>—— 但是你可以从一个列表创建一个稍稍有点不同的列表。</p>
+<h3>4.4.1 使用标准库函数</h3>
+<p>最简单的改变列表的方式是使用标准库（见第 6 章）函数（见第 5 章） <code>listSet</code>。</p>
+<pre><code class="language-wtcd">declare list a = [ 0 1 2 3 ]
+declare list b = listSet::[a 2 &quot;Wow&quot;] // b 是 [ 0 1 &quot;Wow&quot; 3 ]
+</code></pre>
+<p>需要注意的是，正如之前所说，<code>listSet</code> 不会改变列表，你必须把返回值赋给一个之前的或是另一个变量。</p>
+<pre><code class="language-wtcd">declare list a = [ 0 1 2 3 ]
+
+listSet::[a 2 &quot;Wow&quot;]
+// a 依然是 [ 0 1 2 3 ]
+
+a = listSet::[a 2 &quot;Wow&quot;]
+// a 现在是 [ 0 1 &quot;Wow&quot; 3 ] 了
+</code></pre>
+<p>关于其他改变列表的函数，请前往 <code>6.1</code>。</p>
+<h3>4.4.2 使用 <code>...</code> 操作符</h3>
+<p><code>...</code> 允许用一个数组代替一个新的数组的一部分。</p>
+<p>举个例子：</p>
+<pre><code class="language-wtcd">declare list inner = [ 3 4 5 ]
+declare list outer = [ 1 2 ...inner 4 5 ] // [ 1 2 3 4 5 ]
+</code></pre>
+<p>使用 <code>...</code> 可以获得一个在一个列表的基础上加了若干元素的列表。（添加元素）</p>
+<pre><code>declare list a = [ 1 2 3 ]
+a = [ ...a &quot;Back&quot; ] // [ 1 2 3 &quot;Back&quot; ]
+a = [ &quot;Front&quot; ...a ] // [ &quot;Front&quot; 1 2 3 &quot;Back&quot; ]
+</code></pre>
+<p>或者可以做点别的事情比如：</p>
+<pre><code>declare list a = [ 1 2 3 ]
+a = [ ...a ...a ] // [ 1 2 3 1 2 3 ]
+</code></pre>

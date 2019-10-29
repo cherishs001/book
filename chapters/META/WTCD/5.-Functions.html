@@ -1,0 +1,204 @@
+<h1>5. Functions</h1>
+<h2>5.1 概述</h2>
+<p>WTCD 提供匿名支持引用闭包的函数。</p>
+<p>在 WTCD 里，函数就是普通的值，因此也能被存在变量里或是被传递。若被存在变量里，其类型名为 <code>function</code>。</p>
+<h2>5.2 创建新的函数</h2>
+<p>若要创建函数，需要使用 <code>function</code> 关键词。其格式如下：</p>
+<pre><code>function &lt;参数列表&gt; &lt;返回值&gt;
+</code></pre>
+<p>举个例子：</p>
+<pre><code class="language-wtcd">function[number input] input * input
+</code></pre>
+<p>可以创建一个求平方的函数。</p>
+<p>你当然可以把这个刚刚创建的函数存到变量里（不然相当于是创建了就扔了）。</p>
+<pre><code class="language-wtcd">declare function square = function[number input] input * input
+</code></pre>
+<p>需要注意的是，这里有两个 <code>function</code>。其中第一个 <code>function</code> 的作用是告诉 WTCD <code>square</code> 这个变量的类型是 <code>function</code>（类似 <code>declare number a</code> 里的 <code>number</code>）。之后这个 <code>function</code> 是告诉 WTCD 现在需要创建一个 <code>function</code>。</p>
+<p>是的，我也觉得这么写很烦，所以 WTCD 有语法糖。上述定义还可以写成：</p>
+<pre><code class="language-wtcd">declare function square[number input] input * input
+</code></pre>
+<p>这两个写法效果是完全一致的。</p>
+<p>若要创建一个接受多个参数的函数：</p>
+<pre><code class="language-wtcd">declare function add[number a number b] a + b
+</code></pre>
+<p>当然最后返回值那里也可以用代码块：</p>
+<pre><code class="language-wtcd">declare function solveQuad[number a number b number c] {
+  declare number delta = b ** 2 - 4 * a * c
+  delta &gt; 0 ? {
+    return [
+      (-b - delta ** 0.5) / 2 / a
+      (-b + delta ** 0.5) / 2 / a
+    ]
+  } : delta == 0 ? {
+    return [ -b / 2 / a ]
+  } : {
+    return []
+  }
+}
+</code></pre>
+<h2>5.3 调用函数</h2>
+<p>WTCD 提供多种调用函数的方式。</p>
+<h3>5.3.1 <code>::</code> 函数调用操作符</h3>
+<p>最简单的调用函数的方法是使用 <code>::</code> 操作符。使用时，<code>::</code> 左侧提供被调用函数，右侧提供一个参数列表。</p>
+<p>举个例子：</p>
+<pre><code class="language-wtcd">square::[10] // 100
+</code></pre>
+<p>好的，我知道你肯定要问为什么不是 <code>square(10)</code>。那么原因是，因为 WTCD 没有分割符，如果语法是 <code>square(10)</code>，WTCD 将无法区分 <code>square; (10)</code> 和 <code>square(10)</code>。所以非常遗憾，调用函数必须用 <code>::</code>。</p>
+<p>有意思的是，<code>::</code> 右边其实就是一个列表 —— 这里没有魔法。</p>
+<p>因此理论上来说你可以把参数预先算好，然后到时候放进去：</p>
+<pre><code class="language-wtcd">declare list args = [ 10 ]
+square::args // 100
+</code></pre>
+<p>当然，对于多个参数的情况，调用也是一个道理：</p>
+<pre><code class="language-wtcd">solveQuad::[1 (-3) 2] // [ 1 2 ]
+</code></pre>
+<p>预先计算参数也是可以的：</p>
+<pre><code class="language-wtcd">declare list args = [1 (-3) 2]
+solveQuad::args // [ 1 2 ]
+</code></pre>
+<h3>5.3.2 <code>|&gt;</code> 管道调用操作符</h3>
+<p>WTCD 支持单参数管道调用。</p>
+<p>举个例子：</p>
+<pre><code class="language-wtcd">10 |&gt; square // 100
+</code></pre>
+<p>遗憾的是，如果被调用的函数接受超过 1 个参数就没办法了。</p>
+<h3>5.3.3 <code>|::</code> 逆向调用操作符</h3>
+<p>如果因为某些原因导致你不想把参数写在函数的后面，你可以用 <code>|::</code> 来先写参数再写函数：</p>
+<pre><code class="language-wtcd">[ 10 ] |:: square // 100
+</code></pre>
+<pre><code class="language-wtcd">[1 (-3) 2] |:: solveQuad // [ 1 2 ]
+</code></pre>
+<h2>5.4 传参</h2>
+<p>简而言之，WTCD 参数传递一律传值：WTCD 把所有参数全部复制了一遍，然后把它们当成函数内的局部变量。</p>
+<pre><code class="language-wtcd">declare function tryModify[number a] {
+  a += 10
+  return a
+}
+declare number b = 5
+declare number c = tryModify::[b]
+
+b // 5，不会受函数的影响
+c // 15
+</code></pre>
+<h2>5.5 返回值</h2>
+<p>虽然之前已经用过了，但是这边提一下，WTCD 的函数体内允许使用 <code>return</code>。不过你可能会问为什么不使用 <code>yield</code>。</p>
+<p>事实上，<code>yield</code> 和 <code>yield =</code> 也是可以用的：</p>
+<pre><code class="language-wtcd">declare function square[number a] {
+  yield a * a
+}
+</code></pre>
+<p>但是，如果嵌套了多层，<code>return</code> 可以直接一次全部跳出来。</p>
+<pre><code class="language-wtcd">declare function square[number a] { // 代码块 A
+  { // 代码块 B
+    // 这里使用 yield a * a 将并不会设置函数的返回值，而是只会设置代码块 B 的返回值。
+    return a * a // return 则会直接跳出函数
+  }
+}
+</code></pre>
+<p>当然，有了 <code>return</code>，就有 <code>return =</code>。和 <code>yield =</code> 类似，<code>return =</code> 会设置函数的返回值但是不会终止函数执行。</p>
+<pre><code class="language-wtcd">declare function test[number a] {
+  return = a * 2
+  print::[a]
+}
+test::[10] // 返回 20 并打印 10 到控制台。
+</code></pre>
+<p>如果 <code>return</code> 值和 <code>yield</code> 值冲突了，则会使用 <code>return</code>。</p>
+<pre><code class="language-wtcd">declare function square[number n] {
+  yield = &quot;Wrong&quot;
+  return = n * n // Return 优先
+}
+square::[12] // 144
+</code></pre>
+<h2>5.6 默认参数</h2>
+<p>WTCD 支持默认参数。简而言之就是允许你定义的函数被调用时若一部分参数没有提供，或是提供的值是 <code>null</code>，则使用提供的默认值。</p>
+<pre><code class="language-wtcd">declare function greet[string name = &quot;朋友&quot;] {
+  print::[&quot;你好，&quot; + name]
+}
+greet::[] // 你好，朋友
+greet::[&quot;陈志鹏&quot;] // 你好，陈志鹏
+</code></pre>
+<p>如果要忽略之前的参数，但是提供后面的参数，可以在前面的参数使用 <code>null</code>。</p>
+<pre><code class="language-wtcd">declare function fn[number a = 1 number b = 2] {
+  print::[a + b]
+}
+fn::[null 10] // 11
+fn::[10] // 12
+fn::[10 10] // 20
+</code></pre>
+<h2>5.7 Rest / 可变参数</h2>
+<p>WTCD 支持可变参数。简而言之，就是指定一个参数接受多出来的参数。如果除了这个参数以外，别的什么也没提供，那么相当于是所有的参数都会给这个参数。</p>
+<p>WTCD 仅支持让最后一个参数接受所有多出来的参数。若要这么做，请忽略该参数的类型定义并在其前方写上 <code>...</code>。该参数的类型会自动变成 <code>list</code>。</p>
+<pre><code class="language-wtcd">declare function sum[...items] {
+  declare number value
+  listForEach::[items function[number item] {
+    value += item
+  }]
+  return value
+}
+print::[sum::[1 2 3]]
+</code></pre>
+<h2>5.8 闭包</h2>
+<blockquote>
+<p>This is where the magic lies. -- Tepis</p>
+</blockquote>
+<blockquote>
+<p>I want you to make a contract with me and become a Magical Girl! -- Kyubey</p>
+</blockquote>
+<p>简而言之，WTCD 的闭包允许函数内的语句使用函数外定义的变量。</p>
+<p>先举个简单的例子：</p>
+<pre><code class="language-wtcd">declare number value = 100
+declare function printValue[] {
+  print::[value]
+}
+printValue::[] // 打印 100
+value = 200
+printValue::[] // 打印 200
+</code></pre>
+<p>虽然从这个例子来看好像没有什么特殊的，但是仔细观察发现，函数内使用的 <code>value</code> 是在函数外部的。并且可以发现，当这个 <code>value</code> 发生改变时，<code>printValue</code> 的值也会改变。</p>
+<p>这个就是最简单的闭包。</p>
+<p>下面来看第二个例子。</p>
+<pre><code class="language-wtcd">declare function printValue = {
+  declare number value = 100 // 定义 value
+  yield function[] {
+    print::[value]
+  }
+} // value 所在的作用域在此结束
+printValue::[] // 打印 100
+</code></pre>
+<p>需要注意的是，<code>value</code> 这个变量不在外层作用域里面。我们调用的函数 <code>printValue</code> 是从内层有 <code>value</code> 的作用域里面通过 <code>yield</code> 传递出来的。</p>
+<p>也就是说，因为一些原因，即使 <code>value</code> 的作用域已经结束了，<code>value</code> 还在某个地方存在着。</p>
+<p>事实上，在定义函数的时候，WTCD 会把涉及到的函数作用域以外的变量的值全部打包和函数放在一起。因此也就是说这个传回来的 <code>printValue</code> 函数在 WTCD 内部实际上还保存了 <code>value</code> 的值。这就是为什么 <code>value</code> 本身存在的空间已经挂了但是依然能够被 <code>printValue</code> 访问的原因。</p>
+<p>不但如此，WTCD 的闭包捕获的变量都是保存引用的。也就是说，不但你可以访问之前存在的值，你甚至可以修改它们。</p>
+<pre><code class="language-wtcd">declare function printValue = {
+  declare number value = 1 // 定义 value
+  yield function[] {
+    print::[value]
+    value += 1
+  }
+} // value 所在的作用域在此结束
+printValue::[] // 打印 1
+printValue::[] // 打印 2
+printValue::[] // 打印 3
+printValue::[] // 打印 4
+</code></pre>
+<p>除此之外，WTCD 捕获的变量都是互相隔离的。意味着，你两次捕获由同一段代码定义的两个作用域所产生的捕获是互相隔离的。</p>
+<pre><code class="language-wtcd">declare function makeCounter[] {
+  declare number n = 0
+  return function[] {
+    n += 1
+    return n
+  }
+}
+declare [
+  function counter1 = makeCounter::[]
+  function counter2 = makeCounter::[]
+]
+print::[counter1::[]] // 1
+print::[counter1::[]] // 2
+print::[counter1::[]] // 3
+print::[counter2::[]] // 1
+print::[counter1::[]] // 4
+print::[counter2::[]] // 2
+</code></pre>
+<p>因为 <code>makeCounter</code> 被调用了两次。每次调用都会产生一个新的 <code>n</code>。所以两个 <code>counter</code> 捕获的是不同的变量，因此能够独立互不干涉地工作。</p>
+<p>闭包是函数式编程的重要组件之一。只有用好闭包才能在 WTCD 繁荣。</p>

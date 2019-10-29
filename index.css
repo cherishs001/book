@@ -656,6 +656,17 @@ body.animation-enabled .comment>.block-user {
   }
 }
 
+.wtcd-group-container+.wtcd-group-container::before {
+  display: block;
+
+  width: 100%;
+  height: 1px;
+  margin: 1.6em 0;
+
+  content: '';
+
+  background-color: var(--key-opacity-05);
+}
 body.animation-enabled .wtcd-button.candidate::before, body.animation-enabled .wtcd-button.selected::before {
   transition: opacity 0.12s;
 }

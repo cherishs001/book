@@ -8,10 +8,12 @@
 <li><code>boolean</code>：布尔值，只能是 <code>true</code> 或者 <code>false</code></li>
 <li><code>string</code>：字符串</li>
 <li><code>null</code>：空值</li>
-<li><code>action</code>： 表示一个需要可执行的操作（<code>goto</code> 或者 <code>exit</code>）</li>
+<li><code>action</code>： 表示一个需要可执行的操作（<code>goto</code>，<code>exit</code>，或 <code>selection</code>）</li>
 <li><code>choice</code>：表示一个选项（其中记录了这个选项的文字和被选择后执行的操作）</li>
-<li><code>selection</code>： 表示一次选择（每个 selection 含有多个 choice）</li>
+<li><code>list</code>：存储一个列表（详见第 4 章）</li>
+<li><code>function</code>：存储一个函数（详见第 5 章）</li>
 </ul>
+<p>本章节将会跳过 <code>list</code> 和 <code>function</code>。</p>
 <h2>2.3 变量</h2>
 <p>WTCD 允许定义定义和使用变量。每个变量都有固定的类型，其中可使用的有上述每一个除了 <code>null</code> 以外的类型。</p>
 <h3>2.3.1 定义变量</h3>
@@ -148,6 +150,8 @@ poem.&quot; // -&gt; &quot;This is a\npoem&quot;
 <pre><code class="language-wtcd">1 + 1         // -&gt; 2
 1 + 2 * 3     // -&gt; 7（乘法优先级更高）
 (1 + 2) * 3   // -&gt; 9（括号优先运算）
+2 ** 3        // -&gt; 8（指数）
+2 ** 3 ** 2   // -&gt; 64（注意，WTCD 的指数是左结合的）
 &quot;a&quot; + &quot;b&quot;     // -&gt; &quot;ab&quot;（字符串拼接）
 4 &lt; 10        // -&gt; true
 5 &gt;= 5        // -&gt; true
@@ -157,7 +161,7 @@ poem.&quot; // -&gt; &quot;This is a\npoem&quot;
 5 / 2         // -&gt; 2.5（number 可存储小数）
 5 ~/ 2        // -&gt; 2（truncate 整除）
 -5 ~/ 2       // -&gt; -2（truncate 整除永远都往零靠）
-5 &amp; 2         // -&gt; 1（求余）
+5 % 2         // -&gt; 1（求余）
 -10           // -&gt; -10
 !false        // -&gt; true
 true ? 1 : 2  // -&gt; 1（三元/逻辑选择）
@@ -179,116 +183,186 @@ a += 5        // -&gt; a 加上了3（变量累加）
 </thead>
 <tbody>
 <tr>
+<td>2</td>
+<td>::</td>
+<td>20</td>
+<td>函数调用</td>
+<td><code>max::[1 2 3]</code> = 3</td>
+</tr>
+<tr>
+<td>2</td>
+<td>.</td>
+<td>19</td>
+<td>List 成员访问</td>
+<td><code>[ 0 1 2 3 ].(2)</code> = 2，<code>[ 0 1 2 3 ].(4)</code> = 报错</td>
+</tr>
+<tr>
+<td>2</td>
+<td>.?</td>
+<td>19</td>
+<td>越界即空 List 成员访问</td>
+<td><code>[ 0 1 2 3 ].(2)</code> = 2，<code>[ 0 1 2 3 ].?(4)</code> = null</td>
+</tr>
+<tr>
+<td>2</td>
+<td>?.</td>
+<td>19</td>
+<td>可选 List 成员访问</td>
+<td><code>null?.(4)</code> = null，<code>[ 0 1 2 3 ]?.(4)</code> = 报错</td>
+</tr>
+<tr>
+<td>2</td>
+<td>?.?</td>
+<td>19</td>
+<td>可选越界即空 List 成员访问</td>
+<td><code>null?.(4)</code> = null，<code>[ 0 1 2 3 ]?.?(4)</code> = null</td>
+</tr>
+<tr>
 <td>1</td>
 <td>-</td>
-<td>16</td>
+<td>17</td>
 <td>取负</td>
 <td><code>-42</code> = -42</td>
 </tr>
 <tr>
 <td>1</td>
 <td>!</td>
-<td>16</td>
+<td>17</td>
 <td>取逻辑反</td>
 <td><code>!true</code> = false, <code>!false</code> = true</td>
 </tr>
 <tr>
 <td>2</td>
+<td>**</td>
+<td>16</td>
+<td>指数（左结合）</td>
+<td><code>2 ** 3</code> = 8, <code>2 ** 3 ** 2</code> = 64</td>
+</tr>
+<tr>
+<td>2</td>
 <td>*</td>
-<td>14</td>
+<td>15</td>
 <td>数字乘法</td>
 <td><code>5 * 10</code> = 50</td>
 </tr>
 <tr>
 <td>2</td>
 <td>/</td>
-<td>14</td>
+<td>15</td>
 <td>数字除法</td>
 <td><code>10 / 5</code> = 2, <code>5 / 2</code> = 2.5</td>
 </tr>
 <tr>
 <td>2</td>
 <td>~/</td>
-<td>14</td>
+<td>15</td>
 <td>Truncate 整除</td>
 <td><code>5 ~/ 3</code> = 1, <code>-5 ~/ 3</code> = -1</td>
 </tr>
 <tr>
 <td>2</td>
 <td>%</td>
-<td>14</td>
+<td>15</td>
 <td>求余</td>
 <td><code>5 % 2</code> = 1, <code>-9 % 5</code> = -4</td>
 </tr>
 <tr>
 <td>2</td>
 <td>+</td>
-<td>13</td>
+<td>14</td>
 <td>数字加法或字符串拼接</td>
 <td><code>5 + 3</code> = 8, <code>&quot;a&quot; + &quot;b&quot;</code> = &quot;ab&quot;</td>
 </tr>
 <tr>
 <td>2</td>
 <td>-</td>
-<td>13</td>
+<td>14</td>
 <td>数字减法</td>
 <td><code>5 - 3</code> = 2, <code>3 - 5</code> = -2</td>
 </tr>
 <tr>
 <td>2</td>
 <td>&lt;</td>
-<td>11</td>
+<td>12</td>
 <td>判断是否小于</td>
 <td><code>3 &lt; 5</code> = true, <code>5 &lt; 5</code> = false, <code>7 &lt; 5</code> = false</td>
 </tr>
 <tr>
 <td>2</td>
 <td>&lt;=</td>
-<td>11</td>
+<td>12</td>
 <td>判断是否小于或等于</td>
 <td><code>3 &lt;= 5</code> = true, <code>5 &lt;= 5</code> = true, <code>7 &lt;= 5</code> = false</td>
 </tr>
 <tr>
 <td>2</td>
 <td>&gt;</td>
-<td>11</td>
+<td>12</td>
 <td>判断是否大于</td>
 <td><code>3 &gt; 5</code> = false, <code>5 &gt; 5</code> = false, <code>7 &gt; 5</code> = true</td>
 </tr>
 <tr>
 <td>2</td>
 <td>&gt;=</td>
-<td>11</td>
+<td>12</td>
 <td>判断是否大于或等于</td>
 <td><code>3 &gt;= 5</code> = false, <code>5 &gt;= 5</code> = true, <code>7 &gt;= 5</code> = false</td>
 </tr>
 <tr>
 <td>2</td>
 <td>==</td>
-<td>10</td>
+<td>11</td>
 <td>判断是否相等</td>
 <td><code>5 == 5</code> = true, <code>5 == 3</code> = false, <code>&quot;5&quot; == 5</code> = false</td>
 </tr>
 <tr>
 <td>2</td>
 <td>!=</td>
-<td>10</td>
+<td>11</td>
 <td>判断是否不相等</td>
 <td><code>5 != 5</code> = false, <code>5 != 3</code> = true, <code>&quot;5&quot; != 5</code> = true</td>
 </tr>
 <tr>
 <td>2</td>
 <td>&amp;&amp;</td>
-<td>6</td>
+<td>7</td>
 <td>逻辑与</td>
 <td><code>false || true</code> = false, <code>true || true</code> = true</td>
 </tr>
 <tr>
 <td>2</td>
 <td>||</td>
-<td>5</td>
+<td>6</td>
 <td>逻辑或</td>
 <td><code>false || true</code> = true, <code>false || false</code> = true</td>
+</tr>
+<tr>
+<td>2</td>
+<td>?!</td>
+<td>6</td>
+<td>不可空提供默认值</td>
+<td><code>2 ?! 3</code> = 2, <code>null ?! 3</code> = 3, <code>null ?! null</code> = 报错</td>
+</tr>
+<tr>
+<td>2</td>
+<td>??</td>
+<td>6</td>
+<td>提供默认值</td>
+<td><code>2 ?? 3</code> = 2, <code>null ?? 3</code> = 3, <code>null ?? null</code> = null</td>
+</tr>
+<tr>
+<td>2</td>
+<td>|&gt;</td>
+<td>5</td>
+<td>管道调用</td>
+<td><code>&quot;Hello&quot; |&gt; stringLength</code> = 5</td>
+</tr>
+<tr>
+<td>2</td>
+<td>|::</td>
+<td>5</td>
+<td>逆向调用</td>
+<td><code>[1 2 3] |:: max</code> = <code>max::[1 2 3]</code></td>
 </tr>
 <tr>
 <td>3</td>
@@ -354,7 +428,7 @@ a += 5        // -&gt; a 加上了3（变量累加）
 <ul>
 <li>变量定义</li>
 <li>表达式</li>
-<li><code>yield</code></li>
+<li><code>yield</code> / <code>yield =</code> / <code>return</code> / <code>return =</code></li>
 </ul>
 <p>其中，变量定义就是定义局部变量。表达式就是计算某个表达式。而 <code>yield</code> 则是指定当前语句组的返回值。</p>
 <p>举个例子：</p>

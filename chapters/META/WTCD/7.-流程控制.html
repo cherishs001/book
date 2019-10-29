@@ -1,0 +1,47 @@
+<h1>7. 流程控制</h1>
+<h2>7.1 概述</h2>
+<p>目前 WTCD 的传统流程控制只原生提供了 <code>switch</code>。</p>
+<h2>7.2 <code>switch</code></h2>
+<p><code>switch</code> 语句语法如下：</p>
+<pre><code>switch &lt;valueExpr&gt; [
+  &lt;matchList1&gt; &lt;matchExpr1&gt;
+  &lt;matchList2&gt; &lt;matchExpr2&gt;
+  ...
+  [defaultExpr]
+]
+</code></pre>
+<p>举个例子：</p>
+<pre><code class="language-wtcd">declare number value = // ...
+declare number result = switch value [
+  [ 1 5 10 ] 200
+  [ 3 7 ] 300
+  400
+]
+</code></pre>
+<p>在上述例子中，如果 <code>value</code> 的值是 1 或 5 或 10，则 <code>result</code> 会变成 200。如果 <code>value</code> 的值是 3 或 7，则 <code>result</code> 会变成 300。否则 <code>result</code> 会变成 400。</p>
+<p>在 WTCD 中，如果没有提供最后的 <code>defaultExpr</code>，那么在如果没有匹配时就会报错。</p>
+<p>此外，WTCD 的 switch 时没有 fall through 的。也就是说，上一个 <code>case</code> 执行完后不会进入下一个 <code>case</code>，因此也没有必要使用 <code>break</code>。</p>
+<p>另外，每一个 <code>matchList</code> 都可以是一个表达式。上述 <code>switch</code> 语句还可以写成：</p>
+<pre><code class="language-wtcd">declare number value = // ...
+declare list list1 = [ 1 5 10 ]
+declare list list2 = [ 3 7 ]
+declare number result = switch value [
+  list1 200
+  list2 300
+  400
+]
+</code></pre>
+<h2>7.3 <code>if</code></h2>
+<p>WTCD 目前不支持 <code>if</code>，但是可以用 <code>?</code> <code>:</code> 实现。</p>
+<h3>7.3.1 实现 if then</h3>
+<pre><code class="language-wtcd">(condition) ? {
+  // Then
+} : null
+</code></pre>
+<h3>7.3.2 实现 if then else</h3>
+<pre><code class="language-wtcd">(condition) ? {
+  // Then
+} : {
+  // Else
+}
+</code></pre>

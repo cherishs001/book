@@ -462,7 +462,7 @@ window.DATA={
                 "isEarlyAccess": false,
                 "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/72",
                 "htmlRelativePath": "META/WTCD/2.-变量、表达式及语句.html",
-                "chapterCharCount": 5018
+                "chapterCharCount": 5599
               },
               {
                 "displayName": "3. Section",
@@ -473,7 +473,62 @@ window.DATA={
                 "isEarlyAccess": false,
                 "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/73",
                 "htmlRelativePath": "META/WTCD/3.-Section.html",
-                "chapterCharCount": 5512
+                "chapterCharCount": 5372
+              },
+              {
+                "displayName": "4. Lists",
+                "displayIndex": 4,
+                "name": "4 - 4. Lists",
+                "sourceRelativePath": "5 - META/1 - WTCD/4 - 4. Lists.md",
+                "type": "Markdown",
+                "isEarlyAccess": false,
+                "commentsUrl": null,
+                "htmlRelativePath": "META/WTCD/4.-Lists.html",
+                "chapterCharCount": 2118
+              },
+              {
+                "displayName": "5. Functions",
+                "displayIndex": 5,
+                "name": "5 - 5. Functions",
+                "sourceRelativePath": "5 - META/1 - WTCD/5 - 5. Functions.md",
+                "type": "Markdown",
+                "isEarlyAccess": false,
+                "commentsUrl": null,
+                "htmlRelativePath": "META/WTCD/5.-Functions.html",
+                "chapterCharCount": 4366
+              },
+              {
+                "displayName": "6. 标准库",
+                "displayIndex": 6,
+                "name": "6 - 6. 标准库",
+                "sourceRelativePath": "5 - META/1 - WTCD/6 - 6. 标准库.md",
+                "type": "Markdown",
+                "isEarlyAccess": false,
+                "commentsUrl": null,
+                "htmlRelativePath": "META/WTCD/6.-标准库.html",
+                "chapterCharCount": 2516
+              },
+              {
+                "displayName": "7. 流程控制",
+                "displayIndex": 7,
+                "name": "7 - 7. 流程控制",
+                "sourceRelativePath": "5 - META/1 - WTCD/7 - 7. 流程控制.md",
+                "type": "Markdown",
+                "isEarlyAccess": false,
+                "commentsUrl": null,
+                "htmlRelativePath": "META/WTCD/7.-流程控制.html",
+                "chapterCharCount": 774
+              },
+              {
+                "displayName": "变化日志",
+                "displayIndex": 9998,
+                "name": "9998 - 变化日志",
+                "sourceRelativePath": "5 - META/1 - WTCD/9998 - 变化日志.md",
+                "type": "Markdown",
+                "isEarlyAccess": false,
+                "commentsUrl": null,
+                "htmlRelativePath": "META/WTCD/变化日志.html",
+                "chapterCharCount": 199
               },
               {
                 "displayName": "计划功能",
@@ -484,7 +539,7 @@ window.DATA={
                 "isEarlyAccess": false,
                 "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/74",
                 "htmlRelativePath": "META/WTCD/计划功能.html",
-                "chapterCharCount": 1686
+                "chapterCharCount": 507
               }
             ],
             "subFolders": [
@@ -526,7 +581,51 @@ window.DATA={
                     "isEarlyAccess": false,
                     "commentsUrl": null,
                     "htmlRelativePath": "META/WTCD/例子/Goto-入栈.html",
+                    "chapterCharCount": 18
+                  },
+                  {
+                    "displayName": "面向对象（大雾）",
+                    "displayIndex": 4,
+                    "name": "4 - 面向对象（大雾）",
+                    "sourceRelativePath": "5 - META/1 - WTCD/1 - 例子/4 - 面向对象（大雾）.wtcd",
+                    "type": "WTCD",
+                    "isEarlyAccess": false,
+                    "commentsUrl": null,
+                    "htmlRelativePath": "META/WTCD/例子/面向对象（大雾）.html",
+                    "chapterCharCount": 45
+                  },
+                  {
+                    "displayName": "高阶函数工厂",
+                    "displayIndex": 5,
+                    "name": "5 - 高阶函数工厂",
+                    "sourceRelativePath": "5 - META/1 - WTCD/1 - 例子/5 - 高阶函数工厂.wtcd",
+                    "type": "WTCD",
+                    "isEarlyAccess": false,
+                    "commentsUrl": null,
+                    "htmlRelativePath": "META/WTCD/例子/高阶函数工厂.html",
+                    "chapterCharCount": 99
+                  },
+                  {
+                    "displayName": "选项嵌套",
+                    "displayIndex": 6,
+                    "name": "6 - 选项嵌套",
+                    "sourceRelativePath": "5 - META/1 - WTCD/1 - 例子/6 - 选项嵌套.wtcd",
+                    "type": "WTCD",
+                    "isEarlyAccess": false,
+                    "commentsUrl": null,
+                    "htmlRelativePath": "META/WTCD/例子/选项嵌套.html",
                     "chapterCharCount": 12
+                  },
+                  {
+                    "displayName": "动态生成内容",
+                    "displayIndex": 7,
+                    "name": "7 - 动态生成内容",
+                    "sourceRelativePath": "5 - META/1 - WTCD/1 - 例子/7 - 动态生成内容.wtcd",
+                    "type": "WTCD",
+                    "isEarlyAccess": false,
+                    "commentsUrl": null,
+                    "htmlRelativePath": "META/WTCD/例子/动态生成内容.html",
+                    "chapterCharCount": 0
                   },
                   {
                     "displayName": "琳的玩具店",
@@ -538,16 +637,27 @@ window.DATA={
                     "commentsUrl": null,
                     "htmlRelativePath": "META/WTCD/例子/琳的玩具店.html",
                     "chapterCharCount": 2992
+                  },
+                  {
+                    "displayName": "测试",
+                    "displayIndex": 11,
+                    "name": "11 - 测试",
+                    "sourceRelativePath": "5 - META/1 - WTCD/1 - 例子/11 - 测试.wtcd",
+                    "type": "WTCD",
+                    "isEarlyAccess": false,
+                    "commentsUrl": null,
+                    "htmlRelativePath": "META/WTCD/例子/测试.html",
+                    "chapterCharCount": 24
                   }
                 ],
                 "subFolders": [],
-                "folderCharCount": 3269
+                "folderCharCount": 3455
               }
             ],
-            "folderCharCount": 18400
+            "folderCharCount": 27821
           }
         ],
-        "folderCharCount": 18815
+        "folderCharCount": 28236
       },
       {
         "displayName": "杂项",
@@ -572,10 +682,10 @@ window.DATA={
         "folderCharCount": 1361
       }
     ],
-    "folderCharCount": 161199
+    "folderCharCount": 170620
   },
-  "charsCount": 161199,
-  "paragraphsCount": 3352,
+  "charsCount": 170620,
+  "paragraphsCount": 3472,
   "keywordsCount": [
     [
       "高潮",
@@ -591,7 +701,7 @@ window.DATA={
     ],
     [
       "陈志鹏",
-      57
+      59
     ],
     [
       "陈变态",
@@ -646,5 +756,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "315"
+  "buildNumber": "316"
 };
