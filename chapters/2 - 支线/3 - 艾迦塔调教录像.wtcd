@@ -1,0 +1,706 @@
+WTCD 1.0
+declare [
+    number climax = 20
+    number anger
+    number time
+    number climaxCount
+    number sustained
+    boolean selfBondaged
+]
+declare[
+    action waiting = goto machineStartSelection
+    action endAction = goto normalEnding
+]
+declare[
+    number climaxToBeAdd
+    number angerToBeAdd
+    number climaxRatio = 1
+    number angerRatio = 1
+    number timeRatio = 1
+    number timePast
+]
+declare[
+    number climaxToBeShow
+    number angerToBeShow
+    number timeToBeShow
+    number sustainedToBeShow
+]
+section main then goto start
+section start{
+    time = 5
+} then goto stats
+
+section stats{
+    angerToBeAdd = climaxCount>30?(-1):angerToBeAdd
+
+    // 没有函数只能用这种奇怪的操作了啦！！
+    climax += climaxToBeAdd*(climaxToBeAdd>0?climaxRatio:1) // ClimaxRatio 只控制增加
+    anger += angerToBeAdd*angerRatio // AngerRatio 同时控制增加与减少
+
+    climaxToBeAdd=0
+    angerToBeAdd=0
+
+    climax=climax<=0?0:climax
+
+    climaxCount+=climax >= 100? 1 : 0
+    anger += climax>=90?5:0
+    anger -= climax>=100?25:0
+    climax = climax>=100?40:climax
+
+    anger=anger<=0?0:anger
+    anger=anger>=100?100:anger
+
+    time+=timePast*timeRatio
+    sustained = climax>=70? sustained+timePast*timeRatio:0
+
+    climaxToBeShow = climax ~/ 0.01 / 100
+    angerToBeShow = anger ~/ 0.01 / 100
+    timeToBeShow = time ~/ 0.0001 / 10000
+    sustainedToBeShow = sustained ~/ 0.0001 / 10000
+
+
+} then (time <= 1)
+    ? goto start
+    :  (time <= 5)
+    ? goto bind
+    :  (time <= 10)
+    ? goto gag
+    :  (time <= 30)
+    ? goto machineStart
+    : (sustained >= 20)
+    ? goto end
+    : goto machineSelection
+
+section bind{
+    timePast += 10
+    climaxToBeAdd = - 5
+} then selection[
+  choice "普通的捆绑艾迦塔" goto normalBind
+  choice "将艾迦塔的手脚折叠起来捆绑" goto foldBind
+  choice "用更多的拘束带捆绑艾迦塔" goto strictBind
+]
+section normalBind{
+    climaxToBeAdd+= 5
+    angerToBeAdd += -3
+} then goto stats
+section foldBind{
+    climaxToBeAdd+= 7
+    angerToBeAdd += -100
+} then goto stats
+section strictBind{
+    climaxToBeAdd+=3
+    angerToBeAdd+=5
+} then selection[
+  choice "并不调整艾迦塔的捆绑" goto stats
+  choice "普通的捆绑艾迦塔" goto normalBind
+  choice "将艾迦塔的手脚折叠起来捆绑" goto foldBind
+]
+section gag{
+    timePast+=3
+} then selection[
+  choice "为艾迦塔带上面罩" goto normalGag
+  choice "用手指玩弄艾迦塔的乳头和阴蒂" goto fingerPlay
+  choice "亲上去" goto kiss
+]
+section normalGag{
+    climaxToBeAdd = 1
+} then goto stats
+section fingerPlay{
+    climaxToBeAdd+=6
+    angerToBeAdd+=3
+    timePast+=3
+} then goto normalGag
+section kiss{
+    climaxToBeAdd+=1
+    angerToBeAdd -= 3
+    timePast+=3
+} then goto normalGag
+section machineStart then goto machineStartSelection
+section machineStartSelection{
+    waiting = time>=30?goto machineWakeUp:waiting
+} then selection[
+    choice "干等着" goto machineWakeUp
+    choice "给艾莉丝打一个电话" goto phoneCall
+    choice "吃艾迦塔之前买的西瓜" goto watermelon
+    choice "自缚" goto selfBondage
+    choice "阅读历史课本中有关WT-309的章节" goto wt309
+    choice "阅读科幻小说《新能源》" goto newEnerge
+    choice "在《可穿戴科技》的issue区留言催更" goto askForUpdate
+]
+section machineWakeUp{
+    time = 30
+} then goto machineSelection
+section phoneCall{
+    time+=1
+} then waiting
+section watermelon{
+    time+=3
+} then waiting
+section selfBondage{
+    time+=5
+    selfBondaged = true
+} then waiting
+section wt309 {
+    time+=7
+}then waiting
+section newEnerge {
+    time+=10
+}then waiting
+section askForUpdate{
+    time+=1
+} then waiting
+
+section machineSelection then selection [
+    choice "通用：选项" goto generalOptions
+    choice "痛觉：选项" goto painOptions
+    choice "插入：选项" goto insertOptions
+    choice "感官调节：选项" goto placementOptions
+    //choice "VR：选项" goto vrOptions
+]
+section generalOptions then selection[
+    choice "体液采集（乳房）【榨乳】" goto milking
+    choice "呼吸限制" goto brethControl
+    choice "收紧拘束带" goto tightenBind
+    choice "性器官按摩" goto massage
+    choice "性器官按压【木马】" goto woodenHorse
+    choice "注射镇静剂" goto sedativeInsert
+]
+section painOptions then selection[
+    choice "电击" goto electric
+    choice "鞭挞" goto castigate
+]
+section insertOptions then selection[
+    choice "低强度插入" goto insert
+    choice "中强度插入" goto midiumInsert
+    choice "高强度插入" goto highInsert
+    choice "强制高潮（1次）" goto climaxOnce
+    choice "强制高潮（10次）" goto climaxTenTimes
+]
+section placementOptions then selection[
+    choice "感官调节：减缓时间（1档位）" goto placeOneDay
+    choice "感官调节：减缓时间（2档位）" goto placeOneWeek
+    choice "感官调节：减缓时间（3档位）" goto placeOneMonth
+    choice "感官调节：减缓时间（4档位）" goto placeThreeMonth
+    choice "感官调节：恢复正常" goto endPlacement
+]
+section vrOptions then selection[
+    choice "播放VR录像：载人风筝" goto kite
+    choice "播放VR录像：强奸体验机" goto simulator
+    choice "播放VR录像：紧缚逃脱游戏" goto kinbaku
+    choice "播放VR录像：绞首" goto execution
+    choice "播放VR录像：触手" goto tentacle
+    choice "播放VR录像：乳房穿刺" goto nipplePuncture
+    choice "调整VR场景：卧室" goto setBedRoom
+    choice "调整VR场景：监狱" goto setJail
+    choice "调整VR场景：地牢" goto setDungeon
+    choice "调整VR场景：公园" goto setPark
+    choice "调整VR场景：摄像" goto setCamera
+    choice "调整VR场景：默认（全黑）" goto resetVR
+]
+section nipplePuncture{
+    climaxToBeAdd += 1
+    angerToBeAdd += 1
+    climaxRatio *=0.9
+    timePast = 5
+} then goto stats
+section milking{
+    climaxToBeAdd += 7
+    climaxRatio += 0.3
+    angerRatio>1.5?{
+        angerRatio=1.2
+    }:{
+        angerRatio-=0.1
+    }
+    timePast = 5
+} then goto stats
+section brethControl{
+    climaxToBeAdd += 3
+    climaxRatio += 0.1
+    anger+=1
+    angerRatio*=1.001
+    timePast = 5
+} then goto stats
+section electric{
+    climaxToBeAdd +=1
+    angerToBeAdd+=10
+
+    angerRatio +=0.2
+    climaxRatio *=0.9
+
+    anger = anger<=100?anger:100
+    timePast = 5
+} then goto stats
+section castigate {
+    climaxToBeAdd += 2*anger<50?0.5:5
+    angerToBeAdd += anger<50?1:0
+    timePast = 3
+}then goto stats
+section insert {
+    climaxToBeAdd+=5
+    timePast = 2
+}then goto stats
+section midiumInsert{
+    climaxToBeAdd+=10
+    angerToBeAdd-=5
+    climaxRatio *=1.05
+    timePast = 2
+} then goto stats
+section highInsert{
+    climaxToBeAdd+=40
+    angerToBeAdd-=10
+    climaxRatio *=1.1
+    timePast = 2
+} then goto stats
+section climaxOnce{
+    climax+=100
+    timePast+=2
+    sustained-=2
+}then goto stats
+section climaxTenTimes{
+    climax+=100
+    climaxCount+=9
+    timePast+=20
+    sustained-=20
+} then goto stats
+section tightenBind{
+    climaxToBeAdd +=4*anger<50?0.5:5
+    climaxRatio *=anger<50?0.8:1.2
+} then goto stats
+section massage{
+    climaxRatio *=1.1
+    angerRatio *=0.9
+    angerToBeAdd-=5
+    climaxToBeAdd+=5
+    timePast = 3
+} then goto stats
+section woodenHorse{
+    climaxToBeAdd +=8*anger<50?0.5:2
+    climaxRatio *=anger<50?0.8:1.2
+    timePast = 4
+} then goto stats
+section sedativeInsert{
+    climaxRatio = 0.5
+    angerRatio = 0.5
+    climaxToBeAdd-= 20
+    angerToBeAdd -= 20
+    timePast = 1
+} then goto stats
+section placeOneDay{
+    timeRatio /= 2//86400
+} then goto stats
+section placeOneWeek {
+    timeRatio /= 4//86400*7
+} then goto stats
+section placeOneMonth{
+    timeRatio /= 8//86400*30
+}  then goto stats
+section placeThreeMonth{
+    timeRatio /= 16//86400*90
+}  then goto stats
+section endPlacement{
+    timeRatio = 1
+}  then goto stats
+section kite then goto stats
+section simulator then goto stats
+section kinbaku then goto stats
+section execution then goto stats
+section tentacle then goto stats
+section setBedRoom then goto stats
+section setJail then goto stats
+section setDungeon then goto stats
+section setPark then goto stats
+section setCamera then goto stats
+section resetVR then goto stats
+section end{
+    anger>=70?{
+        endAction =selfBondaged? goto selfBondagedEnding: goto angerEnding
+    }:(climaxCount>=30)?{
+        endAction = goto brokenEnding
+    }:(climax>=90)?{
+        endAction = goto climaxEnding
+    }:{
+        endAction = goto normalEnding
+    }
+} then endAction
+
+section selfBondagedEnding then exit
+section angerEnding then exit
+section climaxEnding then exit
+section normalEnding then exit
+section brokenEnding then exit
+
+---<<< stats >>>---
+---
+
+艾迦塔现在有 <$ climaxToBeShow $> % 兴奋， <$ angerToBeShow $> % 愤怒。
+
+已经过去了 <$ timeToBeShow $> 分钟。
+
+艾迦塔高潮了 <$ climaxCount $> 次，已经达到了要求兴奋度 <$ sustainedToBeShow $> 分钟。
+
+当前设置下总共需要维持 20 分钟兴奋才能结束。
+
+---
+
+---<<< main >>>---
+# 使用记录EX - 艾迦塔调教录像
+
+*书接上回，艾迦塔与弱水猎手录制了新版的仪器使用教程录像。*
+
+---<<< start >>>---
+“……弱水猎手”
+
+治疗室的更衣间里，艾迦塔将自己身后庞大的辅助肢卸了下来，看着手中的维护记录说到。
+
+而一旁的弱水猎手，早已更换好了维护用的白色大褂：
+
+“怎么啦艾迦塔？”
+
+“你上次好像说，想看我脱光光嘛”
+
+说着，艾迦塔又将维护记录向后翻了一页。
+
+“诶，是呀”
+
+艾迦塔撩起自己一侧的头发，转头看向弱水猎手：
+
+“那，今天的设备维护就我进去咯”
+
+“？！真的嘛？！”
+
+“当然……”
+
+---<<< bind >>>---
+艾迦塔和弱水猎手来到了治疗仪前。
+
+弱水猎手从艾迦塔手中接过了维护日志：
+
+“外观，没问题，腔体外壳，正经的很，电源……显而易见的没毛病，状态栏都亮着，自诊断……走的慢死了啦！”
+
+“这台的固件还是上个版本的，自检慢了一些，记得上报一下。”
+
+“哦哦，好的”
+
+弱水猎手将这句话记进了维护日志，趁着她在记录的时候，艾迦塔也很麻利的脱下了自己的衣服，放在了一边。
+
+艾迦塔的四肢还是很完整的，原因仅仅是因为弱水猎手从没有让她接触到感染区的病毒。
+
+“弱水猎手……”
+
+“嗯？”
+
+“……绝·对·不·要·电·击”
+
+“好啦好啦，知道了啦”
+
+说完，艾迦塔便自己打开了治疗仪的腔体，熟练地爬上了床位，等待着弱水猎手将她拘束在这里。
+
+弱水猎手打算：
+
+---<<< normalBind >>>---
+
+弱水猎手按照（她自己拍的）教科书将艾迦塔的四肢固定在了床位上。
+
+“嘿嘿，松紧刚好吧？”
+
+“……马马虎虎吧。”
+
+---<<< foldBind >>>---
+
+艾迦塔的四肢，就像是那些被截肢了半截手臂的患者那样，被弱水猎手折叠着固定在了床位上。
+
+“……”
+
+明显能看出艾迦塔比较中意这样的拘束，可能是因为她并不知道失去肢体是什么样的感觉。
+
+---<<< strictBind >>>---
+
+“……这个数量的拘束带不太对吧？”
+
+在弱水猎手还没有把通常数量三倍的拘束带捆绑在艾迦塔身上前，艾迦塔如是问到。
+
+“诶，可我觉得刚刚好嘛！”
+
+弱水猎手打算：
+
+---<<< gag >>>---
+
+似乎知道接下来要安装面罩了，艾迦塔主动张开了嘴。
+
+看着面前这被拘束着的胴体女孩，弱水猎手打算：
+
+---<<< normalGag >>>---
+弱水猎手将管道插进了艾迦塔的嘴与鼻腔中，熟练的手法没有让艾迦塔感到任何的不适。
+
+不仅令人想要发问：你怎么这么熟练啊？
+
+接着，弱水猎手将面罩扣在了艾迦塔的脸上，现在艾迦塔已经彻底看不见外面的情况了。
+
+---<<< fingerPlay >>>---
+弱水猎手的手指，划过了艾迦塔的双峰与下阴，艾迦塔的身体缓缓地颤动了几下：
+
+“快……快点干正事……”
+
+“难得能和你这样亲密接触欸，让我再玩一会儿嘛~”
+
+“……”
+
+艾迦塔的身体还在微微颤动着。
+
+……
+
+就这么玩弄了几分钟，弱水猎手便老实了下来，拿起了面罩，将面罩上的管子整理了一下。
+
+---<<< kiss >>>---
+弱水猎手将自己的唇贴在了艾迦塔那微张的嘴上。
+
+“呜……”
+
+开始还有些抗拒的艾迦塔，在弱水猎手用舌头舔舐了几次艾迦塔的下唇以后，也变得主动了些，将自己的舌贴了上去。
+
+……
+
+“时间要不够啦……”
+
+艾迦塔提醒道。
+
+“好吧……”
+
+于是弱水猎手拿起了面罩，将面罩上的管子整理了一下。
+
+
+---<<< machineStart >>>---
+弱水猎手将床位推回腔体，并合上了治疗仪。
+
+可以看见一些液体从容器的顶部缓缓涌出，从艾迦塔的身上流到了容器底部。
+
+虽然液体划过身体的瘙痒感让艾迦塔觉得很是不悦，却因为身上的拘束，只得略作挣扎，又因为嘴里这根管子，连叫喊出声也做不到。
+
+渐渐的，液体盖住了艾迦塔的头部，催眠机能开始发挥了作用，艾迦塔的挣扎越来越轻微。
+
+“催眠……正常，没有毛病”
+
+现在，弱水猎手拿着的维护日志，只剩下两个项目还未检查了。
+
+---<<< machineStartSelection >>>---
+等待机器唤醒艾迦塔的时候，弱水猎手打算：
+
+---<<< phoneCall@1 >>>---
+比起空等这么些时间，弱水猎手觉得应该打电话联系一下后辈艾莉丝。
+
+于是她操作着自己的终端，拨通了艾莉丝的号码：
+
+“怎么了呀，弱水猎手前辈？”
+
+“艾莉丝你有空唠嗑嘛~”
+
+“欸，我正要前往感染区执行任务……只能下次了”
+
+“好吧……”
+
+“那代我向艾迦塔前辈问好！”
+
+“嗯，好哒，拜拜”
+
+于是弱水猎手只得挂断了电话。
+
+---<<< phoneCall@2- >>>---
+无聊的弱水猎手又翻出了终端，想要和艾莉丝聊天，但是想起艾莉丝还在前线作战，还是放弃了这个念头。
+
+---<<< watermelon@1 >>>---
+弱水猎手想起之前艾迦塔买来的西瓜，虽然是大冬天，艾迦塔买的这个西瓜实在有些意·义·不·明。
+
+于是弱水猎手刨开了西瓜，用很明显不是用来切西瓜而是用来切割感染部位的激光刀将西瓜切成了片。
+
+弱水猎手精确的操作让西瓜被平均分成了24片，她为艾迦塔留下了12片西瓜，然后把剩下的全都吃掉了。
+
+弱水猎手感觉自己的胃有点冷。
+
+---<<< watermelon@2- >>>---
+弱水猎手看了看剩下12片西瓜，觉得不能把艾迦塔的那份吃掉。
+
+---<<< selfBondage@1 >>>---
+“啊！好无聊啊！”
+
+弱水猎手看着手表，时间还没有到，她显得很是烦躁。
+
+于是她打算为自己找点乐子，于是她把身上带着的行军绳取了出来，在自己身上捆了一个龟甲缚。
+
+弱水猎手意识到自己似乎并不会手腕的捆绑方法，于是就很没有情调的用手铐将自己的手铐在了身前。
+
+“可惜手上没有别的小玩具了……”
+
+---<<< selfBondage@2- >>>---
+弱水猎手晃了晃手铐，卡的还是很紧的，似乎没有必要重新来一遍。
+
+于是她享受了几分钟被限制行动的感觉。
+
+---<<< wt309@1 >>>---
+弱水猎手感觉自己应该学习一下历史……
+
+因为沉迷出任务的她，似乎并不是很热衷于学习。
+
+突如其来的想法让她立刻付诸了时间，于是她从终端里打开了历史课本。
+
+上一次看到了WT-309的章节，于是她继续读了下去：
+
+“在A.K.S.介入政府立法体系后，将WT-309有关条款整合进入病毒管理条例，为广大骑士执行医疗任务提供了大量的便利。”
+
+“有声音认为WT-309已经不适合于当代，这个话题仍然有待讨论。”
+
+……
+
+弱水猎手并没有看懂相关评论。
+
+---<<< wt309@2- >>>---
+不信邪的弱水猎手又一次翻开了历史课本。
+
+可是她还是没有看明白两方势力的观点。
+
+---<<< newEnerge@1 >>>---
+弱水猎手想起自己刚收藏了一篇名叫《新能源》的短篇小说，看评论似乎很有趣，她便买了下来。
+
+……
+
+“好像是从精液提取能量的。”
+
+？？？
+
+这是什么神必转折？弱水猎手如是吐槽到。
+
+---<<< newEnerge@2- >>>---
+弱水猎手又读了一遍《新能源》，
+
+“欸，仔细想想如果真有这么个东西，那……A.K.S.续航岂不是就特别强了？”
+
+于是弱水猎手开始了空想。
+
+---<<< askForUpdate >>>---
+弱水猎手看了一下《可穿戴科技》的官网，发现主线竟然还没有更新。
+
+“你快更新啊Kora！！！”
+
+留下来这一段留言以后，弱水猎手关掉了网页。
+
+---<<< machineWakeUp >>>---
+“Bing~Bong~Bang~Bong~患者已经唤醒，请开始操作！”
+
+听了实在太多次的提示音响了起来，弱水猎手这才意识到时间已经到了。
+
+“唤醒，正常……”
+
+弱水猎手瞄了一眼不远处躺在腔体里的艾迦塔，舔了舔自己的嘴唇。
+
+---<<< machineSelection >>>---
+弱水猎手现在打算：
+
+---<<< milking >>>---
+治疗仪内的机械臂，将两根真空管吸在了艾迦塔那并不算丰满的胸脯上，吸吮着她的乳头。
+
+不过十数秒，便有些白色的液体在管道中流淌了起来。
+
+艾迦塔扭动着自己那被拘束着的身躯，享受着这一时刻。
+
+---<<< brethControl >>>---
+往常的艾迦塔一直拒绝呼吸限制与电击，但今天她只提到了不要用电击。
+
+弱水猎手想了想，反正艾迦塔没有拒绝，那就这么做呗！
+
+随着电机的转动，艾迦塔面罩内的空气渐渐变得稀薄了起来，为了顺畅的呼吸，艾迦塔不得不增加呼吸的力道；她的胸口有两道拘束带，这又增加了她呼吸的难度——隔着腔体，也能看到艾迦塔胸部的剧烈起伏。
+
+---<<< tightenBind >>>---
+艾迦塔身上的拘束带向里缩紧了些，将艾迦塔的皮肤向内压去。
+
+陡然增加的压力让她有些不适应，但却有些莫名的舒服。
+
+虽然如此……数据的变化却有些奇怪，不过弱水猎手也没有打算彻底摸清艾迦塔的性癖，这样就没意思了，不是吗？
+
+---<<< massage >>>---
+机械手前端按住了艾迦塔的下体，不断地震动着。
+
+尽管刚开始，艾迦塔还有些挣扎，但不一会儿便放弃了这个行为，开始享受震动所带来的快感。
+
+---<<< woodenHorse >>>---
+由电机带动的一块三棱锥状金属板，渐渐向艾迦塔的阴部压去。
+
+艾迦塔轻轻摇动着臀部，让自己的下体摩擦这块板子，似乎很是享受的样子。
+
+---<<< sedativeInsert >>>---
+一根针管插入了艾迦塔的大腿，针管中的液体缓缓进入了艾迦塔的体内，让她渐渐冷静了下来。
+
+当然，兴奋度也一同下降了。
+
+
+---<<< electric >>>---
+弱水猎手选择了艾迦塔最·讨·厌的电击，隔着腔体看见了艾迦塔正疯狂的扭动着身躯，表达着自己的不满。
+
+弱水猎手隐隐感觉自己接下来可能……她赶紧摇了摇头，打消了这个念头。
+
+---<<< castigate >>>---
+由电机带动的皮鞭，不断地抽打在艾迦塔的身上，不过却没有见得她有什么激烈的挣扎，倒更像是在享受这样的痛感，扭动着身体。
+
+随着鞭挞的次数增加，即使是隔着腔体，也能看见艾迦塔乳房、腿、手臂上逐渐出现的红色鞭痕。
+
+如果不是嘴里插着一根管子，或许就能听见艾迦塔有趣的娇嗔了吧。
+
+---<<< end >>>---
+经过了 <$ time $> 分钟，测试终于结束了，弱水猎手打开了腔体，将艾迦塔身上的拘束带卸了下来。
+
+“嘿嘿，感觉如何呀？”
+
+---<<< angerEnding >>>---
+
+“太过分啦！”
+
+艾迦塔的手刀敲在了弱水猎手的头上。
+
+弱水猎手知道自己今天晚上别想睡个好觉了，当然，她是不是故意这样做的，除了她自己可没人知道。
+
+---<<< brokenEnding >>>---
+
+“还……还想要！！”
+
+弱水猎手看着眼神迷离的艾迦塔，意识到自己好像做过头了……
+
+没办法，只能先带艾迦塔回去，等她恢复意识了……
+
+---<<< normalEnding >>>---
+
+“马……马马虎虎吧……”
+
+艾迦塔抬手摸了摸后脖颈，眼神略有些飘忽。
+
+（太……太可爱了！！！）
+
+弱水猎手看着这并不十分坦率的少女，阿伟便死了。
+
+---<<< climaxEnding >>>---
+
+“啊……”
+
+艾迦塔不断的喘着，将自己的手指插入下体，试图让自己再一次达到高潮。
+
+弱水猎手见此，也不含糊，便也凑上前去，开始了属于她们的游戏。
+
+---<<< selfBondagedEnding >>>---
+“太过分啦！”
+
+这么喊着的艾迦塔，看着不知为什么带着手铐还捆着龟甲缚的弱水猎手，虽然生气，却也有些摸不着头脑。
+
+于是放弃了思考的艾迦塔从弱水猎手的口袋里摸出来一个口球，塞进了她的嘴里。
+
+“唔？呜呜——！”
+
+趁弱水猎手还没反应过来，艾迦塔便绕到了她身后，将口球锁住了。
+
+“哼，今天你就带着这个吧！”
+
+“呜呜——”
+
+“不接受反驳啦！！”
+
+……
+
+那天，弱水猎手真的就带着手铐和口球回到了自己的屋子里。
+
+可惜，似乎并没有遇到别的事件。
