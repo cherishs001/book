@@ -94,9 +94,9 @@ export interface ExitAction extends OptionalLocationInfo {
  *   choice "B" goto b
  * ]
  */
-export interface Selection extends OptionalLocationInfo {
+export interface SelectionAction extends OptionalLocationInfo {
   type: 'selection';
-  choices: Array<Expression>;
+  choices: Expression;
 }
 
 /** e.g. { a += 3 b -= 10 } */
@@ -197,12 +197,11 @@ export type OperatorExpression
   | UnaryExpression
   | ConditionalExpression;
 
-export type Action = GotoAction | ExitAction;
+export type Action = GotoAction | ExitAction | SelectionAction;
 
 export type Expression
   = Literal
   | OperatorExpression
-  | Selection
   | Action
   | BlockExpression
   | ChoiceExpression

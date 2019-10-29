@@ -13,7 +13,7 @@ import {
   NativeFunction,
   RegisterName,
   Section,
-  Selection,
+  SelectionAction,
   Statement,
   SwitchExpression,
   WTCDRoot,
@@ -62,6 +62,9 @@ export interface ActionValue {
     target: Array<string>;
   } | {
     action: 'exit';
+  } | {
+    action: 'selection';
+    choices: Array<ChoiceValue>;
   };
 }
 export interface ChoiceValue {
@@ -72,12 +75,12 @@ type: 'choice';
   };
 }
 
-export interface SelectionValue {
-  type: 'selection';
-  value: {
-    choices: Array<ChoiceValue>;
-  };
-}
+// export interface SelectionValue {
+//   type: 'selection';
+//   value: {
+//     choices: Array<ChoiceValue>;
+//   };
+// }
 
 export interface FunctionValue {
   type: 'function';
@@ -101,7 +104,6 @@ export type RuntimeValueMutable
   | NullValue
   | ActionValue
   | ChoiceValue
-  | SelectionValue
   | ListValue
   | FunctionValue;
 export type RuntimeValue = Readonly<RuntimeValueMutable>;
@@ -133,6 +135,13 @@ export function isEqual(v0: RuntimeValue, v1: RuntimeValue): boolean {
           return true;
         case 'goto':
           return arrayEquals(v0.value.target, (v1 as any).value.target);
+        case 'selection':
+          return (v0.value.choices.length
+            === (v1 as any).value.choices.length) &&
+            (v0.value.choices.every((choice, index) => isEqual(
+              choice,
+              (v1 as any).value.choices[index]),
+            ));
       }
       throw new Error('Shouldn\'t fall through.');
     case 'choice':
@@ -167,15 +176,6 @@ export function isEqual(v0: RuntimeValue, v1: RuntimeValue): boolean {
         (v0.value.every((element, index) => isEqual(
           element,
           (v1 as ListValue).value[index]),
-        ))
-      );
-    case 'selection':
-      return (
-        (v0.value.choices.length
-          === (v1 as SelectionValue).value.choices.length) &&
-        (v0.value.choices.every((choice, index) => isEqual(
-          choice,
-          (v1 as SelectionValue).value.choices[index]),
         ))
       );
   }
@@ -220,12 +220,12 @@ export function describe(rv: RuntimeValue): string {
           return `action (type = goto, target = ${rv.value.target})`;
         case 'exit':
           return `action (type = exit)`;
+        case 'selection':
+          return `action (type = selection, choices = [${rv.value.choices
+            .map(describe).join(', ')}])`;
       }
     case 'null':
       return 'null';
-    case 'selection':
-      return `selection (choices = [${rv.value.choices
-        .map(describe).join(', ')}])`;
     case 'list':
       return `list (elements = [${rv.value.map(describe).join(', ')}])`;
     case 'function':
@@ -411,6 +411,9 @@ export class Interpreter {
           case 'string':
             value = getMaybePooled('string', '');
             break;
+          case 'list':
+            value = { type: 'list', value: [] };
+            break;
           default:
             throw WTCDError.atLocation(expr, `Variable type ${singleDeclaration.variableType} ` +
               `does not have a default initial value`);
@@ -448,19 +451,25 @@ export class Interpreter {
     }
   }
 
-  private evaluateSelectionExpression(expr: Selection): SelectionValue {
-    const choices = expr.choices
-      .map(choiceExpr => this.evaluator(choiceExpr))
+  private evaluateSelectionExpression(expr: SelectionAction): ActionValue {
+    const choicesList = this.evaluator(expr.choices);
+    if (choicesList.type !== 'list') {
+      throw WTCDError.atLocation(expr, `Expression after selection is ` +
+        `expected to be a list of choices, received: ` +
+        `${describe(choicesList)}`);
+    }
+    const choices = choicesList.value
       .filter(choice => choice.type !== 'null');
     for (let i = 0; i < choices.length; i++) {
       if (choices[i].type !== 'choice') {
-        throw WTCDError.atLocation(expr.choices[i], `Choice at index ${i} is expected to be a choice, ` +
-          `received ${describe(choices[i])}`);
+        throw WTCDError.atLocation(expr, `Choice at index ${i} is expected ` +
+          `to be a choice, received: ${describe(choices[i])}`);
       }
     }
     return {
-      type: 'selection',
+      type: 'action',
       value: {
+        action: 'selection',
         choices: choices as Array<Readonly<ChoiceValue>>,
       },
     };
@@ -475,8 +484,8 @@ export class Interpreter {
         }
         const list = this.evaluator(expr.expression);
         if (list.type !== 'list') {
-          throw WTCDError.atLocation(expr, `Spread operator "..." can be ` +
-            `used before a list, received: ${describe(list)}`);
+          throw WTCDError.atLocation(expr, `Spread operator "..." can only ` +
+            `be used before a list, received: ${describe(list)}`);
         }
         return list.value;
       })),
@@ -609,7 +618,7 @@ export class Interpreter {
     throw WTCDError.atUnknown(`Unknown section "${sectionName}"`);
   }
 
-  private executeAction(action: ActionValue) {
+  private *executeAction(action: ActionValue): Generator<ContentOutput, void, number> {
     switch (action.value.action) {
       case 'goto':
         for (let i = action.value.target.length - 1; i >= 0; i--) {
@@ -619,6 +628,27 @@ export class Interpreter {
       case 'exit':
         // Clears the section stack so the scripts end immediately
         this.sectionStack.length = 0;
+        break;
+      case 'selection': {
+        const choicesRaw = action.value.choices;
+        const choices: Array<SingleChoice> = choicesRaw.map(choice => ({
+          content: choice.value.text,
+          disabled: choice.value.action.type === 'null',
+        }));
+        const yieldValue: ContentOutput = {
+          content: this.currentlyBuilding,
+          choices,
+        };
+        this.currentlyBuilding = [];
+        // Hands over control so player can make a decision
+        const playerChoiceIndex = yield yieldValue;
+        const playerChoice = choicesRaw[playerChoiceIndex];
+        if (playerChoice === undefined || playerChoice.value.action.type === 'null') {
+          throw new InvalidChoiceError(playerChoiceIndex);
+        }
+        yield* this.executeAction(playerChoice.value.action);
+        break;
+      }
     }
   }
 
@@ -648,6 +678,8 @@ export class Interpreter {
     }
     this.started = true;
 
+    let lastSection: Section | null = null;
+
     try {
       // Initialization
       for (const statement of this.wtcdRoot.initStatements) {
@@ -656,6 +688,7 @@ export class Interpreter {
       const $host = document.createElement('div');
       while (this.sectionStack.length !== 0) {
         const currentSection = this.sectionStack.pop()!;
+        lastSection = currentSection;
 
         // Evaluate the executes clause
         if (currentSection.executes !== null) {
@@ -693,34 +726,24 @@ export class Interpreter {
           }
         }
         const then = this.evaluator(currentSection.then);
-        // The part after then has to be a selection or an action
-        if (then.type === 'selection') {
-          const choices: Array<SingleChoice> = then.value.choices.map(choice => ({
-            content: choice.value.text,
-            disabled: choice.value.action.type === 'null',
-          }));
-          const yieldValue: ContentOutput = {
-            content: this.currentlyBuilding,
-            choices,
-          };
-          this.currentlyBuilding = [];
-          // Hands over control so player can make a decision
-          const playerChoiceIndex = yield yieldValue;
-          const playerChoice = then.value.choices[playerChoiceIndex];
-          if (playerChoice === undefined || playerChoice.value.action.type === 'null') {
-            throw new InvalidChoiceError(playerChoiceIndex);
-          }
-          this.executeAction(playerChoice.value.action);
-        } else if (then.type === 'action') {
-          this.executeAction(then);
+        if (then.type === 'action') {
+          yield* this.executeAction(then);
         } else if (then.type !== 'null') {
-          throw WTCDError.atLocation(currentSection.then, `Expression after then is expected to return ` +
-            `selection, action, or null, received: ${describe(then)}`);
+          throw WTCDError.atLocation(currentSection.then, `Expression after ` +
+            `then is expected to return an action, or null, ` +
+            `received: ${describe(then)}`);
         }
       }
     } catch (error) {
       if (error instanceof BubbleSignal) {
         throw WTCDError.atUnknown(`Uncaught BubbleSignal with type "${error.type}".`);
+      }
+      if (error instanceof WTCDError) {
+        if (lastSection === null) {
+          error.pushWTCDStack(`initialization`);
+        } else {
+          error.pushWTCDStack(`section "${lastSection.name}"`, lastSection);
+        }
       }
       throw error;
     }

@@ -176,6 +176,7 @@ export class FlowReader {
   private handleOutput(output: ContentOutput) {
     // Create a container for all elements involved so deletion will be easier.
     const $container = document.createElement('div');
+    $container.classList.add('wtcd-group-container');
     output.content.forEach($element => $container.appendChild($element));
     const decisionIndex = this.currentDecisionIndex;
     this.buttons.push(output.choices.map((choice, choiceIndex) => {

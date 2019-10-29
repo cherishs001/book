@@ -24,7 +24,7 @@ import {
   RegisterName,
   ReturnStatement,
   Section,
-  Selection,
+  SelectionAction,
   SetReturnStatement,
   SetYieldStatement,
   SingleSectionContent,
@@ -35,7 +35,6 @@ import {
   SwitchExpression,
   UnaryExpression,
   VariableReference,
-  VariableType,
   WTCDParseResult,
   WTCDRoot,
   YieldStatement,
@@ -57,6 +56,15 @@ const variableTypes = [
   'list',
   'function',
 ];
+
+// V1.1 removed selection type and combined it into action
+function backwardsCompTypeTransformer(variableType: string) {
+  if (variableType === 'selection') {
+    return 'action';
+  } else {
+    return variableType;
+  }
+}
 
 export interface SimpleLogger {
   info(...stuff: any): void;
@@ -272,7 +280,7 @@ class LogicParser {
       }
       functionArguments.push(this.attachLocationInfo<FunctionArgument>(
         typeToken, {
-          type: typeToken.content as any,
+          type: backwardsCompTypeTransformer(typeToken.content) as any,
           name: argNameToken.content,
           defaultValue,
         },
@@ -395,9 +403,9 @@ class LogicParser {
 
     // Selection
     if (this.tokenStream.isNext('keyword', 'selection')) {
-      return this.attachLocationInfo<Selection>(this.tokenStream.next(), {
+      return this.attachLocationInfo<SelectionAction>(this.tokenStream.next(), {
         type: 'selection',
-        choices: this.parseListOrSingleElement(this.parseExpression),
+        choices: this.parseExpression(),
       });
     }
 
@@ -669,7 +677,7 @@ class LogicParser {
     this.lexicalScopeProvider.addVariableToCurrentScope(variableNameToken.content);
     return this.attachLocationInfo<OneVariableDeclaration>(typeToken, {
       variableName: variableNameToken.content,
-      variableType: typeToken.content as VariableType,
+      variableType: backwardsCompTypeTransformer(typeToken.content) as any,
       initialValue,
     });
   }

@@ -202,6 +202,32 @@ export const binaryOperators = new Map<string, BinaryOperatorDefinition>([
       return getMaybePooled('boolean', arg1.value);
     },
   }],
+  ['?!', {
+    precedence: 6,
+    fn: (expr, { evaluator }) => {
+      const arg0 = evaluator(expr.arg0);
+      if (arg0.type !== 'null') {
+        return arg0;
+      }
+      const arg1 = evaluator(expr.arg1);
+      if (arg1.type === 'null') {
+        throw WTCDError.atLocation(expr, `Right side of binary operator "??" ` +
+          `cannot be null. If returning null is desired in this case, please ` +
+          `use "???" instead`);
+      }
+      return arg1;
+    },
+  }],
+  ['??', {
+    precedence: 6,
+    fn: (expr, { evaluator }) => {
+      const arg0 = evaluator(expr.arg0);
+      if (arg0.type !== 'null') {
+        return arg0;
+      }
+      return evaluator(expr.arg1);
+    },
+  }],
   ['&&', {
     precedence: 7,
     fn: (expr, { evaluator }) => {
@@ -291,11 +317,99 @@ export const binaryOperators = new Map<string, BinaryOperatorDefinition>([
     precedence: 15,
     fn: autoEvaluatedSameTypeArg('number', 'number', (arg0Raw, arg1Raw) => arg0Raw % arg1Raw),
   }],
+  ['**', {
+    precedence: 16,
+    fn: autoEvaluatedSameTypeArg('number', 'number', (arg0Raw, arg1Raw) => arg0Raw ** arg1Raw),
+  }],
+  ['.', {
+    precedence: 19,
+    fn: autoEvaluated((arg0, arg1, expr) => {
+      if (arg0.type !== 'list') {
+        throw WTCDError.atLocation(expr, `Left side of binary operator "." ` +
+          `is expected to be a list. Received: ${arg0}`);
+      }
+      if (arg1.type !== 'number' || arg1.value % 1 !== 0) {
+        throw WTCDError.atLocation(expr, `Right side of binary operator "." ` +
+          `is expected to be an integer. Received: ${arg1}`);
+      }
+      if (arg1.value >= arg0.value.length) {
+        throw WTCDError.atLocation(expr, `List does not have an element at ` +
+          `${arg1.value}. If return null is desired, use ".?" instead. List ` +
+          `contents: ${describe(arg0)}`);
+      }
+      return arg0.value[arg1.value];
+    }),
+  }],
+  ['.?', {
+    precedence: 19,
+    fn: autoEvaluated((arg0, arg1, expr) => {
+      if (arg0.type !== 'list') {
+        throw WTCDError.atLocation(expr, `Left side of binary operator ".?" ` +
+          `is expected to be a list. Received: ${arg0}`);
+      }
+      if (arg1.type !== 'number' || arg1.value % 1 !== 0) {
+        throw WTCDError.atLocation(expr, `Right side of binary operator ".?" ` +
+          `is expected to be an integer. Received: ${arg1}`);
+      }
+      const value = arg0.value[arg1.value];
+      if (value === undefined) {
+        return getMaybePooled('null', null);
+      }
+      return value;
+    }),
+  }],
+  ['?.', {
+    precedence: 19,
+    fn: (expr, { evaluator }) => {
+      const arg0 = evaluator(expr.arg0);
+      if (arg0.type === 'null') {
+        return arg0; // Short circuit
+      }
+      if (arg0.type !== 'list') {
+        throw WTCDError.atLocation(expr, `Left side of binary operator "?." ` +
+          `is expected to be a list or null. Received: ${arg0}`);
+      }
+      const arg1 = evaluator(expr.arg1);
+      if (arg1.type !== 'number' || arg1.value % 1 !== 0) {
+        throw WTCDError.atLocation(expr, `Right side of binary operator "?." ` +
+          `is expected to be an integer. Received: ${arg1}`);
+      }
+      const value = arg0.value[arg1.value];
+      if (value === undefined) {
+        throw WTCDError.atLocation(expr, `List does not have an element at ` +
+          `${arg1.value}. If return null is desired, use "?.?" instead. ` +
+          `List contents: ${describe(arg0)}`);
+      }
+      return value;
+    },
+  }],
+  ['?.?', {
+    precedence: 19,
+    fn: (expr, { evaluator }) => {
+      const arg0 = evaluator(expr.arg0);
+      if (arg0.type === 'null') {
+        return arg0; // Short circuit
+      }
+      if (arg0.type !== 'list') {
+        throw WTCDError.atLocation(expr, `Left side of binary operator "?.?" ` +
+          `is expected to be a list or null. Received: ${arg0}`);
+      }
+      const arg1 = evaluator(expr.arg1);
+      if (arg1.type !== 'number' || arg1.value % 1 !== 0) {
+        throw WTCDError.atLocation(expr, `Right side of binary operator ` +
+          `"?.?" is expected to be an integer. Received: ${arg1}`);
+      }
+      const value = arg0.value[arg1.value];
+      if (value === undefined) {
+        return getMaybePooled('null', null);
+      }
+      return value;
+    },
+  }],
   ['::', {
     precedence: 20,
     fn: regularInvocation,
   }],
-
 ]);
 
 export const conditionalOperatorPrecedence = 4;

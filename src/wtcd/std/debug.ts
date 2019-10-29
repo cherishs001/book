@@ -1,6 +1,8 @@
 import { getMaybePooled } from '../constantsPool';
 import { describe } from '../Interpreter';
+import { FunctionInvocationError, invokeFunctionRaw } from '../invokeFunction';
 import { NativeFunction } from '../types';
+import { WTCDError } from '../WTCDError';
 import { assertArgsLength, assertArgType, NativeFunctionError } from './utils';
 export const debugStdFunctions: Array<NativeFunction> = [
   function print(args) {
@@ -16,6 +18,22 @@ export const debugStdFunctions: Array<NativeFunction> = [
       throw new NativeFunctionError('Assertion failed');
     }
     return getMaybePooled('null', null);
+  },
+  function assertError(args, interpreterHandle) {
+    assertArgsLength(args, 1);
+    const fn = assertArgType(args, 0, 'function');
+    try {
+      invokeFunctionRaw(fn, [], interpreterHandle);
+    } catch (error) {
+      if (
+        (error instanceof WTCDError) ||
+        (error instanceof FunctionInvocationError)
+      ) {
+        return getMaybePooled('null', null);
+      }
+      throw error;
+    }
+    throw new NativeFunctionError('Assertion failed, no error is thrown');
   },
   function timeStart(args, interpreterHandle) {
     assertArgsLength(args, 0, 1);

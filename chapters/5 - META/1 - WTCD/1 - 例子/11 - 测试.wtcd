@@ -41,11 +41,19 @@ section main {
   assert::[(choice "b" goto [ dummy1 dummy2 ]) != (choice "b" goto [ dummy1 dummy1 ])]
   assert::[(selection [ choice "a" goto dummy1 choice "b" goto dummy2 choice "c" exit ]) != (selection [ choice "a" goto dummy1 choice "b" goto dummy1 choice "c" exit ])]
 
+  // Selection creation with list
+  {
+    declare list a = [ choice "a" goto dummy1 ]
+    assert::[(selection a) == selection [ choice "a" goto dummy1 ]]
+  }
+
   // 简单算术
   assert::[(1 + 1) == 2]
   assert::[(2 - 1) == 1]
   assert::[(2 * 5) == 10]
   assert::[(8 / 2) == 4]
+
+  assert::[(2 ** 3 ** 2) == 64]
 
   // 三元
   assert::[(9 > 8
@@ -110,6 +118,8 @@ section main {
     assert::[ b == false ]
     declare string c
     assert::[ c == "" ]
+    declare list d
+    assert::[ d == [] ]
   }
 
   // Function equality
@@ -138,6 +148,25 @@ section main {
     assert[f2::[12] == 144]
     assert[f3::[12] == 144]
     assert[f4::[12] == 144]
+  }
+
+  {
+    declare function solveQuad[number a number b number c] {
+      declare number delta = b ** 2 - 4 * a * c
+      delta > 0 ? {
+        return [
+          (-b - delta ** 0.5) / 2 / a
+          (-b + delta ** 0.5) / 2 / a
+        ]
+      } : delta == 0 ? {
+        return [ -b / 2 / a ]
+      } : {
+        return []
+      }
+    }
+    assert::[solveQuad::[1 (-3) 2] == [ 1 2 ]]
+    assert::[solveQuad::[1 2 1] == [ -1 ]]
+    assert::[solveQuad::[1 2 100] == []]
   }
 
   // Function factory
@@ -182,7 +211,7 @@ section main {
     assert::[plusFiveOSquare::[5] == 30]
   }
 
-  // Array spread
+  // List spread
   assert::[[ 1 ...[ 2  3 ] 4 ] == [ 1 2 3 4 ]]
   assert::[[ 1 ...[ ...[ ...[2] ] 3 ] 4 ] == [ 1 2 3 4 ]]
   {
@@ -190,6 +219,42 @@ section main {
     assert::[[ 1 2 3 ...l1 7 8 9 ] == [ 1 2 3 4 5 6 7 8 9 ]]
     assert::[[ 1 ...l1 ...l1 ...l1 1 ] == [ 1 4 5 6 4 5 6 4 5 6 1 ]]
   }
+
+  // Boolean
+  assert::[true && true]
+  assert::[(false && assert::[false]) == false] // Short circuit
+  assert::[(false || false) == false]
+  assert::[true || assert::[false]] // Short circuit
+
+  // List member access
+  assert::[[ 0 1 2 3 4 ].(3) == 3]
+  assertError::[function[] [ 0 1 2 3 4 ].(5)]
+  assert::[[ 0 1 2 null 4 ].(3) == null]
+  assertError::[function[] null.(5)]
+
+  assert::[[ 0 1 2 3 4 ].?(3) == 3]
+  assert::[[ 0 1 2 3 4 ].?(5) == null]
+  assert::[[ 0 1 2 null 4 ].?(3) == null]
+  assertError::[function[] null.?(5)]
+
+  assert::[[ 0 1 2 3 4 ]?.(3) == 3]
+  assertError::[function[] [ 0 1 2 3 4 ]?.(5)]
+  assert::[[ 0 1 2 null 4 ]?.(3) == null]
+  assert::[null?.(assert::[false]) == null] // Short circuit
+
+  assert::[[ 0 1 2 3 4 ]?.?(3) == 3]
+  assert::[[ 0 1 2 3 4 ]?.?(5) == null]
+  assert::[[ 0 1 2 null 4 ]?.?(3) == null]
+  assert::[null?.?(assert::[false]) == null] // Short circuit
+
+  // Null coalescing
+  assert::[(1 ?! assert::[false]) == 1] // Short circuit
+  assert::[(null ?! 2) == 2]
+  assertError::[function[] null ?! null]
+
+  assert::[(1 ?? assert::[false]) == 1] // Short circuit
+  assert::[(null ?? 2) == 2]
+  assert::[(null ?? null) == null]
 
   // std listSet
   {
@@ -201,9 +266,14 @@ section main {
 
   // std listForEach
   {
-    declare number sum = 0
-    listForEach::[[ 1 2 3 4 5 ] function[number item] sum += item]
-    assert::[sum == 15]
+    declare number contentSum = 0
+    declare number indexSum = 0
+    listForEach::[[ 1 2 3 4 100 ] function[number item number index] {
+      contentSum += item
+      indexSum += index
+    }]
+    assert::[contentSum == 110]
+    assert::[indexSum == 10]
   }
 
   // std listMap
@@ -225,7 +295,7 @@ section main {
   // std listChunk
   {
     declare list l = listChunk::[[ 1 2 3 4 5 6 7 8 9 10 ] 3 ]
-    assert::[l == [ [ 1 2 3] [ 4 5 6 ] [ 7 8 9 ] [ 10 ] ]]
+    assert::[l == [ [ 1 2 3 ] [ 4 5 6 ] [ 7 8 9 ] [ 10 ] ]]
   }
 
   // std math*
@@ -242,7 +312,6 @@ section main {
 
 section dummy1 then exit
 section dummy2 then exit
-
 
 ---<<< main >>>---
 # 测试
