@@ -2727,8 +2727,8 @@ class WTCDError extends Error {
                 : ''));
     }
     static atUnknown(message) {
-        return new WTCDError(message + ` at unknown location. (Location ` +
-            +`info is not available for this type of error)`, null, null);
+        return new WTCDError(message + ` at unknown location. (Location `
+            + `info is not available for this type of error)`, null, null);
     }
     static atLineColumn(line, column, message) {
         return new WTCDError(message + ` at ${line}:${column}.`, line, column);
