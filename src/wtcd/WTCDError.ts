@@ -26,7 +26,7 @@ export class WTCDError<TLocationInfo extends boolean> extends Error {
     );
   }
   public static atUnknown(message: string) {
-    return new WTCDError<false>(message + ` at unknown location. (Location ` +
+    return new WTCDError<false>(message + ` at unknown location. (Location `
       + `info is not available for this type of error)`, null, null);
   }
   public static atLineColumn(line: number, column: number, message: string) {
