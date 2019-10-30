@@ -65,6 +65,8 @@ class Style {
 
     attemptInsertRule(`.rect>.comments>.create-comment::before { background-color: ${key}; }`);
 
+    attemptInsertRule(`:root { --paper-bg: ${this.def.paperBgColor}; }`);
+
     attemptInsertRule(`:root { --key: ${key}; }`);
     attemptInsertRule(`:root { --key-opacity-01: ${keyAlpha(0.1)}; }`);
     attemptInsertRule(`:root { --key-opacity-05: ${keyAlpha(0.5)}; }`);

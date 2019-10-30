@@ -21,7 +21,7 @@ export function invokeFunctionRaw(
     pushScope,
     popScope,
   } = interpreterHandle;
-  if (functionValue.builtIn) {
+  if (functionValue.fnType === 'native') {
     try {
       return functionValue.nativeFn(args, interpreterHandle);
     } catch (error) {
@@ -33,73 +33,91 @@ export function invokeFunctionRaw(
         throw error;
       }
     }
-  }
-  const scope = pushScope();
-  try {
-    scope.addRegister('return');
-    // Check and add arguments to the scope
-    functionValue.expr.arguments.forEach((argument, index) => {
-      let value = args[index];
-      if (value === undefined || value.type === 'null') {
-        // Use default
-        if (argument.defaultValue !== null) {
-          value = evaluator(argument.defaultValue);
-        } else {
-          throw new FunctionInvocationError(`The ${index + 1}th argument of ` +
-            `invocation is omitted, but it does not have a default value`);
+  } else if (functionValue.fnType === 'wtcd') {
+    const scope = pushScope();
+    try {
+      scope.addRegister('return');
+      // Check and add arguments to the scope
+      functionValue.expr.arguments.forEach((argument, index) => {
+        let value = args[index];
+        if (value === undefined || value.type === 'null') {
+          // Use default
+          if (argument.defaultValue !== null) {
+            value = evaluator(argument.defaultValue);
+          } else {
+            throw new FunctionInvocationError(`The ${index + 1}th argument of ` +
+              `invocation is omitted, but it does not have a default value`);
+          }
         }
+        if (value.type !== argument.type) {
+          throw new FunctionInvocationError(`The ${index + 1}th argument of ` +
+            `invocation has wrong type. Expected: ${argument.type}, received: ` +
+            `${describe(value)}`);
+        }
+        scope.addVariable(
+          argument.name,
+          {
+            type: value.type,
+            value: value.value,
+          } as any,
+        );
+      });
+      // Rest arg
+      if (functionValue.expr.restArgName !== null) {
+        scope.addVariable(
+          functionValue.expr.restArgName,
+          {
+            type: 'list',
+            value: args.slice(functionValue.expr.arguments.length),
+          },
+        );
       }
-      if (value.type !== argument.type) {
-        throw new FunctionInvocationError(`The ${index + 1}th argument of ` +
-          `invocation has wrong type. Expected: ${argument.type}, received: ` +
-          `${describe(value)}`);
+      // Restore captured variables
+      functionValue.captured.forEach(captured => {
+        scope.addVariable(
+          captured.name,
+          captured.value,
+        );
+      });
+      // Invoke function
+      const evaluatedValue = evaluator(functionValue.expr.expression);
+      const registerValue = scope.getRegister('return')!;
+      // Prioritize register value
+      if (registerValue.type === 'null') {
+        // Only use evaluated value if no return or setReturn statement is
+        // executed.
+        return evaluatedValue;
+      } else {
+        return registerValue;
       }
-      scope.addVariable(
-        argument.name,
-        {
-          type: value.type,
-          value: value.value,
-        } as any,
-      );
-    });
-    // Rest arg
-    if (functionValue.expr.restArgName !== null) {
-      scope.addVariable(
-        functionValue.expr.restArgName,
-        {
-          type: 'list',
-          value: args.slice(functionValue.expr.arguments.length),
-        },
-      );
+    } catch (error) {
+      if (
+        (error instanceof BubbleSignal) &&
+        (error.type === BubbleSignalType.RETURN)
+      ) {
+        return scope.getRegister('return')!;
+      }
+      throw error;
+    } finally {
+      popScope();
     }
-    // Restore captured variables
-    functionValue.captured.forEach(captured => {
-      scope.addVariable(
-        captured.name,
-        captured.value,
-      );
-    });
-    // Invoke function
-    const evaluatedValue = evaluator(functionValue.expr.expression);
-    const registerValue = scope.getRegister('return')!;
-    // Prioritize register value
-    if (registerValue.type === 'null') {
-      // Only use evaluated value if no return or setReturn statement is
-      // executed.
-      return evaluatedValue;
-    } else {
-      return registerValue;
-    }
-  } catch (error) {
-    if (
-      (error instanceof BubbleSignal) &&
-      (error.type === BubbleSignalType.RETURN)
-    ) {
-      return scope.getRegister('return')!;
-    }
-    throw error;
-  } finally {
-    popScope();
+  } else {
+    let fn: RuntimeValueRaw<'function'> = functionValue;
+    const leftApplied = [];
+    const rightApplied = [];
+    do {
+      if (fn.isLeft) {
+        leftApplied.unshift(...fn.applied);
+      } else {
+        rightApplied.push(...fn.applied);
+      }
+      fn = fn.targetFn.value;
+    } while (fn.fnType === 'partial');
+    return invokeFunctionRaw(
+      fn,
+      [...leftApplied, ...args, ...rightApplied],
+      interpreterHandle,
+    );
   }
 }
 

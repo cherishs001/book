@@ -19,6 +19,8 @@ li {
   line-height: 1.6em;
 }
 table {
+  position: relative;
+
   margin: 1em 0;
 
   border-spacing: 0;
@@ -33,11 +35,18 @@ img {
 tbody>tr:nth-child(odd) {
   background-color: var(--key-opacity-01);
 }
-th {
-  white-space: nowrap;
-}
 td, th {
   line-height: 1.6em;
+}
+th {
+  position: sticky;
+  top: 0;
+
+  white-space: nowrap;
+
+  background-color: var(--paper-bg);
+
+  line-height: 2.0;
 }
 h1 {
   font-size: 2.2em;
@@ -187,8 +196,6 @@ body.animation-enabled .rect>div {
   transition: background-color 0.3s, color 0.3s, opacity 0.5s;
 }
 .rect>div {
-  overflow: hidden;
-
   opacity: 0;
 
   font-family: var(--font-family);

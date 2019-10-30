@@ -1,5 +1,6 @@
+import { networkInterfaces } from 'os';
 import { getMaybePooled } from '../constantsPool';
-import { ListValue } from '../Interpreter';
+import { describe, ListValue } from '../Interpreter';
 import { FunctionInvocationError, invokeFunctionRaw } from '../invokeFunction';
 import { NativeFunction } from '../types';
 import { WTCDError } from '../WTCDError';
@@ -41,7 +42,7 @@ export const listStdFunctions: Array<NativeFunction> = [
       } catch (error) {
         if (error instanceof FunctionInvocationError) {
           throw new NativeFunctionError(`Failed to apply function to the ` +
-            `${index}th element of list: ${error.message}`);
+            `element with index = ${index} of list: ${error.message}`);
         } else if (error instanceof WTCDError) {
           error.pushWTCDStack(`listForEach (index = ${index})`);
         }
@@ -63,9 +64,9 @@ export const listStdFunctions: Array<NativeFunction> = [
       } catch (error) {
         if (error instanceof FunctionInvocationError) {
           throw new NativeFunctionError(`Failed to apply function to the ` +
-            `${index}th element of list: ${error.message}`);
+            `element with index = ${index} of list: ${error.message}`);
         } else if (error instanceof WTCDError) {
-          error.pushWTCDStack(`listForEach (index = ${index})`);
+          error.pushWTCDStack(`listForMap (index = ${index})`);
         }
         throw error;
       }
@@ -112,5 +113,99 @@ export const listStdFunctions: Array<NativeFunction> = [
       type: 'list',
       value: results,
     };
+  },
+  function listFilter(args, interpreterHandle) {
+    assertArgsLength(args, 2);
+    const list = assertArgType(args, 0, 'list');
+    const fn = assertArgType(args, 1, 'function');
+    return {
+      type: 'list',
+      value: list.filter((item, index) => {
+        try {
+          const result = invokeFunctionRaw(fn, [
+            item,
+            getMaybePooled('number', index),
+          ], interpreterHandle);
+          if (result.type !== 'boolean') {
+            throw new NativeFunctionError(`Predicate is expected to return ` +
+              `booleans, but ${describe(result)} is returned for element ` +
+              `with index = ${index}`);
+          }
+          return result.value;
+        } catch (error) {
+          if (error instanceof FunctionInvocationError) {
+            throw new NativeFunctionError(`Failed to apply function to the ` +
+              `element with index = ${index} of list: ${error.message}`);
+          } else if (error instanceof WTCDError) {
+            error.pushWTCDStack(`listFilter (index = ${index})`);
+          }
+          throw error;
+        }
+      }),
+    };
+  },
+  function listSplice(args) {
+    assertArgsLength(args, 3, 4);
+    const source = assertArgType(args, 0, 'list');
+    const start = assertArgType(args, 1, 'number');
+    const length = assertArgType(args, 2, 'number');
+    const newItems = assertArgType(args, 3, 'list', []);
+    if (start % 1 !== 0) {
+      throw new NativeFunctionError('Start index must be an integer, ' +
+        `provided: ${start}`);
+    }
+    if (start < 0 || start >= source.length) {
+      throw new NativeFunctionError(`Start index must be in the bounds of ` +
+        `the list given (0 - ${source.length - 1}), provided: ${start}`);
+    }
+    if (length % 1 !== 0) {
+      throw new NativeFunctionError('Start must be an integer.');
+    }
+    if (length < 0) {
+      throw new NativeFunctionError('Length must be nonnegative.');
+    }
+    if ((start + length) > source.length) {
+      throw new NativeFunctionError(`Length is too large and causes overflow.`);
+    }
+    const result = source.slice();
+    result.splice(start, length, ...newItems);
+    return {
+      type: 'list',
+      value: result,
+    };
+  },
+  function listSlice(args) {
+    assertArgsLength(args, 2, 3);
+    const source = assertArgType(args, 0, 'list');
+    const start = assertArgType(args, 1, 'number');
+    const end = assertArgType(args, 2, 'number', source.length);
+    if (start % 1 !== 0) {
+      throw new NativeFunctionError('Start index must be an integer, ' +
+        `provided: ${start}`);
+    }
+    if (start < 0 || start >= source.length) {
+      throw new NativeFunctionError(`Start index must be in the bounds of ` +
+        `the list given (0 - ${source.length - 1}), provided: ${start}`);
+    }
+    if (end % 1 !== 0) {
+      throw new NativeFunctionError('End index must be an integer, ' +
+        `provided: ${end}`);
+    }
+    if (end < 0 || end > source.length) {
+      throw new NativeFunctionError(`End index must be in the bounds of ` +
+        `the list given (0 - ${source.length}), provided: ${end}`);
+    }
+    if (end < start) {
+      throw new NativeFunctionError(`End index must be larger or equal to ` +
+        `start index. Provided start = ${start}, end = ${end}`);
+    }
+    return {
+      type: 'list',
+      value: source.slice(start, end),
+    };
+  },
+  function listLength(args) {
+    assertArgsLength(args, 1);
+    return getMaybePooled('number', assertArgType(args, 0, 'list').length);
   },
 ];

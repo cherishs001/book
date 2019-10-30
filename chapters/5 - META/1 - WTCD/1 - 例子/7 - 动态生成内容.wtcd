@@ -12,4 +12,11 @@ section main {
 
   contentAddHeader::["有序列表" 2]
   contentAddOrderedList::["第 1 个东西" "第 2 个东西" "第 3 个东西"]
+
+  contentAddHeader::["表格" 2]
+  contentAddTable::[
+    [ "名字" "年龄" "性别" ]
+    [ "琳"   "16"   "女"   ]
+    [ "czp"  "？"   "男"   ]
+  ]
 } then exit

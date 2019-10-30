@@ -86,7 +86,7 @@
 		},
 		"operators": {
 			"name": "keyword.operator.wtcd",
-			"match": "[+\\-*\\/^&|=><!?:%]+"
+			"match": "[+\\-*\\/^&|=><!?:%.]+"
 		},
 		"strings": {
 			"name": "string.quoted.double.wtcd",
@@ -101,7 +101,7 @@
 		},
 		"stdFunctions": {
 			"name": "support.function",
-			"match": "\\b(?:contentAddParagraph|contentAddImage|contentAddUnorderedList|contentAddOrderedList|contentAddHeader|print|assert|assertError|timeStart|timeEnd|listSet|listForEach|listMap|listCreateFilled|listChunk|mathMin|mathMax|mathFloor|random|randomInt|randomBoolean|randomBiased|stringLength)\\b"
+			"match": "\\b(?:contentAddParagraph|contentAddImage|contentAddUnorderedList|contentAddOrderedList|contentAddHeader|contentAddTable|print|assert|assertError|timeStart|timeEnd|listSet|listForEach|listMap|listCreateFilled|listChunk|listFilter|listSplice|listSlice|listLength|mathMin|mathMax|mathFloor|random|randomInt|randomBoolean|randomBiased|stringLength|stringFormatNumberFixed|stringFormatNumberPrecision)\\b"
 		},
 		"variables": {
 			"name": "variable.other.readwrite.wtcd",

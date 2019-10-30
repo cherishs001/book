@@ -298,6 +298,26 @@ section main {
     assert::[l == [ [ 1 2 3 ] [ 4 5 6 ] [ 7 8 9 ] [ 10 ] ]]
   }
 
+  // std listSplice
+  {
+    assert::[listSplice::[[ 0 1 2 3 ] 1 2] == [ 0 3 ]]
+    assert::[listSplice::[[ 0 1 2 3 ] 1 2 [ "Wow1" "Wow2" ]] == [ 0 "Wow1" "Wow2" 3]]
+  }
+
+  // std listSlice
+  {
+    assert::[listSlice::[[ 0 1 2 3 4 5 ] 2] == [ 2 3 4 5 ]]
+    assert::[listSlice::[[ 0 1 2 3 4 5 ] 2 4] == [ 2 3 ]]
+  }
+
+  // std listLength
+  {
+    assert::[listLength::[[ 0 1 2 3 4 ]] == 5]
+  }
+
+  // std listFilter
+  assert::[listFilter::[[ 1 2 3 4 5 6 7 8 ] function[number a] a % 2 == 0] == [ 2 4 6 8 ]]
+
   // std math*
   assert::[mathMin::[ 10 1 2 3 4 ] == 1]
   assert::[mathMax::[ 1 2 3 4 0 ] == 4]
@@ -306,6 +326,28 @@ section main {
 
   // std string*
   assert::[stringLength::["Hello~"] == 6]
+  assert::[stringFormatNumberFixed::[1.235 2] == "1.24"]
+  assert::[stringFormatNumberFixed::[1.235 4] == "1.2350"]
+  assert::[stringFormatNumberFixed::[1.235 6] == "1.235000"]
+  assert::[stringFormatNumberPrecision::[1.235 2] == "1.2"]
+  assert::[stringFormatNumberPrecision::[1.235 4] == "1.235"]
+  assert::[stringFormatNumberPrecision::[1.235 6] == "1.23500"]
+  assert::[stringFormatNumberPrecision::[1234 2] == "1.2e+3"]
+
+  // Partial application
+  assert::[([ 0 1 2 3 ] |> listSet.:[2 "Wow"]) == [ 0 1 "Wow" 3 ]]
+  assert::[("Wow" |> listSet:.[[ 0 1 2 3 ] 2]) == [ 0 1 "Wow" 3 ]]
+  assert::[listSet == listSet.:[]]
+  assert::[listSet == listSet:.[]]
+  assert::[listSet != listSet.:[1]]
+  assert::[listSet != listSet:.[1]]
+  assert::[listSet.:[1] == listSet.:[1]]
+  assert::[listSet:.[1] == listSet:.[1]]
+  assert::[listSet:.[1] != listSet.:[1]]
+  assert::[listSet.:[1] != listSet.:[2]]
+  assert::[listSet:.[1] != listSet:.[2]]
+  assert::[(listSet:.[[ 0 1 2 3 ]].:["Wow"]:.[2]::[]) == [ 0 1 "Wow" 3 ]]
+  assert::[(listSet.:["Wow"].:[2]:.[[ 0 1 2 3 ]]::[]) == [ 0 1 "Wow" 3 ]]
 
   timeEnd::[]
 } then exit

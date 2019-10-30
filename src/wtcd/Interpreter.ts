@@ -84,17 +84,22 @@ type: 'choice';
 
 export interface FunctionValue {
   type: 'function';
-  value: ({
-    builtIn: false;
+  value: {
+    fnType: 'wtcd',
     expr: FunctionExpression;
     captured: Array<{
       name: string,
       value: RuntimeValueMutable,
     }>;
   } | {
-    builtIn: true,
+    fnType: 'native',
     nativeFn: NativeFunction,
-  });
+  } | {
+    fnType: 'partial';
+    isLeft: boolean;
+    applied: Array<RuntimeValue>;
+    targetFn: FunctionValue,
+  };
 }
 
 export type RuntimeValueMutable
@@ -150,12 +155,12 @@ export function isEqual(v0: RuntimeValue, v1: RuntimeValue): boolean {
         (isEqual(v0.value.action, (v1 as any).value.action))
       );
     case 'function':
-      if (v0.value.builtIn !== (v1 as FunctionValue).value.builtIn) {
+      if (v0.value.fnType !== (v1 as FunctionValue).value.fnType) {
         return false;
       }
-      if (v0.value.builtIn === true) {
+      if (v0.value.fnType === 'native') {
         return (v0.value.nativeFn === (v1 as any).value.nativeFn);
-      } else {
+      } else if (v0.value.fnType === 'wtcd') {
         return (
           // They refer to same expression
           (v0.value.expr === (v1 as any).value.expr) &&
@@ -168,6 +173,12 @@ export function isEqual(v0: RuntimeValue, v1: RuntimeValue): boolean {
               (v0Cap.value === v1Cap.value)
             );
           }))
+        );
+      } else {
+        return (
+          (v0.value.isLeft === (v1 as any).value.isLeft) &&
+          (isEqual(v0.value.targetFn, (v1 as any).value.targetFn)) &&
+          (arrayEquals(v0.value.applied, (v1 as any).value.applied, isEqual))
         );
       }
     case 'list':
@@ -229,13 +240,17 @@ export function describe(rv: RuntimeValue): string {
     case 'list':
       return `list (elements = [${rv.value.map(describe).join(', ')}])`;
     case 'function':
-      if (rv.value.builtIn) {
+      if (rv.value.fnType === 'native') {
         return `function (native ${rv.value.nativeFn.name})`;
-      } else {
+      } else if (rv.value.fnType === 'wtcd') {
         return `function (arguments = [${rv.value.expr.arguments
           .map(arg => arg.name)
           .join(', ')
         }])`;
+      } else {
+        return `function (partial ${rv.value.isLeft ? 'left' : 'right'}, ` +
+          `applied = [${rv.value.applied.map(describe).join(', ')}], ` +
+          `targetFn = ${describe(rv.value.targetFn)})`;
       }
   }
 }
@@ -496,7 +511,7 @@ export class Interpreter {
     return {
       type: 'function',
       value: {
-        builtIn: false,
+        fnType: 'wtcd',
         expr,
         captured: expr.captures.map(variableName => ({
           name: variableName,
@@ -664,7 +679,7 @@ export class Interpreter {
       stdScope.addVariable(stdFunction.name, {
         type: 'function',
         value: {
-          builtIn: true,
+          fnType: 'native',
           nativeFn: stdFunction,
         },
       });

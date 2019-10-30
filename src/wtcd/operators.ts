@@ -410,6 +410,56 @@ export const binaryOperators = new Map<string, BinaryOperatorDefinition>([
     precedence: 20,
     fn: regularInvocation,
   }],
+  ['.:', {
+    precedence: 20,
+    fn: autoEvaluated((arg0, arg1, expr) => {
+      if (arg0.type !== 'function') {
+        throw WTCDError.atLocation(expr, `Left side of binary operator ".:" ` +
+          `is expected to be a function. Received: ${arg0}`);
+      }
+      if (arg1.type !== 'list') {
+        throw WTCDError.atLocation(expr, `Right side of binary operator ".:" ` +
+          `is expected to be a list. Received: ${arg1}`);
+      }
+      if (arg1.value.length === 0) {
+        return arg0;
+      }
+      return {
+        type: 'function',
+        value: {
+          fnType: 'partial',
+          isLeft: false,
+          applied: arg1.value,
+          targetFn: arg0,
+        },
+      };
+    }),
+  }],
+  [':.', {
+    precedence: 20,
+    fn: autoEvaluated((arg0, arg1, expr) => {
+      if (arg0.type !== 'function') {
+        throw WTCDError.atLocation(expr, `Left side of binary operator ":." ` +
+          `is expected to be a function. Received: ${arg0}`);
+      }
+      if (arg1.type !== 'list') {
+        throw WTCDError.atLocation(expr, `Right side of binary operator ":." ` +
+          `is expected to be a list. Received: ${arg1}`);
+      }
+      if (arg1.value.length === 0) {
+        return arg0;
+      }
+      return {
+        type: 'function',
+        value: {
+          fnType: 'partial',
+          isLeft: true,
+          applied: arg1.value,
+          targetFn: arg0,
+        },
+      };
+    }),
+  }],
 ]);
 
 export const conditionalOperatorPrecedence = 4;

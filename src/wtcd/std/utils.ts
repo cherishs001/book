@@ -46,7 +46,7 @@ export function assertArgType<T extends RuntimeValueType>(
     return defaultValue;
   }
   if (value.type !== type) {
-    throw new NativeFunctionError(`The ${index}th argument of ` +
+    throw new NativeFunctionError(`The argument with index = ${index} of ` +
       `invocation has wrong type. Expected: ${type}, received: ` +
       `${describe(value)}`);
   }
