@@ -1,4 +1,4 @@
-export function flat<T>(arr: Array<T | Array<T>>) {
+export function flat<T>(arr: ReadonlyArray<T | ReadonlyArray<T>>) {
   const result: Array<T> = [];
   for (const item of arr) {
     if (Array.isArray(item)) {
@@ -10,8 +10,8 @@ export function flat<T>(arr: Array<T | Array<T>>) {
   return result;
 }
 export function arrayEquals<T>(
-  arr0: Array<T>,
-  arr1: Array<T>,
+  arr0: ReadonlyArray<T>,
+  arr1: ReadonlyArray<T>,
   comparator: (e0: T, e1: T) => boolean = (e0, e1) => e0 === e1,
 ) {
   return arr0.every((e0, index) => comparator(e0, arr1[index]));

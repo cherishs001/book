@@ -13,7 +13,7 @@ export class FunctionInvocationError extends Error {
 
 export function invokeFunctionRaw(
   functionValue: RuntimeValueRaw<'function'>,
-  args: Array<RuntimeValue>,
+  args: ReadonlyArray<RuntimeValue>,
   interpreterHandle: InterpreterHandle,
 ): RuntimeValue {
   const {

@@ -9,7 +9,7 @@ export class NativeFunctionError extends Error {
 }
 
 export function assertArgsLength(
-  args: Array<RuntimeValue>,
+  args: ReadonlyArray<RuntimeValue>,
   min: number,
   max: number = min,
 ) {
@@ -25,7 +25,7 @@ export function assertArgsLength(
 
 /** Turn undefined to null value */
 export function nullify(
-  args: Array<RuntimeValue>,
+  args: ReadonlyArray<RuntimeValue>,
   index: number,
 ) {
   const value = args[index];
@@ -36,7 +36,7 @@ export function nullify(
 }
 
 export function assertArgType<T extends RuntimeValueType>(
-  args: Array<RuntimeValue>,
+  args: ReadonlyArray<RuntimeValue>,
   index: number,
   type: T,
   defaultValue?: RuntimeValueRaw<T>,

@@ -29,80 +29,93 @@ interface SingleChoice {
 }
 
 export interface ContentOutput {
-  content: Array<HTMLElement>;
-  choices: Array<SingleChoice>;
+  readonly content: Array<HTMLElement>;
+  readonly choices: Array<SingleChoice>;
 }
+
+export type NumberValueRaw = number;
 
 export interface NumberValue {
-  type: 'number';
-  value: number;
+  readonly type: 'number';
+  readonly value: NumberValueRaw;
 }
+
+export type BooleanValueRaw = boolean;
+
 export interface BooleanValue {
-  type: 'boolean';
-  value: boolean;
+  readonly type: 'boolean';
+  readonly value: BooleanValueRaw;
 }
+
+export type StringValueRaw = string;
+
 export interface StringValue {
-  type: 'string';
-  value: string;
+  readonly type: 'string';
+  readonly value: StringValueRaw;
 }
+
+export type NullValueRaw = null;
+
 export interface NullValue {
-  type: 'null';
-  value: null;
+  readonly type: 'null';
+  readonly value: NullValueRaw;
 }
+
+export type ListValueRaw = ReadonlyArray<RuntimeValue>;
 
 export interface ListValue {
-  type: 'list';
-  value: Array<RuntimeValue>;
+  readonly type: 'list';
+  readonly value: ListValueRaw;
 }
+
+export type ActionValueRaw = {
+  readonly action: 'goto';
+  readonly target: Array<string>;
+} | {
+  readonly action: 'exit';
+} | {
+  readonly action: 'selection';
+  readonly choices: ReadonlyArray<ChoiceValue>;
+};
 
 export interface ActionValue {
-  type: 'action';
-  value: {
-    action: 'goto';
-    target: Array<string>;
-  } | {
-    action: 'exit';
-  } | {
-    action: 'selection';
-    choices: Array<ChoiceValue>;
-  };
-}
-export interface ChoiceValue {
-type: 'choice';
-  value: {
-    text: string;
-    action: ActionValue | NullValue;
-  };
+  readonly type: 'action';
+  readonly value: ActionValueRaw;
 }
 
-// export interface SelectionValue {
-//   type: 'selection';
-//   value: {
-//     choices: Array<ChoiceValue>;
-//   };
-// }
+export interface ChoiceValueRaw {
+  readonly text: string;
+  readonly action: ActionValue | NullValue;
+}
+
+export interface ChoiceValue {
+  readonly type: 'choice';
+  readonly value: ChoiceValueRaw;
+}
+
+export type FunctionValueRaw = {
+  readonly fnType: 'wtcd',
+  readonly expr: FunctionExpression;
+  readonly captured: ReadonlyArray<{
+    readonly name: string,
+    readonly value: RuntimeValueMutable,
+  }>;
+} | {
+  readonly fnType: 'native',
+  readonly nativeFn: NativeFunction,
+} | {
+  readonly fnType: 'partial';
+  readonly isLeft: boolean;
+  readonly applied: ReadonlyArray<RuntimeValue>;
+  readonly targetFn: FunctionValue,
+};
 
 export interface FunctionValue {
-  type: 'function';
-  value: {
-    fnType: 'wtcd',
-    expr: FunctionExpression;
-    captured: Array<{
-      name: string,
-      value: RuntimeValueMutable,
-    }>;
-  } | {
-    fnType: 'native',
-    nativeFn: NativeFunction,
-  } | {
-    fnType: 'partial';
-    isLeft: boolean;
-    applied: Array<RuntimeValue>;
-    targetFn: FunctionValue,
-  };
+  readonly type: 'function';
+  readonly value: FunctionValueRaw;
 }
 
-export type RuntimeValueMutable
+export type RuntimeValue
   = NumberValue
   | BooleanValue
   | StringValue
@@ -111,9 +124,16 @@ export type RuntimeValueMutable
   | ChoiceValue
   | ListValue
   | FunctionValue;
-export type RuntimeValue = Readonly<RuntimeValueMutable>;
 
 export type RuntimeValueType = RuntimeValue['type'];
+
+export interface RuntimeValueMutable<
+  T extends RuntimeValueType = RuntimeValueType
+> {
+  readonly type: T;
+  value: RuntimeValueRaw<T>;
+}
+// export type RuntimeValue
 
 export type RuntimeValueRaw<T extends RuntimeValueType> = Extract<
   RuntimeValue,
@@ -268,7 +288,7 @@ class RuntimeScope {
   public resolveVariableReference(variableName: string): RuntimeValueMutable | null {
     return this.variables.get(variableName) || null;
   }
-  public addVariable(variableName: string, value: RuntimeValue) {
+  public addVariable(variableName: string, value: RuntimeValueMutable) {
     this.variables.set(variableName, value);
   }
   public addRegister(registerName: RegisterName) {

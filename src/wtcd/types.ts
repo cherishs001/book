@@ -258,6 +258,6 @@ export type WTCDParseResult = {
 export type RegisterName = 'yield' | 'return';
 
 export type NativeFunction = (
-  args: Array<RuntimeValue>,
+  args: ReadonlyArray<RuntimeValue>,
   interpreterHandle: InterpreterHandle,
 ) => RuntimeValue;
