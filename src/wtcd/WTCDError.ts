@@ -36,7 +36,13 @@ export class WTCDError<TLocationInfo extends boolean> extends Error {
       column,
     );
   }
-  public static atLocation(location: OptionalLocationInfo, message: string) {
+  public static atLocation(
+    location: OptionalLocationInfo | null,
+    message: string,
+  ) {
+    if (location === null) {
+      return WTCDError.atUnknown(message);
+    }
     if (location.line === undefined) {
       return new WTCDError(message + ' at unknown location. (Try recompile in '
         + 'debug mode to enable source map)', null, null);

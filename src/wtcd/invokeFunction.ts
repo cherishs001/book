@@ -1,5 +1,5 @@
 import { autoEvaluated } from './autoEvaluated';
-import { BubbleSignal, BubbleSignalType, describe, InterpreterHandle, RuntimeValue, RuntimeValueRaw } from './Interpreter';
+import { BubbleSignal, BubbleSignalType, describe, InterpreterHandle, RuntimeValue, RuntimeValueRaw, isTypeAssignableTo } from './Interpreter';
 import { NativeFunctionError } from './std/utils';
 import { BinaryExpression } from './types';
 import { WTCDError } from './WTCDError';
@@ -45,30 +45,30 @@ export function invokeFunctionRaw(
           if (argument.defaultValue !== null) {
             value = evaluator(argument.defaultValue);
           } else {
-            throw new FunctionInvocationError(`The ${index + 1}th argument of ` +
-              `invocation is omitted, but it does not have a default value`);
+            throw new FunctionInvocationError(`The argument with index = ` +
+              `${index} of invocation is omitted, but it does not have a ` +
+              `default value`);
           }
         }
-        if (value.type !== argument.type) {
-          throw new FunctionInvocationError(`The ${index + 1}th argument of ` +
-            `invocation has wrong type. Expected: ${argument.type}, received: ` +
-            `${describe(value)}`);
+        if (!isTypeAssignableTo(value.type, argument.type)) {
+          throw new FunctionInvocationError(`The argument with index = ` +
+            `${index} of invocation has wrong type. Expected: ` +
+            `${argument.type}, received: ${describe(value)}`);
         }
-        scope.addVariable(
-          argument.name,
-          {
-            type: value.type,
-            value: value.value,
-          } as any,
-        );
+        scope.addVariable(argument.name, {
+          types: [value.type],
+          value,
+        });
       });
       // Rest arg
       if (functionValue.expr.restArgName !== null) {
         scope.addVariable(
-          functionValue.expr.restArgName,
-          {
-            type: 'list',
-            value: args.slice(functionValue.expr.arguments.length),
+          functionValue.expr.restArgName, {
+            types: ['list'],
+            value: {
+              type: 'list',
+              value: args.slice(functionValue.expr.arguments.length),
+            },
           },
         );
       }

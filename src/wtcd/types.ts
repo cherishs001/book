@@ -1,4 +1,4 @@
-import { InterpreterHandle, RuntimeValue } from './Interpreter';
+import { InterpreterHandle, RuntimeValue, RuntimeValueType } from './Interpreter';
 import { BinaryOperator, UnaryOperator } from './operators';
 
 /**
@@ -225,16 +225,6 @@ export interface Section extends OptionalLocationInfo {
   then: Expression;
 }
 
-export type VariableType
-  = 'number'
-  | 'boolean'
-  | 'string'
-  | 'action'
-  | 'choice'
-  | 'selection'
-  | 'list'
-  | 'function';
-
 export interface OneVariableDeclaration extends OptionalLocationInfo {
   variableName: string;
   variableType: VariableType;
@@ -261,3 +251,5 @@ export type NativeFunction = (
   args: ReadonlyArray<RuntimeValue>,
   interpreterHandle: InterpreterHandle,
 ) => RuntimeValue;
+
+export type VariableType = null | Array<RuntimeValueType>;

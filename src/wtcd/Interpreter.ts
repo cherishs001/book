@@ -1,4 +1,4 @@
-import { clone, getMaybePooled } from './constantsPool';
+import { getMaybePooled } from './constantsPool';
 import { binaryOperators, unaryOperators } from './operators';
 import { Random } from './Random';
 import { stdFunctions } from './std';
@@ -11,11 +11,13 @@ import {
   FunctionExpression,
   ListExpression,
   NativeFunction,
+  OptionalLocationInfo,
   RegisterName,
   Section,
   SelectionAction,
   Statement,
   SwitchExpression,
+  VariableType,
   WTCDRoot,
 } from './types';
 import { arrayEquals, flat } from './utils';
@@ -98,7 +100,7 @@ export type FunctionValueRaw = {
   readonly expr: FunctionExpression;
   readonly captured: ReadonlyArray<{
     readonly name: string,
-    readonly value: RuntimeValueMutable,
+    readonly value: Variable,
   }>;
 } | {
   readonly fnType: 'native',
@@ -127,13 +129,10 @@ export type RuntimeValue
 
 export type RuntimeValueType = RuntimeValue['type'];
 
-export interface RuntimeValueMutable<
-  T extends RuntimeValueType = RuntimeValueType
-> {
-  readonly type: T;
-  value: RuntimeValueRaw<T>;
+export interface Variable {
+  readonly types: null | Array<RuntimeValueType>;
+  value: RuntimeValue;
 }
-// export type RuntimeValue
 
 export type RuntimeValueRaw<T extends RuntimeValueType> = Extract<
   RuntimeValue,
@@ -141,6 +140,8 @@ export type RuntimeValueRaw<T extends RuntimeValueType> = Extract<
 >['value'];
 
 export function isEqual(v0: RuntimeValue, v1: RuntimeValue): boolean {
+  // TypeScript's generic currently does not support type narrowing.
+  // Until that is fixed, this function has to have so many any, unfortunately
   if (v0.type !== v1.type) {
     return false;
   }
@@ -275,8 +276,31 @@ export function describe(rv: RuntimeValue): string {
   }
 }
 
+export function isTypeAssignableTo(
+  type: RuntimeValueType,
+  types: VariableType,
+) {
+  return types === null || types.includes(type);
+}
+
+export function assignValueToVariable(
+  variable: Variable,
+  value: RuntimeValue,
+  location: OptionalLocationInfo, // For error message
+  variableName: string, // For error message
+) {
+  if (isTypeAssignableTo(value.type, variable.types)) {
+    throw WTCDError.atLocation(location, `Cannot assign value (` +
+      `${describe(value)}) to variable "${variableName}". "${variableName}" ` +
+      `can only store these types: ${(
+        variable.types as Array<RuntimeValueType>
+      ).join(', ')}`);
+  }
+  variable.value = value;
+}
+
 class RuntimeScope {
-  private variables: Map<string, RuntimeValueMutable> = new Map();
+  private variables: Map<string, Variable> = new Map();
   private registers: Map<string, RuntimeValue> | null = null;
   /**
    * Attempt to resolve the given variable name within this scope. If variable
@@ -285,10 +309,10 @@ class RuntimeScope {
    * @param variableName
    * @returns
    */
-  public resolveVariableReference(variableName: string): RuntimeValueMutable | null {
+  public resolveVariableReference(variableName: string): Variable | null {
     return this.variables.get(variableName) || null;
   }
-  public addVariable(variableName: string, value: RuntimeValueMutable) {
+  public addVariable(variableName: string, value: Variable) {
     this.variables.set(variableName, value);
   }
   public addRegister(registerName: RegisterName) {
@@ -332,7 +356,7 @@ export interface InterpreterHandle {
   evaluator(expr: Expression): RuntimeValue;
   pushScope(): RuntimeScope;
   popScope(): RuntimeScope | undefined;
-  resolveVariableReference(variableName: string): RuntimeValueMutable;
+  resolveVariableReference(variableName: string): Variable;
   getRandom(): Random;
   pushContent($element: HTMLElement): void;
   readonly timers: Map<string, number>;
@@ -357,15 +381,16 @@ export class Interpreter {
   }
   private scopes: Array<RuntimeScope> = [];
   private sectionStack: Array<Section> = [];
-  private resolveVariableReference(variableName: string): RuntimeValueMutable {
+  private resolveVariableReference(variableName: string) {
     for (let i = this.scopes.length - 1; i >= 0; i--) {
       const variable = this.scopes[i].resolveVariableReference(variableName);
       if (variable !== null) {
         return variable;
       }
     }
-    throw WTCDError.atUnknown(`Cannot resolve variable reference "${variableName}". ` +
-      `This is most likely caused by WTCD compiler's error or the compiled output ` +
+    throw WTCDError.atUnknown(`Cannot resolve variable reference ` +
+      `"${variableName}". This is most likely caused by WTCD compiler's ` +
+      `error or the compiled output ` +
       `has been modified`);
   }
   /**
@@ -436,32 +461,46 @@ export class Interpreter {
       if (singleDeclaration.initialValue !== null) {
         value = this.evaluator(singleDeclaration.initialValue);
       } else {
-        switch (singleDeclaration.variableType) {
-          case 'boolean':
-            value = getMaybePooled('boolean', false);
-            break;
-          case 'number':
-            value = getMaybePooled('number', 0);
-            break;
-          case 'string':
-            value = getMaybePooled('string', '');
-            break;
-          case 'list':
-            value = { type: 'list', value: [] };
-            break;
-          default:
-            throw WTCDError.atLocation(expr, `Variable type ${singleDeclaration.variableType} ` +
-              `does not have a default initial value`);
+        if (singleDeclaration.variableType === null) {
+          value = getMaybePooled('null', null);
+        } else if (singleDeclaration.variableType.length === 1) {
+          switch (singleDeclaration.variableType[0]) {
+            case 'boolean':
+              value = getMaybePooled('boolean', false);
+              break;
+            case 'number':
+              value = getMaybePooled('number', 0);
+              break;
+            case 'string':
+              value = getMaybePooled('string', '');
+              break;
+            case 'list':
+              value = { type: 'list', value: [] };
+              break;
+            default:
+              throw WTCDError.atLocation(expr, `Variable type ` +
+                `"${singleDeclaration.variableType[0]}" ` +
+                `does not have a default initial value`);
+          }
+        } else if (singleDeclaration.variableType.includes('null')) {
+          // Use null if null is allowed
+          value = getMaybePooled('null', null);
+        } else {
+          throw WTCDError.atLocation(expr, `Variable type ` +
+            `"${singleDeclaration.variableType.join(' ')}" does not have a ` +
+            `default initial value`);
         }
       }
-      if (value.type !== singleDeclaration.variableType) {
-        throw WTCDError.atLocation(expr, `The type of variable ${singleDeclaration.variableName} is ` +
-          `${singleDeclaration.variableType}, thus cannot hold ${describe(value)}`);
+      if (!isTypeAssignableTo(value.type, singleDeclaration.variableType)) {
+        throw WTCDError.atLocation(expr, `The type of variable ` +
+          `${singleDeclaration.variableName} is ` +
+          `${singleDeclaration.variableType}, thus cannot hold ` +
+          `${describe(value)}`);
       }
-      this.getCurrentScope().addVariable(
-        singleDeclaration.variableName,
-        { type: singleDeclaration.variableType, value: value.value } as any,
-      );
+      this.getCurrentScope().addVariable(singleDeclaration.variableName, {
+        types: singleDeclaration.variableType,
+        value,
+      });
     }
   }
 
@@ -610,7 +649,7 @@ export class Interpreter {
       case 'selection':
         return this.evaluateSelectionExpression(expr);
       case 'variableReference':
-        return clone(this.resolveVariableReference(expr.variableName));
+        return this.resolveVariableReference(expr.variableName).value;
       case 'function':
         return this.evaluateFunctionExpression(expr);
       case 'switch':
@@ -697,10 +736,13 @@ export class Interpreter {
     const stdScope = this.pushScope();
     for (const stdFunction of stdFunctions) {
       stdScope.addVariable(stdFunction.name, {
-        type: 'function',
+        types: ['function'],
         value: {
-          fnType: 'native',
-          nativeFn: stdFunction,
+          type: 'function',
+          value: {
+            fnType: 'native',
+            nativeFn: stdFunction,
+          },
         },
       });
     }

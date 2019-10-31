@@ -16,7 +16,8 @@
         "dev-watch-browserify": "watchify ts-out/web/index.js -o dist/bundle.js",
         "dev-watch-chapterRebuilder": "chokidar \"./chapters/**/*\" \"./ts-out/builder/**/*\" -c \"npm run buildChaptersDebug\"",
         "watch": "npm run compileTypeScriptOnce && npm run buildChaptersDebug && concurrently -n --kill-others npm:dev-watch-*",
-        "lint": "tslint --project ./"
+        "lint": "tslint --project ./",
+        "vscode-problems": "tsc --watch --noEmit"
     },
     "author": "SCLeo",
     "license": "CC-BY-NC-ND-4.0",

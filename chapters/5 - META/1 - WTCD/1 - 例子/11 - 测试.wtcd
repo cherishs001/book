@@ -41,6 +41,7 @@ section main {
   assert::[(choice "b" goto [ dummy1 dummy2 ]) != (choice "b" goto [ dummy1 dummy1 ])]
   assert::[(selection [ choice "a" goto dummy1 choice "b" goto dummy2 choice "c" exit ]) != (selection [ choice "a" goto dummy1 choice "b" goto dummy1 choice "c" exit ])]
 
+
   // Selection creation with list
   {
     declare list a = [ choice "a" goto dummy1 ]
@@ -120,6 +121,22 @@ section main {
     assert::[ c == "" ]
     declare list d
     assert::[ d == [] ]
+
+    declare any
+    assert::[ any == null ]
+    declare number null nullable
+    assert::[ nullable == null ]
+  }
+
+  // Type checking
+  {
+    assertError::[function[] {
+      declare number a = "test"
+    }]
+    declare number string a = "test"
+    assertError::[function[] {
+      declare number string list boolean b = choice "a" goto dummy1
+    }]
   }
 
   // Function equality

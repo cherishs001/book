@@ -1,4 +1,4 @@
-import { BooleanValue, NullValue, NumberValue, RuntimeValue, RuntimeValueMutable, RuntimeValueRaw, RuntimeValueType } from './Interpreter';
+import { BooleanValue, NullValue, NumberValue, RuntimeValue, RuntimeValueRaw, RuntimeValueType, Variable } from './Interpreter';
 
 // Your typical immature optimization
 // Caches null values, boolean values, and small integers to somewhat reduce GC
@@ -33,7 +33,4 @@ export function getMaybePooled<T extends RuntimeValueType>(
     type,
     value,
   } as any;
-}
-export function clone<T extends RuntimeValueMutable>(value: T): RuntimeValue {
-  return getMaybePooled(value.type, value.value) as any;
 }

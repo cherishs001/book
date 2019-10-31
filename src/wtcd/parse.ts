@@ -1,4 +1,5 @@
 import * as MDI from 'markdown-it';
+import { RuntimeValueType } from './Interpreter';
 import { BinaryOperator, binaryOperators, conditionalOperatorPrecedence, UnaryOperator, unaryOperators } from './operators';
 import { SimpleIdGenerator } from './SimpleIdGenerator';
 import { stdFunctions } from './std';
@@ -35,6 +36,7 @@ import {
   SwitchExpression,
   UnaryExpression,
   VariableReference,
+  VariableType,
   WTCDParseResult,
   WTCDRoot,
   YieldStatement,
@@ -47,6 +49,7 @@ const CURRENT_MINOR_VERSION = 1;
 const CURRENT_VERSION_STR = CURRENT_MAJOR_VERSION + '.' + CURRENT_MINOR_VERSION;
 
 const variableTypes = [
+  'null',
   'number',
   'boolean',
   'string',
@@ -58,7 +61,9 @@ const variableTypes = [
 ];
 
 // V1.1 removed selection type and combined it into action
-function backwardsCompTypeTransformer(variableType: string) {
+function backwardsCompTypeTransformer(
+  variableType: RuntimeValueType | 'selection',
+): RuntimeValueType {
   if (variableType === 'selection') {
     return 'action';
   } else {
@@ -188,6 +193,19 @@ class LogicParser {
     return target;
   }
 
+  private parseVariableType(): VariableType {
+    if (!this.tokenStream.isNext('keyword', variableTypes)) {
+      return null;
+    }
+    const types: Array<RuntimeValueType> = [];
+    do {
+      types.push(backwardsCompTypeTransformer(
+        this.tokenStream.next().content as RuntimeValueType,
+      ));
+    } while (this.tokenStream.isNext('keyword', variableTypes));
+    return types;
+  }
+
   private parseChoice() {
     const choiceToken = this.tokenStream.assertAndSkipNext('keyword', 'choice');
     const text = this.parseExpression();
@@ -261,10 +279,7 @@ class LogicParser {
         restArgName = restArgToken.content;
         break; // Stop reading any more arguments
       }
-      const typeToken = this.tokenStream.assertAndSkipNext(
-        'keyword',
-        variableTypes,
-      );
+      const argType = this.parseVariableType();
       const argNameToken = this.tokenStream.assertAndSkipNext('identifier');
 
       if (usedArgumentNames.has(argNameToken.content)) {
@@ -279,8 +294,8 @@ class LogicParser {
         defaultValue = this.parseExpression();
       }
       functionArguments.push(this.attachLocationInfo<FunctionArgument>(
-        typeToken, {
-          type: backwardsCompTypeTransformer(typeToken.content) as any,
+        argNameToken, {
+          type: argType,
           name: argNameToken.content,
           defaultValue,
         },
@@ -654,30 +669,35 @@ class LogicParser {
   }
 
   private parseOneDeclaration: () => OneVariableDeclaration = () => {
-    const typeToken = this.tokenStream.assertAndSkipNext('keyword', variableTypes);
+    const type = this.parseVariableType();
     const variableNameToken = this.tokenStream.assertAndSkipNext('identifier');
     let initialValue: Expression | null = null;
     if (this.tokenStream.isNext('operator', '=')) {
       // Explicit initialization (number a = 123)
       this.tokenStream.next();
       initialValue = this.parseExpression();
-    } else if ((typeToken.content === 'function') && (this.tokenStream.isNext('punctuation', '['))) {
+    } else if (
+      (this.tokenStream.isNext('punctuation', '[')) &&
+      (type !== null) &&
+      (type.length === 1) &&
+      (type[0] = 'function')
+    ) {
       // Simplified function declaration (declare function test[ ... ] ...)
       initialValue = this.attachLocationInfo<FunctionExpression>(
-        typeToken,
+        variableNameToken,
         this.parseFunctionCore(),
       );
     }
     if (this.lexicalScopeProvider.currentScopeHasVariable(variableNameToken.content)) {
       throw WTCDError.atLocation(
-        typeToken,
+        variableNameToken,
         `Variable "${variableNameToken.content}" has already been declared within the same lexical scope`,
       );
     }
     this.lexicalScopeProvider.addVariableToCurrentScope(variableNameToken.content);
-    return this.attachLocationInfo<OneVariableDeclaration>(typeToken, {
+    return this.attachLocationInfo<OneVariableDeclaration>(variableNameToken, {
       variableName: variableNameToken.content,
-      variableType: backwardsCompTypeTransformer(typeToken.content) as any,
+      variableType: type,
       initialValue,
     });
   }

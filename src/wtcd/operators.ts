@@ -2,7 +2,7 @@
 
 import { autoEvaluated } from './autoEvaluated';
 import { getMaybePooled } from './constantsPool';
-import { describe, InterpreterHandle, isEqual, RuntimeValue, RuntimeValueRaw, RuntimeValueType } from './Interpreter';
+import { assignValueToVariable, describe, InterpreterHandle, isEqual, RuntimeValue, RuntimeValueRaw, RuntimeValueType } from './Interpreter';
 import { pipelineInvocation, regularInvocation, reverseInvocation } from './invokeFunction';
 import { BinaryExpression, UnaryExpression } from './types';
 import { WTCDError } from './WTCDError';
@@ -51,6 +51,7 @@ export interface BinaryOperatorDefinition {
   precedence: number;
   fn: BinaryOperatorFn;
 }
+
 function autoEvaluatedSameTypeArg<TArg extends RuntimeValueType, TReturn extends RuntimeValueType>(
   argType: TArg,
   returnType: TReturn,
@@ -96,23 +97,23 @@ function opAssignment<T0 extends RuntimeValueType, T1 extends RuntimeValueType>(
           `has to be a variable reference`);
     }
     const varRef = interpreterHandle.resolveVariableReference(expr.arg0.variableName);
-    if (varRef.type !== arg0Type) {
+    if (varRef.value.type !== arg0Type) {
       throw WTCDError.atLocation(expr, `Left side of binary operator "${expr.operator}" has to be a ` +
-        `variable of type ${arg0Type}, actual type: ${varRef.type}`);
+        `variable of type ${arg0Type}, actual type: ${varRef.value.type}`);
     }
     const arg1 = interpreterHandle.evaluator(expr.arg1);
     if (arg1.type !== arg1Type) {
       throw WTCDError.atLocation(expr, `Right side of binary operator "${expr.operator}" ` +
         ` has to be a ${arg1Type}, received: ${describe(arg1)}`);
     }
-    const newValue = fn(
-      varRef.value as RuntimeValueRaw<T0>,
+    const newValue = getMaybePooled(arg0Type, fn(
+      varRef.value.value as RuntimeValueRaw<T0>,
       arg1.value as RuntimeValueRaw<T1>,
       expr,
       interpreterHandle,
-    );
+    ));
     varRef.value = newValue;
-    return getMaybePooled(arg0Type, newValue);
+    return newValue;
   };
 }
 export const binaryOperators = new Map<string, BinaryOperatorDefinition>([
@@ -125,11 +126,7 @@ export const binaryOperators = new Map<string, BinaryOperatorDefinition>([
       }
       const varRef = resolveVariableReference(expr.arg0.variableName);
       const arg1 = evaluator(expr.arg1);
-      if (arg1.type !== varRef.type) {
-        throw WTCDError.atLocation(expr, `Variable "${expr.arg0.variableName}" can only hold ` +
-          `values of type ${varRef.type}. Received ${describe(arg1)}`);
-      }
-      varRef.value = arg1.value;
+      assignValueToVariable(varRef, arg1, expr, expr.arg0.variableName);
       return arg1;
     },
   }],
@@ -141,18 +138,21 @@ export const binaryOperators = new Map<string, BinaryOperatorDefinition>([
           `has to be a variable reference`);
       }
       const varRef = resolveVariableReference(expr.arg0.variableName);
-      if (varRef.type !== 'string' && varRef.type !== 'number') {
+      if (varRef.value.type !== 'string' && varRef.value.type !== 'number') {
         throw WTCDError.atLocation(expr, `Left side of binary operator "+=" has to be a ` +
-          `variable of type number or string, actual type: ${varRef.type}`);
+          `variable of type number or string, actual type: ${varRef.value.type}`);
       }
       const arg1 = evaluator(expr.arg1);
-      if (arg1.type !== varRef.type) {
+      if (arg1.type !== varRef.value.type) {
         throw WTCDError.atLocation(expr, `Right side of binary operator "+=" has to ` +
-          ` be a ${varRef.type}, received: ${describe(arg1)}`);
+          ` be a ${varRef.value.type}, received: ${describe(arg1)}`);
       }
-      const newValue = (varRef.value as any) + arg1.value;
+      const newValue = getMaybePooled(
+        varRef.value.type,
+        (varRef.value.value as any) + arg1.value,
+      );
       varRef.value = newValue;
-      return getMaybePooled(varRef.type, newValue);
+      return newValue;
     },
   }],
   ['-=', {
