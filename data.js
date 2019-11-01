@@ -390,6 +390,17 @@ window.DATA={
             "chapterCharCount": 7470
           },
           {
+            "displayName": "家庭用多功能放置架套装",
+            "displayIndex": 10000,
+            "name": "10000 - 家庭用多功能放置架套装",
+            "sourceRelativePath": "4 - 道具集/10000 - 家庭用多功能放置架套装.md",
+            "type": "Markdown",
+            "isEarlyAccess": false,
+            "commentsUrl": null,
+            "htmlRelativePath": "道具集/家庭用多功能放置架套装.html",
+            "chapterCharCount": 2086
+          },
+          {
             "displayName": "使人快乐的 PS4",
             "displayIndex": 10010,
             "name": "10010 - 使人快乐的 PS4",
@@ -413,7 +424,7 @@ window.DATA={
           }
         ],
         "subFolders": [],
-        "folderCharCount": 31467
+        "folderCharCount": 33553
       },
       {
         "displayName": "META",
@@ -682,14 +693,14 @@ window.DATA={
         "folderCharCount": 1361
       }
     ],
-    "folderCharCount": 170622
+    "folderCharCount": 172708
   },
-  "charsCount": 170622,
-  "paragraphsCount": 3472,
+  "charsCount": 172708,
+  "paragraphsCount": 3508,
   "keywordsCount": [
     [
       "高潮",
-      345
+      346
     ],
     [
       "按摩棒",
@@ -701,7 +712,7 @@ window.DATA={
     ],
     [
       "陈志鹏",
-      59
+      60
     ],
     [
       "陈变态",
@@ -756,5 +767,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "319"
+  "buildNumber": "323"
 };
