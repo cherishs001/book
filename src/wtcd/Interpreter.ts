@@ -18,6 +18,7 @@ import {
   Statement,
   SwitchExpression,
   VariableType,
+  WhileExpression,
   WTCDRoot,
 } from './types';
 import { arrayEquals, flat } from './utils';
@@ -218,6 +219,8 @@ export type Evaluator = (expr: Expression) => RuntimeValue;
 export enum BubbleSignalType {
   YIELD,
   RETURN,
+  BREAK,
+  CONTINUE,
 }
 
 /**
@@ -289,7 +292,7 @@ export function assignValueToVariable(
   location: OptionalLocationInfo, // For error message
   variableName: string, // For error message
 ) {
-  if (isTypeAssignableTo(value.type, variable.types)) {
+  if (!isTypeAssignableTo(value.type, variable.types)) {
     throw WTCDError.atLocation(location, `Cannot assign value (` +
       `${describe(value)}) to variable "${variableName}". "${variableName}" ` +
       `can only store these types: ${(
@@ -603,6 +606,59 @@ export class Interpreter {
     }
   }
 
+  private evaluateWhileExpression(expr: WhileExpression) {
+    const scope = this.pushScope();
+    scope.addRegister('break');
+    try { // Break
+      while (true) {
+        if (expr.preExpr !== null) {
+          try { // Continue
+            this.evaluator(expr.preExpr);
+          } catch (error) {
+            if (!(
+              (error instanceof BubbleSignal) &&
+              (error.type === BubbleSignalType.CONTINUE)
+            )) {
+              throw error;
+            }
+          }
+        }
+        const flag = this.evaluator(expr.condition);
+        if (flag.type !== 'boolean') {
+          throw WTCDError.atLocation(expr, `Condition expression of a while ` +
+            `loop is expected to return a boolean. Received: ` +
+            `${describe(flag)}`);
+        }
+        if (flag.value === false) {
+          break;
+        }
+        if (expr.postExpr !== null) {
+          try { // Continue
+            this.evaluator(expr.postExpr);
+          } catch (error) {
+            if (!(
+              (error instanceof BubbleSignal) &&
+              (error.type === BubbleSignalType.CONTINUE)
+            )) {
+              throw error;
+            }
+          }
+        }
+      }
+    } catch (error) {
+      if (
+        (error instanceof BubbleSignal) &&
+        (error.type === BubbleSignalType.BREAK)
+      ) {
+        return scope.getRegister('break')!;
+      }
+      throw error;
+    } finally {
+      this.popScope();
+    }
+    return scope.getRegister('break')!;
+  }
+
   private evaluator(expr: Expression): RuntimeValue {
     switch (expr.type) {
       case 'unaryExpression':
@@ -654,6 +710,8 @@ export class Interpreter {
         return this.evaluateFunctionExpression(expr);
       case 'switch':
         return this.evaluateSwitchExpression(expr);
+      case 'while':
+        return this.evaluateWhileExpression(expr);
     }
   }
 
@@ -677,8 +735,14 @@ export class Interpreter {
       case 'setReturn':
         this.setRegister('return', this.evaluator(statement.value));
         return;
-      default:
-        throw WTCDError.atLocation(statement, 'Not implemented');
+      case 'break':
+        this.setRegister('break', this.evaluator(statement.value));
+        throw new BubbleSignal(BubbleSignalType.BREAK);
+      case 'setBreak':
+        this.setRegister('break', this.evaluator(statement.value));
+        return;
+      case 'continue':
+        throw new BubbleSignal(BubbleSignalType.CONTINUE);
     }
   }
 

@@ -363,8 +363,110 @@ section main {
   assert::[listSet:.[1] != listSet.:[1]]
   assert::[listSet.:[1] != listSet.:[2]]
   assert::[listSet:.[1] != listSet:.[2]]
-  assert::[(listSet:.[[ 0 1 2 3 ]].:["Wow"]:.[2]::[]) == [ 0 1 "Wow" 3 ]]
-  assert::[(listSet.:["Wow"].:[2]:.[[ 0 1 2 3 ]]::[]) == [ 0 1 "Wow" 3 ]]
+  assert::[listSet:.[[ 0 1 2 3 ]].:["Wow"]:.[2]::[] == [ 0 1 "Wow" 3 ]]
+  assert::[listSet.:["Wow"].:[2]:.[[ 0 1 2 3 ]]::[] == [ 0 1 "Wow" 3 ]]
+
+  // No argument shorthand
+  {
+    declare function fn = function[] 100
+    assert::[fn::[] == 100]
+  }
+
+  // Function shorthand
+  {
+    declare function fn = $100
+    declare function add = $[a b] a + b
+    declare function addTyped = $[number a number b] a + b
+    assert::[fn::[] == 100]
+    assert::[add::[1 2] == 3]
+    assert::[addTyped::[1 2] == 3]
+    declare number counter = 100
+    declare function closure = $counter
+    assert::[closure::[] == 100]
+    counter = 300
+    assert::[closure::[] == 300]
+  }
+
+  assert::[([ 1 2 3 4 5 ] |> listMap.:[$[v] v ** 2]) == [ 1 4 9 16 25 ]]
+
+  // While loop
+  {
+    declare number i = 0
+    while i < 10 {
+      i += 1
+    }
+    assert::[i == 10]
+  }
+  {
+    declare number i = 0
+    do {
+      i += 1
+    } while i < 10
+    assert::[i == 10]
+  }
+  {
+    declare number i = 0
+    declare number j = 0
+    do {
+      i += 1
+    } while i < 10 then {
+      j += 1
+    }
+    assert::[i == 10]
+    assert::[j == 9]
+  }
+  
+  // While loop with break
+  {
+    declare number i = 0
+    declare number result = while i < 100 {
+      (i < 50) ? null : {
+        break 1000
+      }
+      i += 1
+    }
+    assert::[result == 1000]
+    assert::[i == 50]
+  }
+  {
+    declare number i = 0
+    declare number result = while i < 100 {
+      (i > 50) ? null : {
+        break = i
+      }
+      i += 1
+    }
+    assert::[result == 50]
+    assert::[i == 100]
+  }
+
+  // While loop with continue
+  {
+    declare number i = 0
+    declare number j = 0
+    while i < 100 {
+      i += 1
+      (i > 50) ? null : {
+        continue
+      }
+      j += 1
+    }
+    assert::[j == 50]
+    assert::[i == 100]
+  }
+  {
+    declare number i = 0
+    declare number j = 0
+    do {
+      i += 1
+      (i > 50) ? null : {
+        continue
+      }
+      j += 1
+    } while i < 100
+    assert::[j == 50]
+    assert::[i == 100]
+  }
 
   timeEnd::[]
 } then exit

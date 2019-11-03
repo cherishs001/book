@@ -151,7 +151,7 @@ function isOperatorPart(char: string | undefined) {
 }
 
 function isPunctuation(char: string | undefined) {
-  return includes('[](){}', char);
+  return includes('[](){}$', char);
 }
 
 function isStringQuote(char: string | undefined) {
@@ -193,14 +193,14 @@ const keywords = new Set([
   'function',
   'return',
   'switch',
+  'while',
+  'do',
 
   // Reserved
   'continue',
   'break',
   'if',
   'else',
-  'while',
-  'do',
   'for',
   'in',
   'of',

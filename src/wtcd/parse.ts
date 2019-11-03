@@ -8,8 +8,10 @@ import {
   BinaryExpression,
   BlockExpression,
   BooleanLiteral,
+  BreakStatement,
   ChoiceExpression,
   ConditionalExpression,
+  ContinueStatement,
   DeclarationStatement,
   ExitAction,
   Expression,
@@ -26,6 +28,7 @@ import {
   ReturnStatement,
   Section,
   SelectionAction,
+  SetBreakStatement,
   SetReturnStatement,
   SetYieldStatement,
   SingleSectionContent,
@@ -37,6 +40,7 @@ import {
   UnaryExpression,
   VariableReference,
   VariableType,
+  WhileExpression,
   WTCDParseResult,
   WTCDRoot,
   YieldStatement,
@@ -263,45 +267,47 @@ class LogicParser {
   }
 
   private parseFunctionCore(): FunctionExpression {
-    this.tokenStream.assertAndSkipNext('punctuation', '[');
     const functionArguments: Array<FunctionArgument> = [];
-    const usedArgumentNames: Set<string> = new Set();
     let restArgName: string | null = null;
-    while (!this.tokenStream.isNext('punctuation', ']')) {
-      if (this.tokenStream.isNext('operator', '...')) {
-        this.tokenStream.next(); // Skip over ...
-        // Rest arguments
-        const restArgToken = this.tokenStream.assertAndSkipNext('identifier');
-        if (usedArgumentNames.has(restArgToken.content)) {
-          throw WTCDError.atLocation(restArgToken, `Argument ` +
-            `"${restArgToken.content}" already existed.`);
+    if (this.tokenStream.isNext('punctuation', '[')) {
+      this.tokenStream.assertAndSkipNext('punctuation', '[');
+      const usedArgumentNames: Set<string> = new Set();
+      while (!this.tokenStream.isNext('punctuation', ']')) {
+        if (this.tokenStream.isNext('operator', '...')) {
+          this.tokenStream.next(); // Skip over ...
+          // Rest arguments
+          const restArgToken = this.tokenStream.assertAndSkipNext('identifier');
+          if (usedArgumentNames.has(restArgToken.content)) {
+            throw WTCDError.atLocation(restArgToken, `Argument ` +
+              `"${restArgToken.content}" already existed.`);
+          }
+          restArgName = restArgToken.content;
+          break; // Stop reading any more arguments
         }
-        restArgName = restArgToken.content;
-        break; // Stop reading any more arguments
-      }
-      const argType = this.parseVariableType();
-      const argNameToken = this.tokenStream.assertAndSkipNext('identifier');
+        const argType = this.parseVariableType();
+        const argNameToken = this.tokenStream.assertAndSkipNext('identifier');
 
-      if (usedArgumentNames.has(argNameToken.content)) {
-        throw WTCDError.atLocation(argNameToken, `Argument ` +
-          `"${argNameToken.content}" already existed.`);
-      }
-      usedArgumentNames.add(argNameToken.content);
+        if (usedArgumentNames.has(argNameToken.content)) {
+          throw WTCDError.atLocation(argNameToken, `Argument ` +
+            `"${argNameToken.content}" already existed.`);
+        }
+        usedArgumentNames.add(argNameToken.content);
 
-      let defaultValue: null | Expression = null;
-      if (this.tokenStream.isNext('operator', '=')) {
-        this.tokenStream.next();
-        defaultValue = this.parseExpression();
+        let defaultValue: null | Expression = null;
+        if (this.tokenStream.isNext('operator', '=')) {
+          this.tokenStream.next();
+          defaultValue = this.parseExpression();
+        }
+        functionArguments.push(this.attachLocationInfo<FunctionArgument>(
+          argNameToken, {
+            type: argType,
+            name: argNameToken.content,
+            defaultValue,
+          },
+        ));
       }
-      functionArguments.push(this.attachLocationInfo<FunctionArgument>(
-        argNameToken, {
-          type: argType,
-          name: argNameToken.content,
-          defaultValue,
-        },
-      ));
+      this.tokenStream.assertAndSkipNext('punctuation', ']');
     }
-    this.tokenStream.assertAndSkipNext('punctuation', ']');
     this.lexicalScopeProvider.enterScope();
     this.lexicalScopeProvider.addRegisterToCurrentScope('return');
     const capturesSet: Set<string> = new Set();
@@ -336,6 +342,13 @@ class LogicParser {
     );
   }
 
+  private parseShortFunctionExpression() {
+    return this.attachLocationInfo<FunctionExpression>(
+      this.tokenStream.assertAndSkipNext('punctuation', '$'),
+      this.parseFunctionCore(),
+    );
+  }
+
   private parseSwitchExpression() {
     const switchToken = this.tokenStream.assertAndSkipNext('keyword', 'switch');
     const expression = this.parseExpression();
@@ -361,6 +374,33 @@ class LogicParser {
     });
   }
 
+  private parseWhileExpression(): WhileExpression {
+    const mainToken = this.tokenStream.peek();
+    this.lexicalScopeProvider.enterScope();
+    this.lexicalScopeProvider.addRegisterToCurrentScope('break');
+    let preExpr: Expression | null = null;
+    if (this.tokenStream.isNext('keyword', 'do')) {
+      this.tokenStream.next();
+      preExpr = this.parseExpression();
+    }
+    this.tokenStream.assertAndSkipNext('keyword', 'while');
+    const condition = this.parseExpression();
+    let postExpr: Expression | null = null;
+    if (preExpr === null) {
+      postExpr = this.parseExpression();
+    } else if (this.tokenStream.isNext('keyword', 'then')) {
+      this.tokenStream.next();
+      postExpr = this.parseExpression();
+    }
+    this.lexicalScopeProvider.exitScope();
+    return this.attachLocationInfo<WhileExpression>(mainToken, {
+      type: 'while',
+      preExpr,
+      condition,
+      postExpr,
+    });
+  }
+
   /**
    * Try to parse an atom node, which includes:
    * - number literals
@@ -376,6 +416,7 @@ class LogicParser {
    * - functions
    * - variables
    * - switches
+   * - while loops
    * - block expressions
    * - unary expressions
    *
@@ -459,9 +500,19 @@ class LogicParser {
       return this.parseFullFunctionExpression();
     }
 
+    // Short function
+    if (this.tokenStream.isNext('punctuation', '$')) {
+      return this.parseShortFunctionExpression();
+    }
+
     // Switch
     if (this.tokenStream.isNext('keyword', 'switch')) {
       return this.parseSwitchExpression();
+    }
+
+    // While
+    if (this.tokenStream.isNext('keyword', ['while', 'do'])) {
+      return this.parseWhileExpression();
     }
 
     // Block expression
@@ -572,6 +623,31 @@ class LogicParser {
     }
   }
 
+  private parseBreakOrSetBreakStatement(): BreakStatement | SetBreakStatement {
+    const breakToken = this.tokenStream.assertAndSkipNext('keyword', 'break');
+    this.assertHasRegister('break', breakToken);
+    if (this.tokenStream.isNext('operator', '=')) {
+      // Set return
+      this.tokenStream.next();
+      return this.attachLocationInfo<SetBreakStatement>(breakToken, {
+        type: 'setBreak',
+        value: this.parseExpression(),
+      });
+    } else {
+      // Return
+      return this.attachLocationInfo<BreakStatement>(breakToken, {
+        type: 'break',
+        value: this.parseExpressionImpliedNull(breakToken),
+      });
+    }
+  }
+
+  private parseContinueStatement(): ContinueStatement {
+    return this.attachLocationInfo<ContinueStatement>(this.tokenStream.next(), {
+      type: 'continue',
+    });
+  }
+
   private parseExpressionImpliedNull(location: OptionalLocationInfo) {
     const atom = this.parseAtom(true);
     if (atom === null) {
@@ -660,6 +736,10 @@ class LogicParser {
       return this.parseReturnOrSetReturnStatement();
     } else if (this.tokenStream.isNext('keyword', 'yield')) {
       return this.parseYieldOrSetYieldExpression();
+    } else if (this.tokenStream.isNext('keyword', 'break')) {
+      return this.parseBreakOrSetBreakStatement();
+    } else if (this.tokenStream.isNext('keyword', 'continue')) {
+      return this.parseContinueStatement();
     } else {
       return this.attachLocationInfo<ExpressionStatement>(this.tokenStream.peek(), {
         type: 'expression',

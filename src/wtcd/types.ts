@@ -144,6 +144,20 @@ export interface SetYieldStatement extends OptionalLocationInfo {
   value: Expression;
 }
 
+export interface BreakStatement extends OptionalLocationInfo {
+  type: 'break';
+  value: Expression;
+}
+
+export interface SetBreakStatement extends OptionalLocationInfo {
+  type: 'setBreak';
+  value: Expression;
+}
+
+export interface ContinueStatement extends OptionalLocationInfo {
+  type: 'continue';
+}
+
 export interface ExpressionStatement extends OptionalLocationInfo {
   type: 'expression';
   expression: Expression;
@@ -186,6 +200,13 @@ export interface SwitchExpression extends OptionalLocationInfo {
   defaultCase: Expression | null;
 }
 
+export interface WhileExpression extends OptionalLocationInfo {
+  type: 'while';
+  preExpr: Expression | null;
+  condition: Expression;
+  postExpr: Expression | null;
+}
+
 export type Literal
   = NumberLiteral
   | BooleanLiteral
@@ -208,7 +229,8 @@ export type Expression
   | VariableReference
   | FunctionExpression
   | ListExpression
-  | SwitchExpression;
+  | SwitchExpression
+  | WhileExpression;
 
 export type Statement
   = DeclarationStatement
@@ -216,6 +238,9 @@ export type Statement
   | SetReturnStatement
   | YieldStatement
   | SetYieldStatement
+  | BreakStatement
+  | SetBreakStatement
+  | ContinueStatement
   | ExpressionStatement;
 
 export interface Section extends OptionalLocationInfo {
@@ -245,7 +270,7 @@ export type WTCDParseResult = {
   internalStack: string;
 };
 
-export type RegisterName = 'yield' | 'return';
+export type RegisterName = 'yield' | 'return' | 'break';
 
 export type NativeFunction = (
   args: ReadonlyArray<RuntimeValue>,
