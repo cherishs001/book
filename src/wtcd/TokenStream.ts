@@ -195,10 +195,10 @@ const keywords = new Set([
   'switch',
   'while',
   'do',
-
-  // Reserved
   'continue',
   'break',
+
+  // Reserved
   'if',
   'else',
   'for',

@@ -366,12 +366,6 @@ section main {
   assert::[listSet:.[[ 0 1 2 3 ]].:["Wow"]:.[2]::[] == [ 0 1 "Wow" 3 ]]
   assert::[listSet.:["Wow"].:[2]:.[[ 0 1 2 3 ]]::[] == [ 0 1 "Wow" 3 ]]
 
-  // No argument shorthand
-  {
-    declare function fn = function[] 100
-    assert::[fn::[] == 100]
-  }
-
   // Function shorthand
   {
     declare function fn = $100
@@ -466,6 +460,41 @@ section main {
     } while i < 100
     assert::[j == 50]
     assert::[i == 100]
+  }
+  {
+    declare number i = 0
+    declare number j = 0
+    do {
+      i += 1
+    } while j < 10 then {
+      j += 1
+      continue
+    }
+    assert::[i == 1]
+    assert::[j == 10]
+  }
+
+  // Function switch
+  {
+    declare function normal = function switch [
+      [ 1 ] 100
+      [ 2 3 ] 200
+      300
+    ]
+    assert::[normal::[1] == 100]
+    assert::[normal::[2] == 200]
+    assert::[normal::[3] == 200]
+    assert::[normal::[4] == 300]
+
+    declare function sugar switch [
+      [ 1 ] 100
+      [ 2 3 ] 200
+      300
+    ]
+    assert::[sugar::[1] == 100]
+    assert::[sugar::[2] == 200]
+    assert::[sugar::[3] == 200]
+    assert::[sugar::[4] == 300]
   }
 
   timeEnd::[]

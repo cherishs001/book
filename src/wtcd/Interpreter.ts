@@ -128,18 +128,33 @@ export type RuntimeValue
   | ListValue
   | FunctionValue;
 
+/**
+ * Represents all possible type names for runtime values.
+ */
 export type RuntimeValueType = RuntimeValue['type'];
 
+/**
+ * Represents a variable. It stores its type information and its value.
+ */
 export interface Variable {
   readonly types: null | Array<RuntimeValueType>;
   value: RuntimeValue;
 }
 
+/**
+ * Extracts the unwrapped value type for a give runtime value type name
+ *
+ * For example, RuntimeValueRaw<"number"> = number
+ */
 export type RuntimeValueRaw<T extends RuntimeValueType> = Extract<
   RuntimeValue,
   { type: T }
 >['value'];
 
+/**
+ * Determine whether two runtime values are equal. Uses deep value equality
+ * instead of reference equality.
+ */
 export function isEqual(v0: RuntimeValue, v1: RuntimeValue): boolean {
   // TypeScript's generic currently does not support type narrowing.
   // Until that is fixed, this function has to have so many any, unfortunately
@@ -214,8 +229,14 @@ export function isEqual(v0: RuntimeValue, v1: RuntimeValue): boolean {
   }
 }
 
+/**
+ * An evaluator is responsible for evaluating an expression and return its value
+ */
 export type Evaluator = (expr: Expression) => RuntimeValue;
 
+/**
+ * Type of a thrown bubble signal.
+ */
 export enum BubbleSignalType {
   YIELD,
   RETURN,
@@ -225,7 +246,8 @@ export enum BubbleSignalType {
 
 /**
  * Bubble signal is used for traversing upward the call stack. It is implemented
- * with JavaScript's Error. Such signal might be yield or return.
+ * with JavaScript's Error. Such signal might be yield, return, break, or
+ * continue.
  */
 export class BubbleSignal extends Error {
   public constructor(
@@ -279,6 +301,14 @@ export function describe(rv: RuntimeValue): string {
   }
 }
 
+/**
+ * Determine whether a given value is assignable to a given type declaration.
+ *
+ * @param type given value's type
+ * @param types type declaration that is to be compared to
+ * @returns whether a value with type type is assignable to a variable with type
+ * declaration types
+ */
 export function isTypeAssignableTo(
   type: RuntimeValueType,
   types: VariableType,
@@ -609,9 +639,10 @@ export class Interpreter {
   private evaluateWhileExpression(expr: WhileExpression) {
     const scope = this.pushScope();
     scope.addRegister('break');
+    let continueFlag = false;
     try { // Break
       while (true) {
-        if (expr.preExpr !== null) {
+        if (!continueFlag && expr.preExpr !== null) {
           try { // Continue
             this.evaluator(expr.preExpr);
           } catch (error) {
@@ -623,13 +654,14 @@ export class Interpreter {
             }
           }
         }
-        const flag = this.evaluator(expr.condition);
-        if (flag.type !== 'boolean') {
+        continueFlag = false;
+        const whileCondition = this.evaluator(expr.condition);
+        if (whileCondition.type !== 'boolean') {
           throw WTCDError.atLocation(expr, `Condition expression of a while ` +
             `loop is expected to return a boolean. Received: ` +
-            `${describe(flag)}`);
+            `${describe(whileCondition)}`);
         }
-        if (flag.value === false) {
+        if (whileCondition.value === false) {
           break;
         }
         if (expr.postExpr !== null) {
@@ -642,6 +674,7 @@ export class Interpreter {
             )) {
               throw error;
             }
+            continueFlag = true;
           }
         }
       }
