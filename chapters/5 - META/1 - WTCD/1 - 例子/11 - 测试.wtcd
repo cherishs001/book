@@ -497,6 +497,12 @@ section main {
     assert::[sugar::[4] == 300]
   }
 
+  // If
+  assert::[(if 5 > 3 100) == 100]
+  assert::[(if 5 > 8 100) == null]
+  assert::[(if 5 > 3 100 else 200) == 100]
+  assert::[(if 5 > 8 100 else 200) == 200]
+
   timeEnd::[]
 } then exit
 

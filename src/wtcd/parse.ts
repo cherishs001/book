@@ -19,6 +19,7 @@ import {
   FunctionArgument,
   FunctionExpression,
   GotoAction,
+  IfExpression,
   ListExpression,
   NullLiteral,
   NumberLiteral,
@@ -431,6 +432,23 @@ class LogicParser {
     });
   }
 
+  private parseIfExpression(): IfExpression {
+    const ifToken = this.tokenStream.assertAndSkipNext('keyword', 'if');
+    const condition = this.parseExpression();
+    const then = this.parseExpression();
+    let otherwise: Expression | null = null;
+    if (this.tokenStream.isNext('keyword', 'else')) {
+      this.tokenStream.next();
+      otherwise = this.parseExpression();
+    }
+    return this.attachLocationInfo<IfExpression>(ifToken, {
+      type: 'if',
+      condition,
+      then,
+      otherwise,
+    });
+  }
+
   /**
    * Try to parse an atom node, which includes:
    * - number literals
@@ -447,6 +465,7 @@ class LogicParser {
    * - variables
    * - switches
    * - while loops
+   * - if
    * - block expressions
    * - unary expressions
    *
@@ -543,6 +562,10 @@ class LogicParser {
     // While
     if (this.tokenStream.isNext('keyword', ['while', 'do'])) {
       return this.parseWhileExpression();
+    }
+
+    if (this.tokenStream.isNext('keyword', 'if')) {
+      return this.parseIfExpression();
     }
 
     // Block expression

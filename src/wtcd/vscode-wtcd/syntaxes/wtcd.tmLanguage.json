@@ -61,7 +61,7 @@
 		},
 		"keywords": {
 			"name": "keyword.control.wtcd",
-			"match": "\\$|\\b(number|boolean|string|action|then|selection|choice|yield|exit|return|function|switch|list|while|do)\\b"
+			"match": "\\$|\\b(number|boolean|string|action|then|selection|choice|yield|exit|return|function|switch|list|while|do|if|else)\\b"
 		},
 		"languageConstants": {
 			"patterns": [{

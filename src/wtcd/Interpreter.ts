@@ -9,6 +9,7 @@ import {
   DeclarationStatement,
   Expression,
   FunctionExpression,
+  IfExpression,
   ListExpression,
   NativeFunction,
   OptionalLocationInfo,
@@ -692,6 +693,21 @@ export class Interpreter {
     return scope.getRegister('break')!;
   }
 
+  private evaluateIfExpression(expr: IfExpression) {
+    const condition = this.evaluator(expr.condition);
+    if (condition.type !== 'boolean') {
+      throw WTCDError.atLocation(expr, `The condition of an if expression is ` +
+        `expected to be a boolean. Received: ${describe(condition)}`);
+    }
+    if (condition.value) {
+      return this.evaluator(expr.then);
+    } else if (expr.otherwise !== null) {
+      return this.evaluator(expr.otherwise);
+    } else {
+      return getMaybePooled('null', null);
+    }
+  }
+
   private evaluator(expr: Expression): RuntimeValue {
     switch (expr.type) {
       case 'unaryExpression':
@@ -745,6 +761,8 @@ export class Interpreter {
         return this.evaluateSwitchExpression(expr);
       case 'while':
         return this.evaluateWhileExpression(expr);
+      case 'if':
+        return this.evaluateIfExpression(expr);
     }
   }
 

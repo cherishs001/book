@@ -207,6 +207,13 @@ export interface WhileExpression extends OptionalLocationInfo {
   postExpr: Expression | null;
 }
 
+export interface IfExpression extends OptionalLocationInfo {
+  type: 'if';
+  condition: Expression;
+  then: Expression;
+  otherwise: Expression | null;
+}
+
 export type Literal
   = NumberLiteral
   | BooleanLiteral
@@ -218,7 +225,15 @@ export type OperatorExpression
   | UnaryExpression
   | ConditionalExpression;
 
-export type Action = GotoAction | ExitAction | SelectionAction;
+export type Action
+  = GotoAction
+  | ExitAction
+  | SelectionAction;
+
+type FlowControl
+  = SwitchExpression
+  | WhileExpression
+  | IfExpression;
 
 export type Expression
   = Literal
@@ -229,8 +244,7 @@ export type Expression
   | VariableReference
   | FunctionExpression
   | ListExpression
-  | SwitchExpression
-  | WhileExpression;
+  | FlowControl;
 
 export type Statement
   = DeclarationStatement
