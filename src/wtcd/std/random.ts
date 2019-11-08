@@ -39,7 +39,7 @@ export const randomStdFunctions: Array<NativeFunction> = [
       throw new NativeFunctionError('Low cannot be larger than or equal to ' +
         'high.');
     }
-    if (bias < low || bias >= high) {
+    if (bias < low || bias > high) {
       throw new NativeFunctionError('Bias has to be between low and high.');
     }
     let norm: number;

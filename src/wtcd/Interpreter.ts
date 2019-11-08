@@ -1,4 +1,5 @@
 import { getMaybePooled } from './constantsPool';
+import { FunctionInvocationError, invokeFunctionRaw } from './invokeFunction';
 import { binaryOperators, unaryOperators } from './operators';
 import { Random } from './Random';
 import { stdFunctions } from './std';
@@ -80,6 +81,10 @@ export type ActionValueRaw = {
 } | {
   readonly action: 'selection';
   readonly choices: ReadonlyArray<ChoiceValue>;
+} | {
+  readonly action: 'function';
+  readonly fn: FunctionValue;
+  readonly creator: ChoiceExpression;
 };
 
 export interface ActionValue {
@@ -461,10 +466,20 @@ export class Interpreter {
       throw WTCDError.atLocation(expr, `First argument of choice is expected to be a string, ` +
         `received: ${describe(text)}`);
     }
-    const action = this.evaluator(expr.action);
-    if (action.type !== 'action' && action.type !== 'null') {
-      throw WTCDError.atLocation(expr, `Second argument of choice is expected to be an action ` +
+    let action = this.evaluator(expr.action);
+    if (action.type !== 'action' && action.type !== 'function' && action.type !== 'null') {
+      throw WTCDError.atLocation(expr, `Second argument of choice is expected to be an action, a function, ` +
         `or null, received: ${describe(text)}`);
+    }
+    if (action.type === 'function') {
+      action = {
+        type: 'action',
+        value: {
+          action: 'function',
+          fn: action,
+          creator: expr,
+        },
+      };
     }
     return {
       type: 'choice',
@@ -763,6 +778,11 @@ export class Interpreter {
         return this.evaluateWhileExpression(expr);
       case 'if':
         return this.evaluateIfExpression(expr);
+      case 'tag':
+        return {
+          type: 'list',
+          value: [ getMaybePooled('string', expr.name) ],
+        };
     }
   }
 
@@ -838,6 +858,34 @@ export class Interpreter {
         yield* this.executeAction(playerChoice.value.action);
         break;
       }
+      case 'function': {
+        let newAction: RuntimeValue;
+        try {
+          newAction = invokeFunctionRaw(
+            action.value.fn.value,
+            [], this.interpreterHandle,
+          );
+        } catch (error) {
+          if (error instanceof FunctionInvocationError) {
+            throw WTCDError.atLocation(
+              action.value.creator,
+              `Failed to evaluate the function action for this choice: ` +
+                `${error.message}`,
+            );
+          } else if (error instanceof WTCDError) {
+            error.pushWTCDStack(`Function action`, action.value.creator);
+          }
+          throw error;
+        }
+        if (newAction.type === 'action') {
+          yield* this.executeAction(newAction);
+        } else if (newAction.type !== 'null') {
+          throw WTCDError.atLocation(action.value.creator, `Value returned ` +
+            `an function action is expected to be an action or null. ` +
+            `Received: ${describe(newAction)}`);
+        }
+        break;
+      }
     }
   }
 
@@ -907,7 +955,7 @@ export class Interpreter {
           // Parameterize
           for (const variable of selectedContent.variables) {
             ($host.getElementsByClassName(variable.elementClass)[0] as HTMLSpanElement)
-              .innerText = String(this.resolveVariableReference(variable.variableName).value);
+              .innerText = String(this.resolveVariableReference(variable.variableName).value.value);
           }
           let $current = $host.firstChild;
           while ($current !== null) {

@@ -1,6 +1,6 @@
 import { networkInterfaces } from 'os';
 import { getMaybePooled } from '../constantsPool';
-import { describe, ListValue } from '../Interpreter';
+import { describe, isEqual, ListValue } from '../Interpreter';
 import { FunctionInvocationError, invokeFunctionRaw } from '../invokeFunction';
 import { NativeFunction } from '../types';
 import { WTCDError } from '../WTCDError';
@@ -207,5 +207,54 @@ export const listStdFunctions: Array<NativeFunction> = [
   function listLength(args) {
     assertArgsLength(args, 1);
     return getMaybePooled('number', assertArgType(args, 0, 'list').length);
+  },
+  function listIndexOf(args) {
+    assertArgsLength(args, 2);
+    const list = assertArgType(args, 0, 'list');
+    for (let i = 0; i < list.length; i++) {
+      if (isEqual(list[i], args[1])) {
+        return getMaybePooled('number', i);
+      }
+    }
+    return getMaybePooled('number', -1);
+  },
+  function listIncludes(args) {
+    assertArgsLength(args, 2);
+    const list = assertArgType(args, 0, 'list');
+    return getMaybePooled(
+      'boolean',
+      list.some(item => isEqual(item, args[1])),
+    );
+  },
+  function listFindIndex(args, interpreterHandle) {
+    assertArgsLength(args, 2);
+    const list = assertArgType(args, 0, 'list');
+    const fn = assertArgType(args, 1, 'function');
+    for (let i = 0; i < list.length; i++) {
+      const item = list[i];
+      try {
+        const result = invokeFunctionRaw(fn, [
+          item,
+          getMaybePooled('number', i),
+        ], interpreterHandle);
+        if (result.type !== 'boolean') {
+          throw new NativeFunctionError(`Predicate is expected to return ` +
+            `booleans, but ${describe(result)} is returned for element ` +
+            `with index = ${i}`);
+        }
+        if (result.value) {
+          return getMaybePooled('number', i);
+        }
+      } catch (error) {
+        if (error instanceof FunctionInvocationError) {
+          throw new NativeFunctionError(`Failed to apply function to the ` +
+            `element with index = ${i} of list: ${error.message}`);
+        } else if (error instanceof WTCDError) {
+          error.pushWTCDStack(`listFindIndex (index = ${i})`);
+        }
+        throw error;
+      }
+    }
+    return getMaybePooled('number', -1);
   },
 ];

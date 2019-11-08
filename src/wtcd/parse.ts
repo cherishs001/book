@@ -38,6 +38,7 @@ import {
   StringLiteral,
   SwitchCase,
   SwitchExpression,
+  TagExpression,
   UnaryExpression,
   VariableReference,
   VariableType,
@@ -49,7 +50,7 @@ import {
 import { WTCDError } from './WTCDError';
 
 const CURRENT_MAJOR_VERSION = 1;
-const CURRENT_MINOR_VERSION = 1;
+const CURRENT_MINOR_VERSION = 2;
 
 const CURRENT_VERSION_STR = CURRENT_MAJOR_VERSION + '.' + CURRENT_MINOR_VERSION;
 
@@ -269,6 +270,13 @@ class LogicParser {
 
   private parseFunctionCore(isFull: boolean): FunctionExpression {
     const functionArguments: Array<FunctionArgument> = [];
+    this.lexicalScopeProvider.enterScope();
+    this.lexicalScopeProvider.addRegisterToCurrentScope('return');
+    const capturesSet: Set<string> = new Set();
+    this.lexicalScopeProvider
+      .addOnVariableReferenceNotFoundTriggerToCurrentScope(
+        variableName => capturesSet.add(variableName),
+      );
     let restArgName: string | null = null;
     let expression: null | Expression = null;
     // If is full, parameter list is mandatory
@@ -333,13 +341,6 @@ class LogicParser {
         this.tokenStream.assertAndSkipNext('punctuation', ']');
       }
     }
-    this.lexicalScopeProvider.enterScope();
-    this.lexicalScopeProvider.addRegisterToCurrentScope('return');
-    const capturesSet: Set<string> = new Set();
-    this.lexicalScopeProvider
-      .addOnVariableReferenceNotFoundTriggerToCurrentScope(
-        variableName => capturesSet.add(variableName),
-      );
     functionArguments.forEach(
       argument => this.lexicalScopeProvider.addVariableToCurrentScope(
         argument.name,
@@ -466,6 +467,7 @@ class LogicParser {
    * - switches
    * - while loops
    * - if
+   * - tags
    * - block expressions
    * - unary expressions
    *
@@ -564,8 +566,17 @@ class LogicParser {
       return this.parseWhileExpression();
     }
 
+    // If
     if (this.tokenStream.isNext('keyword', 'if')) {
       return this.parseIfExpression();
+    }
+
+    // Tag
+    if (this.tokenStream.isNext('tag')) {
+      return this.attachLocationInfo<TagExpression>(
+        this.tokenStream.peek(),
+        { type: 'tag', name: this.tokenStream.next().content },
+      );
     }
 
     // Block expression

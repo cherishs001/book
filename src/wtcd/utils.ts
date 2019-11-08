@@ -14,5 +14,5 @@ export function arrayEquals<T>(
   arr1: ReadonlyArray<T>,
   comparator: (e0: T, e1: T) => boolean = (e0, e1) => e0 === e1,
 ) {
-  return arr0.every((e0, index) => comparator(e0, arr1[index]));
+  return (arr0.length === arr1.length) && arr0.every((e0, index) => comparator(e0, arr1[index]));
 }

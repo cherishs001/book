@@ -249,7 +249,7 @@ export const binaryOperators = new Map<string, BinaryOperatorDefinition>([
   }],
   ['==', {
     precedence: 11,
-    fn: autoEvaluated((arg0, arg1, expr, interpreterHandle) => (getMaybePooled(
+    fn: autoEvaluated((arg0, arg1) => (getMaybePooled(
       'boolean',
       isEqual(arg0, arg1),
     ))),
@@ -258,7 +258,7 @@ export const binaryOperators = new Map<string, BinaryOperatorDefinition>([
     precedence: 11,
     fn: autoEvaluated((arg0, arg1) => (getMaybePooled(
       'boolean',
-      (arg0.type !== arg1.type) || (arg0.value !== arg1.value),
+      !isEqual(arg0, arg1),
     ))),
   }],
   ['<', {
@@ -332,12 +332,13 @@ export const binaryOperators = new Map<string, BinaryOperatorDefinition>([
         throw WTCDError.atLocation(expr, `Right side of binary operator "." ` +
           `is expected to be an integer. Received: ${arg1}`);
       }
-      if (arg1.value >= arg0.value.length) {
+      const value = arg0.value[arg1.value];
+      if (value === undefined) {
         throw WTCDError.atLocation(expr, `List does not have an element at ` +
           `${arg1.value}. If return null is desired, use ".?" instead. List ` +
           `contents: ${describe(arg0)}`);
       }
-      return arg0.value[arg1.value];
+      return value;
     }),
   }],
   ['.?', {

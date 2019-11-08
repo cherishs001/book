@@ -9,9 +9,9 @@ export const stringStdFunctions: Array<NativeFunction> = [
     return getMaybePooled('number', str.length);
   },
   function stringFormatNumberFixed(args) {
-    assertArgsLength(args, 2);
+    assertArgsLength(args, 1, 2);
     const num = assertArgType(args, 0, 'number');
-    const digits = assertArgType(args, 1, 'number');
+    const digits = assertArgType(args, 1, 'number', 0);
     if (digits < 0 || digits > 100 || digits % 1 !== 0) {
       throw new NativeFunctionError('Digits must be an integer between 0 and ' +
         `100, received: ${digits}`);

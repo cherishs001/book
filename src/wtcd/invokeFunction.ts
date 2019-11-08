@@ -1,5 +1,6 @@
 import { autoEvaluated } from './autoEvaluated';
-import { BubbleSignal, BubbleSignalType, describe, InterpreterHandle, RuntimeValue, RuntimeValueRaw, isTypeAssignableTo } from './Interpreter';
+import { getMaybePooled } from './constantsPool';
+import { BubbleSignal, BubbleSignalType, describe, InterpreterHandle, isTypeAssignableTo, RuntimeValue, RuntimeValueRaw } from './Interpreter';
 import { NativeFunctionError } from './std/utils';
 import { BinaryExpression } from './types';
 import { WTCDError } from './WTCDError';
@@ -44,10 +45,12 @@ export function invokeFunctionRaw(
           // Use default
           if (argument.defaultValue !== null) {
             value = evaluator(argument.defaultValue);
+          } else if (isTypeAssignableTo('null', argument.type)) {
+            value = getMaybePooled('null', null);
           } else {
             throw new FunctionInvocationError(`The argument with index = ` +
               `${index} of invocation is omitted, but it does not have a ` +
-              `default value`);
+              `default value and it does not allow null values`);
           }
         }
         if (!isTypeAssignableTo(value.type, argument.type)) {

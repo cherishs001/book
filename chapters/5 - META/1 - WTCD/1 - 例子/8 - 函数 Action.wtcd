@@ -1,0 +1,16 @@
+WTCD 1.2
+
+declare number selected
+
+section main then selection listCreateFilled::[10] |> listMap.:[$[_ index] choice stringFormatNumberFixed::[index] ${
+  selected = index
+  yield goto finish
+}]
+
+section finish then exit
+
+---<<< main >>>---
+# 函数 Action 演示
+
+---<<< finish >>>---
+选择了 <$ selected $>。

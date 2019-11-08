@@ -12,6 +12,7 @@
 		{ "include": "#braces" },
 		{ "include": "#blockExpressions" },
 		{ "include": "#operators" },
+		{ "include": "#tags" },
 		{ "include": "#strings" },
 		{ "include": "#stdFunctions" },
 		{ "include": "#variables" },
@@ -61,7 +62,7 @@
 		},
 		"keywords": {
 			"name": "keyword.control.wtcd",
-			"match": "\\$|\\b(number|boolean|string|action|then|selection|choice|yield|exit|return|function|switch|list|while|do|if|else)\\b"
+			"match": "\\$|\\b(number|boolean|string|action|then|selection|choice|yield|exit|return|function|switch|list|while|do|if|else|continue|break)\\b"
 		},
 		"languageConstants": {
 			"patterns": [{
@@ -88,6 +89,10 @@
 			"name": "keyword.operator.wtcd",
 			"match": "[+\\-*\\/^&|=><!?:%.]+"
 		},
+		"tags": {
+			"name": "variable.other.object.property",
+			"match": "#[a-zA-Z_][a-zA-Z_0-9]*"
+		},
 		"strings": {
 			"name": "string.quoted.double.wtcd",
 			"begin": "\"",
@@ -101,7 +106,7 @@
 		},
 		"stdFunctions": {
 			"name": "support.function",
-			"match": "\\b(?:contentAddParagraph|contentAddImage|contentAddUnorderedList|contentAddOrderedList|contentAddHeader|contentAddTable|print|assert|assertError|timeStart|timeEnd|listSet|listForEach|listMap|listCreateFilled|listChunk|listFilter|listSplice|listSlice|listLength|mathMin|mathMax|mathFloor|random|randomInt|randomBoolean|randomBiased|stringLength|stringFormatNumberFixed|stringFormatNumberPrecision)\\b"
+			"match": "\\b(?:contentAddParagraph|contentAddImage|contentAddUnorderedList|contentAddOrderedList|contentAddHeader|contentAddTable|print|assert|assertError|timeStart|timeEnd|listSet|listForEach|listMap|listCreateFilled|listChunk|listFilter|listSplice|listSlice|listLength|listIndexOf|listIncludes|listFindIndex|mathMin|mathMax|mathFloor|random|randomInt|randomBoolean|randomBiased|stringLength|stringFormatNumberFixed|stringFormatNumberPrecision)\\b"
 		},
 		"variables": {
 			"name": "variable.other.readwrite.wtcd",

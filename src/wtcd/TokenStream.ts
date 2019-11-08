@@ -158,11 +158,19 @@ function isStringQuote(char: string | undefined) {
   return includes('"\'`', char);
 }
 
+function isTagStart(char: string | undefined) {
+  return char === '#';
+}
+
+function isTagBody(char: string | undefined) {
+  return isIdentifierBody(char);
+}
+
 function isCommentStarter(str: string) {
   return ['//', '/*'].includes(str);
 }
 
-type TokenType = 'identifier' | 'keyword' | 'operator' | 'punctuation' | 'string' | 'number';
+type TokenType = 'identifier' | 'keyword' | 'operator' | 'punctuation' | 'string' | 'number' | 'tag';
 
 interface TokenContent {
   type: TokenType;
@@ -197,15 +205,15 @@ const keywords = new Set([
   'do',
   'continue',
   'break',
-
-  // Reserved
   'if',
   'else',
+  'list',
+
+  // Reserved
   'for',
   'in',
   'of',
   'enum',
-  'list',
   'dict',
   'dictionary',
   'const',
@@ -289,6 +297,11 @@ export class TokenStream extends ItemStream<Token> {
   /** Assuming next char is a part of an identifier, reads next identifier */
   private readIdentifier() {
     return this.charStream.next() + this.readWhile(isIdentifierBody);
+  }
+
+  private readTag() {
+    this.charStream.next();
+    return this.readWhile(isTagBody); // # <- is ignored
   }
 
   /** Assuming next char is a part of a number, reads next number */
@@ -408,7 +421,12 @@ export class TokenStream extends ItemStream<Token> {
         type: 'string',
         content: this.readString(),
       };
-    }  else {
+    } else if (isTagStart(this.charStream.peek())) {
+      tokenContent = {
+        type: 'tag',
+        content: this.readTag(),
+      };
+    } else {
       return this.charStream.throwUnexpectedNext();
     }
 

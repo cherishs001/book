@@ -214,6 +214,11 @@ export interface IfExpression extends OptionalLocationInfo {
   otherwise: Expression | null;
 }
 
+export interface TagExpression extends OptionalLocationInfo {
+  type: 'tag';
+  name: string;
+}
+
 export type Literal
   = NumberLiteral
   | BooleanLiteral
@@ -244,7 +249,8 @@ export type Expression
   | VariableReference
   | FunctionExpression
   | ListExpression
-  | FlowControl;
+  | FlowControl
+  | TagExpression;
 
 export type Statement
   = DeclarationStatement
