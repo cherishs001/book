@@ -187,7 +187,21 @@ a += 5        // -&gt; a 加上了3（变量累加）
 <td>::</td>
 <td>20</td>
 <td>函数调用</td>
-<td><code>max::[1 2 3]</code> = 3</td>
+<td><code>mathMax::[1 2 3]</code> = 3</td>
+</tr>
+<tr>
+<td>2</td>
+<td>.:</td>
+<td>20</td>
+<td>右起偏函数调用</td>
+<td><code>[ 0 1 2 3 ] |&gt; listSet.:[2 &quot;Wow&quot;]</code> = [ 0 1 &quot;Wow&quot; 3 ]</td>
+</tr>
+<tr>
+<td>2</td>
+<td>:.</td>
+<td>20</td>
+<td>左起偏函数调用</td>
+<td><code>&quot;Wow&quot; |&gt; listSet:.[[ 0 1 2 3 ] 2]</code> = [ 0 1 &quot;Wow&quot; 3 ]</td>
 </tr>
 <tr>
 <td>2</td>

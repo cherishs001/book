@@ -737,6 +737,7 @@ class Style {
         attemptInsertRule(`.rect>.comments>div { background-color: ${this.def.commentColor}; }`);
         attemptInsertRule(`@media (min-width: 901px) { ::-webkit-scrollbar-thumb { background-color: ${this.def.paperBgColor}; } }`);
         attemptInsertRule(`.rect>.comments>.create-comment::before { background-color: ${key}; }`);
+        attemptInsertRule(`:root { --paper-bg: ${this.def.paperBgColor}; }`);
         attemptInsertRule(`:root { --key: ${key}; }`);
         attemptInsertRule(`:root { --key-opacity-01: ${keyAlpha(0.1)}; }`);
         attemptInsertRule(`:root { --key-opacity-05: ${keyAlpha(0.5)}; }`);
@@ -2048,11 +2049,18 @@ exports.FlowReader = FlowReader;
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const constantsPool_1 = require("./constantsPool");
+const invokeFunction_1 = require("./invokeFunction");
 const operators_1 = require("./operators");
 const std_1 = require("./std");
 const utils_1 = require("./utils");
 const WTCDError_1 = require("./WTCDError");
+/**
+ * Determine whether two runtime values are equal. Uses deep value equality
+ * instead of reference equality.
+ */
 function isEqual(v0, v1) {
+    // TypeScript's generic currently does not support type narrowing.
+    // Until that is fixed, this function has to have so many any, unfortunately
     if (v0.type !== v1.type) {
         return false;
     }
@@ -2082,13 +2090,13 @@ function isEqual(v0, v1) {
             return ((v0.value.text === v1.value.text) &&
                 (isEqual(v0.value.action, v1.value.action)));
         case 'function':
-            if (v0.value.builtIn !== v1.value.builtIn) {
+            if (v0.value.fnType !== v1.value.fnType) {
                 return false;
             }
-            if (v0.value.builtIn === true) {
+            if (v0.value.fnType === 'native') {
                 return (v0.value.nativeFn === v1.value.nativeFn);
             }
-            else {
+            else if (v0.value.fnType === 'wtcd') {
                 return (
                 // They refer to same expression
                 (v0.value.expr === v1.value.expr) &&
@@ -2100,20 +2108,31 @@ function isEqual(v0, v1) {
                             (v0Cap.value === v1Cap.value));
                     })));
             }
+            else {
+                return ((v0.value.isLeft === v1.value.isLeft) &&
+                    (isEqual(v0.value.targetFn, v1.value.targetFn)) &&
+                    (utils_1.arrayEquals(v0.value.applied, v1.value.applied, isEqual)));
+            }
         case 'list':
             return ((v0.value.length === v1.value.length) &&
                 (v0.value.every((element, index) => isEqual(element, v1.value[index]))));
     }
 }
 exports.isEqual = isEqual;
+/**
+ * Type of a thrown bubble signal.
+ */
 var BubbleSignalType;
 (function (BubbleSignalType) {
     BubbleSignalType[BubbleSignalType["YIELD"] = 0] = "YIELD";
     BubbleSignalType[BubbleSignalType["RETURN"] = 1] = "RETURN";
+    BubbleSignalType[BubbleSignalType["BREAK"] = 2] = "BREAK";
+    BubbleSignalType[BubbleSignalType["CONTINUE"] = 3] = "CONTINUE";
 })(BubbleSignalType = exports.BubbleSignalType || (exports.BubbleSignalType = {}));
 /**
  * Bubble signal is used for traversing upward the call stack. It is implemented
- * with JavaScript's Error. Such signal might be yield or return.
+ * with JavaScript's Error. Such signal might be yield, return, break, or
+ * continue.
  */
 class BubbleSignal extends Error {
     constructor(type) {
@@ -2151,17 +2170,44 @@ function describe(rv) {
         case 'list':
             return `list (elements = [${rv.value.map(describe).join(', ')}])`;
         case 'function':
-            if (rv.value.builtIn) {
+            if (rv.value.fnType === 'native') {
                 return `function (native ${rv.value.nativeFn.name})`;
             }
-            else {
+            else if (rv.value.fnType === 'wtcd') {
                 return `function (arguments = [${rv.value.expr.arguments
                     .map(arg => arg.name)
                     .join(', ')}])`;
             }
+            else {
+                return `function (partial ${rv.value.isLeft ? 'left' : 'right'}, ` +
+                    `applied = [${rv.value.applied.map(describe).join(', ')}], ` +
+                    `targetFn = ${describe(rv.value.targetFn)})`;
+            }
     }
 }
 exports.describe = describe;
+/**
+ * Determine whether a given value is assignable to a given type declaration.
+ *
+ * @param type given value's type
+ * @param types type declaration that is to be compared to
+ * @returns whether a value with type type is assignable to a variable with type
+ * declaration types
+ */
+function isTypeAssignableTo(type, types) {
+    return types === null || types.includes(type);
+}
+exports.isTypeAssignableTo = isTypeAssignableTo;
+function assignValueToVariable(variable, value, location, // For error message
+variableName) {
+    if (!isTypeAssignableTo(value.type, variable.types)) {
+        throw WTCDError_1.WTCDError.atLocation(location, `Cannot assign value (` +
+            `${describe(value)}) to variable "${variableName}". "${variableName}" ` +
+            `can only store these types: ${variable.types.join(', ')}`);
+    }
+    variable.value = value;
+}
+exports.assignValueToVariable = assignValueToVariable;
 class RuntimeScope {
     constructor() {
         this.variables = new Map();
@@ -2243,8 +2289,9 @@ class Interpreter {
                 return variable;
             }
         }
-        throw WTCDError_1.WTCDError.atUnknown(`Cannot resolve variable reference "${variableName}". ` +
-            `This is most likely caused by WTCD compiler's error or the compiled output ` +
+        throw WTCDError_1.WTCDError.atUnknown(`Cannot resolve variable reference ` +
+            `"${variableName}". This is most likely caused by WTCD compiler's ` +
+            `error or the compiled output ` +
             `has been modified`);
     }
     /**
@@ -2281,10 +2328,20 @@ class Interpreter {
             throw WTCDError_1.WTCDError.atLocation(expr, `First argument of choice is expected to be a string, ` +
                 `received: ${describe(text)}`);
         }
-        const action = this.evaluator(expr.action);
-        if (action.type !== 'action' && action.type !== 'null') {
-            throw WTCDError_1.WTCDError.atLocation(expr, `Second argument of choice is expected to be an action ` +
+        let action = this.evaluator(expr.action);
+        if (action.type !== 'action' && action.type !== 'function' && action.type !== 'null') {
+            throw WTCDError_1.WTCDError.atLocation(expr, `Second argument of choice is expected to be an action, a function, ` +
                 `or null, received: ${describe(text)}`);
+        }
+        if (action.type === 'function') {
+            action = {
+                type: 'action',
+                value: {
+                    action: 'function',
+                    fn: action,
+                    creator: expr,
+                },
+            };
         }
         return {
             type: 'choice',
@@ -2315,29 +2372,49 @@ class Interpreter {
                 value = this.evaluator(singleDeclaration.initialValue);
             }
             else {
-                switch (singleDeclaration.variableType) {
-                    case 'boolean':
-                        value = constantsPool_1.getMaybePooled('boolean', false);
-                        break;
-                    case 'number':
-                        value = constantsPool_1.getMaybePooled('number', 0);
-                        break;
-                    case 'string':
-                        value = constantsPool_1.getMaybePooled('string', '');
-                        break;
-                    case 'list':
-                        value = { type: 'list', value: [] };
-                        break;
-                    default:
-                        throw WTCDError_1.WTCDError.atLocation(expr, `Variable type ${singleDeclaration.variableType} ` +
-                            `does not have a default initial value`);
+                if (singleDeclaration.variableType === null) {
+                    value = constantsPool_1.getMaybePooled('null', null);
+                }
+                else if (singleDeclaration.variableType.length === 1) {
+                    switch (singleDeclaration.variableType[0]) {
+                        case 'boolean':
+                            value = constantsPool_1.getMaybePooled('boolean', false);
+                            break;
+                        case 'number':
+                            value = constantsPool_1.getMaybePooled('number', 0);
+                            break;
+                        case 'string':
+                            value = constantsPool_1.getMaybePooled('string', '');
+                            break;
+                        case 'list':
+                            value = { type: 'list', value: [] };
+                            break;
+                        default:
+                            throw WTCDError_1.WTCDError.atLocation(expr, `Variable type ` +
+                                `"${singleDeclaration.variableType[0]}" ` +
+                                `does not have a default initial value`);
+                    }
+                }
+                else if (singleDeclaration.variableType.includes('null')) {
+                    // Use null if null is allowed
+                    value = constantsPool_1.getMaybePooled('null', null);
+                }
+                else {
+                    throw WTCDError_1.WTCDError.atLocation(expr, `Variable type ` +
+                        `"${singleDeclaration.variableType.join(' ')}" does not have a ` +
+                        `default initial value`);
                 }
             }
-            if (value.type !== singleDeclaration.variableType) {
-                throw WTCDError_1.WTCDError.atLocation(expr, `The type of variable ${singleDeclaration.variableName} is ` +
-                    `${singleDeclaration.variableType}, thus cannot hold ${describe(value)}`);
+            if (!isTypeAssignableTo(value.type, singleDeclaration.variableType)) {
+                throw WTCDError_1.WTCDError.atLocation(expr, `The type of variable ` +
+                    `${singleDeclaration.variableName} is ` +
+                    `${singleDeclaration.variableType}, thus cannot hold ` +
+                    `${describe(value)}`);
             }
-            this.getCurrentScope().addVariable(singleDeclaration.variableName, { type: singleDeclaration.variableType, value: value.value });
+            this.getCurrentScope().addVariable(singleDeclaration.variableName, {
+                types: singleDeclaration.variableType,
+                value,
+            });
         }
     }
     evaluateBlockExpression(expr) {
@@ -2403,7 +2480,7 @@ class Interpreter {
         return {
             type: 'function',
             value: {
-                builtIn: false,
+                fnType: 'wtcd',
                 expr,
                 captured: expr.captures.map(variableName => ({
                     name: variableName,
@@ -2433,6 +2510,75 @@ class Interpreter {
         }
         else {
             return this.evaluator(expr.defaultCase);
+        }
+    }
+    evaluateWhileExpression(expr) {
+        const scope = this.pushScope();
+        scope.addRegister('break');
+        let continueFlag = false;
+        try { // Break
+            while (true) {
+                if (!continueFlag && expr.preExpr !== null) {
+                    try { // Continue
+                        this.evaluator(expr.preExpr);
+                    }
+                    catch (error) {
+                        if (!((error instanceof BubbleSignal) &&
+                            (error.type === BubbleSignalType.CONTINUE))) {
+                            throw error;
+                        }
+                    }
+                }
+                continueFlag = false;
+                const whileCondition = this.evaluator(expr.condition);
+                if (whileCondition.type !== 'boolean') {
+                    throw WTCDError_1.WTCDError.atLocation(expr, `Condition expression of a while ` +
+                        `loop is expected to return a boolean. Received: ` +
+                        `${describe(whileCondition)}`);
+                }
+                if (whileCondition.value === false) {
+                    break;
+                }
+                if (expr.postExpr !== null) {
+                    try { // Continue
+                        this.evaluator(expr.postExpr);
+                    }
+                    catch (error) {
+                        if (!((error instanceof BubbleSignal) &&
+                            (error.type === BubbleSignalType.CONTINUE))) {
+                            throw error;
+                        }
+                        continueFlag = true;
+                    }
+                }
+            }
+        }
+        catch (error) {
+            if ((error instanceof BubbleSignal) &&
+                (error.type === BubbleSignalType.BREAK)) {
+                return scope.getRegister('break');
+            }
+            throw error;
+        }
+        finally {
+            this.popScope();
+        }
+        return scope.getRegister('break');
+    }
+    evaluateIfExpression(expr) {
+        const condition = this.evaluator(expr.condition);
+        if (condition.type !== 'boolean') {
+            throw WTCDError_1.WTCDError.atLocation(expr, `The condition of an if expression is ` +
+                `expected to be a boolean. Received: ${describe(condition)}`);
+        }
+        if (condition.value) {
+            return this.evaluator(expr.then);
+        }
+        else if (expr.otherwise !== null) {
+            return this.evaluator(expr.otherwise);
+        }
+        else {
+            return constantsPool_1.getMaybePooled('null', null);
         }
     }
     evaluator(expr) {
@@ -2475,11 +2621,20 @@ class Interpreter {
             case 'selection':
                 return this.evaluateSelectionExpression(expr);
             case 'variableReference':
-                return constantsPool_1.clone(this.resolveVariableReference(expr.variableName));
+                return this.resolveVariableReference(expr.variableName).value;
             case 'function':
                 return this.evaluateFunctionExpression(expr);
             case 'switch':
                 return this.evaluateSwitchExpression(expr);
+            case 'while':
+                return this.evaluateWhileExpression(expr);
+            case 'if':
+                return this.evaluateIfExpression(expr);
+            case 'tag':
+                return {
+                    type: 'list',
+                    value: [constantsPool_1.getMaybePooled('string', expr.name)],
+                };
         }
     }
     executeStatement(statement) {
@@ -2502,8 +2657,14 @@ class Interpreter {
             case 'setReturn':
                 this.setRegister('return', this.evaluator(statement.value));
                 return;
-            default:
-                throw WTCDError_1.WTCDError.atLocation(statement, 'Not implemented');
+            case 'break':
+                this.setRegister('break', this.evaluator(statement.value));
+                throw new BubbleSignal(BubbleSignalType.BREAK);
+            case 'setBreak':
+                this.setRegister('break', this.evaluator(statement.value));
+                return;
+            case 'continue':
+                throw new BubbleSignal(BubbleSignalType.CONTINUE);
         }
     }
     addToSectionStack(sectionName) {
@@ -2546,6 +2707,31 @@ class Interpreter {
                 yield* this.executeAction(playerChoice.value.action);
                 break;
             }
+            case 'function': {
+                let newAction;
+                try {
+                    newAction = invokeFunction_1.invokeFunctionRaw(action.value.fn.value, [], this.interpreterHandle);
+                }
+                catch (error) {
+                    if (error instanceof invokeFunction_1.FunctionInvocationError) {
+                        throw WTCDError_1.WTCDError.atLocation(action.value.creator, `Failed to evaluate the function action for this choice: ` +
+                            `${error.message}`);
+                    }
+                    else if (error instanceof WTCDError_1.WTCDError) {
+                        error.pushWTCDStack(`Function action`, action.value.creator);
+                    }
+                    throw error;
+                }
+                if (newAction.type === 'action') {
+                    yield* this.executeAction(newAction);
+                }
+                else if (newAction.type !== 'null') {
+                    throw WTCDError_1.WTCDError.atLocation(action.value.creator, `Value returned ` +
+                        `an function action is expected to be an action or null. ` +
+                        `Received: ${describe(newAction)}`);
+                }
+                break;
+            }
         }
     }
     pushContent($element) {
@@ -2555,10 +2741,13 @@ class Interpreter {
         const stdScope = this.pushScope();
         for (const stdFunction of std_1.stdFunctions) {
             stdScope.addVariable(stdFunction.name, {
-                type: 'function',
+                types: ['function'],
                 value: {
-                    builtIn: true,
-                    nativeFn: stdFunction,
+                    type: 'function',
+                    value: {
+                        fnType: 'native',
+                        nativeFn: stdFunction,
+                    },
                 },
             });
         }
@@ -2596,7 +2785,7 @@ class Interpreter {
                     // Parameterize
                     for (const variable of selectedContent.variables) {
                         $host.getElementsByClassName(variable.elementClass)[0]
-                            .innerText = String(this.resolveVariableReference(variable.variableName).value);
+                            .innerText = String(this.resolveVariableReference(variable.variableName).value.value);
                     }
                     let $current = $host.firstChild;
                     while ($current !== null) {
@@ -2639,7 +2828,7 @@ class Interpreter {
 }
 exports.Interpreter = Interpreter;
 
-},{"./WTCDError":37,"./constantsPool":39,"./operators":41,"./std":44,"./utils":50}],36:[function(require,module,exports){
+},{"./WTCDError":37,"./constantsPool":39,"./invokeFunction":40,"./operators":41,"./std":44,"./utils":50}],36:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 /**
@@ -2734,6 +2923,9 @@ class WTCDError extends Error {
         return new WTCDError(message + ` at ${line}:${column}.`, line, column);
     }
     static atLocation(location, message) {
+        if (location === null) {
+            return WTCDError.atUnknown(message);
+        }
         if (location.line === undefined) {
             return new WTCDError(message + ' at unknown location. (Try recompile in '
                 + 'debug mode to enable source map)', null, null);
@@ -2792,15 +2984,12 @@ function getMaybePooled(type, value) {
     };
 }
 exports.getMaybePooled = getMaybePooled;
-function clone(value) {
-    return getMaybePooled(value.type, value.value);
-}
-exports.clone = clone;
 
 },{}],40:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const autoEvaluated_1 = require("./autoEvaluated");
+const constantsPool_1 = require("./constantsPool");
 const Interpreter_1 = require("./Interpreter");
 const utils_1 = require("./std/utils");
 const WTCDError_1 = require("./WTCDError");
@@ -2813,7 +3002,7 @@ class FunctionInvocationError extends Error {
 exports.FunctionInvocationError = FunctionInvocationError;
 function invokeFunctionRaw(functionValue, args, interpreterHandle) {
     const { evaluator, pushScope, popScope, } = interpreterHandle;
-    if (functionValue.builtIn) {
+    if (functionValue.fnType === 'native') {
         try {
             return functionValue.nativeFn(args, interpreterHandle);
         }
@@ -2828,65 +3017,89 @@ function invokeFunctionRaw(functionValue, args, interpreterHandle) {
             }
         }
     }
-    const scope = pushScope();
-    try {
-        scope.addRegister('return');
-        // Check and add arguments to the scope
-        functionValue.expr.arguments.forEach((argument, index) => {
-            let value = args[index];
-            if (value === undefined || value.type === 'null') {
-                // Use default
-                if (argument.defaultValue !== null) {
-                    value = evaluator(argument.defaultValue);
+    else if (functionValue.fnType === 'wtcd') {
+        const scope = pushScope();
+        try {
+            scope.addRegister('return');
+            // Check and add arguments to the scope
+            functionValue.expr.arguments.forEach((argument, index) => {
+                let value = args[index];
+                if (value === undefined || value.type === 'null') {
+                    // Use default
+                    if (argument.defaultValue !== null) {
+                        value = evaluator(argument.defaultValue);
+                    }
+                    else if (Interpreter_1.isTypeAssignableTo('null', argument.type)) {
+                        value = constantsPool_1.getMaybePooled('null', null);
+                    }
+                    else {
+                        throw new FunctionInvocationError(`The argument with index = ` +
+                            `${index} of invocation is omitted, but it does not have a ` +
+                            `default value and it does not allow null values`);
+                    }
                 }
-                else {
-                    throw new FunctionInvocationError(`The ${index + 1}th argument of ` +
-                        `invocation is omitted, but it does not have a default value`);
+                if (!Interpreter_1.isTypeAssignableTo(value.type, argument.type)) {
+                    throw new FunctionInvocationError(`The argument with index = ` +
+                        `${index} of invocation has wrong type. Expected: ` +
+                        `${argument.type}, received: ${Interpreter_1.describe(value)}`);
                 }
-            }
-            if (value.type !== argument.type) {
-                throw new FunctionInvocationError(`The ${index + 1}th argument of ` +
-                    `invocation has wrong type. Expected: ${argument.type}, received: ` +
-                    `${Interpreter_1.describe(value)}`);
-            }
-            scope.addVariable(argument.name, {
-                type: value.type,
-                value: value.value,
+                scope.addVariable(argument.name, {
+                    types: [value.type],
+                    value,
+                });
             });
-        });
-        // Rest arg
-        if (functionValue.expr.restArgName !== null) {
-            scope.addVariable(functionValue.expr.restArgName, {
-                type: 'list',
-                value: args.slice(functionValue.expr.arguments.length),
+            // Rest arg
+            if (functionValue.expr.restArgName !== null) {
+                scope.addVariable(functionValue.expr.restArgName, {
+                    types: ['list'],
+                    value: {
+                        type: 'list',
+                        value: args.slice(functionValue.expr.arguments.length),
+                    },
+                });
+            }
+            // Restore captured variables
+            functionValue.captured.forEach(captured => {
+                scope.addVariable(captured.name, captured.value);
             });
+            // Invoke function
+            const evaluatedValue = evaluator(functionValue.expr.expression);
+            const registerValue = scope.getRegister('return');
+            // Prioritize register value
+            if (registerValue.type === 'null') {
+                // Only use evaluated value if no return or setReturn statement is
+                // executed.
+                return evaluatedValue;
+            }
+            else {
+                return registerValue;
+            }
         }
-        // Restore captured variables
-        functionValue.captured.forEach(captured => {
-            scope.addVariable(captured.name, captured.value);
-        });
-        // Invoke function
-        const evaluatedValue = evaluator(functionValue.expr.expression);
-        const registerValue = scope.getRegister('return');
-        // Prioritize register value
-        if (registerValue.type === 'null') {
-            // Only use evaluated value if no return or setReturn statement is
-            // executed.
-            return evaluatedValue;
+        catch (error) {
+            if ((error instanceof Interpreter_1.BubbleSignal) &&
+                (error.type === Interpreter_1.BubbleSignalType.RETURN)) {
+                return scope.getRegister('return');
+            }
+            throw error;
         }
-        else {
-            return registerValue;
+        finally {
+            popScope();
         }
     }
-    catch (error) {
-        if ((error instanceof Interpreter_1.BubbleSignal) &&
-            (error.type === Interpreter_1.BubbleSignalType.RETURN)) {
-            return scope.getRegister('return');
-        }
-        throw error;
-    }
-    finally {
-        popScope();
+    else {
+        let fn = functionValue;
+        const leftApplied = [];
+        const rightApplied = [];
+        do {
+            if (fn.isLeft) {
+                leftApplied.unshift(...fn.applied);
+            }
+            else {
+                rightApplied.push(...fn.applied);
+            }
+            fn = fn.targetFn.value;
+        } while (fn.fnType === 'partial');
+        return invokeFunctionRaw(fn, [...leftApplied, ...args, ...rightApplied], interpreterHandle);
     }
 }
 exports.invokeFunctionRaw = invokeFunctionRaw;
@@ -2944,7 +3157,7 @@ exports.reverseInvocation = autoEvaluated_1.autoEvaluated((arg0, arg1, expr, int
     }
 });
 
-},{"./Interpreter":35,"./WTCDError":37,"./autoEvaluated":38,"./std/utils":49}],41:[function(require,module,exports){
+},{"./Interpreter":35,"./WTCDError":37,"./autoEvaluated":38,"./constantsPool":39,"./std/utils":49}],41:[function(require,module,exports){
 "use strict";
 // This file defines all infix and prefix operators in WTCD.
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -2998,18 +3211,18 @@ arg1Type, fn) {
                 `has to be a variable reference`);
         }
         const varRef = interpreterHandle.resolveVariableReference(expr.arg0.variableName);
-        if (varRef.type !== arg0Type) {
+        if (varRef.value.type !== arg0Type) {
             throw WTCDError_1.WTCDError.atLocation(expr, `Left side of binary operator "${expr.operator}" has to be a ` +
-                `variable of type ${arg0Type}, actual type: ${varRef.type}`);
+                `variable of type ${arg0Type}, actual type: ${varRef.value.type}`);
         }
         const arg1 = interpreterHandle.evaluator(expr.arg1);
         if (arg1.type !== arg1Type) {
             throw WTCDError_1.WTCDError.atLocation(expr, `Right side of binary operator "${expr.operator}" ` +
                 ` has to be a ${arg1Type}, received: ${Interpreter_1.describe(arg1)}`);
         }
-        const newValue = fn(varRef.value, arg1.value, expr, interpreterHandle);
+        const newValue = constantsPool_1.getMaybePooled(arg0Type, fn(varRef.value.value, arg1.value, expr, interpreterHandle));
         varRef.value = newValue;
-        return constantsPool_1.getMaybePooled(arg0Type, newValue);
+        return newValue;
     };
 }
 exports.binaryOperators = new Map([
@@ -3022,11 +3235,7 @@ exports.binaryOperators = new Map([
                 }
                 const varRef = resolveVariableReference(expr.arg0.variableName);
                 const arg1 = evaluator(expr.arg1);
-                if (arg1.type !== varRef.type) {
-                    throw WTCDError_1.WTCDError.atLocation(expr, `Variable "${expr.arg0.variableName}" can only hold ` +
-                        `values of type ${varRef.type}. Received ${Interpreter_1.describe(arg1)}`);
-                }
-                varRef.value = arg1.value;
+                Interpreter_1.assignValueToVariable(varRef, arg1, expr, expr.arg0.variableName);
                 return arg1;
             },
         }],
@@ -3038,18 +3247,18 @@ exports.binaryOperators = new Map([
                         `has to be a variable reference`);
                 }
                 const varRef = resolveVariableReference(expr.arg0.variableName);
-                if (varRef.type !== 'string' && varRef.type !== 'number') {
+                if (varRef.value.type !== 'string' && varRef.value.type !== 'number') {
                     throw WTCDError_1.WTCDError.atLocation(expr, `Left side of binary operator "+=" has to be a ` +
-                        `variable of type number or string, actual type: ${varRef.type}`);
+                        `variable of type number or string, actual type: ${varRef.value.type}`);
                 }
                 const arg1 = evaluator(expr.arg1);
-                if (arg1.type !== varRef.type) {
+                if (arg1.type !== varRef.value.type) {
                     throw WTCDError_1.WTCDError.atLocation(expr, `Right side of binary operator "+=" has to ` +
-                        ` be a ${varRef.type}, received: ${Interpreter_1.describe(arg1)}`);
+                        ` be a ${varRef.value.type}, received: ${Interpreter_1.describe(arg1)}`);
                 }
-                const newValue = varRef.value + arg1.value;
+                const newValue = constantsPool_1.getMaybePooled(varRef.value.type, varRef.value.value + arg1.value);
                 varRef.value = newValue;
-                return constantsPool_1.getMaybePooled(varRef.type, newValue);
+                return newValue;
             },
         }],
     ['-=', {
@@ -3146,11 +3355,11 @@ exports.binaryOperators = new Map([
         }],
     ['==', {
             precedence: 11,
-            fn: autoEvaluated_1.autoEvaluated((arg0, arg1, expr, interpreterHandle) => (constantsPool_1.getMaybePooled('boolean', Interpreter_1.isEqual(arg0, arg1)))),
+            fn: autoEvaluated_1.autoEvaluated((arg0, arg1) => (constantsPool_1.getMaybePooled('boolean', Interpreter_1.isEqual(arg0, arg1)))),
         }],
     ['!=', {
             precedence: 11,
-            fn: autoEvaluated_1.autoEvaluated((arg0, arg1) => (constantsPool_1.getMaybePooled('boolean', (arg0.type !== arg1.type) || (arg0.value !== arg1.value)))),
+            fn: autoEvaluated_1.autoEvaluated((arg0, arg1) => (constantsPool_1.getMaybePooled('boolean', !Interpreter_1.isEqual(arg0, arg1)))),
         }],
     ['<', {
             precedence: 12,
@@ -3219,12 +3428,13 @@ exports.binaryOperators = new Map([
                     throw WTCDError_1.WTCDError.atLocation(expr, `Right side of binary operator "." ` +
                         `is expected to be an integer. Received: ${arg1}`);
                 }
-                if (arg1.value >= arg0.value.length) {
+                const value = arg0.value[arg1.value];
+                if (value === undefined) {
                     throw WTCDError_1.WTCDError.atLocation(expr, `List does not have an element at ` +
                         `${arg1.value}. If return null is desired, use ".?" instead. List ` +
                         `contents: ${Interpreter_1.describe(arg0)}`);
                 }
-                return arg0.value[arg1.value];
+                return value;
             }),
         }],
     ['.?', {
@@ -3297,6 +3507,56 @@ exports.binaryOperators = new Map([
             precedence: 20,
             fn: invokeFunction_1.regularInvocation,
         }],
+    ['.:', {
+            precedence: 20,
+            fn: autoEvaluated_1.autoEvaluated((arg0, arg1, expr) => {
+                if (arg0.type !== 'function') {
+                    throw WTCDError_1.WTCDError.atLocation(expr, `Left side of binary operator ".:" ` +
+                        `is expected to be a function. Received: ${arg0}`);
+                }
+                if (arg1.type !== 'list') {
+                    throw WTCDError_1.WTCDError.atLocation(expr, `Right side of binary operator ".:" ` +
+                        `is expected to be a list. Received: ${arg1}`);
+                }
+                if (arg1.value.length === 0) {
+                    return arg0;
+                }
+                return {
+                    type: 'function',
+                    value: {
+                        fnType: 'partial',
+                        isLeft: false,
+                        applied: arg1.value,
+                        targetFn: arg0,
+                    },
+                };
+            }),
+        }],
+    [':.', {
+            precedence: 20,
+            fn: autoEvaluated_1.autoEvaluated((arg0, arg1, expr) => {
+                if (arg0.type !== 'function') {
+                    throw WTCDError_1.WTCDError.atLocation(expr, `Left side of binary operator ":." ` +
+                        `is expected to be a function. Received: ${arg0}`);
+                }
+                if (arg1.type !== 'list') {
+                    throw WTCDError_1.WTCDError.atLocation(expr, `Right side of binary operator ":." ` +
+                        `is expected to be a list. Received: ${arg1}`);
+                }
+                if (arg1.value.length === 0) {
+                    return arg0;
+                }
+                return {
+                    type: 'function',
+                    value: {
+                        fnType: 'partial',
+                        isLeft: true,
+                        applied: arg1.value,
+                        targetFn: arg0,
+                    },
+                };
+            }),
+        }],
 ]);
 exports.conditionalOperatorPrecedence = 4;
 exports.operators = new Set([...exports.unaryOperators.keys(), ...exports.binaryOperators.keys(), '?', ':', '...']);
@@ -3305,6 +3565,7 @@ exports.operators = new Set([...exports.unaryOperators.keys(), ...exports.binary
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const constantsPool_1 = require("../constantsPool");
+const Interpreter_1 = require("../Interpreter");
 const utils_1 = require("./utils");
 exports.contentStdFunctions = [
     function contentAddParagraph(args, interpreterHandle) {
@@ -3354,9 +3615,52 @@ exports.contentStdFunctions = [
         interpreterHandle.pushContent($header);
         return constantsPool_1.getMaybePooled('null', null);
     },
+    function contentAddTable(args, interpreterHandle) {
+        utils_1.assertArgsLength(args, 1, Infinity);
+        const rows = args
+            .map((_, index) => utils_1.assertArgType(args, index, 'list'));
+        rows.forEach((row, rowIndex) => {
+            if (row.length !== rows[0].length) {
+                throw new utils_1.NativeFunctionError(`Row with index = ${rowIndex} has ` +
+                    `incorrect number of items. Expecting ${rows[0].length}, received ` +
+                    `${row.length}`);
+            }
+            row.forEach((item, columnIndex) => {
+                if (item.type !== 'string') {
+                    throw new utils_1.NativeFunctionError(`Item in row with index = ${rowIndex}` +
+                        `, and column with index = ${columnIndex} is expected to be a ` +
+                        `string, received: ${Interpreter_1.describe(item)}`);
+                }
+            });
+        });
+        const $table = document.createElement('table');
+        const $thead = document.createElement('thead');
+        const $headTr = document.createElement('tr');
+        const headerRow = rows.shift();
+        headerRow.forEach(content => {
+            const $th = document.createElement('th');
+            $th.innerText = content.value;
+            $headTr.appendChild($th);
+        });
+        $thead.appendChild($headTr);
+        $table.appendChild($thead);
+        const $tbody = document.createElement('tbody');
+        rows.forEach(row => {
+            const $tr = document.createElement('tr');
+            row.forEach(content => {
+                const $td = document.createElement('td');
+                $td.innerText = content.value;
+                $tr.appendChild($td);
+            });
+            $tbody.appendChild($tr);
+        });
+        $table.appendChild($tbody);
+        interpreterHandle.pushContent($table);
+        return constantsPool_1.getMaybePooled('null', null);
+    },
 ];
 
-},{"../constantsPool":39,"./utils":49}],43:[function(require,module,exports){
+},{"../Interpreter":35,"../constantsPool":39,"./utils":49}],43:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const constantsPool_1 = require("../constantsPool");
@@ -3444,6 +3748,7 @@ exports.stdFunctions = [
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const constantsPool_1 = require("../constantsPool");
+const Interpreter_1 = require("../Interpreter");
 const invokeFunction_1 = require("../invokeFunction");
 const WTCDError_1 = require("../WTCDError");
 const utils_1 = require("./utils");
@@ -3484,7 +3789,7 @@ exports.listStdFunctions = [
             catch (error) {
                 if (error instanceof invokeFunction_1.FunctionInvocationError) {
                     throw new utils_1.NativeFunctionError(`Failed to apply function to the ` +
-                        `${index}th element of list: ${error.message}`);
+                        `element with index = ${index} of list: ${error.message}`);
                 }
                 else if (error instanceof WTCDError_1.WTCDError) {
                     error.pushWTCDStack(`listForEach (index = ${index})`);
@@ -3508,10 +3813,10 @@ exports.listStdFunctions = [
             catch (error) {
                 if (error instanceof invokeFunction_1.FunctionInvocationError) {
                     throw new utils_1.NativeFunctionError(`Failed to apply function to the ` +
-                        `${index}th element of list: ${error.message}`);
+                        `element with index = ${index} of list: ${error.message}`);
                 }
                 else if (error instanceof WTCDError_1.WTCDError) {
-                    error.pushWTCDStack(`listForEach (index = ${index})`);
+                    error.pushWTCDStack(`listForMap (index = ${index})`);
                 }
                 throw error;
             }
@@ -3559,9 +3864,153 @@ exports.listStdFunctions = [
             value: results,
         };
     },
+    function listFilter(args, interpreterHandle) {
+        utils_1.assertArgsLength(args, 2);
+        const list = utils_1.assertArgType(args, 0, 'list');
+        const fn = utils_1.assertArgType(args, 1, 'function');
+        return {
+            type: 'list',
+            value: list.filter((item, index) => {
+                try {
+                    const result = invokeFunction_1.invokeFunctionRaw(fn, [
+                        item,
+                        constantsPool_1.getMaybePooled('number', index),
+                    ], interpreterHandle);
+                    if (result.type !== 'boolean') {
+                        throw new utils_1.NativeFunctionError(`Predicate is expected to return ` +
+                            `booleans, but ${Interpreter_1.describe(result)} is returned for element ` +
+                            `with index = ${index}`);
+                    }
+                    return result.value;
+                }
+                catch (error) {
+                    if (error instanceof invokeFunction_1.FunctionInvocationError) {
+                        throw new utils_1.NativeFunctionError(`Failed to apply function to the ` +
+                            `element with index = ${index} of list: ${error.message}`);
+                    }
+                    else if (error instanceof WTCDError_1.WTCDError) {
+                        error.pushWTCDStack(`listFilter (index = ${index})`);
+                    }
+                    throw error;
+                }
+            }),
+        };
+    },
+    function listSplice(args) {
+        utils_1.assertArgsLength(args, 3, 4);
+        const source = utils_1.assertArgType(args, 0, 'list');
+        const start = utils_1.assertArgType(args, 1, 'number');
+        const length = utils_1.assertArgType(args, 2, 'number');
+        const newItems = utils_1.assertArgType(args, 3, 'list', []);
+        if (start % 1 !== 0) {
+            throw new utils_1.NativeFunctionError('Start index must be an integer, ' +
+                `provided: ${start}`);
+        }
+        if (start < 0 || start >= source.length) {
+            throw new utils_1.NativeFunctionError(`Start index must be in the bounds of ` +
+                `the list given (0 - ${source.length - 1}), provided: ${start}`);
+        }
+        if (length % 1 !== 0) {
+            throw new utils_1.NativeFunctionError('Start must be an integer.');
+        }
+        if (length < 0) {
+            throw new utils_1.NativeFunctionError('Length must be nonnegative.');
+        }
+        if ((start + length) > source.length) {
+            throw new utils_1.NativeFunctionError(`Length is too large and causes overflow.`);
+        }
+        const result = source.slice();
+        result.splice(start, length, ...newItems);
+        return {
+            type: 'list',
+            value: result,
+        };
+    },
+    function listSlice(args) {
+        utils_1.assertArgsLength(args, 2, 3);
+        const source = utils_1.assertArgType(args, 0, 'list');
+        const start = utils_1.assertArgType(args, 1, 'number');
+        const end = utils_1.assertArgType(args, 2, 'number', source.length);
+        if (start % 1 !== 0) {
+            throw new utils_1.NativeFunctionError('Start index must be an integer, ' +
+                `provided: ${start}`);
+        }
+        if (start < 0 || start >= source.length) {
+            throw new utils_1.NativeFunctionError(`Start index must be in the bounds of ` +
+                `the list given (0 - ${source.length - 1}), provided: ${start}`);
+        }
+        if (end % 1 !== 0) {
+            throw new utils_1.NativeFunctionError('End index must be an integer, ' +
+                `provided: ${end}`);
+        }
+        if (end < 0 || end > source.length) {
+            throw new utils_1.NativeFunctionError(`End index must be in the bounds of ` +
+                `the list given (0 - ${source.length}), provided: ${end}`);
+        }
+        if (end < start) {
+            throw new utils_1.NativeFunctionError(`End index must be larger or equal to ` +
+                `start index. Provided start = ${start}, end = ${end}`);
+        }
+        return {
+            type: 'list',
+            value: source.slice(start, end),
+        };
+    },
+    function listLength(args) {
+        utils_1.assertArgsLength(args, 1);
+        return constantsPool_1.getMaybePooled('number', utils_1.assertArgType(args, 0, 'list').length);
+    },
+    function listIndexOf(args) {
+        utils_1.assertArgsLength(args, 2);
+        const list = utils_1.assertArgType(args, 0, 'list');
+        for (let i = 0; i < list.length; i++) {
+            if (Interpreter_1.isEqual(list[i], args[1])) {
+                return constantsPool_1.getMaybePooled('number', i);
+            }
+        }
+        return constantsPool_1.getMaybePooled('number', -1);
+    },
+    function listIncludes(args) {
+        utils_1.assertArgsLength(args, 2);
+        const list = utils_1.assertArgType(args, 0, 'list');
+        return constantsPool_1.getMaybePooled('boolean', list.some(item => Interpreter_1.isEqual(item, args[1])));
+    },
+    function listFindIndex(args, interpreterHandle) {
+        utils_1.assertArgsLength(args, 2);
+        const list = utils_1.assertArgType(args, 0, 'list');
+        const fn = utils_1.assertArgType(args, 1, 'function');
+        for (let i = 0; i < list.length; i++) {
+            const item = list[i];
+            try {
+                const result = invokeFunction_1.invokeFunctionRaw(fn, [
+                    item,
+                    constantsPool_1.getMaybePooled('number', i),
+                ], interpreterHandle);
+                if (result.type !== 'boolean') {
+                    throw new utils_1.NativeFunctionError(`Predicate is expected to return ` +
+                        `booleans, but ${Interpreter_1.describe(result)} is returned for element ` +
+                        `with index = ${i}`);
+                }
+                if (result.value) {
+                    return constantsPool_1.getMaybePooled('number', i);
+                }
+            }
+            catch (error) {
+                if (error instanceof invokeFunction_1.FunctionInvocationError) {
+                    throw new utils_1.NativeFunctionError(`Failed to apply function to the ` +
+                        `element with index = ${i} of list: ${error.message}`);
+                }
+                else if (error instanceof WTCDError_1.WTCDError) {
+                    error.pushWTCDStack(`listFindIndex (index = ${i})`);
+                }
+                throw error;
+            }
+        }
+        return constantsPool_1.getMaybePooled('number', -1);
+    },
 ];
 
-},{"../WTCDError":37,"../constantsPool":39,"../invokeFunction":40,"./utils":49}],46:[function(require,module,exports){
+},{"../Interpreter":35,"../WTCDError":37,"../constantsPool":39,"../invokeFunction":40,"./utils":49}],46:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const constantsPool_1 = require("../constantsPool");
@@ -3631,7 +4080,7 @@ exports.randomStdFunctions = [
             throw new utils_1.NativeFunctionError('Low cannot be larger than or equal to ' +
                 'high.');
         }
-        if (bias < low || bias >= high) {
+        if (bias < low || bias > high) {
             throw new utils_1.NativeFunctionError('Bias has to be between low and high.');
         }
         let norm;
@@ -3658,6 +4107,26 @@ exports.stringStdFunctions = [
         utils_1.assertArgsLength(args, 1);
         const str = utils_1.assertArgType(args, 0, 'string');
         return constantsPool_1.getMaybePooled('number', str.length);
+    },
+    function stringFormatNumberFixed(args) {
+        utils_1.assertArgsLength(args, 1, 2);
+        const num = utils_1.assertArgType(args, 0, 'number');
+        const digits = utils_1.assertArgType(args, 1, 'number', 0);
+        if (digits < 0 || digits > 100 || digits % 1 !== 0) {
+            throw new utils_1.NativeFunctionError('Digits must be an integer between 0 and ' +
+                `100, received: ${digits}`);
+        }
+        return constantsPool_1.getMaybePooled('string', num.toFixed(digits));
+    },
+    function stringFormatNumberPrecision(args) {
+        utils_1.assertArgsLength(args, 2);
+        const num = utils_1.assertArgType(args, 0, 'number');
+        const digits = utils_1.assertArgType(args, 1, 'number');
+        if (digits < 1 || digits > 100 || digits % 1 !== 0) {
+            throw new utils_1.NativeFunctionError('Digits must be an integer between 1 and ' +
+                `100, received: ${digits}`);
+        }
+        return constantsPool_1.getMaybePooled('string', num.toPrecision(digits));
     },
 ];
 
@@ -3699,7 +4168,7 @@ function assertArgType(args, index, type, defaultValue) {
         return defaultValue;
     }
     if (value.type !== type) {
-        throw new NativeFunctionError(`The ${index}th argument of ` +
+        throw new NativeFunctionError(`The argument with index = ${index} of ` +
             `invocation has wrong type. Expected: ${type}, received: ` +
             `${Interpreter_1.describe(value)}`);
     }
@@ -3724,7 +4193,7 @@ function flat(arr) {
 }
 exports.flat = flat;
 function arrayEquals(arr0, arr1, comparator = (e0, e1) => e0 === e1) {
-    return arr0.every((e0, index) => comparator(e0, arr1[index]));
+    return (arr0.length === arr1.length) && arr0.every((e0, index) => comparator(e0, arr1[index]));
 }
 exports.arrayEquals = arrayEquals;
 

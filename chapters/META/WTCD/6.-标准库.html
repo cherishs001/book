@@ -33,6 +33,47 @@ indexSum // 10
 <p>将 <code>targetList</code> 分成若干个列表，每个列表的长度为 <code>chunkSize</code>。</p>
 <pre><code class="language-wtcd">listChunk::[[ 1 2 3 4 5 6 7 8 9 10 ] 3 ] == [ [ 1 2 3 ] [ 4 5 6 ] [ 7 8 9 ] [ 10 ] ]
 </code></pre>
+<h3>6.1.6 <code>listFilter</code></h3>
+<p>接受 2 个参数：<code>list targetList</code>，<code>function fn</code>。</p>
+<p>对 <code>targetList</code> 中每一项运行 <code>fn</code>。<code>fn</code> 的第一个参数是这一项的值，第二个参数是这一项的下标，并要求返回一个布尔值。然后，将所有返回 true 的项目合在一起形成一个新的列表并返回。</p>
+<pre><code class="language-wtcd">listFilter::[[ 1 2 3 4 5 6 7 8 ] function[number a] a % 2 == 0] == [ 2 4 6 8 ]
+</code></pre>
+<h3>6.1.7 <code>listSplice</code></h3>
+<p>接受 3 - 4 个参数：<code>list source</code>，<code>number start</code>，<code>number length</code>，<code>list newItems = []</code>。</p>
+<p>从 <code>source</code> 的 index = <code>start</code> 的元素开始，删除 <code>length</code> 个元素，并用 <code>newItems</code> 中的元素代替。返回修改后的列表。（不会修改原始列表）</p>
+<pre><code class="language-wtcd">listSplice::[[ 0 1 2 3 ] 1 2] == [ 0 3 ]
+listSplice::[[ 0 1 2 3 ] 1 2 [ &quot;Wow1&quot; &quot;Wow2&quot; ]] == [ 0 &quot;Wow1&quot; &quot;Wow2&quot; 3]
+</code></pre>
+<h3>6.1.8 <code>listSlice</code></h3>
+<p>接受 2 - 3 个参数：<code>list source</code>，<code>number start</code>，<code>number end = listLength::[source]</code>。</p>
+<p>复制从 <code>source</code> 的 index = <code>start</code>（含）开始到 index = <code>end</code>（不含）的元素。</p>
+<pre><code class="language-wtcd">    assert::[listSlice::[[ 0 1 2 3 4 5 ] 2] == [ 2 3 4 5 ]]
+    assert::[listSlice::[[ 0 1 2 3 4 5 ] 2 4] == [ 2 3 ]]
+</code></pre>
+<h3>6.1.9 <code>listLength</code></h3>
+<p>接受 1 个参数：<code>list targetList</code>。</p>
+<p>返回 <code>targetList</code> 的元素数量。</p>
+<pre><code class="language-wtcd">listLength::[[ 0 1 2 3 4 ]] == 5
+</code></pre>
+<h3>6.1.10 <code>listIndexOf</code></h3>
+<p>接受 2 个参数：<code>list targetList</code>，<code>target</code>。</p>
+<p>找 <code>targetList</code> 中第一个 == <code>target</code> 的元素，返回其 index。若无法找到，返回 -1。</p>
+<pre><code class="language-wtcd">assert::[listIndexOf::[[ 0 1 2 3 ] 2] == 2]
+assert::[listIndexOf::[[ 0 1 2 3 ] 4] == -1]
+</code></pre>
+<h3>6.1.11 <code>listIncludes</code></h3>
+<p>接受 2 个参数：<code>list targetList</code>，<code>target</code>。</p>
+<p>判断 <code>targetList</code> 中是否有 == <code>target</code> 的元素。</p>
+<pre><code class="language-wtcd">assert::[listIncludes::[[ 0 1 2 3 ] 2] == true]
+assert::[listIncludes::[[ 0 1 2 3 ] 4] == false]
+</code></pre>
+<h3>6.1.12 <code>listFindIndex</code></h3>
+<p>接受 2 个参数：<code>list targetList</code>，<code>function predicate</code>。</p>
+<p>对 <code>targetList</code> 中每一项依次运行 <code>fn</code>。<code>fn</code> 的第一个参数是这一项的值，第二个参数是这一项的下标，并要求返回一个布尔值。当任意一个 <code>predicate</code> 返回 true 时，返回该项的 index。如果没有一项能使 <code>predicate</code> 返回 true，否则返回 -1。</p>
+<pre><code class="language-wtcd">assert::[listFindIndex::[[ 1 3 5 8 9 11 14 ] $[item] item % 2 == 0] == 3]
+assert::[listFindIndex::[[ 1 3 5 8 9 11 14 ] $[item index] index == 4] == 4]
+assert::[listFindIndex::[[ 1 3 5 8 9 11 14 ] $[item] false] == -1]
+</code></pre>
 <h2>6.2 <code>math*</code></h2>
 <h3>6.2.1 <code>mathMin</code></h3>
 <p>接受 1 个及以上的数字。返回其中最小的值。</p>
@@ -52,6 +93,15 @@ mathFloor::[-11.8] == -12
 <p>接受 1 个参数：<code>string input</code>。返回 <code>input</code> 的长度。</p>
 <pre><code class="language-wtcd">stringLength::[&quot;Hello~&quot;] == 6
 </code></pre>
+<h3>6.3.2 <code>stringFormatNumberFixed</code></h3>
+<p>接受 1 个参数：<code>number target</code>，<code>number digits = 0</code>。返回将 <code>target</code> 四舍五入到 <code>digits</code> 位小数后的字符串。</p>
+<pre><code class="language-wtcd">stringFormatNumberFixed::[1.235 2] == &quot;1.24&quot;
+</code></pre>
+<h3>6.3.3 <code>stringFormatNumberPrecision</code></h3>
+<p>接受 2 个参数：<code>number target</code>，<code>number digits</code>。返回将 <code>target</code> 四舍五入到保留 <code>digits</code> 位数字后的字符串。</p>
+<pre><code class="language-wtcd">stringFormatNumberPrecision::[1.235 2] == &quot;1.2&quot;
+stringFormatNumberPrecision::[1234 2] == &quot;1.2e+3&quot;
+</code></pre>
 <h2>6.4 <code>random*</code></h2>
 <h3>6.4.1 <code>random</code></h3>
 <p>接受 0 - 2 个参数：<code>number low = 0</code>，<code>number high = 1</code>。</p>
@@ -64,7 +114,7 @@ mathFloor::[-11.8] == -12
 <p>返回一个有 <code>trueChance</code> 为 <code>true</code> 的随机布尔值。</p>
 <h3>6.4.4 <code>randomBiased</code></h3>
 <p><strong>实验性，尚未确认</strong></p>
-<p>接受 0 - 4 个参数：<code>number low = 0</code>，<code>number high = 1</code>，<code>number bias = (low + high) / 2</code>，<code>number influence = 4</code>。</p>
+<p>接受 0 - 4 个参数：<code>number low = 0</code>，<code>number high = 1</code>，<code>number bias = (low + high) / 2</code>，<code>number influence = 3</code>。</p>
 <p>返回一个大于等于 <code>low</code>，小于 <code>high</code>，偏向于 <code>bias</code>，影响系数为 <code>influence</code> 的随机浮点数。</p>
 <h2>6.5 <code>content*</code></h2>
 <h3>6.5.1 <code>contentAddParagraph</code></h3>
@@ -82,6 +132,14 @@ mathFloor::[-11.8] == -12
 <h3>6.5.5 <code>contentAddHeader</code></h3>
 <p>接受 1 - 2 个参数：<code>string content</code>，<code>number level = 1</code>。</p>
 <p>创建并插入一个级别为 <code>level</code>，内容为 <code>content</code> 的标题。</p>
+<h3>6.5.6 <code>contentAddTable</code></h3>
+<p>接受 1 个及以上的参数。每一个参数都是长度相同的列表。每一个列表对应表格的一行。第一行作为表头。</p>
+<pre><code class="language-wtcd">contentAddTable::[
+  [ &quot;名字&quot; &quot;年龄&quot; &quot;性别&quot; ]
+  [ &quot;琳&quot;   &quot;16&quot;   &quot;女&quot;   ]
+  [ &quot;czp&quot;  &quot;？&quot;   &quot;男&quot;   ]
+]
+</code></pre>
 <h2>6.6 Debug</h2>
 <h3>6.6.1 <code>print</code></h3>
 <p>接受任意数量个参数。将这些值打印到浏览器控制台。</p>

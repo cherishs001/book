@@ -473,7 +473,7 @@ window.DATA={
                 "isEarlyAccess": false,
                 "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/72",
                 "htmlRelativePath": "META/WTCD/2.-变量、表达式及语句.html",
-                "chapterCharCount": 5599
+                "chapterCharCount": 5715
               },
               {
                 "displayName": "3. Section",
@@ -517,7 +517,7 @@ window.DATA={
                 "isEarlyAccess": false,
                 "commentsUrl": null,
                 "htmlRelativePath": "META/WTCD/6.-标准库.html",
-                "chapterCharCount": 2516
+                "chapterCharCount": 4545
               },
               {
                 "displayName": "7. 流程控制",
@@ -531,6 +531,17 @@ window.DATA={
                 "chapterCharCount": 774
               },
               {
+                "displayName": "文档债",
+                "displayIndex": 9997,
+                "name": "9997 - 文档债",
+                "sourceRelativePath": "5 - META/1 - WTCD/9997 - 文档债.md",
+                "type": "Markdown",
+                "isEarlyAccess": false,
+                "commentsUrl": null,
+                "htmlRelativePath": "META/WTCD/文档债.html",
+                "chapterCharCount": 96
+              },
+              {
                 "displayName": "变化日志",
                 "displayIndex": 9998,
                 "name": "9998 - 变化日志",
@@ -539,7 +550,7 @@ window.DATA={
                 "isEarlyAccess": false,
                 "commentsUrl": null,
                 "htmlRelativePath": "META/WTCD/变化日志.html",
-                "chapterCharCount": 199
+                "chapterCharCount": 498
               },
               {
                 "displayName": "计划功能",
@@ -639,6 +650,17 @@ window.DATA={
                     "chapterCharCount": 0
                   },
                   {
+                    "displayName": "函数 Action",
+                    "displayIndex": 8,
+                    "name": "8 - 函数 Action",
+                    "sourceRelativePath": "5 - META/1 - WTCD/1 - 例子/8 - 函数 Action.wtcd",
+                    "type": "WTCD",
+                    "isEarlyAccess": false,
+                    "commentsUrl": null,
+                    "htmlRelativePath": "META/WTCD/例子/函数-Action.html",
+                    "chapterCharCount": 26
+                  },
+                  {
                     "displayName": "琳的玩具店",
                     "displayIndex": 10,
                     "name": "10 - 琳的玩具店",
@@ -662,13 +684,13 @@ window.DATA={
                   }
                 ],
                 "subFolders": [],
-                "folderCharCount": 3455
+                "folderCharCount": 3481
               }
             ],
-            "folderCharCount": 27823
+            "folderCharCount": 30389
           }
         ],
-        "folderCharCount": 28238
+        "folderCharCount": 30804
       },
       {
         "displayName": "杂项",
@@ -693,10 +715,10 @@ window.DATA={
         "folderCharCount": 1361
       }
     ],
-    "folderCharCount": 172708
+    "folderCharCount": 175274
   },
-  "charsCount": 172708,
-  "paragraphsCount": 3508,
+  "charsCount": 175274,
+  "paragraphsCount": 3527,
   "keywordsCount": [
     [
       "高潮",
@@ -771,5 +793,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "325"
+  "buildNumber": "326"
 };
