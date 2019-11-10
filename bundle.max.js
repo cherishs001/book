@@ -3422,11 +3422,11 @@ exports.binaryOperators = new Map([
             fn: autoEvaluated_1.autoEvaluated((arg0, arg1, expr) => {
                 if (arg0.type !== 'list') {
                     throw WTCDError_1.WTCDError.atLocation(expr, `Left side of binary operator "." ` +
-                        `is expected to be a list. Received: ${arg0}`);
+                        `is expected to be a list. Received: ${Interpreter_1.describe(arg0)}`);
                 }
                 if (arg1.type !== 'number' || arg1.value % 1 !== 0) {
                     throw WTCDError_1.WTCDError.atLocation(expr, `Right side of binary operator "." ` +
-                        `is expected to be an integer. Received: ${arg1}`);
+                        `is expected to be an integer. Received: ${Interpreter_1.describe(arg1)}`);
                 }
                 const value = arg0.value[arg1.value];
                 if (value === undefined) {
@@ -3442,11 +3442,11 @@ exports.binaryOperators = new Map([
             fn: autoEvaluated_1.autoEvaluated((arg0, arg1, expr) => {
                 if (arg0.type !== 'list') {
                     throw WTCDError_1.WTCDError.atLocation(expr, `Left side of binary operator ".?" ` +
-                        `is expected to be a list. Received: ${arg0}`);
+                        `is expected to be a list. Received: ${Interpreter_1.describe(arg0)}`);
                 }
                 if (arg1.type !== 'number' || arg1.value % 1 !== 0) {
                     throw WTCDError_1.WTCDError.atLocation(expr, `Right side of binary operator ".?" ` +
-                        `is expected to be an integer. Received: ${arg1}`);
+                        `is expected to be an integer. Received: ${Interpreter_1.describe(arg1)}`);
                 }
                 const value = arg0.value[arg1.value];
                 if (value === undefined) {
@@ -3464,12 +3464,12 @@ exports.binaryOperators = new Map([
                 }
                 if (arg0.type !== 'list') {
                     throw WTCDError_1.WTCDError.atLocation(expr, `Left side of binary operator "?." ` +
-                        `is expected to be a list or null. Received: ${arg0}`);
+                        `is expected to be a list or null. Received: ${Interpreter_1.describe(arg0)}`);
                 }
                 const arg1 = evaluator(expr.arg1);
                 if (arg1.type !== 'number' || arg1.value % 1 !== 0) {
                     throw WTCDError_1.WTCDError.atLocation(expr, `Right side of binary operator "?." ` +
-                        `is expected to be an integer. Received: ${arg1}`);
+                        `is expected to be an integer. Received: ${Interpreter_1.describe(arg1)}`);
                 }
                 const value = arg0.value[arg1.value];
                 if (value === undefined) {
@@ -3489,12 +3489,12 @@ exports.binaryOperators = new Map([
                 }
                 if (arg0.type !== 'list') {
                     throw WTCDError_1.WTCDError.atLocation(expr, `Left side of binary operator "?.?" ` +
-                        `is expected to be a list or null. Received: ${arg0}`);
+                        `is expected to be a list or null. Received: ${Interpreter_1.describe(arg0)}`);
                 }
                 const arg1 = evaluator(expr.arg1);
                 if (arg1.type !== 'number' || arg1.value % 1 !== 0) {
                     throw WTCDError_1.WTCDError.atLocation(expr, `Right side of binary operator ` +
-                        `"?.?" is expected to be an integer. Received: ${arg1}`);
+                        `"?.?" is expected to be an integer. Received: ${Interpreter_1.describe(arg1)}`);
                 }
                 const value = arg0.value[arg1.value];
                 if (value === undefined) {
@@ -3512,11 +3512,11 @@ exports.binaryOperators = new Map([
             fn: autoEvaluated_1.autoEvaluated((arg0, arg1, expr) => {
                 if (arg0.type !== 'function') {
                     throw WTCDError_1.WTCDError.atLocation(expr, `Left side of binary operator ".:" ` +
-                        `is expected to be a function. Received: ${arg0}`);
+                        `is expected to be a function. Received: ${Interpreter_1.describe(arg0)}`);
                 }
                 if (arg1.type !== 'list') {
                     throw WTCDError_1.WTCDError.atLocation(expr, `Right side of binary operator ".:" ` +
-                        `is expected to be a list. Received: ${arg1}`);
+                        `is expected to be a list. Received: ${Interpreter_1.describe(arg1)}`);
                 }
                 if (arg1.value.length === 0) {
                     return arg0;
@@ -3537,11 +3537,11 @@ exports.binaryOperators = new Map([
             fn: autoEvaluated_1.autoEvaluated((arg0, arg1, expr) => {
                 if (arg0.type !== 'function') {
                     throw WTCDError_1.WTCDError.atLocation(expr, `Left side of binary operator ":." ` +
-                        `is expected to be a function. Received: ${arg0}`);
+                        `is expected to be a function. Received: ${Interpreter_1.describe(arg0)}`);
                 }
                 if (arg1.type !== 'list') {
                     throw WTCDError_1.WTCDError.atLocation(expr, `Right side of binary operator ":." ` +
-                        `is expected to be a list. Received: ${arg1}`);
+                        `is expected to be a list. Received: ${Interpreter_1.describe(arg1)}`);
                 }
                 if (arg1.value.length === 0) {
                     return arg0;
