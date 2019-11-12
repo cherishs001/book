@@ -398,7 +398,7 @@ window.DATA={
             "isEarlyAccess": false,
             "commentsUrl": null,
             "htmlRelativePath": "道具集/家庭用多功能放置架套装.html",
-            "chapterCharCount": 2086
+            "chapterCharCount": 3754
           },
           {
             "displayName": "使人快乐的 PS4",
@@ -424,7 +424,7 @@ window.DATA={
           }
         ],
         "subFolders": [],
-        "folderCharCount": 33553
+        "folderCharCount": 35221
       },
       {
         "displayName": "META",
@@ -715,14 +715,14 @@ window.DATA={
         "folderCharCount": 1361
       }
     ],
-    "folderCharCount": 175274
+    "folderCharCount": 176942
   },
-  "charsCount": 175274,
-  "paragraphsCount": 3527,
+  "charsCount": 176942,
+  "paragraphsCount": 3545,
   "keywordsCount": [
     [
       "高潮",
-      346
+      349
     ],
     [
       "按摩棒",
@@ -793,5 +793,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "329"
+  "buildNumber": "331"
 };
