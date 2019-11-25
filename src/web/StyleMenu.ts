@@ -59,7 +59,7 @@ class Style {
     attemptInsertRule(`.rect.reading>.content a { color: ${this.def.linkColor}; }`);
     attemptInsertRule(`.rect.reading>.content a:hover { color: ${this.def.linkHoverColor}; }`);
     attemptInsertRule(`.rect.reading>.content a:active { color: ${this.def.linkActiveColor}; }`);
-    attemptInsertRule(`.rect.reading>.content>.earlyAccess.block { background-color: ${this.def.contentBlockEarlyAccessColor}; }`);
+    attemptInsertRule(`.rect.reading .early-access.content-block { background-color: ${this.def.contentBlockEarlyAccessColor}; }`);
     attemptInsertRule(`.rect>.comments>div { background-color: ${this.def.commentColor}; }`);
     attemptInsertRule(`@media (min-width: 901px) { ::-webkit-scrollbar-thumb { background-color: ${this.def.paperBgColor}; } }`);
 

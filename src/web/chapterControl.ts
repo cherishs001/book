@@ -21,6 +21,7 @@ import { Selection, state } from './state';
 const debugLogger = new DebugLogger('chapterControl');
 
 const $content = id('content');
+const $rect = id('rect');
 const chaptersCache = new Map<string, string | null>();
 
 export const loadChapterEvent = new Event<string>();
@@ -69,7 +70,7 @@ const canChapterShown = (chapter: Chapter) =>
 
 const createContentBlock = (type: ContentBlockType, title: string, text: string) => {
   const $block = document.createElement('div');
-  $block.classList.add('block', type);
+  $block.classList.add('content-block', type);
   const $title = document.createElement('h1');
   $title.innerText = title;
   $block.appendChild($title);
@@ -123,8 +124,8 @@ const finalizeChapterLoading = (selection?: Selection) => {
   const chapterIndex = chapterCtx.inFolderIndex;
 
   if (chapterCtx.chapter.isEarlyAccess) {
-    const $block = createContentBlock('earlyAccess', '编写中章节', '请注意，本文正在编写中，因此可能会含有未完成的句子或是尚未更新的信息。');
-    $content.prepend($block);
+    const $block = createContentBlock('early-access', '编写中章节', '请注意，本文正在编写中，因此可能会含有未完成的句子或是尚未更新的信息。');
+    $rect.prepend($block);
   }
 
   const $div = document.createElement('div');
@@ -326,6 +327,8 @@ function insertContent($target: HTMLDivElement, content: string, chapter: Chapte
 export function loadChapter(chapterHtmlRelativePath: string, selection?: Selection) {
   debugLogger.log('Load chapter', chapterHtmlRelativePath, 'selection', selection);
   hideComments();
+  Array.from(document.getElementsByClassName('content-block'))
+    .forEach($block => $block.remove());
   loadChapterEvent.emit(chapterHtmlRelativePath);
   window.localStorage.setItem('lastRead', chapterHtmlRelativePath);
   setRectMode(RectMode.MAIN);

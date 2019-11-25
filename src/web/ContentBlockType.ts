@@ -1,1 +1,1 @@
-export type ContentBlockType = 'earlyAccess';
+export type ContentBlockType = 'early-access';
