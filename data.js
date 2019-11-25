@@ -251,9 +251,9 @@ window.DATA={
             "displayIndex": 3,
             "name": "3 - 艾迦塔调教录像",
             "sourceRelativePath": "2 - 支线/3 - 艾迦塔调教录像.wtcd",
-            "type": "WTCD",
             "isEarlyAccess": false,
-            "commentsUrl": null,
+            "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/88",
+            "type": "WTCD",
             "htmlRelativePath": "支线/艾迦塔调教录像.html",
             "chapterCharCount": 3893
           }
@@ -577,9 +577,9 @@ window.DATA={
                     "displayIndex": 1,
                     "name": "1 - Hello World",
                     "sourceRelativePath": "5 - META/1 - WTCD/1 - 例子/1 - Hello World.wtcd",
-                    "type": "WTCD",
                     "isEarlyAccess": false,
                     "commentsUrl": null,
+                    "type": "WTCD",
                     "htmlRelativePath": "META/WTCD/例子/Hello-World.html",
                     "chapterCharCount": 11
                   },
@@ -588,9 +588,9 @@ window.DATA={
                     "displayIndex": 2,
                     "name": "2 - 稍微复杂点的涉及粉红色遥控器的例子",
                     "sourceRelativePath": "5 - META/1 - WTCD/1 - 例子/2 - 稍微复杂点的涉及粉红色遥控器的例子.wtcd",
-                    "type": "WTCD",
                     "isEarlyAccess": false,
                     "commentsUrl": null,
+                    "type": "WTCD",
                     "htmlRelativePath": "META/WTCD/例子/稍微复杂点的涉及粉红色遥控器的例子.html",
                     "chapterCharCount": 254
                   },
@@ -599,9 +599,9 @@ window.DATA={
                     "displayIndex": 3,
                     "name": "3 - Goto 入栈",
                     "sourceRelativePath": "5 - META/1 - WTCD/1 - 例子/3 - Goto 入栈.wtcd",
-                    "type": "WTCD",
                     "isEarlyAccess": false,
                     "commentsUrl": null,
+                    "type": "WTCD",
                     "htmlRelativePath": "META/WTCD/例子/Goto-入栈.html",
                     "chapterCharCount": 18
                   },
@@ -610,9 +610,9 @@ window.DATA={
                     "displayIndex": 4,
                     "name": "4 - 面向对象（大雾）",
                     "sourceRelativePath": "5 - META/1 - WTCD/1 - 例子/4 - 面向对象（大雾）.wtcd",
-                    "type": "WTCD",
                     "isEarlyAccess": false,
                     "commentsUrl": null,
+                    "type": "WTCD",
                     "htmlRelativePath": "META/WTCD/例子/面向对象（大雾）.html",
                     "chapterCharCount": 45
                   },
@@ -621,9 +621,9 @@ window.DATA={
                     "displayIndex": 5,
                     "name": "5 - 高阶函数工厂",
                     "sourceRelativePath": "5 - META/1 - WTCD/1 - 例子/5 - 高阶函数工厂.wtcd",
-                    "type": "WTCD",
                     "isEarlyAccess": false,
                     "commentsUrl": null,
+                    "type": "WTCD",
                     "htmlRelativePath": "META/WTCD/例子/高阶函数工厂.html",
                     "chapterCharCount": 99
                   },
@@ -632,9 +632,9 @@ window.DATA={
                     "displayIndex": 6,
                     "name": "6 - 选项嵌套",
                     "sourceRelativePath": "5 - META/1 - WTCD/1 - 例子/6 - 选项嵌套.wtcd",
-                    "type": "WTCD",
                     "isEarlyAccess": false,
                     "commentsUrl": null,
+                    "type": "WTCD",
                     "htmlRelativePath": "META/WTCD/例子/选项嵌套.html",
                     "chapterCharCount": 12
                   },
@@ -643,9 +643,9 @@ window.DATA={
                     "displayIndex": 7,
                     "name": "7 - 动态生成内容",
                     "sourceRelativePath": "5 - META/1 - WTCD/1 - 例子/7 - 动态生成内容.wtcd",
-                    "type": "WTCD",
                     "isEarlyAccess": false,
                     "commentsUrl": null,
+                    "type": "WTCD",
                     "htmlRelativePath": "META/WTCD/例子/动态生成内容.html",
                     "chapterCharCount": 0
                   },
@@ -654,9 +654,9 @@ window.DATA={
                     "displayIndex": 8,
                     "name": "8 - 函数 Action",
                     "sourceRelativePath": "5 - META/1 - WTCD/1 - 例子/8 - 函数 Action.wtcd",
-                    "type": "WTCD",
                     "isEarlyAccess": false,
                     "commentsUrl": null,
+                    "type": "WTCD",
                     "htmlRelativePath": "META/WTCD/例子/函数-Action.html",
                     "chapterCharCount": 26
                   },
@@ -665,9 +665,9 @@ window.DATA={
                     "displayIndex": 10,
                     "name": "10 - 琳的玩具店",
                     "sourceRelativePath": "5 - META/1 - WTCD/1 - 例子/10 - 琳的玩具店.wtcd",
-                    "type": "WTCD",
                     "isEarlyAccess": false,
                     "commentsUrl": null,
+                    "type": "WTCD",
                     "htmlRelativePath": "META/WTCD/例子/琳的玩具店.html",
                     "chapterCharCount": 2992
                   },
@@ -676,9 +676,9 @@ window.DATA={
                     "displayIndex": 11,
                     "name": "11 - 测试",
                     "sourceRelativePath": "5 - META/1 - WTCD/1 - 例子/11 - 测试.wtcd",
-                    "type": "WTCD",
                     "isEarlyAccess": false,
                     "commentsUrl": null,
+                    "type": "WTCD",
                     "htmlRelativePath": "META/WTCD/例子/测试.html",
                     "chapterCharCount": 24
                   }
@@ -793,5 +793,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "336"
+  "buildNumber": "337"
 };

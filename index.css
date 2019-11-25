@@ -201,27 +201,6 @@ body.animation-enabled .rect>div {
   font-family: var(--font-family);
 }
 @media (min-width: 901px) {
-  .rect>div>.block {
-    width: 800px;
-    padding: 5vh;
-
-    transform: translate(calc(-1.8em - 1.2vw), calc(-1.8em - 1.2vw));
-  }
-}
-@media (max-width: 900px) {
-  .rect>div>.block {
-    width: 100vw;
-    padding: 1em;
-
-    transform: translate(-1em, -1em);
-
-    box-shadow: rgba(0,0,0,0.24) 0 1.01372px 2.32903px;
-  }
-}
-.rect>div>.block>p {
-  margin-bottom: 0;
-}
-@media (min-width: 901px) {
   .rect.reading {
     top: 0;
 
@@ -283,8 +262,11 @@ body.animation-enabled .rect>div {
     opacity: 1;
   }
 }
-.rect>div>:first-child, .rect>div>:first-child>:first-child, .rect>div>:first-child>:first-child>:first-child, .rect>div .block+*, .rect>div .block+*>:first-child, .rect>div .block+*>:first-child>:first-child {
+.rect>div>:first-child, .rect>div>:first-child>:first-child, .rect>div>:first-child>:first-child>:first-child {
   margin-top: 0;
+}
+.rect>div>:last-child, .rect>div>:last-child>:last-child, .rect>div>:last-child>:last-child>:last-child {
+  margin-bottom: 0;
 }
 .rect>.content code {
   cursor: text;

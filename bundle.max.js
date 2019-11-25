@@ -733,7 +733,7 @@ class Style {
         attemptInsertRule(`.rect.reading>.content a { color: ${this.def.linkColor}; }`);
         attemptInsertRule(`.rect.reading>.content a:hover { color: ${this.def.linkHoverColor}; }`);
         attemptInsertRule(`.rect.reading>.content a:active { color: ${this.def.linkActiveColor}; }`);
-        attemptInsertRule(`.rect.reading>.content>.earlyAccess.block { background-color: ${this.def.contentBlockEarlyAccessColor}; }`);
+        attemptInsertRule(`.rect.reading .early-access.content-block { background-color: ${this.def.contentBlockEarlyAccessColor}; }`);
         attemptInsertRule(`.rect>.comments>div { background-color: ${this.def.commentColor}; }`);
         attemptInsertRule(`@media (min-width: 901px) { ::-webkit-scrollbar-thumb { background-color: ${this.def.paperBgColor}; } }`);
         attemptInsertRule(`.rect>.comments>.create-comment::before { background-color: ${key}; }`);
@@ -848,6 +848,7 @@ const settings_1 = require("./settings");
 const state_1 = require("./state");
 const debugLogger = new DebugLogger_1.DebugLogger('chapterControl');
 const $content = DOM_1.id('content');
+const $rect = DOM_1.id('rect');
 const chaptersCache = new Map();
 exports.loadChapterEvent = new Event_1.Event();
 function closeChapter() {
@@ -880,7 +881,7 @@ const getFlexOneSpan = () => {
 const canChapterShown = (chapter) => settings_1.earlyAccess.getValue() || !chapter.isEarlyAccess;
 const createContentBlock = (type, title, text) => {
     const $block = document.createElement('div');
-    $block.classList.add('block', type);
+    $block.classList.add('content-block', type);
     const $title = document.createElement('h1');
     $title.innerText = title;
     $block.appendChild($title);
@@ -931,8 +932,8 @@ const finalizeChapterLoading = (selection) => {
     const chapterCtx = state_1.state.currentChapter;
     const chapterIndex = chapterCtx.inFolderIndex;
     if (chapterCtx.chapter.isEarlyAccess) {
-        const $block = createContentBlock('earlyAccess', '编写中章节', '请注意，本文正在编写中，因此可能会含有未完成的句子或是尚未更新的信息。');
-        $content.prepend($block);
+        const $block = createContentBlock('early-access', '编写中章节', '请注意，本文正在编写中，因此可能会含有未完成的句子或是尚未更新的信息。');
+        $rect.prepend($block);
     }
     const $div = document.createElement('div');
     $div.style.display = 'flex';
@@ -1113,6 +1114,8 @@ function insertContent($target, content, chapter) {
 function loadChapter(chapterHtmlRelativePath, selection) {
     debugLogger.log('Load chapter', chapterHtmlRelativePath, 'selection', selection);
     commentsControl_1.hideComments();
+    Array.from(document.getElementsByClassName('content-block'))
+        .forEach($block => $block.remove());
     exports.loadChapterEvent.emit(chapterHtmlRelativePath);
     window.localStorage.setItem('lastRead', chapterHtmlRelativePath);
     RectMode_1.setRectMode(RectMode_1.RectMode.MAIN);
