@@ -3,7 +3,7 @@ import * as MDI from 'markdown-it';
 import * as mdiReplaceLinkPlugin from 'markdown-it-replace-link';
 import { basename, dirname, parse as parsePath, posix, relative, resolve } from 'path';
 import yargs = require('yargs');
-import { Chapter, Data, Folder, Node } from '../Data';
+import { Chapter, Data, Folder, Node, WTCDReader } from '../Data';
 import { parse } from '../wtcd/parse';
 import { countCertainWord } from './countCertainWord';
 import { countChars } from './countChars';
@@ -152,9 +152,14 @@ const argv = yargs.options({
   async function loadWTCDChapter(path: string, parentHtmlRelativePath: string): Promise<Chapter> {
     const parsedPath = parsePath(path);
     const metaPath = resolve(parsedPath.dir, parsedPath.name + '.meta.json');
-    const meta = {
+    const meta: {
+      isEarlyAccess: boolean,
+      commentsUrl: null | string,
+      preferredReader: WTCDReader,
+    } = {
       isEarlyAccess: false,
       commentsUrl: null,
+      preferredReader: 'flow',
     };
     if (await pathExists(metaPath)) {
       const content = JSON.parse(await readFile(metaPath, 'utf8'));
@@ -163,6 +168,15 @@ const argv = yargs.options({
       }
       if (typeof content.commentsUrl === 'string') {
         meta.commentsUrl = content.commentsUrl;
+      }
+      if (typeof content.preferredReader === 'string') {
+        if (
+          content.preferredReader !== 'flow' &&
+          content.preferredReader !== 'game'
+        ) {
+          throw new Error(`Unknown reader type: ${content.preferredReader}.`);
+        }
+        meta.preferredReader = content.preferredReader;
       }
     }
 

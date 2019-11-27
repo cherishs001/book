@@ -1,0 +1,26 @@
+WTCD 1.3
+
+declare number a
+section start {
+  readerSetPinned::[$[] {
+    a += 1
+    contentAddHeader::["阿松大！" + stringFormatNumberFixed::[a]]
+  }]
+} then selection [
+  choice "Next" goto a
+]
+section a then selection [ choice "Next" goto b ]
+section b then selection [ choice "Next" goto c ]
+section c then exit
+
+---<<< start >>>---
+# Start
+
+---<<< a >>>---
+# a
+
+---<<< b >>>---
+# b
+
+---<<< c >>>---
+# c

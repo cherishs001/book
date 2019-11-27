@@ -1,5 +1,6 @@
 import { Chapter } from '../Data';
 import { FlowReader } from '../wtcd/FlowReader';
+import { GameReader } from '../wtcd/GameReader';
 import { WTCDParseResult } from '../wtcd/types';
 import { WTCDError } from '../wtcd/WTCDError';
 import { hideComments, loadComments } from './commentsControl';
@@ -285,6 +286,19 @@ function createWTCDErrorMessage({
   return $target;
 }
 
+function createWTCDErrorMessageFromError(error: Error) {
+  return createWTCDErrorMessage({
+    errorType: (error instanceof WTCDError)
+      ? ErrorType.RUNTIME
+      : ErrorType.INTERNAL,
+    message: error.message,
+    internalStack: error.stack,
+    wtcdStack: (error instanceof WTCDError)
+      ? error.wtcdStack
+      : undefined,
+  });
+}
+
 function insertContent($target: HTMLDivElement, content: string, chapter: Chapter) {
   switch (chapter.type) {
     case 'Markdown':
@@ -301,25 +315,32 @@ function insertContent($target: HTMLDivElement, content: string, chapter: Chapte
         }));
         break;
       }
-      const flowInterface = new FlowReader(
-        chapter.htmlRelativePath,
-        wtcdParseResult.wtcdRoot,
-        error => createWTCDErrorMessage({
-          errorType: (error instanceof WTCDError)
-            ? ErrorType.RUNTIME
-            : ErrorType.INTERNAL,
-          message: error.message,
-          internalStack: error.stack,
-          wtcdStack: (error instanceof WTCDError)
-            ? error.wtcdStack
-            : undefined,
-        }),
-        processElements,
-      );
-      const $wtcdContainer = document.createElement('div');
-      flowInterface.renderTo($wtcdContainer);
-      $content.appendChild($wtcdContainer);
-      break;
+      switch (chapter.preferredReader) {
+        case 'flow': {
+          const flowReader = new FlowReader(
+            chapter.htmlRelativePath,
+            wtcdParseResult.wtcdRoot,
+            createWTCDErrorMessageFromError,
+            processElements,
+          );
+          const $wtcdContainer = document.createElement('div');
+          flowReader.renderTo($wtcdContainer);
+          $content.appendChild($wtcdContainer);
+          break;
+        }
+        case 'game': {
+          const gameReader = new GameReader(
+            chapter.htmlRelativePath,
+            wtcdParseResult.wtcdRoot,
+            createWTCDErrorMessageFromError,
+            processElements,
+          );
+          const $wtcdContainer = document.createElement('div');
+          gameReader.renderTo($wtcdContainer);
+          $content.appendChild($wtcdContainer);
+          break;
+        }
+      }
     }
   }
 }

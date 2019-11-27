@@ -399,6 +399,8 @@ export interface InterpreterHandle {
   getRandom(): Random;
   pushContent($element: HTMLElement): void;
   readonly timers: Map<string, number>;
+  setPinnedFunction(pinnedFunction: FunctionValue | null): void;
+  setStateDesc(stateDesc: string | null): void;
 }
 
 export class Interpreter {
@@ -411,7 +413,18 @@ export class Interpreter {
     getRandom: () => this.random,
     pushContent: this.pushContent.bind(this),
     timers: this.timers,
+    setPinnedFunction: this.setPinnedFunction.bind(this),
+    setStateDesc: this.setStateDesc.bind(this),
   };
+  private pinnedFunction: FunctionValue | null = null;
+  private pinned: Array<HTMLElement> = [];
+  private stateDesc: string | null = null;
+  private setPinnedFunction(pinnedFunction: FunctionValue | null) {
+    this.pinnedFunction = pinnedFunction;
+  }
+  private setStateDesc(stateDesc: string | null) {
+    this.stateDesc = stateDesc;
+  }
   public constructor(
     private wtcdRoot: WTCDRoot,
     private random: Random,
@@ -827,6 +840,32 @@ export class Interpreter {
     throw WTCDError.atUnknown(`Unknown section "${sectionName}"`);
   }
 
+  private updatePinned() {
+    if (this.pinnedFunction !== null) {
+      try {
+        invokeFunctionRaw(
+          this.pinnedFunction.value,
+          [],
+          this.interpreterHandle,
+        );
+      } catch (error) {
+        if (error instanceof FunctionInvocationError) {
+          throw WTCDError.atUnknown(`Failed to invoke the pinned ` +
+            `function (${describe(this.pinnedFunction)}): ` +
+            error.message);
+        } else if (error instanceof WTCDError) {
+          error.pushWTCDStack(`Pinned function (` +
+            `${describe(this.pinnedFunction)})`);
+        }
+        throw error;
+      }
+      this.pinned = this.currentlyBuilding;
+      this.currentlyBuilding = [];
+    } else if (this.pinned.length !== 0) {
+      this.pinned = [];
+    }
+  }
+
   private *executeAction(action: ActionValue): Generator<ContentOutput, void, number> {
     switch (action.value.action) {
       case 'goto':
@@ -849,6 +888,9 @@ export class Interpreter {
           choices,
         };
         this.currentlyBuilding = [];
+
+        this.updatePinned();
+
         // Hands over control so player can make a decision
         const playerChoiceIndex = yield yieldValue;
         const playerChoice = choicesRaw[playerChoiceIndex];
@@ -895,6 +937,49 @@ export class Interpreter {
   private pushContent($element: HTMLElement) {
     this.currentlyBuilding.push($element);
   }
+  private runSection(section: Section): RuntimeValue {
+    const $mdHost = document.createElement('div');
+
+    // Evaluate the executes clause
+    if (section.executes !== null) {
+      this.evaluator(section.executes);
+    }
+
+    /** Times this section has been entered including this time */
+    const enterTime = this.sectionEnterTimes.has(section.name)
+      ? this.sectionEnterTimes.get(section.name)! + 1
+      : 1;
+    this.sectionEnterTimes.set(section.name, enterTime);
+
+    /** Content that fits within the bounds */
+    const eligibleSectionContents = section.content.filter(
+      content => (content.lowerBound === undefined || content.lowerBound <= enterTime) &&
+        (content.upperBound === undefined || content.upperBound >= enterTime),
+    );
+    if (eligibleSectionContents.length !== 0) {
+      const selectedContent = eligibleSectionContents[
+        this.random.nextInt(0, eligibleSectionContents.length)
+      ];
+      $mdHost.innerHTML = selectedContent.html;
+
+      // Parameterize
+      for (const variable of selectedContent.variables) {
+        ($mdHost.getElementsByClassName(variable.elementClass)[0] as HTMLSpanElement)
+          .innerText = String(this.resolveVariableReference(variable.variableName).value.value);
+      }
+      let $current = $mdHost.firstChild;
+      while ($current !== null) {
+        if ($current instanceof HTMLElement) {
+          this.pushContent($current);
+        }
+        $current = $current.nextSibling;
+      }
+    }
+    return this.evaluator(section.then);
+  }
+  public getPinned() {
+    return this.pinned;
+  }
   public *start(): Generator<ContentOutput, ContentOutput, number> {
     const stdScope = this.pushScope();
     for (const stdFunction of stdFunctions) {
@@ -925,47 +1010,12 @@ export class Interpreter {
       for (const statement of this.wtcdRoot.initStatements) {
         this.executeStatement(statement);
       }
-      const $host = document.createElement('div');
       while (this.sectionStack.length !== 0) {
         const currentSection = this.sectionStack.pop()!;
         lastSection = currentSection;
 
-        // Evaluate the executes clause
-        if (currentSection.executes !== null) {
-          this.evaluator(currentSection.executes);
-        }
+        const then = this.runSection(currentSection);
 
-        /** Times this section has been entered including this time */
-        const enterTime = this.sectionEnterTimes.has(currentSection.name)
-          ? this.sectionEnterTimes.get(currentSection.name)! + 1
-          : 1;
-        this.sectionEnterTimes.set(currentSection.name, enterTime);
-
-        /** Content that fits within the bounds */
-        const eligibleSectionContents = currentSection.content.filter(
-          content => (content.lowerBound === undefined || content.lowerBound <= enterTime) &&
-            (content.upperBound === undefined || content.upperBound >= enterTime),
-        );
-        if (eligibleSectionContents.length !== 0) {
-          const selectedContent = eligibleSectionContents[
-            this.random.nextInt(0, eligibleSectionContents.length)
-          ];
-          $host.innerHTML = selectedContent.html;
-
-          // Parameterize
-          for (const variable of selectedContent.variables) {
-            ($host.getElementsByClassName(variable.elementClass)[0] as HTMLSpanElement)
-              .innerText = String(this.resolveVariableReference(variable.variableName).value.value);
-          }
-          let $current = $host.firstChild;
-          while ($current !== null) {
-            if ($current instanceof HTMLElement) {
-              this.pushContent($current);
-            }
-            $current = $current.nextSibling;
-          }
-        }
-        const then = this.evaluator(currentSection.then);
         if (then.type === 'action') {
           yield* this.executeAction(then);
         } else if (then.type !== 'null') {
@@ -987,9 +1037,11 @@ export class Interpreter {
       }
       throw error;
     }
-    return {
+    const lastContent = {
       content: this.currentlyBuilding,
       choices: [],
     };
+    this.updatePinned();
+    return lastContent;
   }
 }

@@ -1,4 +1,3 @@
-import { networkInterfaces } from 'os';
 import { getMaybePooled } from '../constantsPool';
 import { describe, isEqual, ListValue } from '../Interpreter';
 import { FunctionInvocationError, invokeFunctionRaw } from '../invokeFunction';
