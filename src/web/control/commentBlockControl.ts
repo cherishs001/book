@@ -1,4 +1,4 @@
-import { Event } from './Event';
+import { Event } from '../Event';
 
 const blockedUsers = new Set<string>(JSON.parse(window.localStorage.getItem('blockedUsers') || '[]'));
 

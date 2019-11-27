@@ -1,5 +1,5 @@
-import { DebugLogger } from './DebugLogger';
-import { Event } from './Event';
+import { DebugLogger } from '../DebugLogger';
+import { Event } from '../Event';
 
 export enum ArrowKey {
   LEFT,

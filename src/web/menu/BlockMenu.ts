@@ -1,6 +1,6 @@
-import { blockedUserUpdateEvent, getBlockedUsers, unblockUser } from './commentBlockControl';
-import { Menu } from './Menu';
-import { CLICK_TO_UNBLOCK, NO_BLOCKED_USERS } from './messages';
+import { CLICK_TO_UNBLOCK, NO_BLOCKED_USERS } from '../constant/messages';
+import { blockedUserUpdateEvent, getBlockedUsers, unblockUser } from '../control/commentBlockControl';
+import { Menu } from '../Menu';
 
 export class BlockMenu extends Menu {
   private update() {

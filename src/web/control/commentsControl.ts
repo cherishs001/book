@@ -1,8 +1,8 @@
+import { COMMENTS_FAILED, COMMENTS_LOADED, COMMENTS_LOADING, COMMENTS_UNAVAILABLE } from '../constant/messages';
+import { useComments } from '../data/settings';
+import { id } from '../util/DOM';
+import { formatTime } from '../util/formatTime';
 import { blockUser, isUserBlocked } from './commentBlockControl';
-import { id } from './DOM';
-import { formatTime } from './formatTime';
-import { COMMENTS_FAILED, COMMENTS_LOADED, COMMENTS_LOADING, COMMENTS_UNAVAILABLE } from './messages';
-import { useComments } from './settings';
 
 const $comments = id('comments');
 const $commentsStatus = id('comments-status');

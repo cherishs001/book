@@ -1,4 +1,4 @@
-import { selectNode } from './DOM';
+import { selectNode } from '../util/DOM';
 
 export function processElements($parent: HTMLElement) {
   Array.from($parent.getElementsByTagName('a')).forEach($anchor => ($anchor as HTMLAnchorElement).target = '_blank');

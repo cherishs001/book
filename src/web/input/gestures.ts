@@ -1,6 +1,6 @@
-import { DebugLogger } from './DebugLogger';
-import { isAnyParent } from './DOM';
-import { Event } from './Event';
+import { DebugLogger } from '../DebugLogger';
+import { Event } from '../Event';
+import { isAnyParent } from '../util/DOM';
 
 export enum SwipeDirection {
   TO_TOP,

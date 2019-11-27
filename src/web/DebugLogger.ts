@@ -1,4 +1,4 @@
-import { developerMode } from './settings';
+import { developerMode } from './data/settings';
 
 function simpleToString(value: string | number | boolean) {
   switch (typeof value) {
