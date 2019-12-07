@@ -462,7 +462,7 @@ body {
   background-color: var(--paper-bg-color);
 }
 .content-container {
-  position: absolute;
+  position: fixed;
   z-index: 2;
   overflow-x: hidden;
   height: 100vh;
