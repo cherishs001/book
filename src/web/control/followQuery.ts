@@ -1,8 +1,8 @@
 import { relativePathLookUpMap } from '../data/data';
 import { state } from '../data/state';
 import { closeChapter, loadChapter } from './chapterControl';
-import { getTitle, updateHistory } from './history';
 import { Side } from './contentControl';
+import { getTitle, updateHistory } from './history';
 
 export function followQuery() {
   const chapterHtmlRelativePath = decodeURIComponent(window.location.hash.substr(1)); // Ignore the # in the result

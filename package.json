@@ -9,7 +9,7 @@
         "buildWebScript": "browserify ts-out/web/index.js -o dist/bundle.max.js",
         "minifyWebScript": "terser dist/bundle.max.js --compress --mangle --keep-fnames -o dist/bundle.js",
         "buildStyle": "lessc src/style/index.less dist/index.css",
-        "build": "run-s compileTypeScriptOnce buildChapters buildWebScript minifyWebScript",
+        "build": "run-s compileTypeScriptOnce buildStyle buildChapters buildWebScript minifyWebScript",
         "buildChaptersDebug": "node ts-out/builder/index.js --debug",
         "dev-watch-staticServer": "cd dist && static-server -p 2333 -o --no-cache",
         "dev-watch-staticFileCopier": "fucking-fixed-sync-files --watch --no-delete static dist",
