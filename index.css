@@ -472,7 +472,7 @@ body.animation-enabled .content-container {
   transition: width 0.5s, left 0.5s, top 0.5s;
 }
 body.layout-off .content-container {
-  top: 100%;
+  top: 100vh;
   left: 0;
   width: 100%;
 }
