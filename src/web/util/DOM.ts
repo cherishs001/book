@@ -19,7 +19,7 @@ export function getTextNodes(parent: HTMLElement, initArray?: Array<Text>) {
   return textNodes;
 }
 
-const selectNodeDebugLogger = new DebugLogger('selectNode');
+const selectNodeDebugLogger = new DebugLogger('Select Node');
 export function selectNode(node: Node) {
   try {
     const selection = window.getSelection()!;

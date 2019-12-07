@@ -2,6 +2,7 @@ import { relativePathLookUpMap } from '../data/data';
 import { state } from '../data/state';
 import { closeChapter, loadChapter } from './chapterControl';
 import { getTitle, updateHistory } from './history';
+import { Side } from './contentControl';
 
 export function followQuery() {
   const chapterHtmlRelativePath = decodeURIComponent(window.location.hash.substr(1)); // Ignore the # in the result
@@ -12,8 +13,12 @@ export function followQuery() {
       document.title = getTitle();
     }
   } else if (state.currentChapter !== chapterCtx) {
+    const side = (
+      state.currentChapter !== null &&
+      chapterCtx.inFolderIndex > state.currentChapter.inFolderIndex
+    ) ? Side.RIGHT : Side.LEFT;
     if (typeof URLSearchParams !== 'function') {
-      loadChapter(chapterHtmlRelativePath);
+      loadChapter(chapterHtmlRelativePath, undefined, side);
     } else {
       const query = new URLSearchParams(window.location.search);
       const selectionQuery = query.get('selection');
@@ -23,9 +28,13 @@ export function followQuery() {
       if (selection.length !== 4 || !selection.every(
         num => (num >= 0) && (num % 1 === 0) && (!Number.isNaN(num)) && (Number.isFinite(num)),
       )) {
-        loadChapter(chapterHtmlRelativePath);
+        loadChapter(chapterHtmlRelativePath, undefined, side);
       } else {
-        loadChapter(chapterHtmlRelativePath, selection as [number, number, number, number]);
+        loadChapter(
+          chapterHtmlRelativePath,
+          selection as [number, number, number, number],
+          side,
+        );
       }
       document.title = getTitle();
     }

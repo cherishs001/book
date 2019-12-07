@@ -10,7 +10,10 @@ export enum ArrowKey {
 
 export const arrowKeyPressEvent = new Event<ArrowKey>();
 export const escapeKeyPressEvent = new Event();
-document.addEventListener('keyup', event => {
+document.addEventListener('keydown', event => {
+  if (event.repeat) {
+    return;
+  }
   switch (event.keyCode) {
     case 27:
       escapeKeyPressEvent.emit();
@@ -30,7 +33,7 @@ document.addEventListener('keyup', event => {
   }
 });
 
-const arrowEventDebugLogger = new DebugLogger('arrowKeyEvent');
+const arrowEventDebugLogger = new DebugLogger('Arrow Key Event');
 arrowKeyPressEvent.on(arrowKey => {
   arrowEventDebugLogger.log(ArrowKey[arrowKey]);
 });

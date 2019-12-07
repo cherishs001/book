@@ -1,0 +1,73 @@
+.content-container>.content>.content-block.comments {
+  >p {
+    margin-bottom: 0;
+  }
+  >div {
+    position: relative;
+
+    overflow: hidden;
+
+    margin-top: 2vh;
+    padding: 3vh;
+
+    border-radius: 5px;
+    background-color: var(--comment-color);
+    box-shadow: rgba(0,0,0,0.24) 0 1.01372px 2.32903px;
+  }
+  >.create-comment {
+    user-select: none;
+    text-align: center;
+
+    font-size: 2em;
+    line-height: 1em;
+
+    body.animation-enabled & {
+      transition: opacity 0.12s;
+    }
+    &::before {
+      position: absolute;
+      top: 0;
+      left: 0;
+
+      width: 100%;
+      height: 100%;
+
+      content: '';
+      cursor: pointer;
+
+      opacity: 0;
+      background-color: var(--key);
+    }
+    &:hover::before {
+      opacity: 0.1;
+    }
+    &:active::before {
+      opacity: 0.04;
+    }
+  }
+  >.comment {
+    >.avatar {
+      width: 44px;
+      height: 44px;
+
+      border-radius: 3px;
+    }
+    >.author {
+      position: absolute;
+      top: 3vh;
+      left: calc(44px + 4.5vh);
+
+      font-size: 1.15em;
+    }
+    >.time {
+      position: absolute;
+      top: calc(3vh + 2.3em);
+      left: calc(44px + 4.5vh);
+
+      font-size: 0.7em;
+    }
+    >p {
+      margin-bottom: 0;
+    }
+  }
+}

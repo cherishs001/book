@@ -1,9 +1,8 @@
 import { stylePreviewArticle } from '../constant/stylePreviewArticle';
-import { hideComments } from '../control/commentsControl';
+import { newContent, Side } from '../control/contentControl';
 import { Layout } from '../control/layoutControl';
 import { DebugLogger } from '../DebugLogger';
 import { ItemDecoration, ItemHandle, Menu } from '../Menu';
-import { id } from '../util/DOM';
 
 interface StyleDef {
   readonly rectBgColor: string;
@@ -16,7 +15,7 @@ interface StyleDef {
 
   readonly keyIsDark: boolean;
 
-  readonly contentBlockEarlyAccessColor: string;
+  readonly contentBlockWarningColor: string;
 }
 
 class Style {
@@ -28,7 +27,7 @@ class Style {
     public readonly name: string,
     public readonly def: StyleDef,
   ) {
-    this.debugLogger = new DebugLogger('Style', { name });
+    this.debugLogger = new DebugLogger(`Style (${name})`);
   }
   private injectStyleSheet() {
     const $style = document.createElement('style');
@@ -54,18 +53,24 @@ class Style {
     attemptInsertRule(`body { background-color: ${this.def.paperBgColor}; }`);
     attemptInsertRule(`.rect { background-color: ${this.def.rectBgColor}; }`);
 
-    attemptInsertRule(`.rect.reading>div { background-color: ${this.def.paperBgColor}; }`);
-    attemptInsertRule(`.rect.reading>div { color: ${key}; }`);
-    attemptInsertRule(`.rect.reading>.content a { color: ${this.def.linkColor}; }`);
-    attemptInsertRule(`.rect.reading>.content a:hover { color: ${this.def.linkHoverColor}; }`);
-    attemptInsertRule(`.rect.reading>.content a:active { color: ${this.def.linkActiveColor}; }`);
-    attemptInsertRule(`.rect.reading .early-access.content-block { background-color: ${this.def.contentBlockEarlyAccessColor}; }`);
-    attemptInsertRule(`.rect>.comments>div { background-color: ${this.def.commentColor}; }`);
-    attemptInsertRule(`@media (min-width: 901px) { ::-webkit-scrollbar-thumb { background-color: ${this.def.paperBgColor}; } }`);
+    // attemptInsertRule(`.rect.reading>div { background-color: ${this.def.paperBgColor}; }`);
+    // attemptInsertRule(`.rect.reading>div { color: ${key}; }`);
+    // attemptInsertRule(`.rect.reading>.content a { color: ${this.def.linkColor}; }`);
+    // attemptInsertRule(`.rect.reading>.content a:hover { color: ${this.def.linkHoverColor}; }`);
+    // attemptInsertRule(`.rect.reading>.content a:active { color: ${this.def.linkActiveColor}; }`);
+    // attemptInsertRule(`.rect.reading .early-access.content-block { background-color: ${this.def.contentBlockEarlyAccessColor}; }`);
+    // attemptInsertRule(`.rect>.comments>div { background-color: ${this.def.commentColor}; }`);
+    // attemptInsertRule(`@media (min-width: 901px) { ::-webkit-scrollbar-thumb { background-color: ${this.def.paperBgColor}; } }`);
 
-    attemptInsertRule(`.rect>.comments>.create-comment::before { background-color: ${key}; }`);
+    // attemptInsertRule(`.rect>.comments>.create-comment::before { background-color: ${key}; }`);
 
-    attemptInsertRule(`:root { --paper-bg: ${this.def.paperBgColor}; }`);
+    attemptInsertRule(`:root { --comment-color:${this.def.commentColor}; }`);
+    attemptInsertRule(`:root { --content-block-warning-color:${this.def.contentBlockWarningColor}; }`);
+
+    attemptInsertRule(`:root { --paper-bg-color: ${this.def.paperBgColor}; }`);
+    attemptInsertRule(`:root { --link-color: ${this.def.linkColor}; }`);
+    attemptInsertRule(`:root { --link-hover-color: ${this.def.linkHoverColor}; }`);
+    attemptInsertRule(`:root { --link-active-color: ${this.def.linkActiveColor}; }`);
 
     attemptInsertRule(`:root { --key: ${key}; }`);
     attemptInsertRule(`:root { --key-opacity-01: ${keyAlpha(0.1)}; }`);
@@ -112,7 +117,7 @@ const styles = [
     paperBgColor: '#333',
     keyColor: [221, 221, 221],
     ...lightKeyLinkColors,
-    contentBlockEarlyAccessColor: '#E65100',
+    contentBlockWarningColor: '#E65100',
     commentColor: '#444',
 
     keyIsDark: false,
@@ -122,7 +127,7 @@ const styles = [
     paperBgColor: '#FFF',
     keyColor: [0, 0, 0],
     ...darkKeyLinkColors,
-    contentBlockEarlyAccessColor: '#FFE082',
+    contentBlockWarningColor: '#FFE082',
     commentColor: '#F5F5F5',
 
     keyIsDark: true,
@@ -132,7 +137,7 @@ const styles = [
     paperBgColor: '#38404D',
     keyColor: [221, 221, 221],
     ...lightKeyLinkColors,
-    contentBlockEarlyAccessColor: '#E65100',
+    contentBlockWarningColor: '#E65100',
     commentColor: '#272B36',
 
     keyIsDark: false,
@@ -142,7 +147,7 @@ const styles = [
     paperBgColor: '#F8F4E9',
     keyColor: [85, 40, 48],
     ...darkKeyLinkColors,
-    contentBlockEarlyAccessColor: '#FFE082',
+    contentBlockWarningColor: '#FFE082',
     commentColor: '#F9EFD7',
 
     keyIsDark: true,
@@ -152,7 +157,7 @@ const styles = [
     paperBgColor: '#3A2519',
     keyColor: [221, 175, 153],
     ...lightKeyLinkColors,
-    contentBlockEarlyAccessColor: '#E65100',
+    contentBlockWarningColor: '#E65100',
     commentColor: '#2C1C11',
 
     keyIsDark: false,
@@ -182,8 +187,9 @@ export class StyleMenu extends Menu {
     }
 
     this.activateEvent.on(() => {
-      hideComments();
-      id('content').innerHTML = stylePreviewArticle;
+      const content = newContent(Side.RIGHT);
+      const $div = content.addBlock().element;
+      $div.innerHTML = stylePreviewArticle;
     });
   }
 }

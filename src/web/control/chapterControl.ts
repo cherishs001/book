@@ -3,27 +3,43 @@ import { FlowReader } from '../../wtcd/FlowReader';
 import { GameReader } from '../../wtcd/GameReader';
 import { WTCDParseResult } from '../../wtcd/types';
 import { WTCDError } from '../../wtcd/WTCDError';
-import { ContentBlockType } from '../constant/ContentBlockType';
 import { loadingText } from '../constant/loadingText';
-import { WTCD_ERROR_COMPILE_TITLE, WTCD_ERROR_INTERNAL_DESC, WTCD_ERROR_INTERNAL_STACK_DESC, WTCD_ERROR_INTERNAL_STACK_TITLE, WTCD_ERROR_INTERNAL_TITLE, WTCD_ERROR_MESSAGE, WTCD_ERROR_RUNTIME_DESC, WTCD_ERROR_RUNTIME_TITLE, WTCD_ERROR_WTCD_STACK_DESC, WTCD_ERROR_WTCD_STACK_TITLE } from '../constant/messages';
+import {
+  CHAPTER_FAILED,
+  EARLY_ACCESS_DESC,
+  EARLY_ACCESS_TITLE,
+  GO_TO_MENU,
+  NEXT_CHAPTER,
+  PREVIOUS_CHAPTER,
+  WTCD_ERROR_COMPILE_TITLE,
+  WTCD_ERROR_INTERNAL_DESC,
+  WTCD_ERROR_INTERNAL_STACK_DESC,
+  WTCD_ERROR_INTERNAL_STACK_TITLE,
+  WTCD_ERROR_INTERNAL_TITLE,
+  WTCD_ERROR_MESSAGE,
+  WTCD_ERROR_RUNTIME_DESC,
+  WTCD_ERROR_RUNTIME_TITLE,
+  WTCD_ERROR_WTCD_STACK_DESC,
+  WTCD_ERROR_WTCD_STACK_TITLE,
+} from '../constant/messages';
+import { AutoCache } from '../data/AutoCache';
 import { relativePathLookUpMap } from '../data/data';
 import { earlyAccess, gestureSwitchChapter } from '../data/settings';
 import { Selection, state } from '../data/state';
 import { DebugLogger } from '../DebugLogger';
 import { Event } from '../Event';
+import { h } from '../hs';
 import { SwipeDirection, swipeEvent } from '../input/gestures';
 import { ArrowKey, arrowKeyPressEvent, escapeKeyPressEvent } from '../input/keyboard';
 import { getTextNodes, id } from '../util/DOM';
-import { hideComments, loadComments } from './commentsControl';
+import { loadComments } from './commentsControl';
+import { ContentBlockStyle, focusOnContainer, getCurrentContent, newContent, Side } from './contentControl';
 import { updateHistory } from './history';
 import { Layout, setLayout } from './layoutControl';
 import { processElements } from './processElements';
+import { scrollTo } from './scrollControl';
 
-const debugLogger = new DebugLogger('chapterControl');
-
-const $content = id('content');
-const $rect = id('rect');
-const chaptersCache = new Map<string, string | null>();
+const debugLogger = new DebugLogger('Chapter Control');
 
 export const loadChapterEvent = new Event<string>();
 
@@ -69,18 +85,6 @@ const getFlexOneSpan = () => {
 const canChapterShown = (chapter: Chapter) =>
   earlyAccess.getValue() || !chapter.isEarlyAccess;
 
-const createContentBlock = (type: ContentBlockType, title: string, text: string) => {
-  const $block = document.createElement('div');
-  $block.classList.add('content-block', type);
-  const $title = document.createElement('h1');
-  $title.innerText = title;
-  $block.appendChild($title);
-  const $text = document.createElement('p');
-  $text.innerText = text;
-  $block.appendChild($text);
-  return $block;
-};
-
 export function loadPrevChapter() {
   const chapterCtx = state.currentChapter;
   if (chapterCtx === null) {
@@ -89,7 +93,7 @@ export function loadPrevChapter() {
   const chapterIndex = chapterCtx.inFolderIndex;
   if (chapterIndex >= 1 && canChapterShown(chapterCtx.folder.chapters[chapterIndex - 1])) {
     const prevChapter = chapterCtx.folder.chapters[chapterIndex - 1].htmlRelativePath;
-    loadChapter(prevChapter);
+    loadChapter(prevChapter, undefined, Side.LEFT);
     updateHistory(true);
   }
 }
@@ -102,95 +106,131 @@ export function loadNextChapter() {
   const chapterIndex = chapterCtx.inFolderIndex;
   if (chapterIndex < chapterCtx.folder.chapters.length - 1 && canChapterShown(chapterCtx.folder.chapters[chapterIndex + 1])) {
     const nextChapter = chapterCtx.folder.chapters[chapterIndex + 1].htmlRelativePath;
-    loadChapter(nextChapter);
+    loadChapter(nextChapter, undefined, Side.RIGHT);
     updateHistory(true);
   }
 }
 
-const finalizeChapterLoading = (selection?: Selection) => {
-  state.chapterTextNodes = getTextNodes($content);
-  if (selection !== undefined) {
-    if (id('warning') === null) {
-      select(selection);
-    } else {
-      id('warning').addEventListener('click', () => {
-        select(selection);
-      });
-    }
-  }
+const chaptersCache = new AutoCache<string, string>(
+  chapterHtmlRelativePath => {
+    const url = `./chapters/${chapterHtmlRelativePath}`;
+    debugLogger.log(`Loading chapter from ${url}.`);
+    return fetch(url).then(response => response.text());
+  },
+  new DebugLogger('Chapters Cache'),
+);
+export function loadChapter(
+  chapterHtmlRelativePath: string,
+  selection?: Selection,
+  side: Side = Side.LEFT,
+) {
+  scrollTo(0);
 
-  processElements($content);
+  debugLogger.log(
+    'Load chapter',
+    chapterHtmlRelativePath,
+    'with selection',
+    selection,
+  );
+  loadChapterEvent.emit(chapterHtmlRelativePath);
+  window.localStorage.setItem('lastRead', chapterHtmlRelativePath);
+  const chapterCtx = relativePathLookUpMap.get(chapterHtmlRelativePath)!;
+  state.currentChapter = chapterCtx;
 
-  const chapterCtx = state.currentChapter!;
-  const chapterIndex = chapterCtx.inFolderIndex;
+  const content = newContent(side);
 
   if (chapterCtx.chapter.isEarlyAccess) {
-    const $block = createContentBlock('early-access', '编写中章节', '请注意，本文正在编写中，因此可能会含有未完成的句子或是尚未更新的信息。');
-    $rect.prepend($block);
+    content.addBlock((
+      h('div', [
+        h('h1', EARLY_ACCESS_TITLE),
+        h('p', EARLY_ACCESS_DESC),
+      ])
+    ), ContentBlockStyle.WARNING);
   }
+  const chapterBlock = content.addBlock(h('.content') as HTMLDivElement);
 
-  const $div = document.createElement('div');
-  $div.style.display = 'flex';
-  $div.style.marginTop = '2vw';
-  if (chapterIndex >= 1 && canChapterShown(chapterCtx.folder.chapters[chapterIndex - 1])) {
-    const prevChapter = chapterCtx.folder.chapters[chapterIndex - 1].htmlRelativePath;
-    const $prevLink = document.createElement('a');
-    $prevLink.innerText = '上一章';
-    $prevLink.href = `${window.location.pathname}#${prevChapter}`;
-    $prevLink.style.textAlign = 'left';
-    $prevLink.style.flex = '1';
-    $prevLink.addEventListener('click', event => {
-      event.preventDefault();
-      loadPrevChapter();
-    });
-    $div.appendChild($prevLink);
-  } else {
-    $div.appendChild(getFlexOneSpan());
-  }
-  const $menuLink = document.createElement('a');
-  $menuLink.innerText = '返回菜单';
-  $menuLink.href = window.location.pathname;
-  $menuLink.style.textAlign = 'center';
-  $menuLink.style.flex = '1';
-  $menuLink.addEventListener('click', event => {
-    event.preventDefault();
-    closeChapter();
-    updateHistory(true);
-  });
-  $div.appendChild($menuLink);
-  if (chapterIndex < chapterCtx.folder.chapters.length - 1 && canChapterShown(chapterCtx.folder.chapters[chapterIndex + 1])) {
-    const nextChapter = chapterCtx.folder.chapters[chapterIndex + 1].htmlRelativePath;
-    const $nextLink = document.createElement('a');
-    $nextLink.innerText = '下一章';
-    $nextLink.href = `${window.location.pathname}#${nextChapter}`;
-    $nextLink.style.textAlign = 'right';
-    $nextLink.style.flex = '1';
-    $nextLink.addEventListener('click', event => {
-      event.preventDefault();
-      loadNextChapter();
-    });
-    $div.appendChild($nextLink);
-  } else {
-    $div.appendChild(getFlexOneSpan());
-  }
-  $content.appendChild($div);
+  setLayout(Layout.MAIN);
 
-  loadComments(chapterCtx.chapter.commentsUrl);
-
-  // fix for stupid scrolling issues under iOS
-  id('rect').style.overflow = 'hidden';
-  setTimeout(() => {
-    id('rect').style.overflow = '';
-    if (selection === undefined) {
-      id('rect').scrollTo(0, 0);
+  chapterBlock.element.innerText = loadingText;
+  chaptersCache.get(chapterHtmlRelativePath).then(text => {
+    if (content.isDestroyed) {
+      debugLogger.log('Chapter loaded, but abandoned since the original ' +
+        'content page is already destroyed.');
+      return;
     }
-  }, 1);
+    debugLogger.log('Chapter loaded.');
 
-  // Re-focus the rect so it is arrow-scrollable
-  setTimeout(() => {
-    id('rect').focus();
-  }, 1);
-};
+    insertContent(chapterBlock.element, text, chapterCtx.chapter);
+    processElements(chapterBlock.element);
+
+    state.chapterTextNodes = getTextNodes(chapterBlock.element);
+    if (selection !== undefined) {
+      if (id('warning') === null) {
+        select(selection);
+      } else {
+        id('warning').addEventListener('click', () => {
+          select(selection);
+        });
+      }
+    }
+
+    const chapterIndex = chapterCtx.inFolderIndex;
+    const prevChapter = chapterCtx.folder.chapters[chapterIndex - 1];
+    const nextChapter = chapterCtx.folder.chapters[chapterIndex + 1];
+    chapterBlock.element.appendChild(h('div.page-switcher', [
+      // 上一章
+      (prevChapter !== undefined && canChapterShown(prevChapter))
+        ? h('a.to-prev', {
+          href: window.location.pathname + '#' + prevChapter.htmlRelativePath,
+          onclick: (event: MouseEvent) => {
+            event.preventDefault();
+            loadPrevChapter();
+          },
+        }, PREVIOUS_CHAPTER)
+        : h('a'),
+
+      // 返回菜单
+      h('a.to-menu', {
+        href: window.location.pathname,
+        onclick: (event: MouseEvent) => {
+          event.preventDefault();
+          closeChapter();
+          updateHistory(true);
+        },
+      }, GO_TO_MENU),
+
+      // 下一章
+      (nextChapter !== undefined && canChapterShown(nextChapter))
+        ? h('a.to-next', {
+          href: window.location.pathname + '#' + nextChapter.htmlRelativePath,
+          onclick: (event: MouseEvent) => {
+            event.preventDefault();
+            loadNextChapter();
+          },
+        }, NEXT_CHAPTER)
+        : h('a'),
+    ]));
+
+    // fix for stupid scrolling issues under iOS
+    // id('rect').style.overflow = 'hidden';
+    // setTimeout(() => {
+    //   id('rect').style.overflow = '';
+    //   if (selection === undefined) {
+    //     id('rect').scrollTo(0, 0);
+    //   }
+    // }, 1);
+
+    // Re-focus the rect so it is arrow-scrollable
+    setTimeout(() => {
+      focusOnContainer();
+    }, 1);
+    loadComments(getCurrentContent()!, chapterCtx.chapter.commentsUrl);
+  })
+  .catch(error => {
+    debugLogger.error(`Failed to load chapter.`, error);
+    chapterBlock.element.innerText = CHAPTER_FAILED;
+  });
+}
 
 swipeEvent.on(direction => {
   if (!gestureSwitchChapter.getValue()) {
@@ -325,7 +365,7 @@ function insertContent($target: HTMLDivElement, content: string, chapter: Chapte
           );
           const $wtcdContainer = document.createElement('div');
           flowReader.renderTo($wtcdContainer);
-          $content.appendChild($wtcdContainer);
+          $target.appendChild($wtcdContainer);
           break;
         }
         case 'game': {
@@ -337,42 +377,10 @@ function insertContent($target: HTMLDivElement, content: string, chapter: Chapte
           );
           const $wtcdContainer = document.createElement('div');
           gameReader.renderTo($wtcdContainer);
-          $content.appendChild($wtcdContainer);
+          $target.appendChild($wtcdContainer);
           break;
         }
       }
     }
   }
-}
-
-export function loadChapter(chapterHtmlRelativePath: string, selection?: Selection) {
-  debugLogger.log('Load chapter', chapterHtmlRelativePath, 'selection', selection);
-  hideComments();
-  Array.from(document.getElementsByClassName('content-block'))
-    .forEach($block => $block.remove());
-  loadChapterEvent.emit(chapterHtmlRelativePath);
-  window.localStorage.setItem('lastRead', chapterHtmlRelativePath);
-  setLayout(Layout.MAIN);
-  const chapterCtx = relativePathLookUpMap.get(chapterHtmlRelativePath)!;
-  state.currentChapter = chapterCtx;
-  if (chaptersCache.has(chapterHtmlRelativePath)) {
-    if (chaptersCache.get(chapterHtmlRelativePath) === null) {
-      $content.innerText = loadingText;
-    } else {
-      insertContent($content, chaptersCache.get(chapterHtmlRelativePath)!, chapterCtx.chapter);
-      finalizeChapterLoading(selection);
-    }
-  } else {
-    $content.innerText = loadingText;
-    fetch(`./chapters/${chapterHtmlRelativePath}`)
-      .then(response => response.text())
-      .then(text => {
-        chaptersCache.set(chapterHtmlRelativePath, text);
-        if (chapterCtx === state.currentChapter) {
-          insertContent($content, text, chapterCtx.chapter);
-          finalizeChapterLoading(selection);
-        }
-      });
-  }
-  return true;
 }

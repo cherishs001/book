@@ -1,9 +1,8 @@
 import { stylePreviewArticle } from '../constant/stylePreviewArticle';
-import { hideComments } from '../control/commentsControl';
+import { newContent, Side } from '../control/contentControl';
 import { Layout } from '../control/layoutControl';
 import { animation, BooleanSetting, charCount, developerMode, earlyAccess, EnumSetting, fontFamily, gestureSwitchChapter, useComments, warning } from '../data/settings';
 import { ItemDecoration, ItemHandle, Menu } from '../Menu';
-import { id } from '../util/DOM';
 import { BlockMenu } from './BlockMenu';
 
 export class EnumSettingMenu extends Menu {
@@ -12,8 +11,8 @@ export class EnumSettingMenu extends Menu {
     let currentHandle: ItemHandle;
     if (usePreview) {
       this.activateEvent.on(() => {
-        hideComments();
-        id('content').innerHTML = stylePreviewArticle;
+        const block = newContent(Side.RIGHT).addBlock();
+        block.element.innerHTML = stylePreviewArticle;
       });
     }
     setting.options.forEach((valueName, value) => {

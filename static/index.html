@@ -10,8 +10,8 @@
   <link rel="stylesheet" type="text/css" href="index.css">
   <link rel="icon" type="image/png" href="./favicon.png">
 </head>
-<body>
-  <div id="warning" class="warning">
+<body class="layout-off">
+  <div id="warning" class="nsfw-warning">
     <div class="warning-backdrop"></div>
     <div class="warning-container">
       <div class="title">NSFW 警告</div>
@@ -28,17 +28,8 @@
       document.getElementById('warning').remove();
     }
   </script>
-  <div id="rect" class="rect" tabindex="-1">
-    <div id="content" class="content">
-      我能吞下玻璃而不伤身体。
-    </div>
-    <div id="comments" class="comments">
-      <h1>评论区</h1>
-      <p id="comments-status">正在加载评论...</p>
-      <div id="create-comment" class="create-comment">+ 添加评论</div>
-    </div>
-  </div>
-  <div id="content-container" class="content-container"></div>
+  <div id="rect" class="rect off"></div>
+  <div id="content-container" tabindex="-1" class="content-container"></div>
   <div class="container">
     <div class="english-title">Wearable Technology</div>
     <div class="title">可穿戴科技</div>

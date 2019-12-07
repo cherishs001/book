@@ -1,31 +1,30 @@
-import { COMMENTS_FAILED, COMMENTS_LOADED, COMMENTS_LOADING, COMMENTS_UNAVAILABLE } from '../constant/messages';
+import {
+  COMMENTS_CREATE,
+  COMMENTS_FAILED,
+  COMMENTS_LOADED,
+  COMMENTS_LOADING,
+  COMMENTS_SECTION,
+  COMMENTS_UNAVAILABLE,
+} from '../constant/messages';
+import { AutoCache } from '../data/AutoCache';
 import { useComments } from '../data/settings';
-import { id } from '../util/DOM';
+import { DebugLogger } from '../DebugLogger';
+import { h } from '../hs';
 import { formatTime } from '../util/formatTime';
 import { blockUser, isUserBlocked } from './commentBlockControl';
+import { Content } from './contentControl';
 
-const $comments = id('comments');
-const $commentsStatus = id('comments-status');
-const $createComment = id('create-comment');
-
+const debugLogger = new DebugLogger('Comments Control');
 const getApiUrlRegExp = /^https:\/\/github\.com\/([a-zA-Z0-9-_]+)\/([a-zA-Z0-9-_]+)\/issues\/([1-9][0-9]*)$/;
+// Input sample: https://github.com/SCLeoX/Wearable-Technology/issues/1
+// Output sample: https://api.github.com/repos/SCLeoX/Wearable-Technology/issues/1/comments
 function getApiUrl(issueUrl: string) {
-  // Input sample: https://github.com/SCLeoX/Wearable-Technology/issues/1
-  // Output sample: https://api.github.com/repos/SCLeoX/Wearable-Technology/issues/1/comments
   const result = getApiUrlRegExp.exec(issueUrl);
   if (result === null) {
     throw new Error(`Bad issue url: ${issueUrl}.`);
   }
   return `https://api.github.com/repos/${result[1]}/${result[2]}/issues/${result[3]}/comments`;
 }
-
-let nextRequestId = 1;
-let currentRequestId = 0;
-let currentCreateCommentLinkUrl = '';
-
-$createComment.addEventListener('click', () => {
-  window.open(currentCreateCommentLinkUrl, '_blank');
-});
 
 function createCommentElement(
   userAvatarUrl: string,
@@ -35,71 +34,62 @@ function createCommentElement(
   updateTime: string,
   content: string,
 ) {
-  const $comment = document.createElement('div');
-  $comment.classList.add('comment');
-  const $avatar = document.createElement('img');
-  $avatar.classList.add('avatar');
-  $avatar.src = userAvatarUrl;
-  $comment.appendChild($avatar);
-  const $author = document.createElement('a');
-  $author.classList.add('author');
-  $author.innerText = userName;
-  $author.target = '_blank';
-  $author.href = userUrl;
-  $comment.appendChild($author);
-  const $time = document.createElement('div');
-  $time.classList.add('time');
-  $time.innerText = createTime === updateTime
-    ? formatTime(new Date(createTime))
-    : `${formatTime(new Date(createTime))}（最后修改于 ${formatTime(new Date(updateTime))}）`;
-  $comment.appendChild($time);
-  const $blockUser = document.createElement('a');
-  $blockUser.classList.add('block-user');
-  $blockUser.innerText = '屏蔽此人';
-  $blockUser.onclick = () => {
-    blockUser(userName);
-    $comment.remove();
-  };
-  $comment.appendChild($blockUser);
-  content.split('\n\n').forEach(paragraph => {
-    const $p = document.createElement('p');
-    $p.innerText = paragraph;
-    $comment.appendChild($p);
-  });
+  const $comment = h('.comment', [
+    h('img.avatar', { src: userAvatarUrl }),
+    h('a.author', {
+      target: '_blank',
+      href: userUrl,
+    }, userName),
+    h('.time', createTime === updateTime
+      ? formatTime(new Date(createTime))
+      : `${formatTime(new Date(createTime))}` +
+        `（最后修改于 ${formatTime(new Date(updateTime))}）`),
+    h('a.block-user', {
+      onclick: () => {
+        blockUser(userName);
+        $comment.remove();
+      },
+    }, '屏蔽此人'),
+    ...content.split('\n\n').map(paragraph => h('p', paragraph)),
+  ]);
   return $comment;
 }
 
-// 为了确保 comments 在离场动画中存在，hideComments 和 showComments 应该只在入场动画前使用。
-export function hideComments() {
-  $comments.classList.toggle('display-none', true);
-  currentRequestId = 0;
-}
-export function loadComments(issueUrl: string | null) {
+const commentsCache = new AutoCache<string, any>(
+  apiUrl => {
+    debugLogger.log(`Loading comments from ${apiUrl}.`);
+    return fetch(apiUrl).then(response => response.json());
+  },
+  new DebugLogger('Comments Cache'),
+);
+export function loadComments(
+  content: Content,
+  issueUrl: string | null,
+) {
   if (useComments.getValue() === false) {
     return;
   }
-
-  Array.from($comments.getElementsByClassName('comment')).forEach($element => $element.remove());
-
-  $comments.classList.toggle('display-none', false);
-  $createComment.classList.toggle('display-none', true);
+  const $commentsStatus = h('p', COMMENTS_LOADING);
+  const $comments = h('.comments', [
+    h('h1', COMMENTS_SECTION),
+    $commentsStatus,
+  ]) as HTMLDivElement;
+  const block = content.addBlock($comments);
 
   if (issueUrl === null) {
     $commentsStatus.innerText = COMMENTS_UNAVAILABLE;
     return;
   }
 
-  currentCreateCommentLinkUrl = issueUrl;
-
-  const requestId = currentRequestId = nextRequestId++;
-  const apiUrl = getApiUrl(issueUrl);
-  $commentsStatus.innerText = COMMENTS_LOADING;
-  fetch(apiUrl)
-    .then(response => response.json())
-    .then(data => {
-      if (requestId !== currentRequestId) {
+  block.onEnteringView(() => {
+    const apiUrl = getApiUrl(issueUrl);
+    commentsCache.get(apiUrl).then(data => {
+      if (content.isDestroyed) {
+        debugLogger.log('Comments loaded, but abandoned since the original ' +
+          'content page is already destroyed.');
         return;
       }
+      debugLogger.log('Comments loaded.');
       $commentsStatus.innerText = COMMENTS_LOADED;
       data.forEach((comment: any) => {
         if (isUserBlocked(comment.user.login)) {
@@ -114,9 +104,16 @@ export function loadComments(issueUrl: string | null) {
           comment.body,
         ));
       });
-      $createComment.classList.toggle('display-none', false);
+      $comments.appendChild(
+        h('.create-comment', {
+          onclick: () => {
+            window.open(issueUrl, '_blank');
+          },
+        }, COMMENTS_CREATE),
+      );
     })
-    .catch(error => {
+    .catch(() => {
       $commentsStatus.innerText = COMMENTS_FAILED;
     });
+  });
 }

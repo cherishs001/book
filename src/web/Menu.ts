@@ -102,7 +102,7 @@ export class Menu {
     private parent: Menu | null,
     public readonly layout: Layout = Layout.OFF,
   ) {
-    this.debugLogger = new DebugLogger('Menu', { name });
+    this.debugLogger = new DebugLogger(`Menu (${name})`);
 
     this.fullPath = parent === null ? [] : parent.fullPath.slice();
     if (name !== '') {

@@ -77,7 +77,7 @@ window.addEventListener('touchend', event => {
     }
   }
 });
-const swipeEventDebugLogger = new DebugLogger('swipeEvent');
+const swipeEventDebugLogger = new DebugLogger('Swipe Event');
 swipeEvent.on(direction => {
   swipeEventDebugLogger.log(SwipeDirection[direction]);
 });

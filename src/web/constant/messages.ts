@@ -1,7 +1,19 @@
-export const COMMENTS_UNAVAILABLE = '本文评论不可用。';
+export const EARLY_ACCESS_TITLE = '编写中章节';
+export const EARLY_ACCESS_DESC = '请注意，本文正在编写中，因此可能会含有未完成的句子或是尚未更新的信息。';
+
+export const PREVIOUS_CHAPTER = '上一章';
+export const GO_TO_MENU = '返回菜单';
+export const NEXT_CHAPTER = '下一章';
+
+export const CHAPTER_LOADING = '章节加载中...';
+export const CHAPTER_FAILED = '章节加载失败，请检查网络连接。';
+
+export const COMMENTS_SECTION = '评论区';
 export const COMMENTS_LOADING = '评论加载中...';
+export const COMMENTS_UNAVAILABLE = '本文评论不可用。';
+export const COMMENTS_CREATE = '+ 添加评论';
 export const COMMENTS_LOADED = '以下为本章节的评论区。';
-export const COMMENTS_FAILED = '评论加载失败。';
+export const COMMENTS_FAILED = '评论加载失败，请检查网络连接。';
 
 export const NO_BLOCKED_USERS = '没有用户的评论被屏蔽';
 export const CLICK_TO_UNBLOCK = '(点击用户名以解除屏蔽)';
