@@ -1,223 +1,422 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const commentBlockControl_1 = require("./commentBlockControl");
-const Menu_1 = require("./Menu");
-const messages_1 = require("./messages");
-class BlockMenu extends Menu_1.Menu {
-    update() {
-        this.clearItems();
-        const blockedUsers = commentBlockControl_1.getBlockedUsers();
-        if (blockedUsers.length === 0) {
-            this.addItem(messages_1.NO_BLOCKED_USERS, { small: true });
-        }
-        else {
-            this.addItem(messages_1.CLICK_TO_UNBLOCK, { small: true });
-        }
-        blockedUsers.forEach(userName => {
-            this.addItem(userName, { small: true, button: true })
-                .onClick(() => {
-                commentBlockControl_1.unblockUser(userName);
-            });
-        });
-    }
-    constructor(parent) {
-        super('屏蔽用户评论管理', parent);
-        this.update();
-        commentBlockControl_1.blockedUserUpdateEvent.on(this.update.bind(this));
-    }
-}
-exports.BlockMenu = BlockMenu;
 
-},{"./Menu":8,"./commentBlockControl":16,"./messages":26}],2:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const chapterControl_1 = require("./chapterControl");
-const data_1 = require("./data");
-const history_1 = require("./history");
-const Menu_1 = require("./Menu");
-const shortNumber_1 = require("./shortNumber");
-const chapterSelectionButtonsMap = new Map();
-let currentLastReadLabelAt = null;
-function attachLastReadLabelTo(button, htmlRelativePath) {
-    currentLastReadLabelAt = button.append('[上次阅读]');
-}
-chapterControl_1.loadChapterEvent.on(newChapterHtmlRelativePath => {
-    if (currentLastReadLabelAt !== null) {
-        currentLastReadLabelAt.remove();
+},{}],2:[function(require,module,exports){
+/*!
+ * Cross-Browser Split 1.1.1
+ * Copyright 2007-2012 Steven Levithan <stevenlevithan.com>
+ * Available under the MIT License
+ * ECMAScript compliant, uniform cross-browser split method
+ */
+
+/**
+ * Splits a string into an array of strings using a regex or string separator. Matches of the
+ * separator are not included in the result array. However, if `separator` is a regex that contains
+ * capturing groups, backreferences are spliced into the result each time `separator` is matched.
+ * Fixes browser bugs compared to the native `String.prototype.split` and can be used reliably
+ * cross-browser.
+ * @param {String} str String to split.
+ * @param {RegExp|String} separator Regex or string to use for separating the string.
+ * @param {Number} [limit] Maximum number of items to include in the result array.
+ * @returns {Array} Array of substrings.
+ * @example
+ *
+ * // Basic use
+ * split('a b c d', ' ');
+ * // -> ['a', 'b', 'c', 'd']
+ *
+ * // With limit
+ * split('a b c d', ' ', 2);
+ * // -> ['a', 'b']
+ *
+ * // Backreferences in result array
+ * split('..word1 word2..', /([a-z]+)(\d+)/i);
+ * // -> ['..', 'word', '1', ' ', 'word', '2', '..']
+ */
+module.exports = (function split(undef) {
+
+  var nativeSplit = String.prototype.split,
+    compliantExecNpcg = /()??/.exec("")[1] === undef,
+    // NPCG: nonparticipating capturing group
+    self;
+
+  self = function(str, separator, limit) {
+    // If `separator` is not a regex, use `nativeSplit`
+    if (Object.prototype.toString.call(separator) !== "[object RegExp]") {
+      return nativeSplit.call(str, separator, limit);
     }
-    attachLastReadLabelTo(chapterSelectionButtonsMap.get(newChapterHtmlRelativePath), newChapterHtmlRelativePath);
-});
-function getDecorationForChapterType(chapterType) {
-    switch (chapterType) {
-        case 'Markdown': return Menu_1.ItemDecoration.ICON_FILE;
-        case 'WTCD': return Menu_1.ItemDecoration.ICON_GAME;
+    var output = [],
+      flags = (separator.ignoreCase ? "i" : "") + (separator.multiline ? "m" : "") + (separator.extended ? "x" : "") + // Proposed for ES6
+      (separator.sticky ? "y" : ""),
+      // Firefox 3+
+      lastLastIndex = 0,
+      // Make `global` and avoid `lastIndex` issues by working with a copy
+      separator = new RegExp(separator.source, flags + "g"),
+      separator2, match, lastIndex, lastLength;
+    str += ""; // Type-convert
+    if (!compliantExecNpcg) {
+      // Doesn't need flags gy, but they don't hurt
+      separator2 = new RegExp("^" + separator.source + "$(?!\\s)", flags);
     }
-}
-class ChaptersMenu extends Menu_1.Menu {
-    constructor(parent, folder) {
-        if (folder === undefined) {
-            folder = data_1.data.chapterTree;
-        }
-        super(folder.isRoot ? '章节选择' : folder.displayName, parent);
-        for (const subfolder of folder.subFolders) {
-            const handle = this.addLink(new ChaptersMenu(this, subfolder), true, Menu_1.ItemDecoration.ICON_FOLDER);
-            handle.append(`[${shortNumber_1.shortNumber(subfolder.folderCharCount)}]`, 'char-count');
-        }
-        for (const chapter of folder.chapters) {
-            const handle = this.addItem(chapter.displayName, {
-                small: true,
-                button: true,
-                decoration: getDecorationForChapterType(chapter.type),
-            })
-                .onClick(() => {
-                chapterControl_1.loadChapter(chapter.htmlRelativePath);
-                history_1.updateHistory(true);
-            });
-            if (chapter.isEarlyAccess) {
-                handle.prepend('[编写中]');
-                handle.addClass('early-access');
+    /* Values for `limit`, per the spec:
+     * If undefined: 4294967295 // Math.pow(2, 32) - 1
+     * If 0, Infinity, or NaN: 0
+     * If positive number: limit = Math.floor(limit); if (limit > 4294967295) limit -= 4294967296;
+     * If negative number: 4294967296 - Math.floor(Math.abs(limit))
+     * If other: Type-convert, then use the above rules
+     */
+    limit = limit === undef ? -1 >>> 0 : // Math.pow(2, 32) - 1
+    limit >>> 0; // ToUint32(limit)
+    while (match = separator.exec(str)) {
+      // `separator.lastIndex` is not reliable cross-browser
+      lastIndex = match.index + match[0].length;
+      if (lastIndex > lastLastIndex) {
+        output.push(str.slice(lastLastIndex, match.index));
+        // Fix browsers whose `exec` methods don't consistently return `undefined` for
+        // nonparticipating capturing groups
+        if (!compliantExecNpcg && match.length > 1) {
+          match[0].replace(separator2, function() {
+            for (var i = 1; i < arguments.length - 2; i++) {
+              if (arguments[i] === undef) {
+                match[i] = undef;
+              }
             }
-            handle.append(`[${shortNumber_1.shortNumber(chapter.chapterCharCount)}]`, 'char-count');
-            const lastRead = window.localStorage.getItem('lastRead');
-            if (lastRead === chapter.htmlRelativePath) {
-                attachLastReadLabelTo(handle, chapter.htmlRelativePath);
+          });
+        }
+        if (match.length > 1 && match.index < str.length) {
+          Array.prototype.push.apply(output, match.slice(1));
+        }
+        lastLength = match[0].length;
+        lastLastIndex = lastIndex;
+        if (output.length >= limit) {
+          break;
+        }
+      }
+      if (separator.lastIndex === match.index) {
+        separator.lastIndex++; // Avoid an infinite loop
+      }
+    }
+    if (lastLastIndex === str.length) {
+      if (lastLength || !separator.test("")) {
+        output.push("");
+      }
+    } else {
+      output.push(str.slice(lastLastIndex));
+    }
+    return output.length > limit ? output.slice(0, limit) : output;
+  };
+
+  return self;
+})();
+
+},{}],3:[function(require,module,exports){
+// contains, add, remove, toggle
+var indexof = require('indexof')
+
+module.exports = ClassList
+
+function ClassList(elem) {
+    var cl = elem.classList
+
+    if (cl) {
+        return cl
+    }
+
+    var classList = {
+        add: add
+        , remove: remove
+        , contains: contains
+        , toggle: toggle
+        , toString: $toString
+        , length: 0
+        , item: item
+    }
+
+    return classList
+
+    function add(token) {
+        var list = getTokens()
+        if (indexof(list, token) > -1) {
+            return
+        }
+        list.push(token)
+        setTokens(list)
+    }
+
+    function remove(token) {
+        var list = getTokens()
+            , index = indexof(list, token)
+
+        if (index === -1) {
+            return
+        }
+
+        list.splice(index, 1)
+        setTokens(list)
+    }
+
+    function contains(token) {
+        return indexof(getTokens(), token) > -1
+    }
+
+    function toggle(token) {
+        if (contains(token)) {
+            remove(token)
+            return false
+        } else {
+            add(token)
+            return true
+        }
+    }
+
+    function $toString() {
+        return elem.className
+    }
+
+    function item(index) {
+        var tokens = getTokens()
+        return tokens[index] || null
+    }
+
+    function getTokens() {
+        var className = elem.className
+
+        return filter(className.split(" "), isTruthy)
+    }
+
+    function setTokens(list) {
+        var length = list.length
+
+        elem.className = list.join(" ")
+        classList.length = length
+
+        for (var i = 0; i < list.length; i++) {
+            classList[i] = list[i]
+        }
+
+        delete list[length]
+    }
+}
+
+function filter (arr, fn) {
+    var ret = []
+    for (var i = 0; i < arr.length; i++) {
+        if (fn(arr[i])) ret.push(arr[i])
+    }
+    return ret
+}
+
+function isTruthy(value) {
+    return !!value
+}
+
+},{"indexof":5}],4:[function(require,module,exports){
+var split = require('browser-split')
+var ClassList = require('class-list')
+
+var w = typeof window === 'undefined' ? require('html-element') : window
+var document = w.document
+var Text = w.Text
+
+function context () {
+
+  var cleanupFuncs = []
+
+  function h() {
+    var args = [].slice.call(arguments), e = null
+    function item (l) {
+      var r
+      function parseClass (string) {
+        // Our minimal parser doesn’t understand escaping CSS special
+        // characters like `#`. Don’t use them. More reading:
+        // https://mathiasbynens.be/notes/css-escapes .
+
+        var m = split(string, /([\.#]?[^\s#.]+)/)
+        if(/^\.|#/.test(m[1]))
+          e = document.createElement('div')
+        forEach(m, function (v) {
+          var s = v.substring(1,v.length)
+          if(!v) return
+          if(!e)
+            e = document.createElement(v)
+          else if (v[0] === '.')
+            ClassList(e).add(s)
+          else if (v[0] === '#')
+            e.setAttribute('id', s)
+        })
+      }
+
+      if(l == null)
+        ;
+      else if('string' === typeof l) {
+        if(!e)
+          parseClass(l)
+        else
+          e.appendChild(r = document.createTextNode(l))
+      }
+      else if('number' === typeof l
+        || 'boolean' === typeof l
+        || l instanceof Date
+        || l instanceof RegExp ) {
+          e.appendChild(r = document.createTextNode(l.toString()))
+      }
+      //there might be a better way to handle this...
+      else if (isArray(l))
+        forEach(l, item)
+      else if(isNode(l))
+        e.appendChild(r = l)
+      else if(l instanceof Text)
+        e.appendChild(r = l)
+      else if ('object' === typeof l) {
+        for (var k in l) {
+          if('function' === typeof l[k]) {
+            if(/^on\w+/.test(k)) {
+              (function (k, l) { // capture k, l in the closure
+                if (e.addEventListener){
+                  e.addEventListener(k.substring(2), l[k], false)
+                  cleanupFuncs.push(function(){
+                    e.removeEventListener(k.substring(2), l[k], false)
+                  })
+                }else{
+                  e.attachEvent(k, l[k])
+                  cleanupFuncs.push(function(){
+                    e.detachEvent(k, l[k])
+                  })
+                }
+              })(k, l)
+            } else {
+              // observable
+              e[k] = l[k]()
+              cleanupFuncs.push(l[k](function (v) {
+                e[k] = v
+              }))
             }
-            chapterSelectionButtonsMap.set(chapter.htmlRelativePath, handle);
+          }
+          else if(k === 'style') {
+            if('string' === typeof l[k]) {
+              e.style.cssText = l[k]
+            }else{
+              for (var s in l[k]) (function(s, v) {
+                if('function' === typeof v) {
+                  // observable
+                  e.style.setProperty(s, v())
+                  cleanupFuncs.push(v(function (val) {
+                    e.style.setProperty(s, val)
+                  }))
+                } else
+                  var match = l[k][s].match(/(.*)\W+!important\W*$/);
+                  if (match) {
+                    e.style.setProperty(s, match[1], 'important')
+                  } else {
+                    e.style.setProperty(s, l[k][s])
+                  }
+              })(s, l[k][s])
+            }
+          } else if(k === 'attrs') {
+            for (var v in l[k]) {
+              e.setAttribute(v, l[k][v])
+            }
+          }
+          else if (k.substr(0, 5) === "data-") {
+            e.setAttribute(k, l[k])
+          } else {
+            e[k] = l[k]
+          }
         }
-    }
-}
-exports.ChaptersMenu = ChaptersMenu;
+      } else if ('function' === typeof l) {
+        //assume it's an observable!
+        var v = l()
+        e.appendChild(r = isNode(v) ? v : document.createTextNode(v))
 
-},{"./Menu":8,"./chapterControl":15,"./data":18,"./history":22,"./shortNumber":29}],3:[function(require,module,exports){
+        cleanupFuncs.push(l(function (v) {
+          if(isNode(v) && r.parentElement)
+            r.parentElement.replaceChild(v, r), r = v
+          else
+            r.textContent = v
+        }))
+      }
+
+      return r
+    }
+    while(args.length)
+      item(args.shift())
+
+    return e
+  }
+
+  h.cleanup = function () {
+    for (var i = 0; i < cleanupFuncs.length; i++){
+      cleanupFuncs[i]()
+    }
+    cleanupFuncs.length = 0
+  }
+
+  return h
+}
+
+var h = module.exports = context()
+h.context = context
+
+function isNode (el) {
+  return el && el.nodeName && el.nodeType
+}
+
+function forEach (arr, fn) {
+  if (arr.forEach) return arr.forEach(fn)
+  for (var i = 0; i < arr.length; i++) fn(arr[i], i)
+}
+
+function isArray (arr) {
+  return Object.prototype.toString.call(arr) == '[object Array]'
+}
+
+
+
+},{"browser-split":2,"class-list":3,"html-element":1}],5:[function(require,module,exports){
+
+var indexOf = [].indexOf;
+
+module.exports = function(arr, obj){
+  if (indexOf) return arr.indexOf(obj);
+  for (var i = 0; i < arr.length; ++i) {
+    if (arr[i] === obj) return i;
+  }
+  return -1;
+};
+},{}],6:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const Menu_1 = require("./Menu");
-class ContactMenu extends Menu_1.Menu {
-    constructor(parent) {
-        super('订阅/讨论组', parent);
-        this.addItem('Telegram 更新推送频道', {
-            small: true,
-            button: true,
-            link: 'https://t.me/joinchat/AAAAAEpkRVwZ-3s5V3YHjA',
-            decoration: Menu_1.ItemDecoration.ICON_LINK,
-        });
-        this.addItem('Telegram 讨论组', {
-            small: true,
-            button: true,
-            link: 'https://t.me/joinchat/Dt8_WlJnmEwYNbjzlnLyNA',
-            decoration: Menu_1.ItemDecoration.ICON_LINK,
-        });
-        this.addItem('GitHub Repo', {
-            small: true,
-            button: true,
-            link: 'https://github.com/SCLeoX/Wearable-Technology',
-            decoration: Menu_1.ItemDecoration.ICON_LINK,
-        });
-        this.addItem('原始 Google Docs', {
-            small: true,
-            button: true,
-            link: 'https://docs.google.com/document/d/1Pp5CtO8c77DnWGqbXg-3e7w9Q3t88P35FOl6iIJvMfo/edit?usp=sharing',
-            decoration: Menu_1.ItemDecoration.ICON_LINK,
-        });
-    }
-}
-exports.ContactMenu = ContactMenu;
-
-},{"./Menu":8}],4:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const DebugLogger_1 = require("./DebugLogger");
-function id(id) {
-    return document.getElementById(id);
-}
-exports.id = id;
-function getTextNodes(parent, initArray) {
-    const textNodes = initArray || [];
-    let pointer = parent.firstChild;
-    while (pointer !== null) {
-        if (pointer instanceof HTMLElement) {
-            getTextNodes(pointer, textNodes);
-        }
-        if (pointer instanceof Text) {
-            textNodes.push(pointer);
-        }
-        pointer = pointer.nextSibling;
-    }
-    return textNodes;
-}
-exports.getTextNodes = getTextNodes;
-const selectNodeDebugLogger = new DebugLogger_1.DebugLogger('selectNode');
-function selectNode(node) {
-    try {
-        const selection = window.getSelection();
-        const range = document.createRange();
-        range.selectNodeContents(node);
-        selection.removeAllRanges();
-        selection.addRange(range);
-    }
-    catch (error) {
-        selectNodeDebugLogger.log('Failed to select node: ', node, '; Error: ', error);
-    }
-}
-exports.selectNode = selectNode;
-function isAnyParent($element, predicate) {
-    while ($element !== null) {
-        if (predicate($element)) {
-            return true;
-        }
-        $element = $element.parentElement;
-    }
-    return false;
-}
-exports.isAnyParent = isAnyParent;
-
-},{"./DebugLogger":5}],5:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const settings_1 = require("./settings");
-function simpleToString(value) {
-    switch (typeof value) {
-        case 'string':
-            return `"${value}"`;
-        default:
-            return String(value);
-    }
-}
+const materialDarkColors_1 = require("./constant/materialDarkColors");
+const settings_1 = require("./data/settings");
+const stringHash_1 = require("./util/stringHash");
 class DebugLogger {
-    constructor(name, parameters = {}) {
-        this.prefix = name + '('
-            + Object.keys(parameters).map(key => `${key}=${simpleToString(parameters[key])}`).join(',')
-            + ')';
+    constructor(name) {
+        this.prefix = '%c' + name;
+        this.css = `background-color: #` +
+            materialDarkColors_1.materialDarkColors[Math.abs(stringHash_1.stringHash(name)) % materialDarkColors_1.materialDarkColors.length] +
+            '; border-radius: 0.3em; padding: 0 0.3em; color: white';
     }
     log(...stuff) {
         if (!settings_1.developerMode.getValue()) {
             return;
         }
-        console.info(this.prefix, ...stuff);
-    }
-    info(...stuff) {
-        if (!settings_1.developerMode.getValue()) {
-            return;
-        }
-        console.info(this.prefix, ...stuff);
+        console.info(this.prefix, this.css, ...stuff);
     }
     warn(...stuff) {
         if (!settings_1.developerMode.getValue()) {
             return;
         }
-        console.warn(this.prefix, ...stuff);
+        console.warn(this.prefix, this.css, ...stuff);
     }
     error(...stuff) {
         if (!settings_1.developerMode.getValue()) {
             return;
         }
-        console.error(this.prefix, ...stuff);
+        console.error(this.prefix, this.css, ...stuff);
     }
 }
 exports.DebugLogger = DebugLogger;
 
-},{"./settings":28}],6:[function(require,module,exports){
+},{"./constant/materialDarkColors":10,"./data/settings":27,"./util/stringHash":45}],7:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class Event {
@@ -308,36 +507,12 @@ class Event {
 }
 exports.Event = Event;
 
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const ChaptersMenu_1 = require("./ChaptersMenu");
-const ContactMenu_1 = require("./ContactMenu");
-const Menu_1 = require("./Menu");
-const SettingsMenu_1 = require("./SettingsMenu");
-const StatsMenu_1 = require("./StatsMenu");
-const StyleMenu_1 = require("./StyleMenu");
-const ThanksMenu_1 = require("./ThanksMenu");
-class MainMenu extends Menu_1.Menu {
-    constructor() {
-        super('', null);
-        this.addLink(new ChaptersMenu_1.ChaptersMenu(this));
-        this.addLink(new ThanksMenu_1.ThanksMenu(this));
-        this.addLink(new StyleMenu_1.StyleMenu(this));
-        this.addLink(new ContactMenu_1.ContactMenu(this));
-        this.addItem('源代码', { button: true, link: 'https://github.com/SCLeoX/Wearable-Technology' });
-        this.addLink(new SettingsMenu_1.SettingsMenu(this));
-        this.addLink(new StatsMenu_1.StatsMenu(this));
-    }
-}
-exports.MainMenu = MainMenu;
-
-},{"./ChaptersMenu":2,"./ContactMenu":3,"./Menu":8,"./SettingsMenu":10,"./StatsMenu":12,"./StyleMenu":13,"./ThanksMenu":14}],8:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
+const layoutControl_1 = require("./control/layoutControl");
 const DebugLogger_1 = require("./DebugLogger");
 const Event_1 = require("./Event");
-const RectMode_1 = require("./RectMode");
 var ItemDecoration;
 (function (ItemDecoration) {
     ItemDecoration[ItemDecoration["SELECTABLE"] = 0] = "SELECTABLE";
@@ -416,14 +591,14 @@ class ItemHandle {
 }
 exports.ItemHandle = ItemHandle;
 class Menu {
-    constructor(name, parent, rectMode = RectMode_1.RectMode.OFF) {
+    constructor(name, parent, layout = layoutControl_1.Layout.OFF) {
         this.name = name;
         this.parent = parent;
-        this.rectMode = rectMode;
+        this.layout = layout;
         this.active = false;
         this.clearableElements = [];
         this.activateEvent = new Event_1.Event();
-        this.debugLogger = new DebugLogger_1.DebugLogger('Menu', { name });
+        this.debugLogger = new DebugLogger_1.DebugLogger(`Menu (${name})`);
         this.fullPath = parent === null ? [] : parent.fullPath.slice();
         if (name !== '') {
             this.fullPath.push(name);
@@ -442,13 +617,13 @@ class Menu {
         }
         document.body.appendChild(this.container);
         // 当显示模式变化时
-        RectMode_1.rectModeChangeEvent.on(({ newRectMode }) => {
+        layoutControl_1.layoutChangeEvent.on(({ newLayout }) => {
             // 如果自己是当前激活的菜单并且显示模式正在变化为全屏阅读器
-            if (this.active && newRectMode === RectMode_1.RectMode.MAIN) {
+            if (this.active && newLayout === layoutControl_1.Layout.MAIN) {
                 // 设置自己为非激活模式
                 this.setActive(false);
                 // 等待显示模式再次变化时
-                RectMode_1.rectModeChangeEvent.expect().then(() => {
+                layoutControl_1.layoutChangeEvent.expect().then(() => {
                     // 设置自己为激活模式
                     this.setActive(true);
                 });
@@ -458,7 +633,7 @@ class Menu {
     navigateTo(targetMenu) {
         this.setActive(false);
         targetMenu.setActive(true);
-        RectMode_1.setRectMode(targetMenu.rectMode);
+        layoutControl_1.setLayout(targetMenu.layout);
     }
     exit() {
         if (this.parent === null) {
@@ -533,326 +708,253 @@ class Menu {
 }
 exports.Menu = Menu;
 
-},{"./DebugLogger":5,"./Event":6,"./RectMode":9}],9:[function(require,module,exports){
+},{"./DebugLogger":6,"./Event":7,"./control/layoutControl":21}],9:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const DebugLogger_1 = require("./DebugLogger");
-const DOM_1 = require("./DOM");
-const Event_1 = require("./Event");
-var RectMode;
-(function (RectMode) {
-    RectMode[RectMode["SIDE"] = 0] = "SIDE";
-    RectMode[RectMode["MAIN"] = 1] = "MAIN";
-    RectMode[RectMode["OFF"] = 2] = "OFF";
-})(RectMode = exports.RectMode || (exports.RectMode = {}));
-const $rect = DOM_1.id('rect');
-const debugLogger = new DebugLogger_1.DebugLogger('RectMode');
-exports.rectModeChangeEvent = new Event_1.Event();
-let rectMode = RectMode.OFF;
-function setRectMode(newRectMode) {
-    debugLogger.log(`${RectMode[rectMode]} -> ${RectMode[newRectMode]}`);
-    if (rectMode === newRectMode) {
-        return;
-    }
-    if (newRectMode === RectMode.OFF) {
-        $rect.classList.remove('reading');
-    }
-    else {
-        if (rectMode === RectMode.MAIN) {
-            $rect.classList.remove('main');
-        }
-        else if (rectMode === RectMode.SIDE) {
-            $rect.classList.remove('side');
-        }
-        else {
-            $rect.classList.remove('main', 'side');
-            $rect.classList.add('reading');
-        }
-        if (newRectMode === RectMode.MAIN) {
-            $rect.classList.add('main');
-        }
-        else {
-            $rect.classList.add('side');
-        }
-    }
-    exports.rectModeChangeEvent.emit({
-        previousRectMode: rectMode,
-        newRectMode,
-    });
-    rectMode = newRectMode;
-}
-exports.setRectMode = setRectMode;
+exports.loadingText = '加载中...';
 
-},{"./DOM":4,"./DebugLogger":5,"./Event":6}],10:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const BlockMenu_1 = require("./BlockMenu");
-const commentsControl_1 = require("./commentsControl");
-const DOM_1 = require("./DOM");
-const Menu_1 = require("./Menu");
-const RectMode_1 = require("./RectMode");
-const settings_1 = require("./settings");
-const stylePreviewArticle_1 = require("./stylePreviewArticle");
-class EnumSettingMenu extends Menu_1.Menu {
-    constructor(parent, label, setting, usePreview) {
-        super(`${label}设置`, parent, usePreview ? RectMode_1.RectMode.SIDE : RectMode_1.RectMode.MAIN);
-        let currentHandle;
-        if (usePreview) {
-            this.activateEvent.on(() => {
-                commentsControl_1.hideComments();
-                DOM_1.id('content').innerHTML = stylePreviewArticle_1.stylePreviewArticle;
-            });
-        }
-        setting.options.forEach((valueName, value) => {
-            const handle = this.addItem(valueName, { small: true, button: true, decoration: Menu_1.ItemDecoration.SELECTABLE })
-                .onClick(() => {
-                currentHandle.setSelected(false);
-                handle.setSelected(true);
-                setting.setValue(value);
-                currentHandle = handle;
-            });
-            if (value === setting.getValue()) {
-                currentHandle = handle;
-                handle.setSelected(true);
-            }
-        });
-    }
-}
-exports.EnumSettingMenu = EnumSettingMenu;
-class SettingsMenu extends Menu_1.Menu {
-    constructor(parent) {
-        super('设置', parent);
-        this.addBooleanSetting('NSFW 警告', settings_1.warning);
-        this.addBooleanSetting('使用动画', settings_1.animation);
-        this.addBooleanSetting('显示编写中章节', settings_1.earlyAccess);
-        this.addBooleanSetting('显示评论', settings_1.useComments);
-        this.addBooleanSetting('手势切换章节（仅限手机）', settings_1.gestureSwitchChapter);
-        this.addEnumSetting('字体', settings_1.fontFamily, true);
-        this.addBooleanSetting('显示每个章节的字数', settings_1.charCount);
-        this.addBooleanSetting('开发人员模式', settings_1.developerMode);
-        this.addLink(new BlockMenu_1.BlockMenu(this), true);
-    }
-    addBooleanSetting(label, setting) {
-        const getText = () => `${label}：${setting.getValue() ? '开' : '关'}`;
-        const handle = this.addItem(getText(), { small: true, button: true })
-            .onClick(() => {
-            setting.toggle();
-            handle.setInnerText(getText());
-        });
-    }
-    addEnumSetting(label, setting, usePreview) {
-        const getText = () => `${label}：${setting.getValueName()}`;
-        const handle = this.addItem(getText(), { small: true, button: true });
-        const enumSettingMenu = new EnumSettingMenu(this, label, setting, usePreview === true);
-        handle.linkTo(enumSettingMenu).onClick(() => {
-            this.activateEvent.once(() => {
-                handle.setInnerText(getText());
-            });
-        });
-    }
-}
-exports.SettingsMenu = SettingsMenu;
-
-},{"./BlockMenu":1,"./DOM":4,"./Menu":8,"./RectMode":9,"./commentsControl":17,"./settings":28,"./stylePreviewArticle":31}],11:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const data_1 = require("./data");
-const Menu_1 = require("./Menu");
-class StatsKeywordsCountMenu extends Menu_1.Menu {
-    constructor(parent) {
-        super('关键词统计', parent);
-        this.addItem('添加其他关键词', {
-            small: true,
-            button: true,
-            link: 'https://github.com/SCLeoX/Wearable-Technology/edit/master/src/builder/keywords.ts',
-            decoration: Menu_1.ItemDecoration.ICON_LINK,
-        });
-        data_1.data.keywordsCount.forEach(([keyword, count]) => {
-            this.addItem(`${keyword}：${count}`, { small: true });
-        });
-    }
-}
-exports.StatsKeywordsCountMenu = StatsKeywordsCountMenu;
-
-},{"./Menu":8,"./data":18}],12:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const data_1 = require("./data");
-const Menu_1 = require("./Menu");
-const StatsKeywordsCountMenu_1 = require("./StatsKeywordsCountMenu");
-class StatsMenu extends Menu_1.Menu {
-    constructor(parent) {
-        super('统计', parent);
-        this.addItem('统计数据由构建脚本自动生成', { small: true });
-        this.addLink(new StatsKeywordsCountMenu_1.StatsKeywordsCountMenu(this), true, Menu_1.ItemDecoration.ICON_EQUALIZER);
-        this.addItem(`总字数：${data_1.data.charsCount}`, { small: true });
-        this.addItem(`总段落数：${data_1.data.paragraphsCount}`, { small: true });
-    }
-}
-exports.StatsMenu = StatsMenu;
-
-},{"./Menu":8,"./StatsKeywordsCountMenu":11,"./data":18}],13:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const commentsControl_1 = require("./commentsControl");
-const DebugLogger_1 = require("./DebugLogger");
-const DOM_1 = require("./DOM");
-const Menu_1 = require("./Menu");
-const RectMode_1 = require("./RectMode");
-const stylePreviewArticle_1 = require("./stylePreviewArticle");
-class Style {
-    constructor(name, def) {
-        this.name = name;
-        this.def = def;
-        this.styleSheet = null;
-        this.debugLogger = new DebugLogger_1.DebugLogger('Style', { name });
-    }
-    injectStyleSheet() {
-        const $style = document.createElement('style');
-        document.head.appendChild($style);
-        const sheet = $style.sheet;
-        sheet.disabled = true;
-        const attemptInsertRule = (rule) => {
-            try {
-                sheet.insertRule(rule);
-            }
-            catch (error) {
-                this.debugLogger.error(`Failed to inject rule "${rule}".`, error);
-            }
-        };
-        const key = `rgb(${this.def.keyColor.join(',')})`;
-        const keyAlpha = (alpha) => `rgba(${this.def.keyColor.join(',')},${alpha})`;
-        attemptInsertRule(`.container { color: ${key}; }`);
-        attemptInsertRule(`.menu { color: ${key}; }`);
-        attemptInsertRule(`.menu .button:active::after { background-color: ${key}; }`);
-        attemptInsertRule(`.button::after { background-color: ${key}; }`);
-        attemptInsertRule(`body { background-color: ${this.def.paperBgColor}; }`);
-        attemptInsertRule(`.rect { background-color: ${this.def.rectBgColor}; }`);
-        attemptInsertRule(`.rect.reading>div { background-color: ${this.def.paperBgColor}; }`);
-        attemptInsertRule(`.rect.reading>div { color: ${key}; }`);
-        attemptInsertRule(`.rect.reading>.content a { color: ${this.def.linkColor}; }`);
-        attemptInsertRule(`.rect.reading>.content a:hover { color: ${this.def.linkHoverColor}; }`);
-        attemptInsertRule(`.rect.reading>.content a:active { color: ${this.def.linkActiveColor}; }`);
-        attemptInsertRule(`.rect.reading .early-access.content-block { background-color: ${this.def.contentBlockEarlyAccessColor}; }`);
-        attemptInsertRule(`.rect>.comments>div { background-color: ${this.def.commentColor}; }`);
-        attemptInsertRule(`@media (min-width: 901px) { ::-webkit-scrollbar-thumb { background-color: ${this.def.paperBgColor}; } }`);
-        attemptInsertRule(`.rect>.comments>.create-comment::before { background-color: ${key}; }`);
-        attemptInsertRule(`:root { --paper-bg: ${this.def.paperBgColor}; }`);
-        attemptInsertRule(`:root { --key: ${key}; }`);
-        attemptInsertRule(`:root { --key-opacity-01: ${keyAlpha(0.1)}; }`);
-        attemptInsertRule(`:root { --key-opacity-05: ${keyAlpha(0.5)}; }`);
-        attemptInsertRule(`:root { --key-opacity-007: ${keyAlpha(0.07)}; }`);
-        attemptInsertRule(`:root { --key-opacity-004: ${keyAlpha(0.04)}; }`);
-        attemptInsertRule(`:root { --button-color: ${this.def.commentColor}; }`);
-        this.styleSheet = sheet;
-    }
-    active() {
-        if (Style.currentlyEnabled !== null) {
-            const currentlyEnabled = Style.currentlyEnabled;
-            if (currentlyEnabled.styleSheet !== null) {
-                currentlyEnabled.styleSheet.disabled = true;
-            }
-            currentlyEnabled.itemHandle.setSelected(false);
-        }
-        if (this.styleSheet === null) {
-            this.injectStyleSheet();
-        }
-        this.styleSheet.disabled = false;
-        this.itemHandle.setSelected(true);
-        window.localStorage.setItem('style', this.name);
-        Style.currentlyEnabled = this;
-    }
-}
-Style.currentlyEnabled = null;
-const darkKeyLinkColors = {
-    linkColor: '#00E',
-    linkHoverColor: '#F00',
-    linkActiveColor: '#00E',
-};
-const lightKeyLinkColors = {
-    linkColor: '#88F',
-    linkHoverColor: '#F33',
-    linkActiveColor: '#88F',
-};
-const styles = [
-    new Style('可穿戴科技（默认）', Object.assign(Object.assign({ rectBgColor: '#444', paperBgColor: '#333', keyColor: [221, 221, 221] }, lightKeyLinkColors), { contentBlockEarlyAccessColor: '#E65100', commentColor: '#444', keyIsDark: false })),
-    new Style('白纸', Object.assign(Object.assign({ rectBgColor: '#EFEFED', paperBgColor: '#FFF', keyColor: [0, 0, 0] }, darkKeyLinkColors), { contentBlockEarlyAccessColor: '#FFE082', commentColor: '#F5F5F5', keyIsDark: true })),
-    new Style('夜间', Object.assign(Object.assign({ rectBgColor: '#272B36', paperBgColor: '#38404D', keyColor: [221, 221, 221] }, lightKeyLinkColors), { contentBlockEarlyAccessColor: '#E65100', commentColor: '#272B36', keyIsDark: false })),
-    new Style('羊皮纸', Object.assign(Object.assign({ rectBgColor: '#D8D4C9', paperBgColor: '#F8F4E9', keyColor: [85, 40, 48] }, darkKeyLinkColors), { contentBlockEarlyAccessColor: '#FFE082', commentColor: '#F9EFD7', keyIsDark: true })),
-    new Style('巧克力', Object.assign(Object.assign({ rectBgColor: '#2E1C11', paperBgColor: '#3A2519', keyColor: [221, 175, 153] }, lightKeyLinkColors), { contentBlockEarlyAccessColor: '#E65100', commentColor: '#2C1C11', keyIsDark: false })),
+// https://material.io/resources/color/
+exports.materialDarkColors = [
+    'b71c1c',
+    '880e4f',
+    '4a148c',
+    '311b92',
+    '1a237e',
+    '0d47a1',
+    '01579b',
+    '006064',
+    '004d40',
+    '1b5e20',
+    '33691e',
+    '827717',
+    'bf360c',
+    '3e2723',
+    '795548',
+    '5d4037',
+    '1976d2',
+    '303f9f',
+    '3f51b5',
+    '673ab7',
+    '9c27b0',
+    'c2185b',
+    'd32f2f',
+    '263238',
+    '455a64',
+    '616161',
+    '212121',
 ];
-class StyleMenu extends Menu_1.Menu {
-    constructor(parent) {
-        super('阅读器样式', parent, RectMode_1.RectMode.SIDE);
-        for (const style of styles) {
-            style.itemHandle = this.addItem(style.name, { small: true, button: true, decoration: Menu_1.ItemDecoration.SELECTABLE })
-                .onClick(() => {
-                style.active();
-            });
-        }
-        const usedStyle = window.localStorage.getItem('style');
-        let flag = false;
-        for (const style of styles) {
-            if (usedStyle === style.name) {
-                style.active();
-                flag = true;
-                break;
-            }
-        }
-        if (!flag) {
-            styles[0].active();
-        }
-        this.activateEvent.on(() => {
-            commentsControl_1.hideComments();
-            DOM_1.id('content').innerHTML = stylePreviewArticle_1.stylePreviewArticle;
-        });
-    }
-}
-exports.StyleMenu = StyleMenu;
 
-},{"./DOM":4,"./DebugLogger":5,"./Menu":8,"./RectMode":9,"./commentsControl":17,"./stylePreviewArticle":31}],14:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const Menu_1 = require("./Menu");
-const thanks_1 = require("./thanks");
-class ThanksMenu extends Menu_1.Menu {
-    constructor(parent) {
-        super('鸣谢列表', parent);
-        for (const person of thanks_1.thanks) {
-            this.addItem(person.name, person.link === undefined
-                ? { small: true }
-                : { small: true, button: true, link: person.link, decoration: Menu_1.ItemDecoration.ICON_LINK });
-        }
-    }
-}
-exports.ThanksMenu = ThanksMenu;
+exports.EARLY_ACCESS_TITLE = '编写中章节';
+exports.EARLY_ACCESS_DESC = '请注意，本文正在编写中，因此可能会含有未完成的句子或是尚未更新的信息。';
+exports.PREVIOUS_CHAPTER = '上一章';
+exports.GO_TO_MENU = '返回菜单';
+exports.NEXT_CHAPTER = '下一章';
+exports.CHAPTER_LOADING = '章节加载中...';
+exports.CHAPTER_FAILED = '章节加载失败，请检查网络连接。';
+exports.COMMENTS_SECTION = '评论区';
+exports.COMMENTS_LOADING = '评论加载中...';
+exports.COMMENTS_UNAVAILABLE = '本文评论不可用。';
+exports.COMMENTS_CREATE = '+ 添加评论';
+exports.COMMENTS_LOADED = '以下为本章节的评论区。';
+exports.COMMENTS_FAILED = '评论加载失败，请检查网络连接。';
+exports.NO_BLOCKED_USERS = '没有用户的评论被屏蔽';
+exports.CLICK_TO_UNBLOCK = '(点击用户名以解除屏蔽)';
+exports.WTCD_ERROR_COMPILE_TITLE = 'WTCD 编译失败';
+exports.WTCD_ERROR_COMPILE_DESC = '该 WTCD 文档在编译时发生了错误。请检查是否有语法错误或是其他基本错误。';
+exports.WTCD_ERROR_RUNTIME_TITLE = 'WTCD 运行时错误';
+exports.WTCD_ERROR_RUNTIME_DESC = '该 WTCD 文档在运行时发生了错误。请检查是否有逻辑错误。';
+exports.WTCD_ERROR_INTERNAL_TITLE = 'WTCD 内部错误';
+exports.WTCD_ERROR_INTERNAL_DESC = 'WTCD 解释器在解释执行该 WTCD 文档时崩溃了。请务必告诉琳你做了什么好让她来修。';
+exports.WTCD_ERROR_MESSAGE = '错误信息：';
+exports.WTCD_ERROR_WTCD_STACK_TITLE = 'WTCD 调用栈';
+exports.WTCD_ERROR_WTCD_STACK_DESC = 'WTCD 调用栈记录了在错误发生时 WTCD 的解释器状态。这可以帮助理解错误发生的上下文。';
+exports.WTCD_ERROR_INTERNAL_STACK_TITLE = '内部调用栈';
+exports.WTCD_ERROR_INTERNAL_STACK_DESC = '内部调用栈记录了出现该错误时编译器或是解释器的状态。请注意内部调用栈通常只在调试 WTCD 编译器或是解释器时有用。内部调用栈通常对调试 WTCD 文档没有作用。';
 
-},{"./Menu":8,"./thanks":32}],15:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const FlowReader_1 = require("../wtcd/FlowReader");
-const WTCDError_1 = require("../wtcd/WTCDError");
+exports.stylePreviewArticle = `<h1>午饭</h1>
+<p><em>作者：友人♪B</em></p>
+<p>“午饭，午饭♪”</p>
+<p>阳伞下的琳，很是期待今天的午饭。</p>
+<p>或许是体质和别的血族不太一样，琳能够感知到食物的味道，似乎也保有着生物对食物的喜爱。</p>
+<p>虽然她并不能从这些食物中获取能量就是。</p>
+<p>学校食堂的夏季限定甜点今天也很是抢手，这点从队伍的长度就能看出来——队伍险些就要超出食堂的范围了。</p>
+<p>“你说我要有钱多好——”</p>
+<p>已经从隔壁窗口买下了普通，但是很便宜的营养餐的秋镜悬，看着队伍中兴致勃勃的琳。</p>
+<p>其实她并不是缺钱，大约是吝啬。</p>
+<p>这得怪她娘，穷养秋镜悬养习惯了，现在她光自己除灵退魔挣来的外快都够她奢侈上一把了，可却还保留着能不花钱绝对不花，必须花钱越少越好的吝啬习惯。</p>
+<p>少顷，琳已经带着她的甜品建筑——每块砖头都是一块蛋糕，堆成一个诡异的火柴盒——来到了桌前。</p>
+<p>“（吃不胖真好，有钱真好……”</p>
+<p>血族的听觉自然是捕捉到了秋镜悬的嘀咕，琳放下盘子，悄咪咪地将牙贴上了秋镜悬的脖颈。</p>
+<p>“嘻嘻♪”</p>
+<p>“呜——”</p>
+<p>盯——</p>
+<p>秋镜悬看了看盘中剩下的一块毛血旺，似是联系到了什么，将目光转向了琳的牙。</p>
+<p>正在享用蛋糕盛宴的琳以余光瞥见了她的视线，</p>
+<p>“盯着本小姐是要做什么呢？”</p>
+<p>“啊，没，没什么……”</p>
+<p>秋镜悬支支吾吾的说着，</p>
+<p>“就是好奇一个问题，血族为什么不吃毛血旺……”</p>
+<p>“噢☆毛血旺就是那个煮熟的血块是吧？太没有美感了这种血！而且吃了也没法儿恢复能量，简直就是血液的绝佳浪费☆！”</p>
+<p>琳发出了对这样美食的鄙视，不过这种鄙视大约只有血族和蚊子会出现吧……</p>
+<p>“血族需要摄入血，是因为血所具有的生命能量，如果煮熟了的话，超过九成的能量都被转化成其他的东西了，对我们来说实在是没什么用处，还白白浪费了作为原料的血，这种东西本小姐才不吃咧✘！饿死，死外边，从这边跳下去也不吃✘！”</p>
+<p>“欸，别这么说嘛，你能尝得到味道的吧，吃一块试试呗？”</p>
+<p>“真……真香♪”</p>
+<p>当晚，因为触发了真香定律而感到很火大的琳，把秋镜悬丢进了自己的高维空间里头放置了一晚上（高维时间三天）泄愤。</p>`;
+
+},{}],13:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.thanks = [
+    { name: '神楽坂 立音' },
+    { name: 'lgd_小翅膀' },
+    { name: '青葉' },
+    { name: 'kn' },
+    { name: 'F74nk', link: 'https://t.me/F74nk_K' },
+    { name: '杨佳文' },
+    { name: '不知名的N姓人士就好' },
+    { name: '某不愿透露姓名的N性？' },
+    { name: '神楽坂 萌绫' },
+    { name: 'Butby' },
+    { name: '友人♪B' },
+    { name: 'NekoCaffeine' },
+    { name: 'RainSlide' },
+    { name: 'czp', link: 'https://www.hiczp.com' },
+    { name: 'kookxiang' },
+    { name: '櫻川 紗良' },
+    { name: 'Skimige' },
+    { name: 'TExL', link: 'http://texas.penguin-logistics.cn' },
+    { name: '路人乙' },
+    { name: 'pokemonchw', link: 'https://github.com/pokemonchw' },
+    { name: '帕蒂卡', link: 'https://github.com/Patika-ailemait' },
+    { name: '零件', link: 'https://nekosc.com' },
+    { name: '幻梦', link: 'https://t.me/HuanmengQwQ' },
+    { name: 'acted咕咕喵', link: 'https://acted.gitlab.io' },
+    { name: '重水时雨', link: 'https://t.me/boatmasteronD2O' },
+    { name: '神楽坂 紫' },
+    { name: 'Runian Lee', link: 'https://t.me/Runian' },
+].sort(() => Math.random() - 0.5);
+
+},{}],14:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+function sign(x) {
+    return x > 0 ? 1 : x < 0 ? -1 : 0;
+}
+function solveQuad(a, b, c) {
+    const D = (b ** 2) - 4 * a * c;
+    return (-b + sign(a) * (D ** 0.5)) / (2 * a);
+}
+class MonoDimensionTransitionControl {
+    constructor(
+    /** Initial value */
+    lastValue, accelerationPerSecSq) {
+        this.lastValue = lastValue;
+        /** Start time of the current transition */
+        this.initialTime = 0;
+        /** Time when the acceleration is reversed of the current transition */
+        this.reverseTime = 0;
+        /** Value when the acceleration is reversed of the current transition */
+        this.reverseValue = 0;
+        /** Velocity when the acceleration is reversed of the current transition */
+        this.reverseVelocity = 0;
+        /** Start velocity of the current transition */
+        this.lastStartingVelocity = 0;
+        /** Time when the current transition is finished */
+        this.finalTime = 0;
+        /** Target value of the current transition */
+        this.finalValue = 0;
+        /** Acceleration in unit per ms */
+        this.acceleration = 0;
+        this.finalValue = lastValue;
+        this.acceleration = accelerationPerSecSq / 1000 / 1000;
+    }
+    setTarget(targetValue) {
+        this.lastValue = this.getValue();
+        const x = targetValue - this.lastValue;
+        if (x === 0) {
+            return;
+        }
+        const now = Date.now();
+        const v = this.getVelocity(now);
+        // Find a solution for reverse time
+        let t = solveQuad(this.acceleration, 2 * v, 0.5 * (v ** 2) / this.acceleration - x);
+        if (Number.isNaN(t) || t < 0) {
+            // If a reverse time cannot be found with current sign of acceleration, try again with the opposite of acceleration
+            this.acceleration = -this.acceleration;
+            t = solveQuad(this.acceleration, 2 * v, 0.5 * (v ** 2) / this.acceleration - x);
+        }
+        const a = this.acceleration;
+        this.initialTime = now;
+        this.reverseTime = this.initialTime + t;
+        this.reverseValue = this.lastValue + 0.5 * a * (t ** 2) + v * t;
+        this.reverseVelocity = v + a * t;
+        this.finalTime = this.reverseTime + t + v / a;
+        this.lastStartingVelocity = v;
+        this.finalValue = targetValue;
+    }
+    getVelocity(now = Date.now()) {
+        return now < this.reverseTime
+            ? this.lastStartingVelocity + (now - this.initialTime) * this.acceleration
+            : now < this.finalTime
+                ? this.lastStartingVelocity + (2 * this.reverseTime - this.initialTime - now) * this.acceleration
+                : 0;
+    }
+    getValue(now = Date.now()) {
+        if (now < this.reverseTime) {
+            const t = now - this.initialTime;
+            return this.lastValue + 0.5 * this.acceleration * (t ** 2) + this.lastStartingVelocity * t;
+        }
+        else if (now < this.finalTime) {
+            const t = now - this.reverseTime;
+            return this.reverseValue - 0.5 * this.acceleration * (t ** 2) + this.reverseVelocity * t;
+        }
+        else {
+            return this.finalValue;
+        }
+    }
+    isFinished(now = Date.now()) {
+        return now >= this.finalTime;
+    }
+}
+exports.MonoDimensionTransitionControl = MonoDimensionTransitionControl;
+
+},{}],15:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const FlowReader_1 = require("../../wtcd/FlowReader");
+const GameReader_1 = require("../../wtcd/GameReader");
+const WTCDError_1 = require("../../wtcd/WTCDError");
+const loadingText_1 = require("../constant/loadingText");
+const messages_1 = require("../constant/messages");
+const AutoCache_1 = require("../data/AutoCache");
+const data_1 = require("../data/data");
+const settings_1 = require("../data/settings");
+const state_1 = require("../data/state");
+const DebugLogger_1 = require("../DebugLogger");
+const Event_1 = require("../Event");
+const hs_1 = require("../hs");
+const gestures_1 = require("../input/gestures");
+const keyboard_1 = require("../input/keyboard");
+const DOM_1 = require("../util/DOM");
 const commentsControl_1 = require("./commentsControl");
-const data_1 = require("./data");
-const DebugLogger_1 = require("./DebugLogger");
-const DOM_1 = require("./DOM");
-const Event_1 = require("./Event");
-const gestures_1 = require("./gestures");
+const contentControl_1 = require("./contentControl");
 const history_1 = require("./history");
-const keyboard_1 = require("./keyboard");
-const loadingText_1 = require("./loadingText");
-const messages_1 = require("./messages");
+const layoutControl_1 = require("./layoutControl");
 const processElements_1 = require("./processElements");
-const RectMode_1 = require("./RectMode");
-const settings_1 = require("./settings");
-const state_1 = require("./state");
-const debugLogger = new DebugLogger_1.DebugLogger('chapterControl');
-const $content = DOM_1.id('content');
-const $rect = DOM_1.id('rect');
-const chaptersCache = new Map();
+const scrollControl_1 = require("./scrollControl");
+const debugLogger = new DebugLogger_1.DebugLogger('Chapter Control');
 exports.loadChapterEvent = new Event_1.Event();
 function closeChapter() {
-    RectMode_1.setRectMode(RectMode_1.RectMode.OFF);
+    layoutControl_1.setLayout(layoutControl_1.Layout.OFF);
     state_1.state.currentChapter = null;
     state_1.state.chapterSelection = null;
     state_1.state.chapterTextNodes = null;
@@ -879,17 +981,6 @@ const getFlexOneSpan = () => {
     return $span;
 };
 const canChapterShown = (chapter) => settings_1.earlyAccess.getValue() || !chapter.isEarlyAccess;
-const createContentBlock = (type, title, text) => {
-    const $block = document.createElement('div');
-    $block.classList.add('content-block', type);
-    const $title = document.createElement('h1');
-    $title.innerText = title;
-    $block.appendChild($title);
-    const $text = document.createElement('p');
-    $text.innerText = text;
-    $block.appendChild($text);
-    return $block;
-};
 function loadPrevChapter() {
     const chapterCtx = state_1.state.currentChapter;
     if (chapterCtx === null) {
@@ -898,7 +989,7 @@ function loadPrevChapter() {
     const chapterIndex = chapterCtx.inFolderIndex;
     if (chapterIndex >= 1 && canChapterShown(chapterCtx.folder.chapters[chapterIndex - 1])) {
         const prevChapter = chapterCtx.folder.chapters[chapterIndex - 1].htmlRelativePath;
-        loadChapter(prevChapter);
+        loadChapter(prevChapter, undefined, contentControl_1.Side.LEFT);
         history_1.updateHistory(true);
     }
 }
@@ -911,91 +1002,107 @@ function loadNextChapter() {
     const chapterIndex = chapterCtx.inFolderIndex;
     if (chapterIndex < chapterCtx.folder.chapters.length - 1 && canChapterShown(chapterCtx.folder.chapters[chapterIndex + 1])) {
         const nextChapter = chapterCtx.folder.chapters[chapterIndex + 1].htmlRelativePath;
-        loadChapter(nextChapter);
+        loadChapter(nextChapter, undefined, contentControl_1.Side.RIGHT);
         history_1.updateHistory(true);
     }
 }
 exports.loadNextChapter = loadNextChapter;
-const finalizeChapterLoading = (selection) => {
-    state_1.state.chapterTextNodes = DOM_1.getTextNodes($content);
-    if (selection !== undefined) {
-        if (DOM_1.id('warning') === null) {
-            select(selection);
-        }
-        else {
-            DOM_1.id('warning').addEventListener('click', () => {
-                select(selection);
-            });
-        }
-    }
-    processElements_1.processElements($content);
-    const chapterCtx = state_1.state.currentChapter;
-    const chapterIndex = chapterCtx.inFolderIndex;
+const chaptersCache = new AutoCache_1.AutoCache(chapterHtmlRelativePath => {
+    const url = `./chapters/${chapterHtmlRelativePath}`;
+    debugLogger.log(`Loading chapter from ${url}.`);
+    return fetch(url).then(response => response.text());
+}, new DebugLogger_1.DebugLogger('Chapters Cache'));
+function loadChapter(chapterHtmlRelativePath, selection, side = contentControl_1.Side.LEFT) {
+    scrollControl_1.scrollTo(0);
+    debugLogger.log('Load chapter', chapterHtmlRelativePath, 'with selection', selection);
+    exports.loadChapterEvent.emit(chapterHtmlRelativePath);
+    window.localStorage.setItem('lastRead', chapterHtmlRelativePath);
+    const chapterCtx = data_1.relativePathLookUpMap.get(chapterHtmlRelativePath);
+    state_1.state.currentChapter = chapterCtx;
+    const content = contentControl_1.newContent(side);
     if (chapterCtx.chapter.isEarlyAccess) {
-        const $block = createContentBlock('early-access', '编写中章节', '请注意，本文正在编写中，因此可能会含有未完成的句子或是尚未更新的信息。');
-        $rect.prepend($block);
+        content.addBlock((hs_1.h('div', [
+            hs_1.h('h1', messages_1.EARLY_ACCESS_TITLE),
+            hs_1.h('p', messages_1.EARLY_ACCESS_DESC),
+        ])), contentControl_1.ContentBlockStyle.WARNING);
     }
-    const $div = document.createElement('div');
-    $div.style.display = 'flex';
-    $div.style.marginTop = '2vw';
-    if (chapterIndex >= 1 && canChapterShown(chapterCtx.folder.chapters[chapterIndex - 1])) {
-        const prevChapter = chapterCtx.folder.chapters[chapterIndex - 1].htmlRelativePath;
-        const $prevLink = document.createElement('a');
-        $prevLink.innerText = '上一章';
-        $prevLink.href = `${window.location.pathname}#${prevChapter}`;
-        $prevLink.style.textAlign = 'left';
-        $prevLink.style.flex = '1';
-        $prevLink.addEventListener('click', event => {
-            event.preventDefault();
-            loadPrevChapter();
-        });
-        $div.appendChild($prevLink);
-    }
-    else {
-        $div.appendChild(getFlexOneSpan());
-    }
-    const $menuLink = document.createElement('a');
-    $menuLink.innerText = '返回菜单';
-    $menuLink.href = window.location.pathname;
-    $menuLink.style.textAlign = 'center';
-    $menuLink.style.flex = '1';
-    $menuLink.addEventListener('click', event => {
-        event.preventDefault();
-        closeChapter();
-        history_1.updateHistory(true);
-    });
-    $div.appendChild($menuLink);
-    if (chapterIndex < chapterCtx.folder.chapters.length - 1 && canChapterShown(chapterCtx.folder.chapters[chapterIndex + 1])) {
-        const nextChapter = chapterCtx.folder.chapters[chapterIndex + 1].htmlRelativePath;
-        const $nextLink = document.createElement('a');
-        $nextLink.innerText = '下一章';
-        $nextLink.href = `${window.location.pathname}#${nextChapter}`;
-        $nextLink.style.textAlign = 'right';
-        $nextLink.style.flex = '1';
-        $nextLink.addEventListener('click', event => {
-            event.preventDefault();
-            loadNextChapter();
-        });
-        $div.appendChild($nextLink);
-    }
-    else {
-        $div.appendChild(getFlexOneSpan());
-    }
-    $content.appendChild($div);
-    commentsControl_1.loadComments(chapterCtx.chapter.commentsUrl);
-    // fix for stupid scrolling issues under iOS
-    DOM_1.id('rect').style.overflow = 'hidden';
-    setTimeout(() => {
-        DOM_1.id('rect').style.overflow = '';
-        if (selection === undefined) {
-            DOM_1.id('rect').scrollTo(0, 0);
+    const chapterBlock = content.addBlock(hs_1.h('.content'));
+    layoutControl_1.setLayout(layoutControl_1.Layout.MAIN);
+    chapterBlock.element.innerText = loadingText_1.loadingText;
+    chaptersCache.get(chapterHtmlRelativePath).then(text => {
+        if (content.isDestroyed) {
+            debugLogger.log('Chapter loaded, but abandoned since the original ' +
+                'content page is already destroyed.');
+            return;
         }
-    }, 1);
-    // Re-focus the rect so it is arrow-scrollable
-    setTimeout(() => {
-        DOM_1.id('rect').focus();
-    }, 1);
-};
+        debugLogger.log('Chapter loaded.');
+        insertContent(chapterBlock.element, text, chapterCtx.chapter);
+        processElements_1.processElements(chapterBlock.element);
+        state_1.state.chapterTextNodes = DOM_1.getTextNodes(chapterBlock.element);
+        if (selection !== undefined) {
+            if (DOM_1.id('warning') === null) {
+                select(selection);
+            }
+            else {
+                DOM_1.id('warning').addEventListener('click', () => {
+                    select(selection);
+                });
+            }
+        }
+        const chapterIndex = chapterCtx.inFolderIndex;
+        const prevChapter = chapterCtx.folder.chapters[chapterIndex - 1];
+        const nextChapter = chapterCtx.folder.chapters[chapterIndex + 1];
+        chapterBlock.element.appendChild(hs_1.h('div.page-switcher', [
+            // 上一章
+            (prevChapter !== undefined && canChapterShown(prevChapter))
+                ? hs_1.h('a.to-prev', {
+                    href: window.location.pathname + '#' + prevChapter.htmlRelativePath,
+                    onclick: (event) => {
+                        event.preventDefault();
+                        loadPrevChapter();
+                    },
+                }, messages_1.PREVIOUS_CHAPTER)
+                : hs_1.h('a'),
+            // 返回菜单
+            hs_1.h('a.to-menu', {
+                href: window.location.pathname,
+                onclick: (event) => {
+                    event.preventDefault();
+                    closeChapter();
+                    history_1.updateHistory(true);
+                },
+            }, messages_1.GO_TO_MENU),
+            // 下一章
+            (nextChapter !== undefined && canChapterShown(nextChapter))
+                ? hs_1.h('a.to-next', {
+                    href: window.location.pathname + '#' + nextChapter.htmlRelativePath,
+                    onclick: (event) => {
+                        event.preventDefault();
+                        loadNextChapter();
+                    },
+                }, messages_1.NEXT_CHAPTER)
+                : hs_1.h('a'),
+        ]));
+        // fix for stupid scrolling issues under iOS
+        // id('rect').style.overflow = 'hidden';
+        // setTimeout(() => {
+        //   id('rect').style.overflow = '';
+        //   if (selection === undefined) {
+        //     id('rect').scrollTo(0, 0);
+        //   }
+        // }, 1);
+        // Re-focus the rect so it is arrow-scrollable
+        setTimeout(() => {
+            contentControl_1.focusOnContainer();
+        }, 1);
+        commentsControl_1.loadComments(contentControl_1.getCurrentContent(), chapterCtx.chapter.commentsUrl);
+    })
+        .catch(error => {
+        debugLogger.error(`Failed to load chapter.`, error);
+        chapterBlock.element.innerText = messages_1.CHAPTER_FAILED;
+    });
+}
+exports.loadChapter = loadChapter;
 gestures_1.swipeEvent.on(direction => {
     if (!settings_1.gestureSwitchChapter.getValue()) {
         return;
@@ -1078,6 +1185,18 @@ function createWTCDErrorMessage({ errorType, message, internalStack, wtcdStack, 
     }
     return $target;
 }
+function createWTCDErrorMessageFromError(error) {
+    return createWTCDErrorMessage({
+        errorType: (error instanceof WTCDError_1.WTCDError)
+            ? ErrorType.RUNTIME
+            : ErrorType.INTERNAL,
+        message: error.message,
+        internalStack: error.stack,
+        wtcdStack: (error instanceof WTCDError_1.WTCDError)
+            ? error.wtcdStack
+            : undefined,
+    });
+}
 function insertContent($target, content, chapter) {
     switch (chapter.type) {
         case 'Markdown':
@@ -1094,62 +1213,30 @@ function insertContent($target, content, chapter) {
                 }));
                 break;
             }
-            const flowInterface = new FlowReader_1.FlowReader(chapter.htmlRelativePath, wtcdParseResult.wtcdRoot, error => createWTCDErrorMessage({
-                errorType: (error instanceof WTCDError_1.WTCDError)
-                    ? ErrorType.RUNTIME
-                    : ErrorType.INTERNAL,
-                message: error.message,
-                internalStack: error.stack,
-                wtcdStack: (error instanceof WTCDError_1.WTCDError)
-                    ? error.wtcdStack
-                    : undefined,
-            }), processElements_1.processElements);
-            const $wtcdContainer = document.createElement('div');
-            flowInterface.renderTo($wtcdContainer);
-            $content.appendChild($wtcdContainer);
-            break;
-        }
-    }
-}
-function loadChapter(chapterHtmlRelativePath, selection) {
-    debugLogger.log('Load chapter', chapterHtmlRelativePath, 'selection', selection);
-    commentsControl_1.hideComments();
-    Array.from(document.getElementsByClassName('content-block'))
-        .forEach($block => $block.remove());
-    exports.loadChapterEvent.emit(chapterHtmlRelativePath);
-    window.localStorage.setItem('lastRead', chapterHtmlRelativePath);
-    RectMode_1.setRectMode(RectMode_1.RectMode.MAIN);
-    const chapterCtx = data_1.relativePathLookUpMap.get(chapterHtmlRelativePath);
-    state_1.state.currentChapter = chapterCtx;
-    if (chaptersCache.has(chapterHtmlRelativePath)) {
-        if (chaptersCache.get(chapterHtmlRelativePath) === null) {
-            $content.innerText = loadingText_1.loadingText;
-        }
-        else {
-            insertContent($content, chaptersCache.get(chapterHtmlRelativePath), chapterCtx.chapter);
-            finalizeChapterLoading(selection);
-        }
-    }
-    else {
-        $content.innerText = loadingText_1.loadingText;
-        fetch(`./chapters/${chapterHtmlRelativePath}`)
-            .then(response => response.text())
-            .then(text => {
-            chaptersCache.set(chapterHtmlRelativePath, text);
-            if (chapterCtx === state_1.state.currentChapter) {
-                insertContent($content, text, chapterCtx.chapter);
-                finalizeChapterLoading(selection);
+            switch (chapter.preferredReader) {
+                case 'flow': {
+                    const flowReader = new FlowReader_1.FlowReader(chapter.htmlRelativePath, wtcdParseResult.wtcdRoot, createWTCDErrorMessageFromError, processElements_1.processElements);
+                    const $wtcdContainer = document.createElement('div');
+                    flowReader.renderTo($wtcdContainer);
+                    $target.appendChild($wtcdContainer);
+                    break;
+                }
+                case 'game': {
+                    const gameReader = new GameReader_1.GameReader(chapter.htmlRelativePath, wtcdParseResult.wtcdRoot, createWTCDErrorMessageFromError, processElements_1.processElements);
+                    const $wtcdContainer = document.createElement('div');
+                    gameReader.renderTo($wtcdContainer);
+                    $target.appendChild($wtcdContainer);
+                    break;
+                }
             }
-        });
+        }
     }
-    return true;
 }
-exports.loadChapter = loadChapter;
 
-},{"../wtcd/FlowReader":34,"../wtcd/WTCDError":37,"./DOM":4,"./DebugLogger":5,"./Event":6,"./RectMode":9,"./commentsControl":17,"./data":18,"./gestures":21,"./history":22,"./keyboard":24,"./loadingText":25,"./messages":26,"./processElements":27,"./settings":28,"./state":30}],16:[function(require,module,exports){
+},{"../../wtcd/FlowReader":46,"../../wtcd/GameReader":47,"../../wtcd/WTCDError":50,"../DebugLogger":6,"../Event":7,"../constant/loadingText":9,"../constant/messages":11,"../data/AutoCache":25,"../data/data":26,"../data/settings":27,"../data/state":28,"../hs":29,"../input/gestures":31,"../input/keyboard":32,"../util/DOM":42,"./commentsControl":17,"./contentControl":18,"./history":20,"./layoutControl":21,"./processElements":22,"./scrollControl":23}],16:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const Event_1 = require("./Event");
+const Event_1 = require("../Event");
 const blockedUsers = new Set(JSON.parse(window.localStorage.getItem('blockedUsers') || '[]'));
 exports.blockedUserUpdateEvent = new Event_1.Event();
 function saveBlockedUsers() {
@@ -1175,135 +1262,233 @@ function getBlockedUsers() {
 }
 exports.getBlockedUsers = getBlockedUsers;
 
-},{"./Event":6}],17:[function(require,module,exports){
+},{"../Event":7}],17:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const messages_1 = require("../constant/messages");
+const AutoCache_1 = require("../data/AutoCache");
+const settings_1 = require("../data/settings");
+const DebugLogger_1 = require("../DebugLogger");
+const hs_1 = require("../hs");
+const formatTime_1 = require("../util/formatTime");
 const commentBlockControl_1 = require("./commentBlockControl");
-const DOM_1 = require("./DOM");
-const formatTime_1 = require("./formatTime");
-const messages_1 = require("./messages");
-const settings_1 = require("./settings");
-const $comments = DOM_1.id('comments');
-const $commentsStatus = DOM_1.id('comments-status');
-const $createComment = DOM_1.id('create-comment');
+const debugLogger = new DebugLogger_1.DebugLogger('Comments Control');
 const getApiUrlRegExp = /^https:\/\/github\.com\/([a-zA-Z0-9-_]+)\/([a-zA-Z0-9-_]+)\/issues\/([1-9][0-9]*)$/;
+// Input sample: https://github.com/SCLeoX/Wearable-Technology/issues/1
+// Output sample: https://api.github.com/repos/SCLeoX/Wearable-Technology/issues/1/comments
 function getApiUrl(issueUrl) {
-    // Input sample: https://github.com/SCLeoX/Wearable-Technology/issues/1
-    // Output sample: https://api.github.com/repos/SCLeoX/Wearable-Technology/issues/1/comments
     const result = getApiUrlRegExp.exec(issueUrl);
     if (result === null) {
         throw new Error(`Bad issue url: ${issueUrl}.`);
     }
     return `https://api.github.com/repos/${result[1]}/${result[2]}/issues/${result[3]}/comments`;
 }
-let nextRequestId = 1;
-let currentRequestId = 0;
-let currentCreateCommentLinkUrl = '';
-$createComment.addEventListener('click', () => {
-    window.open(currentCreateCommentLinkUrl, '_blank');
-});
 function createCommentElement(userAvatarUrl, userName, userUrl, createTime, updateTime, content) {
-    const $comment = document.createElement('div');
-    $comment.classList.add('comment');
-    const $avatar = document.createElement('img');
-    $avatar.classList.add('avatar');
-    $avatar.src = userAvatarUrl;
-    $comment.appendChild($avatar);
-    const $author = document.createElement('a');
-    $author.classList.add('author');
-    $author.innerText = userName;
-    $author.target = '_blank';
-    $author.href = userUrl;
-    $comment.appendChild($author);
-    const $time = document.createElement('div');
-    $time.classList.add('time');
-    $time.innerText = createTime === updateTime
-        ? formatTime_1.formatTime(new Date(createTime))
-        : `${formatTime_1.formatTime(new Date(createTime))}（最后修改于 ${formatTime_1.formatTime(new Date(updateTime))}）`;
-    $comment.appendChild($time);
-    const $blockUser = document.createElement('a');
-    $blockUser.classList.add('block-user');
-    $blockUser.innerText = '屏蔽此人';
-    $blockUser.onclick = () => {
-        commentBlockControl_1.blockUser(userName);
-        $comment.remove();
-    };
-    $comment.appendChild($blockUser);
-    content.split('\n\n').forEach(paragraph => {
-        const $p = document.createElement('p');
-        $p.innerText = paragraph;
-        $comment.appendChild($p);
-    });
+    const $comment = hs_1.h('.comment', [
+        hs_1.h('img.avatar', { src: userAvatarUrl }),
+        hs_1.h('a.author', {
+            target: '_blank',
+            href: userUrl,
+        }, userName),
+        hs_1.h('.time', createTime === updateTime
+            ? formatTime_1.formatTime(new Date(createTime))
+            : `${formatTime_1.formatTime(new Date(createTime))}` +
+                `（最后修改于 ${formatTime_1.formatTime(new Date(updateTime))}）`),
+        hs_1.h('a.block-user', {
+            onclick: () => {
+                commentBlockControl_1.blockUser(userName);
+                $comment.remove();
+            },
+        }, '屏蔽此人'),
+        ...content.split('\n\n').map(paragraph => hs_1.h('p', paragraph)),
+    ]);
     return $comment;
 }
-// 为了确保 comments 在离场动画中存在，hideComments 和 showComments 应该只在入场动画前使用。
-function hideComments() {
-    $comments.classList.toggle('display-none', true);
-    currentRequestId = 0;
-}
-exports.hideComments = hideComments;
-function loadComments(issueUrl) {
+const commentsCache = new AutoCache_1.AutoCache(apiUrl => {
+    debugLogger.log(`Loading comments from ${apiUrl}.`);
+    return fetch(apiUrl).then(response => response.json());
+}, new DebugLogger_1.DebugLogger('Comments Cache'));
+function loadComments(content, issueUrl) {
     if (settings_1.useComments.getValue() === false) {
         return;
     }
-    Array.from($comments.getElementsByClassName('comment')).forEach($element => $element.remove());
-    $comments.classList.toggle('display-none', false);
-    $createComment.classList.toggle('display-none', true);
+    const $commentsStatus = hs_1.h('p', messages_1.COMMENTS_LOADING);
+    const $comments = hs_1.h('.comments', [
+        hs_1.h('h1', messages_1.COMMENTS_SECTION),
+        $commentsStatus,
+    ]);
+    const block = content.addBlock($comments);
     if (issueUrl === null) {
         $commentsStatus.innerText = messages_1.COMMENTS_UNAVAILABLE;
         return;
     }
-    currentCreateCommentLinkUrl = issueUrl;
-    const requestId = currentRequestId = nextRequestId++;
-    const apiUrl = getApiUrl(issueUrl);
-    $commentsStatus.innerText = messages_1.COMMENTS_LOADING;
-    fetch(apiUrl)
-        .then(response => response.json())
-        .then(data => {
-        if (requestId !== currentRequestId) {
-            return;
-        }
-        $commentsStatus.innerText = messages_1.COMMENTS_LOADED;
-        data.forEach((comment) => {
-            if (commentBlockControl_1.isUserBlocked(comment.user.login)) {
+    block.onEnteringView(() => {
+        const apiUrl = getApiUrl(issueUrl);
+        commentsCache.get(apiUrl).then(data => {
+            if (content.isDestroyed) {
+                debugLogger.log('Comments loaded, but abandoned since the original ' +
+                    'content page is already destroyed.');
                 return;
             }
-            $comments.appendChild(createCommentElement(comment.user.avatar_url, comment.user.login, comment.user.html_url, comment.created_at, comment.updated_at, comment.body));
+            debugLogger.log('Comments loaded.');
+            $commentsStatus.innerText = messages_1.COMMENTS_LOADED;
+            data.forEach((comment) => {
+                if (commentBlockControl_1.isUserBlocked(comment.user.login)) {
+                    return;
+                }
+                $comments.appendChild(createCommentElement(comment.user.avatar_url, comment.user.login, comment.user.html_url, comment.created_at, comment.updated_at, comment.body));
+            });
+            $comments.appendChild(hs_1.h('.create-comment', {
+                onclick: () => {
+                    window.open(issueUrl, '_blank');
+                },
+            }, messages_1.COMMENTS_CREATE));
+        })
+            .catch(() => {
+            $commentsStatus.innerText = messages_1.COMMENTS_FAILED;
         });
-        $createComment.classList.toggle('display-none', false);
-    })
-        .catch(error => {
-        $commentsStatus.innerText = messages_1.COMMENTS_FAILED;
     });
 }
 exports.loadComments = loadComments;
 
-},{"./DOM":4,"./commentBlockControl":16,"./formatTime":20,"./messages":26,"./settings":28}],18:[function(require,module,exports){
+},{"../DebugLogger":6,"../constant/messages":11,"../data/AutoCache":25,"../data/settings":27,"../hs":29,"../util/formatTime":43,"./commentBlockControl":16}],18:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.data = window.DATA;
-exports.relativePathLookUpMap = new Map();
-function iterateFolder(folder) {
-    folder.subFolders.forEach(subFolder => {
-        iterateFolder(subFolder);
-    });
-    folder.chapters.forEach((chapter, index) => {
-        exports.relativePathLookUpMap.set(chapter.htmlRelativePath, {
-            folder,
-            chapter,
-            inFolderIndex: index,
-        });
+const settings_1 = require("../data/settings");
+const DOM_1 = require("../util/DOM");
+const layoutControl_1 = require("./layoutControl");
+const $contentContainer = DOM_1.id('content-container');
+var Side;
+(function (Side) {
+    Side[Side["LEFT"] = 0] = "LEFT";
+    Side[Side["RIGHT"] = 1] = "RIGHT";
+})(Side = exports.Side || (exports.Side = {}));
+function setSide($element, side) {
+    if (side === Side.LEFT) {
+        $element.classList.add('left');
+        $element.classList.remove('right');
+    }
+    else {
+        $element.classList.add('right');
+        $element.classList.remove('left');
+    }
+}
+function otherSide(side) {
+    return side === Side.LEFT ? Side.RIGHT : Side.LEFT;
+}
+let currentContent = null;
+function getCurrentContent() {
+    return currentContent;
+}
+exports.getCurrentContent = getCurrentContent;
+function focusOnContainer() {
+    $contentContainer.focus({
+        // Why:
+        // https://stackoverflow.com/questions/26782998/why-does-calling-focus-break-my-css-transition
+        preventScroll: true,
     });
 }
-iterateFolder(exports.data.chapterTree);
+exports.focusOnContainer = focusOnContainer;
+/**
+ * 创建一个新的 Content 并替换之前的 Content。
+ *
+ * @param side 如果有动画，那么入场位置。
+ * @returns 创建的 Content 对象
+ */
+function newContent(side) {
+    const newContent = new Content();
+    if (layoutControl_1.getCurrentLayout() === layoutControl_1.Layout.OFF) {
+        if (currentContent !== null) {
+            currentContent.destroy();
+        }
+    }
+    else {
+        if (settings_1.animation.getValue()) {
+            // Animation is enabled
+            if (currentContent !== null) {
+                setSide(currentContent.element, otherSide(side));
+                // Remove the content after a timeout instead of listening for
+                // transition event
+                const oldContent = currentContent;
+                setTimeout(() => {
+                    oldContent.destroy();
+                }, 2000);
+            }
+            setSide(newContent.element, side);
+            // Force reflow, so transition starts now
+            // tslint:disable-next-line:no-unused-expression
+            newContent.element.offsetWidth;
+            newContent.element.classList.remove('left', 'right');
+        }
+        else {
+            if (currentContent !== null) {
+                currentContent.destroy();
+            }
+        }
+    }
+    currentContent = newContent;
+    return newContent;
+}
+exports.newContent = newContent;
+var ContentBlockStyle;
+(function (ContentBlockStyle) {
+    ContentBlockStyle[ContentBlockStyle["REGULAR"] = 0] = "REGULAR";
+    ContentBlockStyle[ContentBlockStyle["WARNING"] = 1] = "WARNING";
+})(ContentBlockStyle = exports.ContentBlockStyle || (exports.ContentBlockStyle = {}));
+class Content {
+    constructor() {
+        this.isDestroyed = false;
+        this.blocks = [];
+        const $content = document.createElement('div');
+        $content.classList.add('content');
+        $contentContainer.appendChild($content);
+        this.element = $content;
+    }
+    addBlock($init = document.createElement('div'), style = ContentBlockStyle.REGULAR) {
+        const block = new ContentBlock(this, $init, style);
+        this.blocks.push(block);
+        return block;
+    }
+    destroy() {
+        this.isDestroyed = true;
+        this.element.remove();
+    }
+}
+exports.Content = Content;
+class ContentBlock {
+    constructor(content, element, style) {
+        this.element = element;
+        element.classList.add('content-block');
+        switch (style) {
+            case ContentBlockStyle.WARNING:
+                element.classList.add('warning');
+                break;
+        }
+        content.element.appendChild(element);
+    }
+    onEnteringView(callback) {
+        const observer = new IntersectionObserver(entries => {
+            const entry = entries[0];
+            if (entry.isIntersecting) {
+                observer.disconnect();
+                callback();
+            }
+        }, {
+            root: $contentContainer,
+            threshold: 0,
+        });
+        observer.observe(this.element);
+    }
+}
 
-},{}],19:[function(require,module,exports){
+},{"../data/settings":27,"../util/DOM":42,"./layoutControl":21}],19:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const data_1 = require("../data/data");
+const state_1 = require("../data/state");
 const chapterControl_1 = require("./chapterControl");
-const data_1 = require("./data");
+const contentControl_1 = require("./contentControl");
 const history_1 = require("./history");
-const state_1 = require("./state");
 function followQuery() {
     const chapterHtmlRelativePath = decodeURIComponent(window.location.hash.substr(1)); // Ignore the # in the result
     const chapterCtx = data_1.relativePathLookUpMap.get(chapterHtmlRelativePath);
@@ -1314,8 +1499,10 @@ function followQuery() {
         }
     }
     else if (state_1.state.currentChapter !== chapterCtx) {
+        const side = (state_1.state.currentChapter !== null &&
+            chapterCtx.inFolderIndex > state_1.state.currentChapter.inFolderIndex) ? contentControl_1.Side.RIGHT : contentControl_1.Side.LEFT;
         if (typeof URLSearchParams !== 'function') {
-            chapterControl_1.loadChapter(chapterHtmlRelativePath);
+            chapterControl_1.loadChapter(chapterHtmlRelativePath, undefined, side);
         }
         else {
             const query = new URLSearchParams(window.location.search);
@@ -1324,10 +1511,10 @@ function followQuery() {
                 ? selectionQuery.split(',').map(str => +str)
                 : [];
             if (selection.length !== 4 || !selection.every(num => (num >= 0) && (num % 1 === 0) && (!Number.isNaN(num)) && (Number.isFinite(num)))) {
-                chapterControl_1.loadChapter(chapterHtmlRelativePath);
+                chapterControl_1.loadChapter(chapterHtmlRelativePath, undefined, side);
             }
             else {
-                chapterControl_1.loadChapter(chapterHtmlRelativePath, selection);
+                chapterControl_1.loadChapter(chapterHtmlRelativePath, selection, side);
             }
             document.title = history_1.getTitle();
         }
@@ -1336,120 +1523,10 @@ function followQuery() {
 }
 exports.followQuery = followQuery;
 
-},{"./chapterControl":15,"./data":18,"./history":22,"./state":30}],20:[function(require,module,exports){
+},{"../data/data":26,"../data/state":28,"./chapterControl":15,"./contentControl":18,"./history":20}],20:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const SECOND = 1000;
-const MINUTE = 60 * SECOND;
-const HOUR = 60 * MINUTE;
-const DAY = 24 * HOUR;
-const MAX_RELATIVE_TIME = 7 * DAY;
-function formatTime(time) {
-    const relativeTime = Date.now() - time.getTime();
-    if (relativeTime > MAX_RELATIVE_TIME) {
-        return `${time.getFullYear()}/${time.getMonth() + 1}/${time.getDate()}`;
-    }
-    if (relativeTime > DAY) {
-        return `${Math.floor(relativeTime / DAY)} 天前`;
-    }
-    if (relativeTime > HOUR) {
-        return `${Math.floor(relativeTime / HOUR)} 小时前`;
-    }
-    if (relativeTime > MINUTE) {
-        return `${Math.floor(relativeTime / MINUTE)} 分钟前`;
-    }
-    return `${Math.floor(relativeTime / SECOND)} 秒前`;
-}
-exports.formatTime = formatTime;
-
-},{}],21:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const DebugLogger_1 = require("./DebugLogger");
-const DOM_1 = require("./DOM");
-const Event_1 = require("./Event");
-var SwipeDirection;
-(function (SwipeDirection) {
-    SwipeDirection[SwipeDirection["TO_TOP"] = 0] = "TO_TOP";
-    SwipeDirection[SwipeDirection["TO_RIGHT"] = 1] = "TO_RIGHT";
-    SwipeDirection[SwipeDirection["TO_BOTTOM"] = 2] = "TO_BOTTOM";
-    SwipeDirection[SwipeDirection["TO_LEFT"] = 3] = "TO_LEFT";
-})(SwipeDirection = exports.SwipeDirection || (exports.SwipeDirection = {}));
-const gestureMinWidth = 900;
-exports.swipeEvent = new Event_1.Event();
-const horizontalMinXProportion = 0.17;
-const horizontalMaxYProportion = 0.1;
-const verticalMinYProportion = 0.1;
-const verticalMaxProportion = 0.1;
-const swipeTimeThreshold = 500;
-let startX = 0;
-let startY = 0;
-let startTime = 0;
-let startTarget = null;
-window.addEventListener('touchstart', event => {
-    // Only listen for first touch starts
-    if (event.touches.length !== 1) {
-        return;
-    }
-    startTarget = event.target;
-    startX = event.touches[0].clientX;
-    startY = event.touches[0].clientY;
-    startTime = Date.now();
-});
-window.addEventListener('touchend', event => {
-    // Only listen for last touch ends
-    if (event.touches.length !== 0) {
-        return;
-    }
-    // Ignore touches that lasted too long
-    if (Date.now() - startTime > swipeTimeThreshold) {
-        return;
-    }
-    if (window.innerWidth > gestureMinWidth) {
-        return;
-    }
-    const deltaX = event.changedTouches[0].clientX - startX;
-    const deltaY = event.changedTouches[0].clientY - startY;
-    const xProportion = Math.abs(deltaX / window.innerWidth);
-    const yProportion = Math.abs(deltaY / window.innerHeight);
-    if (xProportion > horizontalMinXProportion && yProportion < horizontalMaxYProportion) {
-        // Horizontal swipe detected
-        // Check for scrollable element
-        if (DOM_1.isAnyParent(startTarget, $element => ((window.getComputedStyle($element).getPropertyValue('overflow-x') !== 'hidden') &&
-            ($element.scrollWidth > $element.clientWidth)))) {
-            return;
-        }
-        if (deltaX > 0) {
-            exports.swipeEvent.emit(SwipeDirection.TO_RIGHT);
-        }
-        else {
-            exports.swipeEvent.emit(SwipeDirection.TO_LEFT);
-        }
-    }
-    else if (yProportion > verticalMinYProportion && xProportion < verticalMaxProportion) {
-        // Vertical swipe detected
-        // Check for scrollable element
-        if (DOM_1.isAnyParent(startTarget, $element => ((window.getComputedStyle($element).getPropertyValue('overflow-y') !== 'hidden') &&
-            ($element.scrollHeight > $element.clientHeight)))) {
-            return;
-        }
-        if (deltaY > 0) {
-            exports.swipeEvent.emit(SwipeDirection.TO_BOTTOM);
-        }
-        else {
-            exports.swipeEvent.emit(SwipeDirection.TO_TOP);
-        }
-    }
-});
-const swipeEventDebugLogger = new DebugLogger_1.DebugLogger('swipeEvent');
-exports.swipeEvent.on(direction => {
-    swipeEventDebugLogger.log(SwipeDirection[direction]);
-});
-
-},{"./DOM":4,"./DebugLogger":5,"./Event":6}],22:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const state_1 = require("./state");
+const state_1 = require("../data/state");
 function getTitle() {
     let title = '可穿戴科技';
     if (state_1.state.currentChapter !== null) {
@@ -1473,108 +1550,73 @@ function updateHistory(push) {
 }
 exports.updateHistory = updateHistory;
 
-},{"./state":30}],23:[function(require,module,exports){
+},{"../data/state":28}],21:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const data_1 = require("./data");
-const DOM_1 = require("./DOM");
-const followQuery_1 = require("./followQuery");
-const MainMenu_1 = require("./MainMenu");
-const settings_1 = require("./settings");
-const updateSelection_1 = require("./updateSelection");
-const $warning = DOM_1.id('warning');
-if ($warning !== null) {
-    $warning.addEventListener('click', () => {
-        $warning.style.opacity = '0';
-        if (settings_1.animation.getValue()) {
-            $warning.addEventListener('transitionend', () => {
-                $warning.remove();
-            });
-        }
-        else {
-            $warning.remove();
-        }
-    });
-}
-const $buildNumber = DOM_1.id('build-number');
-$buildNumber.innerText = `Build ${data_1.data.buildNumber}`;
-new MainMenu_1.MainMenu().setActive(true);
-document.addEventListener('selectionchange', () => {
-    updateSelection_1.updateSelection();
-});
-window.addEventListener('popstate', () => {
-    followQuery_1.followQuery();
-});
-followQuery_1.followQuery();
-
-},{"./DOM":4,"./MainMenu":7,"./data":18,"./followQuery":19,"./settings":28,"./updateSelection":33}],24:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const DebugLogger_1 = require("./DebugLogger");
-const Event_1 = require("./Event");
-var ArrowKey;
-(function (ArrowKey) {
-    ArrowKey[ArrowKey["LEFT"] = 0] = "LEFT";
-    ArrowKey[ArrowKey["UP"] = 1] = "UP";
-    ArrowKey[ArrowKey["RIGHT"] = 2] = "RIGHT";
-    ArrowKey[ArrowKey["DOWN"] = 3] = "DOWN";
-})(ArrowKey = exports.ArrowKey || (exports.ArrowKey = {}));
-exports.arrowKeyPressEvent = new Event_1.Event();
-exports.escapeKeyPressEvent = new Event_1.Event();
-document.addEventListener('keyup', event => {
-    switch (event.keyCode) {
-        case 27:
-            exports.escapeKeyPressEvent.emit();
+const DebugLogger_1 = require("../DebugLogger");
+const Event_1 = require("../Event");
+var Layout;
+(function (Layout) {
+    Layout[Layout["SIDE"] = 0] = "SIDE";
+    Layout[Layout["MAIN"] = 1] = "MAIN";
+    Layout[Layout["OFF"] = 2] = "OFF";
+})(Layout = exports.Layout || (exports.Layout = {}));
+const $body = document.body;
+const debugLogger = new DebugLogger_1.DebugLogger('Layout');
+exports.layoutChangeEvent = new Event_1.Event();
+exports.layoutChangeEvent.on(({ newLayout }) => {
+    $body.classList.remove('layout-side', 'layout-main', 'layout-off');
+    switch (newLayout) {
+        case Layout.SIDE:
+            $body.classList.add('layout-side');
             break;
-        case 37:
-            exports.arrowKeyPressEvent.emit(ArrowKey.LEFT);
+        case Layout.MAIN:
+            $body.classList.add('layout-main');
             break;
-        case 38:
-            exports.arrowKeyPressEvent.emit(ArrowKey.UP);
-            break;
-        case 39:
-            exports.arrowKeyPressEvent.emit(ArrowKey.RIGHT);
-            break;
-        case 40:
-            exports.arrowKeyPressEvent.emit(ArrowKey.DOWN);
+        case Layout.OFF:
+            $body.classList.add('layout-off');
             break;
     }
 });
-const arrowEventDebugLogger = new DebugLogger_1.DebugLogger('arrowKeyEvent');
-exports.arrowKeyPressEvent.on(arrowKey => {
-    arrowEventDebugLogger.log(ArrowKey[arrowKey]);
-});
+let layout = Layout.OFF;
+function getCurrentLayout() {
+    return layout;
+}
+exports.getCurrentLayout = getCurrentLayout;
+function setLayout(newLayout) {
+    debugLogger.log(`${Layout[layout]} -> ${Layout[newLayout]}`);
+    if (layout === newLayout) {
+        return;
+    }
+    // if (newLayout === Layout.OFF) {
+    //   $rect.classList.remove('reading');
+    // } else {
+    //   if (layout === Layout.MAIN) {
+    //     $rect.classList.remove('main');
+    //   } else if (layout === Layout.SIDE) {
+    //     $rect.classList.remove('side');
+    //   } else {
+    //     $rect.classList.remove('main', 'side');
+    //     $rect.classList.add('reading');
+    //   }
+    //   if (newLayout === Layout.MAIN) {
+    //     $rect.classList.add('main');
+    //   } else {
+    //     $rect.classList.add('side');
+    //   }
+    // }
+    exports.layoutChangeEvent.emit({
+        previousLayout: layout,
+        newLayout,
+    });
+    layout = newLayout;
+}
+exports.setLayout = setLayout;
 
-},{"./DebugLogger":5,"./Event":6}],25:[function(require,module,exports){
+},{"../DebugLogger":6,"../Event":7}],22:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.loadingText = '加载中...';
-
-},{}],26:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.COMMENTS_UNAVAILABLE = '本文评论不可用。';
-exports.COMMENTS_LOADING = '评论加载中...';
-exports.COMMENTS_LOADED = '以下为本章节的评论区。';
-exports.COMMENTS_FAILED = '评论加载失败。';
-exports.NO_BLOCKED_USERS = '没有用户的评论被屏蔽';
-exports.CLICK_TO_UNBLOCK = '(点击用户名以解除屏蔽)';
-exports.WTCD_ERROR_COMPILE_TITLE = 'WTCD 编译失败';
-exports.WTCD_ERROR_COMPILE_DESC = '该 WTCD 文档在编译时发生了错误。请检查是否有语法错误或是其他基本错误。';
-exports.WTCD_ERROR_RUNTIME_TITLE = 'WTCD 运行时错误';
-exports.WTCD_ERROR_RUNTIME_DESC = '该 WTCD 文档在运行时发生了错误。请检查是否有逻辑错误。';
-exports.WTCD_ERROR_INTERNAL_TITLE = 'WTCD 内部错误';
-exports.WTCD_ERROR_INTERNAL_DESC = 'WTCD 解释器在解释执行该 WTCD 文档时崩溃了。请务必告诉琳你做了什么好让她来修。';
-exports.WTCD_ERROR_MESSAGE = '错误信息：';
-exports.WTCD_ERROR_WTCD_STACK_TITLE = 'WTCD 调用栈';
-exports.WTCD_ERROR_WTCD_STACK_DESC = 'WTCD 调用栈记录了在错误发生时 WTCD 的解释器状态。这可以帮助理解错误发生的上下文。';
-exports.WTCD_ERROR_INTERNAL_STACK_TITLE = '内部调用栈';
-exports.WTCD_ERROR_INTERNAL_STACK_DESC = '内部调用栈记录了出现该错误时编译器或是解释器的状态。请注意内部调用栈通常只在调试 WTCD 编译器或是解释器时有用。内部调用栈通常对调试 WTCD 文档没有作用。';
-
-},{}],27:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const DOM_1 = require("./DOM");
+const DOM_1 = require("../util/DOM");
 function processElements($parent) {
     Array.from($parent.getElementsByTagName('a')).forEach($anchor => $anchor.target = '_blank');
     Array.from($parent.getElementsByTagName('code')).forEach($code => $code.addEventListener('dblclick', () => {
@@ -1596,7 +1638,166 @@ function processElements($parent) {
 }
 exports.processElements = processElements;
 
-},{"./DOM":4}],28:[function(require,module,exports){
+},{"../util/DOM":42}],23:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const settings_1 = require("../data/settings");
+const DebugLogger_1 = require("../DebugLogger");
+const keyboard_1 = require("../input/keyboard");
+const DOM_1 = require("../util/DOM");
+const layoutControl_1 = require("./layoutControl");
+const MonoDimensionTransitionControl_1 = require("./MonoDimensionTransitionControl");
+const debugLogger = new DebugLogger_1.DebugLogger('Scroll Control');
+const $contentContainer = DOM_1.id('content-container');
+let scrollTransition = null;
+function interruptTransition() {
+    if (scrollTransition !== null) {
+        scrollTransition = null;
+        debugLogger.log('Transition interrupted.');
+    }
+}
+$contentContainer.addEventListener('wheel', () => {
+    interruptTransition();
+});
+keyboard_1.arrowKeyPressEvent.on(key => {
+    if (key === keyboard_1.ArrowKey.UP || key === keyboard_1.ArrowKey.DOWN) {
+        interruptTransition();
+    }
+});
+function scrollAnimation() {
+    if (scrollTransition === null) {
+        return;
+    }
+    const now = Date.now();
+    $contentContainer.scrollTop = scrollTransition.getValue(now);
+    if (scrollTransition.isFinished(now)) {
+        debugLogger.log('Transition finished.');
+        scrollTransition = null;
+    }
+    else {
+        requestAnimationFrame(scrollAnimation);
+    }
+}
+function scrollTo(target) {
+    if (!settings_1.animation.getValue() || layoutControl_1.getCurrentLayout() === layoutControl_1.Layout.OFF) {
+        debugLogger.log(`Scroll to ${target}, no animation.`);
+        $contentContainer.scrollTop = target;
+        return;
+    }
+    if (scrollTransition === null) {
+        debugLogger.log(`Scrolling to ${target}, new transition stared.`);
+        scrollTransition = new MonoDimensionTransitionControl_1.MonoDimensionTransitionControl($contentContainer.scrollTop, 50000);
+        scrollTransition.setTarget(target);
+        requestAnimationFrame(scrollAnimation);
+    }
+    else {
+        debugLogger.log(`Scrolling to ${target}, existing transition updated.`);
+        scrollTransition.setTarget(target);
+    }
+}
+exports.scrollTo = scrollTo;
+
+},{"../DebugLogger":6,"../data/settings":27,"../input/keyboard":32,"../util/DOM":42,"./MonoDimensionTransitionControl":14,"./layoutControl":21}],24:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const state_1 = require("../data/state");
+const history_1 = require("./history");
+function updateSelection() {
+    if (state_1.state.chapterTextNodes === null) {
+        return;
+    }
+    const before = String(state_1.state.chapterSelection);
+    const selection = document.getSelection();
+    if (selection === null) {
+        state_1.state.chapterSelection = null;
+    }
+    else {
+        const anchor = ((selection.anchorNode instanceof HTMLElement)
+            ? selection.anchorNode.firstChild
+            : selection.anchorNode);
+        const anchorNodeIndex = state_1.state.chapterTextNodes.indexOf(anchor);
+        const focus = ((selection.focusNode instanceof HTMLElement)
+            ? selection.focusNode.firstChild
+            : selection.focusNode);
+        const focusNodeIndex = state_1.state.chapterTextNodes.indexOf(focus);
+        if ((anchorNodeIndex === -1) || (focusNodeIndex === -1) ||
+            (anchorNodeIndex === focusNodeIndex && selection.anchorOffset === selection.focusOffset)) {
+            state_1.state.chapterSelection = null;
+        }
+        else {
+            if ((anchorNodeIndex < focusNodeIndex) ||
+                (anchorNodeIndex === focusNodeIndex && selection.anchorOffset < selection.focusOffset)) {
+                state_1.state.chapterSelection = [
+                    anchorNodeIndex,
+                    selection.anchorOffset,
+                    focusNodeIndex,
+                    selection.focusOffset,
+                ];
+            }
+            else {
+                state_1.state.chapterSelection = [
+                    focusNodeIndex,
+                    selection.focusOffset,
+                    anchorNodeIndex,
+                    selection.anchorOffset,
+                ];
+            }
+        }
+    }
+    if (before !== String(state_1.state.chapterSelection)) {
+        history_1.updateHistory(false);
+    }
+}
+exports.updateSelection = updateSelection;
+
+},{"../data/state":28,"./history":20}],25:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+class AutoCache {
+    constructor(loader, logger) {
+        this.loader = loader;
+        this.logger = logger;
+        this.map = new Map();
+    }
+    get(key) {
+        let value = this.map.get(key);
+        if (value === undefined) {
+            this.logger.log(`Start loading for key=${key}.`);
+            value = this.loader(key);
+            this.map.set(key, value);
+            value.catch(error => {
+                this.map.delete(key);
+                this.logger.warn(`Loader failed for key=${key}. Cache removed.`, error);
+            });
+        }
+        else {
+            this.logger.log(`Cached value used for key=${key}.`);
+        }
+        return value;
+    }
+}
+exports.AutoCache = AutoCache;
+
+},{}],26:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.data = window.DATA;
+exports.relativePathLookUpMap = new Map();
+function iterateFolder(folder) {
+    folder.subFolders.forEach(subFolder => {
+        iterateFolder(subFolder);
+    });
+    folder.chapters.forEach((chapter, index) => {
+        exports.relativePathLookUpMap.set(chapter.htmlRelativePath, {
+            folder,
+            chapter,
+            inFolderIndex: index,
+        });
+    });
+}
+iterateFolder(exports.data.chapterTree);
+
+},{}],27:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const noop = () => { };
@@ -1697,7 +1898,653 @@ exports.charCount = new BooleanSetting('charCount', true, value => {
     document.body.classList.toggle('char-count-disabled', !value);
 });
 
+},{}],28:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.state = {
+    currentChapter: null,
+    chapterSelection: null,
+    chapterTextNodes: null,
+};
+
 },{}],29:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const hs = require("hyperscript");
+exports.h = hs;
+
+},{"hyperscript":4}],30:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const followQuery_1 = require("./control/followQuery");
+const updateSelection_1 = require("./control/updateSelection");
+const data_1 = require("./data/data");
+const settings_1 = require("./data/settings");
+const MainMenu_1 = require("./menu/MainMenu");
+const DOM_1 = require("./util/DOM");
+const $warning = DOM_1.id('warning');
+if ($warning !== null) {
+    $warning.addEventListener('click', () => {
+        $warning.style.opacity = '0';
+        if (settings_1.animation.getValue()) {
+            $warning.addEventListener('transitionend', () => {
+                $warning.remove();
+            });
+        }
+        else {
+            $warning.remove();
+        }
+    });
+}
+const $buildNumber = DOM_1.id('build-number');
+$buildNumber.innerText = `Build ${data_1.data.buildNumber}`;
+new MainMenu_1.MainMenu().setActive(true);
+document.addEventListener('selectionchange', () => {
+    updateSelection_1.updateSelection();
+});
+window.addEventListener('popstate', () => {
+    followQuery_1.followQuery();
+});
+followQuery_1.followQuery();
+
+},{"./control/followQuery":19,"./control/updateSelection":24,"./data/data":26,"./data/settings":27,"./menu/MainMenu":36,"./util/DOM":42}],31:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const DebugLogger_1 = require("../DebugLogger");
+const Event_1 = require("../Event");
+const DOM_1 = require("../util/DOM");
+var SwipeDirection;
+(function (SwipeDirection) {
+    SwipeDirection[SwipeDirection["TO_TOP"] = 0] = "TO_TOP";
+    SwipeDirection[SwipeDirection["TO_RIGHT"] = 1] = "TO_RIGHT";
+    SwipeDirection[SwipeDirection["TO_BOTTOM"] = 2] = "TO_BOTTOM";
+    SwipeDirection[SwipeDirection["TO_LEFT"] = 3] = "TO_LEFT";
+})(SwipeDirection = exports.SwipeDirection || (exports.SwipeDirection = {}));
+const gestureMinWidth = 900;
+exports.swipeEvent = new Event_1.Event();
+const horizontalMinXProportion = 0.17;
+const horizontalMaxYProportion = 0.1;
+const verticalMinYProportion = 0.1;
+const verticalMaxProportion = 0.1;
+const swipeTimeThreshold = 500;
+let startX = 0;
+let startY = 0;
+let startTime = 0;
+let startTarget = null;
+window.addEventListener('touchstart', event => {
+    // Only listen for first touch starts
+    if (event.touches.length !== 1) {
+        return;
+    }
+    startTarget = event.target;
+    startX = event.touches[0].clientX;
+    startY = event.touches[0].clientY;
+    startTime = Date.now();
+});
+window.addEventListener('touchend', event => {
+    // Only listen for last touch ends
+    if (event.touches.length !== 0) {
+        return;
+    }
+    // Ignore touches that lasted too long
+    if (Date.now() - startTime > swipeTimeThreshold) {
+        return;
+    }
+    if (window.innerWidth > gestureMinWidth) {
+        return;
+    }
+    const deltaX = event.changedTouches[0].clientX - startX;
+    const deltaY = event.changedTouches[0].clientY - startY;
+    const xProportion = Math.abs(deltaX / window.innerWidth);
+    const yProportion = Math.abs(deltaY / window.innerHeight);
+    if (xProportion > horizontalMinXProportion && yProportion < horizontalMaxYProportion) {
+        // Horizontal swipe detected
+        // Check for scrollable element
+        if (DOM_1.isAnyParent(startTarget, $element => ((window.getComputedStyle($element).getPropertyValue('overflow-x') !== 'hidden') &&
+            ($element.scrollWidth > $element.clientWidth)))) {
+            return;
+        }
+        if (deltaX > 0) {
+            exports.swipeEvent.emit(SwipeDirection.TO_RIGHT);
+        }
+        else {
+            exports.swipeEvent.emit(SwipeDirection.TO_LEFT);
+        }
+    }
+    else if (yProportion > verticalMinYProportion && xProportion < verticalMaxProportion) {
+        // Vertical swipe detected
+        // Check for scrollable element
+        if (DOM_1.isAnyParent(startTarget, $element => ((window.getComputedStyle($element).getPropertyValue('overflow-y') !== 'hidden') &&
+            ($element.scrollHeight > $element.clientHeight)))) {
+            return;
+        }
+        if (deltaY > 0) {
+            exports.swipeEvent.emit(SwipeDirection.TO_BOTTOM);
+        }
+        else {
+            exports.swipeEvent.emit(SwipeDirection.TO_TOP);
+        }
+    }
+});
+const swipeEventDebugLogger = new DebugLogger_1.DebugLogger('Swipe Event');
+exports.swipeEvent.on(direction => {
+    swipeEventDebugLogger.log(SwipeDirection[direction]);
+});
+
+},{"../DebugLogger":6,"../Event":7,"../util/DOM":42}],32:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const DebugLogger_1 = require("../DebugLogger");
+const Event_1 = require("../Event");
+var ArrowKey;
+(function (ArrowKey) {
+    ArrowKey[ArrowKey["LEFT"] = 0] = "LEFT";
+    ArrowKey[ArrowKey["UP"] = 1] = "UP";
+    ArrowKey[ArrowKey["RIGHT"] = 2] = "RIGHT";
+    ArrowKey[ArrowKey["DOWN"] = 3] = "DOWN";
+})(ArrowKey = exports.ArrowKey || (exports.ArrowKey = {}));
+exports.arrowKeyPressEvent = new Event_1.Event();
+exports.escapeKeyPressEvent = new Event_1.Event();
+document.addEventListener('keydown', event => {
+    if (event.repeat) {
+        return;
+    }
+    switch (event.keyCode) {
+        case 27:
+            exports.escapeKeyPressEvent.emit();
+            break;
+        case 37:
+            exports.arrowKeyPressEvent.emit(ArrowKey.LEFT);
+            break;
+        case 38:
+            exports.arrowKeyPressEvent.emit(ArrowKey.UP);
+            break;
+        case 39:
+            exports.arrowKeyPressEvent.emit(ArrowKey.RIGHT);
+            break;
+        case 40:
+            exports.arrowKeyPressEvent.emit(ArrowKey.DOWN);
+            break;
+    }
+});
+const arrowEventDebugLogger = new DebugLogger_1.DebugLogger('Arrow Key Event');
+exports.arrowKeyPressEvent.on(arrowKey => {
+    arrowEventDebugLogger.log(ArrowKey[arrowKey]);
+});
+
+},{"../DebugLogger":6,"../Event":7}],33:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const messages_1 = require("../constant/messages");
+const commentBlockControl_1 = require("../control/commentBlockControl");
+const Menu_1 = require("../Menu");
+class BlockMenu extends Menu_1.Menu {
+    update() {
+        this.clearItems();
+        const blockedUsers = commentBlockControl_1.getBlockedUsers();
+        if (blockedUsers.length === 0) {
+            this.addItem(messages_1.NO_BLOCKED_USERS, { small: true });
+        }
+        else {
+            this.addItem(messages_1.CLICK_TO_UNBLOCK, { small: true });
+        }
+        blockedUsers.forEach(userName => {
+            this.addItem(userName, { small: true, button: true })
+                .onClick(() => {
+                commentBlockControl_1.unblockUser(userName);
+            });
+        });
+    }
+    constructor(parent) {
+        super('屏蔽用户评论管理', parent);
+        this.update();
+        commentBlockControl_1.blockedUserUpdateEvent.on(this.update.bind(this));
+    }
+}
+exports.BlockMenu = BlockMenu;
+
+},{"../Menu":8,"../constant/messages":11,"../control/commentBlockControl":16}],34:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const chapterControl_1 = require("../control/chapterControl");
+const history_1 = require("../control/history");
+const data_1 = require("../data/data");
+const Menu_1 = require("../Menu");
+const shortNumber_1 = require("../util/shortNumber");
+const chapterSelectionButtonsMap = new Map();
+let currentLastReadLabelAt = null;
+function attachLastReadLabelTo(button, htmlRelativePath) {
+    currentLastReadLabelAt = button.append('[上次阅读]');
+}
+chapterControl_1.loadChapterEvent.on(newChapterHtmlRelativePath => {
+    if (currentLastReadLabelAt !== null) {
+        currentLastReadLabelAt.remove();
+    }
+    attachLastReadLabelTo(chapterSelectionButtonsMap.get(newChapterHtmlRelativePath), newChapterHtmlRelativePath);
+});
+function getDecorationForChapterType(chapterType) {
+    switch (chapterType) {
+        case 'Markdown': return Menu_1.ItemDecoration.ICON_FILE;
+        case 'WTCD': return Menu_1.ItemDecoration.ICON_GAME;
+    }
+}
+class ChaptersMenu extends Menu_1.Menu {
+    constructor(parent, folder) {
+        if (folder === undefined) {
+            folder = data_1.data.chapterTree;
+        }
+        super(folder.isRoot ? '章节选择' : folder.displayName, parent);
+        for (const subfolder of folder.subFolders) {
+            const handle = this.addLink(new ChaptersMenu(this, subfolder), true, Menu_1.ItemDecoration.ICON_FOLDER);
+            handle.append(`[${shortNumber_1.shortNumber(subfolder.folderCharCount)}]`, 'char-count');
+        }
+        for (const chapter of folder.chapters) {
+            const handle = this.addItem(chapter.displayName, {
+                small: true,
+                button: true,
+                decoration: getDecorationForChapterType(chapter.type),
+            })
+                .onClick(() => {
+                chapterControl_1.loadChapter(chapter.htmlRelativePath);
+                history_1.updateHistory(true);
+            });
+            if (chapter.isEarlyAccess) {
+                handle.prepend('[编写中]');
+                handle.addClass('early-access');
+            }
+            handle.append(`[${shortNumber_1.shortNumber(chapter.chapterCharCount)}]`, 'char-count');
+            const lastRead = window.localStorage.getItem('lastRead');
+            if (lastRead === chapter.htmlRelativePath) {
+                attachLastReadLabelTo(handle, chapter.htmlRelativePath);
+            }
+            chapterSelectionButtonsMap.set(chapter.htmlRelativePath, handle);
+        }
+    }
+}
+exports.ChaptersMenu = ChaptersMenu;
+
+},{"../Menu":8,"../control/chapterControl":15,"../control/history":20,"../data/data":26,"../util/shortNumber":44}],35:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const Menu_1 = require("../Menu");
+class ContactMenu extends Menu_1.Menu {
+    constructor(parent) {
+        super('订阅/讨论组', parent);
+        this.addItem('Telegram 更新推送频道', {
+            small: true,
+            button: true,
+            link: 'https://t.me/joinchat/AAAAAEpkRVwZ-3s5V3YHjA',
+            decoration: Menu_1.ItemDecoration.ICON_LINK,
+        });
+        this.addItem('Telegram 讨论组', {
+            small: true,
+            button: true,
+            link: 'https://t.me/joinchat/Dt8_WlJnmEwYNbjzlnLyNA',
+            decoration: Menu_1.ItemDecoration.ICON_LINK,
+        });
+        this.addItem('GitHub Repo', {
+            small: true,
+            button: true,
+            link: 'https://github.com/SCLeoX/Wearable-Technology',
+            decoration: Menu_1.ItemDecoration.ICON_LINK,
+        });
+        this.addItem('原始 Google Docs', {
+            small: true,
+            button: true,
+            link: 'https://docs.google.com/document/d/1Pp5CtO8c77DnWGqbXg-3e7w9Q3t88P35FOl6iIJvMfo/edit?usp=sharing',
+            decoration: Menu_1.ItemDecoration.ICON_LINK,
+        });
+    }
+}
+exports.ContactMenu = ContactMenu;
+
+},{"../Menu":8}],36:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const Menu_1 = require("../Menu");
+const ChaptersMenu_1 = require("./ChaptersMenu");
+const ContactMenu_1 = require("./ContactMenu");
+const SettingsMenu_1 = require("./SettingsMenu");
+const StatsMenu_1 = require("./StatsMenu");
+const StyleMenu_1 = require("./StyleMenu");
+const ThanksMenu_1 = require("./ThanksMenu");
+class MainMenu extends Menu_1.Menu {
+    constructor() {
+        super('', null);
+        this.addLink(new ChaptersMenu_1.ChaptersMenu(this));
+        this.addLink(new ThanksMenu_1.ThanksMenu(this));
+        this.addLink(new StyleMenu_1.StyleMenu(this));
+        this.addLink(new ContactMenu_1.ContactMenu(this));
+        this.addItem('源代码', { button: true, link: 'https://github.com/SCLeoX/Wearable-Technology' });
+        this.addLink(new SettingsMenu_1.SettingsMenu(this));
+        this.addLink(new StatsMenu_1.StatsMenu(this));
+    }
+}
+exports.MainMenu = MainMenu;
+
+},{"../Menu":8,"./ChaptersMenu":34,"./ContactMenu":35,"./SettingsMenu":37,"./StatsMenu":39,"./StyleMenu":40,"./ThanksMenu":41}],37:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const stylePreviewArticle_1 = require("../constant/stylePreviewArticle");
+const contentControl_1 = require("../control/contentControl");
+const layoutControl_1 = require("../control/layoutControl");
+const settings_1 = require("../data/settings");
+const Menu_1 = require("../Menu");
+const BlockMenu_1 = require("./BlockMenu");
+class EnumSettingMenu extends Menu_1.Menu {
+    constructor(parent, label, setting, usePreview) {
+        super(`${label}设置`, parent, usePreview ? layoutControl_1.Layout.SIDE : layoutControl_1.Layout.MAIN);
+        let currentHandle;
+        if (usePreview) {
+            this.activateEvent.on(() => {
+                const block = contentControl_1.newContent(contentControl_1.Side.RIGHT).addBlock();
+                block.element.innerHTML = stylePreviewArticle_1.stylePreviewArticle;
+            });
+        }
+        setting.options.forEach((valueName, value) => {
+            const handle = this.addItem(valueName, { small: true, button: true, decoration: Menu_1.ItemDecoration.SELECTABLE })
+                .onClick(() => {
+                currentHandle.setSelected(false);
+                handle.setSelected(true);
+                setting.setValue(value);
+                currentHandle = handle;
+            });
+            if (value === setting.getValue()) {
+                currentHandle = handle;
+                handle.setSelected(true);
+            }
+        });
+    }
+}
+exports.EnumSettingMenu = EnumSettingMenu;
+class SettingsMenu extends Menu_1.Menu {
+    constructor(parent) {
+        super('设置', parent);
+        this.addBooleanSetting('NSFW 警告', settings_1.warning);
+        this.addBooleanSetting('使用动画', settings_1.animation);
+        this.addBooleanSetting('显示编写中章节', settings_1.earlyAccess);
+        this.addBooleanSetting('显示评论', settings_1.useComments);
+        this.addBooleanSetting('手势切换章节（仅限手机）', settings_1.gestureSwitchChapter);
+        this.addEnumSetting('字体', settings_1.fontFamily, true);
+        this.addBooleanSetting('显示每个章节的字数', settings_1.charCount);
+        this.addBooleanSetting('开发人员模式', settings_1.developerMode);
+        this.addLink(new BlockMenu_1.BlockMenu(this), true);
+    }
+    addBooleanSetting(label, setting) {
+        const getText = () => `${label}：${setting.getValue() ? '开' : '关'}`;
+        const handle = this.addItem(getText(), { small: true, button: true })
+            .onClick(() => {
+            setting.toggle();
+            handle.setInnerText(getText());
+        });
+    }
+    addEnumSetting(label, setting, usePreview) {
+        const getText = () => `${label}：${setting.getValueName()}`;
+        const handle = this.addItem(getText(), { small: true, button: true });
+        const enumSettingMenu = new EnumSettingMenu(this, label, setting, usePreview === true);
+        handle.linkTo(enumSettingMenu).onClick(() => {
+            this.activateEvent.once(() => {
+                handle.setInnerText(getText());
+            });
+        });
+    }
+}
+exports.SettingsMenu = SettingsMenu;
+
+},{"../Menu":8,"../constant/stylePreviewArticle":12,"../control/contentControl":18,"../control/layoutControl":21,"../data/settings":27,"./BlockMenu":33}],38:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const data_1 = require("../data/data");
+const Menu_1 = require("../Menu");
+class StatsKeywordsCountMenu extends Menu_1.Menu {
+    constructor(parent) {
+        super('关键词统计', parent);
+        this.addItem('添加其他关键词', {
+            small: true,
+            button: true,
+            link: 'https://github.com/SCLeoX/Wearable-Technology/edit/master/src/builder/keywords.ts',
+            decoration: Menu_1.ItemDecoration.ICON_LINK,
+        });
+        data_1.data.keywordsCount.forEach(([keyword, count]) => {
+            this.addItem(`${keyword}：${count}`, { small: true });
+        });
+    }
+}
+exports.StatsKeywordsCountMenu = StatsKeywordsCountMenu;
+
+},{"../Menu":8,"../data/data":26}],39:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const data_1 = require("../data/data");
+const Menu_1 = require("../Menu");
+const StatsKeywordsCountMenu_1 = require("./StatsKeywordsCountMenu");
+class StatsMenu extends Menu_1.Menu {
+    constructor(parent) {
+        super('统计', parent);
+        this.addItem('统计数据由构建脚本自动生成', { small: true });
+        this.addLink(new StatsKeywordsCountMenu_1.StatsKeywordsCountMenu(this), true, Menu_1.ItemDecoration.ICON_EQUALIZER);
+        this.addItem(`总字数：${data_1.data.charsCount}`, { small: true });
+        this.addItem(`总段落数：${data_1.data.paragraphsCount}`, { small: true });
+    }
+}
+exports.StatsMenu = StatsMenu;
+
+},{"../Menu":8,"../data/data":26,"./StatsKeywordsCountMenu":38}],40:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const stylePreviewArticle_1 = require("../constant/stylePreviewArticle");
+const contentControl_1 = require("../control/contentControl");
+const layoutControl_1 = require("../control/layoutControl");
+const DebugLogger_1 = require("../DebugLogger");
+const Menu_1 = require("../Menu");
+class Style {
+    constructor(name, def) {
+        this.name = name;
+        this.def = def;
+        this.styleSheet = null;
+        this.debugLogger = new DebugLogger_1.DebugLogger(`Style (${name})`);
+    }
+    injectStyleSheet() {
+        const $style = document.createElement('style');
+        document.head.appendChild($style);
+        const sheet = $style.sheet;
+        sheet.disabled = true;
+        const attemptInsertRule = (rule) => {
+            try {
+                sheet.insertRule(rule);
+            }
+            catch (error) {
+                this.debugLogger.error(`Failed to inject rule "${rule}".`, error);
+            }
+        };
+        const key = `rgb(${this.def.keyColor.join(',')})`;
+        const keyAlpha = (alpha) => `rgba(${this.def.keyColor.join(',')},${alpha})`;
+        attemptInsertRule(`.container { color: ${key}; }`);
+        attemptInsertRule(`.menu { color: ${key}; }`);
+        attemptInsertRule(`.menu .button:active::after { background-color: ${key}; }`);
+        attemptInsertRule(`.button::after { background-color: ${key}; }`);
+        attemptInsertRule(`body { background-color: ${this.def.paperBgColor}; }`);
+        attemptInsertRule(`.rect { background-color: ${this.def.rectBgColor}; }`);
+        // attemptInsertRule(`.rect.reading>div { background-color: ${this.def.paperBgColor}; }`);
+        // attemptInsertRule(`.rect.reading>div { color: ${key}; }`);
+        // attemptInsertRule(`.rect.reading>.content a { color: ${this.def.linkColor}; }`);
+        // attemptInsertRule(`.rect.reading>.content a:hover { color: ${this.def.linkHoverColor}; }`);
+        // attemptInsertRule(`.rect.reading>.content a:active { color: ${this.def.linkActiveColor}; }`);
+        // attemptInsertRule(`.rect.reading .early-access.content-block { background-color: ${this.def.contentBlockEarlyAccessColor}; }`);
+        // attemptInsertRule(`.rect>.comments>div { background-color: ${this.def.commentColor}; }`);
+        // attemptInsertRule(`@media (min-width: 901px) { ::-webkit-scrollbar-thumb { background-color: ${this.def.paperBgColor}; } }`);
+        // attemptInsertRule(`.rect>.comments>.create-comment::before { background-color: ${key}; }`);
+        attemptInsertRule(`:root { --comment-color:${this.def.commentColor}; }`);
+        attemptInsertRule(`:root { --content-block-warning-color:${this.def.contentBlockWarningColor}; }`);
+        attemptInsertRule(`:root { --paper-bg-color: ${this.def.paperBgColor}; }`);
+        attemptInsertRule(`:root { --link-color: ${this.def.linkColor}; }`);
+        attemptInsertRule(`:root { --link-hover-color: ${this.def.linkHoverColor}; }`);
+        attemptInsertRule(`:root { --link-active-color: ${this.def.linkActiveColor}; }`);
+        attemptInsertRule(`:root { --key: ${key}; }`);
+        attemptInsertRule(`:root { --key-opacity-01: ${keyAlpha(0.1)}; }`);
+        attemptInsertRule(`:root { --key-opacity-05: ${keyAlpha(0.5)}; }`);
+        attemptInsertRule(`:root { --key-opacity-007: ${keyAlpha(0.07)}; }`);
+        attemptInsertRule(`:root { --key-opacity-004: ${keyAlpha(0.04)}; }`);
+        attemptInsertRule(`:root { --button-color: ${this.def.commentColor}; }`);
+        this.styleSheet = sheet;
+    }
+    active() {
+        if (Style.currentlyEnabled !== null) {
+            const currentlyEnabled = Style.currentlyEnabled;
+            if (currentlyEnabled.styleSheet !== null) {
+                currentlyEnabled.styleSheet.disabled = true;
+            }
+            currentlyEnabled.itemHandle.setSelected(false);
+        }
+        if (this.styleSheet === null) {
+            this.injectStyleSheet();
+        }
+        this.styleSheet.disabled = false;
+        this.itemHandle.setSelected(true);
+        window.localStorage.setItem('style', this.name);
+        Style.currentlyEnabled = this;
+    }
+}
+Style.currentlyEnabled = null;
+const darkKeyLinkColors = {
+    linkColor: '#00E',
+    linkHoverColor: '#F00',
+    linkActiveColor: '#00E',
+};
+const lightKeyLinkColors = {
+    linkColor: '#88F',
+    linkHoverColor: '#F33',
+    linkActiveColor: '#88F',
+};
+const styles = [
+    new Style('可穿戴科技（默认）', Object.assign(Object.assign({ rectBgColor: '#444', paperBgColor: '#333', keyColor: [221, 221, 221] }, lightKeyLinkColors), { contentBlockWarningColor: '#E65100', commentColor: '#444', keyIsDark: false })),
+    new Style('白纸', Object.assign(Object.assign({ rectBgColor: '#EFEFED', paperBgColor: '#FFF', keyColor: [0, 0, 0] }, darkKeyLinkColors), { contentBlockWarningColor: '#FFE082', commentColor: '#F5F5F5', keyIsDark: true })),
+    new Style('夜间', Object.assign(Object.assign({ rectBgColor: '#272B36', paperBgColor: '#38404D', keyColor: [221, 221, 221] }, lightKeyLinkColors), { contentBlockWarningColor: '#E65100', commentColor: '#272B36', keyIsDark: false })),
+    new Style('羊皮纸', Object.assign(Object.assign({ rectBgColor: '#D8D4C9', paperBgColor: '#F8F4E9', keyColor: [85, 40, 48] }, darkKeyLinkColors), { contentBlockWarningColor: '#FFE082', commentColor: '#F9EFD7', keyIsDark: true })),
+    new Style('巧克力', Object.assign(Object.assign({ rectBgColor: '#2E1C11', paperBgColor: '#3A2519', keyColor: [221, 175, 153] }, lightKeyLinkColors), { contentBlockWarningColor: '#E65100', commentColor: '#2C1C11', keyIsDark: false })),
+];
+class StyleMenu extends Menu_1.Menu {
+    constructor(parent) {
+        super('阅读器样式', parent, layoutControl_1.Layout.SIDE);
+        for (const style of styles) {
+            style.itemHandle = this.addItem(style.name, { small: true, button: true, decoration: Menu_1.ItemDecoration.SELECTABLE })
+                .onClick(() => {
+                style.active();
+            });
+        }
+        const usedStyle = window.localStorage.getItem('style');
+        let flag = false;
+        for (const style of styles) {
+            if (usedStyle === style.name) {
+                style.active();
+                flag = true;
+                break;
+            }
+        }
+        if (!flag) {
+            styles[0].active();
+        }
+        this.activateEvent.on(() => {
+            const content = contentControl_1.newContent(contentControl_1.Side.RIGHT);
+            const $div = content.addBlock().element;
+            $div.innerHTML = stylePreviewArticle_1.stylePreviewArticle;
+        });
+    }
+}
+exports.StyleMenu = StyleMenu;
+
+},{"../DebugLogger":6,"../Menu":8,"../constant/stylePreviewArticle":12,"../control/contentControl":18,"../control/layoutControl":21}],41:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const thanks_1 = require("../constant/thanks");
+const Menu_1 = require("../Menu");
+class ThanksMenu extends Menu_1.Menu {
+    constructor(parent) {
+        super('鸣谢列表', parent);
+        for (const person of thanks_1.thanks) {
+            this.addItem(person.name, person.link === undefined
+                ? { small: true }
+                : { small: true, button: true, link: person.link, decoration: Menu_1.ItemDecoration.ICON_LINK });
+        }
+    }
+}
+exports.ThanksMenu = ThanksMenu;
+
+},{"../Menu":8,"../constant/thanks":13}],42:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const DebugLogger_1 = require("../DebugLogger");
+function id(id) {
+    return document.getElementById(id);
+}
+exports.id = id;
+function getTextNodes(parent, initArray) {
+    const textNodes = initArray || [];
+    let pointer = parent.firstChild;
+    while (pointer !== null) {
+        if (pointer instanceof HTMLElement) {
+            getTextNodes(pointer, textNodes);
+        }
+        if (pointer instanceof Text) {
+            textNodes.push(pointer);
+        }
+        pointer = pointer.nextSibling;
+    }
+    return textNodes;
+}
+exports.getTextNodes = getTextNodes;
+const selectNodeDebugLogger = new DebugLogger_1.DebugLogger('Select Node');
+function selectNode(node) {
+    try {
+        const selection = window.getSelection();
+        const range = document.createRange();
+        range.selectNodeContents(node);
+        selection.removeAllRanges();
+        selection.addRange(range);
+    }
+    catch (error) {
+        selectNodeDebugLogger.log('Failed to select node: ', node, '; Error: ', error);
+    }
+}
+exports.selectNode = selectNode;
+function isAnyParent($element, predicate) {
+    while ($element !== null) {
+        if (predicate($element)) {
+            return true;
+        }
+        $element = $element.parentElement;
+    }
+    return false;
+}
+exports.isAnyParent = isAnyParent;
+
+},{"../DebugLogger":6}],43:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const SECOND = 1000;
+const MINUTE = 60 * SECOND;
+const HOUR = 60 * MINUTE;
+const DAY = 24 * HOUR;
+const MAX_RELATIVE_TIME = 7 * DAY;
+function formatTime(time) {
+    const relativeTime = Date.now() - time.getTime();
+    if (relativeTime > MAX_RELATIVE_TIME) {
+        return `${time.getFullYear()}/${time.getMonth() + 1}/${time.getDate()}`;
+    }
+    if (relativeTime > DAY) {
+        return `${Math.floor(relativeTime / DAY)} 天前`;
+    }
+    if (relativeTime > HOUR) {
+        return `${Math.floor(relativeTime / HOUR)} 小时前`;
+    }
+    if (relativeTime > MINUTE) {
+        return `${Math.floor(relativeTime / MINUTE)} 分钟前`;
+    }
+    return `${Math.floor(relativeTime / SECOND)} 秒前`;
+}
+exports.formatTime = formatTime;
+
+},{}],44:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 function shortNumber(input) {
@@ -1711,141 +2558,30 @@ function shortNumber(input) {
 }
 exports.shortNumber = shortNumber;
 
-},{}],30:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.state = {
-    currentChapter: null,
-    chapterSelection: null,
-    chapterTextNodes: null,
-};
-
-},{}],31:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.stylePreviewArticle = `<h1>午饭</h1>
-<p><em>作者：友人♪B</em></p>
-<p>“午饭，午饭♪”</p>
-<p>阳伞下的琳，很是期待今天的午饭。</p>
-<p>或许是体质和别的血族不太一样，琳能够感知到食物的味道，似乎也保有着生物对食物的喜爱。</p>
-<p>虽然她并不能从这些食物中获取能量就是。</p>
-<p>学校食堂的夏季限定甜点今天也很是抢手，这点从队伍的长度就能看出来——队伍险些就要超出食堂的范围了。</p>
-<p>“你说我要有钱多好——”</p>
-<p>已经从隔壁窗口买下了普通，但是很便宜的营养餐的秋镜悬，看着队伍中兴致勃勃的琳。</p>
-<p>其实她并不是缺钱，大约是吝啬。</p>
-<p>这得怪她娘，穷养秋镜悬养习惯了，现在她光自己除灵退魔挣来的外快都够她奢侈上一把了，可却还保留着能不花钱绝对不花，必须花钱越少越好的吝啬习惯。</p>
-<p>少顷，琳已经带着她的甜品建筑——每块砖头都是一块蛋糕，堆成一个诡异的火柴盒——来到了桌前。</p>
-<p>“（吃不胖真好，有钱真好……”</p>
-<p>血族的听觉自然是捕捉到了秋镜悬的嘀咕，琳放下盘子，悄咪咪地将牙贴上了秋镜悬的脖颈。</p>
-<p>“嘻嘻♪”</p>
-<p>“呜——”</p>
-<p>盯——</p>
-<p>秋镜悬看了看盘中剩下的一块毛血旺，似是联系到了什么，将目光转向了琳的牙。</p>
-<p>正在享用蛋糕盛宴的琳以余光瞥见了她的视线，</p>
-<p>“盯着本小姐是要做什么呢？”</p>
-<p>“啊，没，没什么……”</p>
-<p>秋镜悬支支吾吾的说着，</p>
-<p>“就是好奇一个问题，血族为什么不吃毛血旺……”</p>
-<p>“噢☆毛血旺就是那个煮熟的血块是吧？太没有美感了这种血！而且吃了也没法儿恢复能量，简直就是血液的绝佳浪费☆！”</p>
-<p>琳发出了对这样美食的鄙视，不过这种鄙视大约只有血族和蚊子会出现吧……</p>
-<p>“血族需要摄入血，是因为血所具有的生命能量，如果煮熟了的话，超过九成的能量都被转化成其他的东西了，对我们来说实在是没什么用处，还白白浪费了作为原料的血，这种东西本小姐才不吃咧✘！饿死，死外边，从这边跳下去也不吃✘！”</p>
-<p>“欸，别这么说嘛，你能尝得到味道的吧，吃一块试试呗？”</p>
-<p>“真……真香♪”</p>
-<p>当晚，因为触发了真香定律而感到很火大的琳，把秋镜悬丢进了自己的高维空间里头放置了一晚上（高维时间三天）泄愤。</p>`;
-
-},{}],32:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.thanks = [
-    { name: '神楽坂 立音' },
-    { name: 'lgd_小翅膀' },
-    { name: '青葉' },
-    { name: 'kn' },
-    { name: 'F74nk', link: 'https://t.me/F74nk_K' },
-    { name: '杨佳文' },
-    { name: '不知名的N姓人士就好' },
-    { name: '某不愿透露姓名的N性？' },
-    { name: '神楽坂 萌绫' },
-    { name: 'Butby' },
-    { name: '友人♪B' },
-    { name: 'NekoCaffeine' },
-    { name: 'RainSlide' },
-    { name: 'czp', link: 'https://www.hiczp.com' },
-    { name: 'kookxiang' },
-    { name: '櫻川 紗良' },
-    { name: 'Skimige' },
-    { name: 'TExL', link: 'http://texas.penguin-logistics.cn' },
-    { name: '路人乙' },
-    { name: 'pokemonchw', link: 'https://github.com/pokemonchw' },
-    { name: '帕蒂卡', link: 'https://github.com/Patika-ailemait' },
-    { name: '零件', link: 'https://nekosc.com' },
-    { name: '幻梦', link: 'https://t.me/HuanmengQwQ' },
-    { name: 'acted咕咕喵', link: 'https://acted.gitlab.io' },
-    { name: '重水时雨', link: 'https://t.me/boatmasteronD2O' },
-    { name: '神楽坂 紫' },
-    { name: 'Runian Lee', link: 'https://t.me/Runian' },
-].sort(() => Math.random() - 0.5);
-
-},{}],33:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const history_1 = require("./history");
-const state_1 = require("./state");
-function updateSelection() {
-    if (state_1.state.chapterTextNodes === null) {
-        return;
+// https://stackoverflow.com/a/7616484
+function stringHash(str) {
+    let hash = 0;
+    if (str.length === 0) {
+        return hash;
     }
-    const before = String(state_1.state.chapterSelection);
-    const selection = document.getSelection();
-    if (selection === null) {
-        state_1.state.chapterSelection = null;
+    for (let i = 0; i < str.length; i++) {
+        hash = ((hash << 5) - hash) + str.charCodeAt(i);
+        hash |= 0;
     }
-    else {
-        const anchor = ((selection.anchorNode instanceof HTMLElement)
-            ? selection.anchorNode.firstChild
-            : selection.anchorNode);
-        const anchorNodeIndex = state_1.state.chapterTextNodes.indexOf(anchor);
-        const focus = ((selection.focusNode instanceof HTMLElement)
-            ? selection.focusNode.firstChild
-            : selection.focusNode);
-        const focusNodeIndex = state_1.state.chapterTextNodes.indexOf(focus);
-        if ((anchorNodeIndex === -1) || (focusNodeIndex === -1) ||
-            (anchorNodeIndex === focusNodeIndex && selection.anchorOffset === selection.focusOffset)) {
-            state_1.state.chapterSelection = null;
-        }
-        else {
-            if ((anchorNodeIndex < focusNodeIndex) ||
-                (anchorNodeIndex === focusNodeIndex && selection.anchorOffset < selection.focusOffset)) {
-                state_1.state.chapterSelection = [
-                    anchorNodeIndex,
-                    selection.anchorOffset,
-                    focusNodeIndex,
-                    selection.focusOffset,
-                ];
-            }
-            else {
-                state_1.state.chapterSelection = [
-                    focusNodeIndex,
-                    selection.focusOffset,
-                    anchorNodeIndex,
-                    selection.anchorOffset,
-                ];
-            }
-        }
-    }
-    if (before !== String(state_1.state.chapterSelection)) {
-        history_1.updateHistory(false);
-    }
+    return hash;
 }
-exports.updateSelection = updateSelection;
+exports.stringHash = stringHash;
 
-},{"./history":22,"./state":30}],34:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const Interpreter_1 = require("./Interpreter");
 const Random_1 = require("./Random");
 /**
- * This is one of the possible implementation of a WTCD reader.
+ * This is one of the possible implementations of a WTCD reader.
  *
  * In this implementation, all new content and buttons are appended to a single
  * HTML element. The user is expected to continuously scroll down the page in
@@ -1930,8 +2666,8 @@ class FlowReader {
     }
     /** Restart the interpreter and reset the interpreterIterator */
     resetInterpreter() {
-        const interpreter = new Interpreter_1.Interpreter(this.wtcdRoot, new Random_1.Random(this.data.random));
-        this.interpreterIterator = interpreter.start();
+        this.interpreter = new Interpreter_1.Interpreter(this.wtcdRoot, new Random_1.Random(this.data.random));
+        this.interpreterIterator = this.interpreter.start();
     }
     /**
      * Make a decision at currentDecisionIndex and update buttons accordingly
@@ -2001,6 +2737,7 @@ class FlowReader {
         const $container = document.createElement('div');
         $container.classList.add('wtcd-group-container');
         output.content.forEach($element => $container.appendChild($element));
+        this.interpreter.getPinned().forEach($element => $container.appendChild($element));
         const decisionIndex = this.currentDecisionIndex;
         this.buttons.push(output.choices.map((choice, choiceIndex) => {
             const $button = document.createElement('div');
@@ -2031,7 +2768,7 @@ class FlowReader {
     }
     renderTo($target) {
         if (this.started) {
-            throw new Error('Flow Interface already started.');
+            throw new Error('Flow reader already started.');
         }
         this.started = true;
         this.target = $target;
@@ -2048,7 +2785,173 @@ class FlowReader {
 }
 exports.FlowReader = FlowReader;
 
-},{"./Interpreter":35,"./Random":36}],35:[function(require,module,exports){
+},{"./Interpreter":48,"./Random":49}],47:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const Interpreter_1 = require("./Interpreter");
+const Random_1 = require("./Random");
+function isGameData(data) {
+    if (typeof data !== 'object' || data === null) {
+        return false;
+    }
+    if (typeof data.random !== 'string') {
+        return false;
+    }
+    if (!Array.isArray(data.decisions)) {
+        return false;
+    }
+    if (data.decisions.some((decision) => typeof decision !== 'number')) {
+        return false;
+    }
+    return true;
+}
+function isSaveData(data) {
+    if (!isGameData(data)) {
+        return false;
+    }
+    if (typeof data.date !== 'number') {
+        return false;
+    }
+    if (typeof data.desc !== 'string') {
+        return false;
+    }
+    return true;
+}
+function isData(data) {
+    if (typeof data !== 'object' || data === null) {
+        return false;
+    }
+    if (!isGameData(data.current)) {
+        return false;
+    }
+    if (!Array.isArray(data.saves)) {
+        return false;
+    }
+    if (!data.saves.every((save) => save === null || isSaveData(save))) {
+        return false;
+    }
+    return true;
+}
+/**
+ * This is one of the possible implementations of a WTCD reader.
+ *
+ * This is a reader specialized for games. This reader only display one section
+ * at a time. This reader also does not allow undo.
+ *
+ * However, this reader does support save/load. It persists data via memorizing
+ * all decisions too.
+ */
+class GameReader {
+    constructor(docIdentifier, wtcdRoot, errorMessageCreator, elementPreprocessor) {
+        this.wtcdRoot = wtcdRoot;
+        this.errorMessageCreator = errorMessageCreator;
+        this.elementPreprocessor = elementPreprocessor;
+        this.started = false;
+        this.storageKey = `wtcd.gr.${docIdentifier}`;
+        this.data = this.parseData(window.localStorage.getItem(this.storageKey)) || {
+            saves: [null, null, null],
+            current: {
+                random: String(Math.random()),
+                decisions: [],
+            },
+        };
+    }
+    parseData(data) {
+        if (typeof data !== 'string') {
+            return null;
+        }
+        let obj;
+        try {
+            obj = JSON.parse(data);
+        }
+        catch (error) {
+            return null;
+        }
+        if (!isData(obj)) {
+            return null;
+        }
+        return obj;
+    }
+    persist() {
+        window.localStorage.setItem(this.storageKey, JSON.stringify(this.data));
+    }
+    getSaves() {
+        return this.data.saves.map(save => save === null
+            ? null
+            : {
+                desc: save.desc,
+                date: new Date(save.date),
+            });
+    }
+    load(saveIndex) {
+        const save = this.data.saves[saveIndex];
+        if (save === undefined || save === null) {
+            throw new Error(`Illegal save index: ${saveIndex}.`);
+        }
+        this.data.current.random = save.random;
+        this.data.current.decisions = save.decisions.slice();
+        this.restoreGameState();
+    }
+    /** Calls this.interpreterIterator.next() and handles error. */
+    next(decision) {
+        try {
+            return this.interpreterIterator.next(decision);
+        }
+        catch (error) {
+            const $errorMessage = this.errorMessageCreator(error);
+            this.target.innerHTML = '';
+            this.target.appendChild($errorMessage);
+            return {
+                done: true,
+                value: {
+                    choices: [],
+                    content: [],
+                },
+            };
+        }
+    }
+    restoreGameState() {
+        this.interpreter = new Interpreter_1.Interpreter(this.wtcdRoot, new Random_1.Random(this.data.current.random));
+        this.interpreterIterator = this.interpreter.start();
+        let lastOutput = this.interpreterIterator.next();
+        this.data.current.decisions.forEach(decision => lastOutput = this.interpreterIterator.next(decision));
+        this.handleOutput(lastOutput.value);
+    }
+    handleOutput(output) {
+        this.target.innerHTML = '';
+        output.content.forEach($element => this.target.appendChild($element));
+        this.interpreter.getPinned().forEach($element => this.target.appendChild($element));
+        output.choices.forEach((choice, choiceIndex) => {
+            const $button = document.createElement('div');
+            $button.classList.add('wtcd-button');
+            $button.innerText = choice.content;
+            if (choice.disabled) {
+                $button.classList.add('disabled');
+            }
+            else {
+                $button.classList.add('candidate');
+                $button.addEventListener('click', () => {
+                    this.data.current.decisions.push(choiceIndex);
+                    this.handleOutput(this.next(choiceIndex).value);
+                    this.persist();
+                });
+            }
+            this.target.appendChild($button);
+        });
+        this.elementPreprocessor(this.target);
+    }
+    renderTo($target) {
+        if (this.started) {
+            throw new Error('Game reader already started.');
+        }
+        this.started = true;
+        this.target = $target;
+        this.restoreGameState();
+    }
+}
+exports.GameReader = GameReader;
+
+},{"./Interpreter":48,"./Random":49}],48:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const constantsPool_1 = require("./constantsPool");
@@ -2277,13 +3180,24 @@ class Interpreter {
             getRandom: () => this.random,
             pushContent: this.pushContent.bind(this),
             timers: this.timers,
+            setPinnedFunction: this.setPinnedFunction.bind(this),
+            setStateDesc: this.setStateDesc.bind(this),
         };
+        this.pinnedFunction = null;
+        this.pinned = [];
+        this.stateDesc = null;
         this.scopes = [];
         this.sectionStack = [];
         this.started = false;
         this.sectionEnterTimes = new Map();
         this.currentlyBuilding = [];
         this.sectionStack.push(this.wtcdRoot.sections[0]);
+    }
+    setPinnedFunction(pinnedFunction) {
+        this.pinnedFunction = pinnedFunction;
+    }
+    setStateDesc(stateDesc) {
+        this.stateDesc = stateDesc;
     }
     resolveVariableReference(variableName) {
         for (let i = this.scopes.length - 1; i >= 0; i--) {
@@ -2679,6 +3593,30 @@ class Interpreter {
         }
         throw WTCDError_1.WTCDError.atUnknown(`Unknown section "${sectionName}"`);
     }
+    updatePinned() {
+        if (this.pinnedFunction !== null) {
+            try {
+                invokeFunction_1.invokeFunctionRaw(this.pinnedFunction.value, [], this.interpreterHandle);
+            }
+            catch (error) {
+                if (error instanceof invokeFunction_1.FunctionInvocationError) {
+                    throw WTCDError_1.WTCDError.atUnknown(`Failed to invoke the pinned ` +
+                        `function (${describe(this.pinnedFunction)}): ` +
+                        error.message);
+                }
+                else if (error instanceof WTCDError_1.WTCDError) {
+                    error.pushWTCDStack(`Pinned function (` +
+                        `${describe(this.pinnedFunction)})`);
+                }
+                throw error;
+            }
+            this.pinned = this.currentlyBuilding;
+            this.currentlyBuilding = [];
+        }
+        else if (this.pinned.length !== 0) {
+            this.pinned = [];
+        }
+    }
     *executeAction(action) {
         switch (action.value.action) {
             case 'goto':
@@ -2701,6 +3639,7 @@ class Interpreter {
                     choices,
                 };
                 this.currentlyBuilding = [];
+                this.updatePinned();
                 // Hands over control so player can make a decision
                 const playerChoiceIndex = yield yieldValue;
                 const playerChoice = choicesRaw[playerChoiceIndex];
@@ -2740,6 +3679,41 @@ class Interpreter {
     pushContent($element) {
         this.currentlyBuilding.push($element);
     }
+    runSection(section) {
+        const $mdHost = document.createElement('div');
+        // Evaluate the executes clause
+        if (section.executes !== null) {
+            this.evaluator(section.executes);
+        }
+        /** Times this section has been entered including this time */
+        const enterTime = this.sectionEnterTimes.has(section.name)
+            ? this.sectionEnterTimes.get(section.name) + 1
+            : 1;
+        this.sectionEnterTimes.set(section.name, enterTime);
+        /** Content that fits within the bounds */
+        const eligibleSectionContents = section.content.filter(content => (content.lowerBound === undefined || content.lowerBound <= enterTime) &&
+            (content.upperBound === undefined || content.upperBound >= enterTime));
+        if (eligibleSectionContents.length !== 0) {
+            const selectedContent = eligibleSectionContents[this.random.nextInt(0, eligibleSectionContents.length)];
+            $mdHost.innerHTML = selectedContent.html;
+            // Parameterize
+            for (const variable of selectedContent.variables) {
+                $mdHost.getElementsByClassName(variable.elementClass)[0]
+                    .innerText = String(this.resolveVariableReference(variable.variableName).value.value);
+            }
+            let $current = $mdHost.firstChild;
+            while ($current !== null) {
+                if ($current instanceof HTMLElement) {
+                    this.pushContent($current);
+                }
+                $current = $current.nextSibling;
+            }
+        }
+        return this.evaluator(section.then);
+    }
+    getPinned() {
+        return this.pinned;
+    }
     *start() {
         const stdScope = this.pushScope();
         for (const stdFunction of std_1.stdFunctions) {
@@ -2766,39 +3740,10 @@ class Interpreter {
             for (const statement of this.wtcdRoot.initStatements) {
                 this.executeStatement(statement);
             }
-            const $host = document.createElement('div');
             while (this.sectionStack.length !== 0) {
                 const currentSection = this.sectionStack.pop();
                 lastSection = currentSection;
-                // Evaluate the executes clause
-                if (currentSection.executes !== null) {
-                    this.evaluator(currentSection.executes);
-                }
-                /** Times this section has been entered including this time */
-                const enterTime = this.sectionEnterTimes.has(currentSection.name)
-                    ? this.sectionEnterTimes.get(currentSection.name) + 1
-                    : 1;
-                this.sectionEnterTimes.set(currentSection.name, enterTime);
-                /** Content that fits within the bounds */
-                const eligibleSectionContents = currentSection.content.filter(content => (content.lowerBound === undefined || content.lowerBound <= enterTime) &&
-                    (content.upperBound === undefined || content.upperBound >= enterTime));
-                if (eligibleSectionContents.length !== 0) {
-                    const selectedContent = eligibleSectionContents[this.random.nextInt(0, eligibleSectionContents.length)];
-                    $host.innerHTML = selectedContent.html;
-                    // Parameterize
-                    for (const variable of selectedContent.variables) {
-                        $host.getElementsByClassName(variable.elementClass)[0]
-                            .innerText = String(this.resolveVariableReference(variable.variableName).value.value);
-                    }
-                    let $current = $host.firstChild;
-                    while ($current !== null) {
-                        if ($current instanceof HTMLElement) {
-                            this.pushContent($current);
-                        }
-                        $current = $current.nextSibling;
-                    }
-                }
-                const then = this.evaluator(currentSection.then);
+                const then = this.runSection(currentSection);
                 if (then.type === 'action') {
                     yield* this.executeAction(then);
                 }
@@ -2823,15 +3768,17 @@ class Interpreter {
             }
             throw error;
         }
-        return {
+        const lastContent = {
             content: this.currentlyBuilding,
             choices: [],
         };
+        this.updatePinned();
+        return lastContent;
     }
 }
 exports.Interpreter = Interpreter;
 
-},{"./WTCDError":37,"./constantsPool":39,"./invokeFunction":40,"./operators":41,"./std":44,"./utils":50}],36:[function(require,module,exports){
+},{"./WTCDError":50,"./constantsPool":52,"./invokeFunction":53,"./operators":54,"./std":57,"./utils":64}],49:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 /**
@@ -2894,7 +3841,7 @@ class Random {
 }
 exports.Random = Random;
 
-},{}],37:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const empty = {};
@@ -2940,7 +3887,7 @@ class WTCDError extends Error {
 }
 exports.WTCDError = WTCDError;
 
-},{}],38:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 function autoEvaluated(fn) {
@@ -2952,7 +3899,7 @@ function autoEvaluated(fn) {
 }
 exports.autoEvaluated = autoEvaluated;
 
-},{}],39:[function(require,module,exports){
+},{}],52:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 // Your typical immature optimization
@@ -2988,7 +3935,7 @@ function getMaybePooled(type, value) {
 }
 exports.getMaybePooled = getMaybePooled;
 
-},{}],40:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const autoEvaluated_1 = require("./autoEvaluated");
@@ -3160,7 +4107,7 @@ exports.reverseInvocation = autoEvaluated_1.autoEvaluated((arg0, arg1, expr, int
     }
 });
 
-},{"./Interpreter":35,"./WTCDError":37,"./autoEvaluated":38,"./constantsPool":39,"./std/utils":49}],41:[function(require,module,exports){
+},{"./Interpreter":48,"./WTCDError":50,"./autoEvaluated":51,"./constantsPool":52,"./std/utils":63}],54:[function(require,module,exports){
 "use strict";
 // This file defines all infix and prefix operators in WTCD.
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -3564,7 +4511,7 @@ exports.binaryOperators = new Map([
 exports.conditionalOperatorPrecedence = 4;
 exports.operators = new Set([...exports.unaryOperators.keys(), ...exports.binaryOperators.keys(), '?', ':', '...']);
 
-},{"./Interpreter":35,"./WTCDError":37,"./autoEvaluated":38,"./constantsPool":39,"./invokeFunction":40}],42:[function(require,module,exports){
+},{"./Interpreter":48,"./WTCDError":50,"./autoEvaluated":51,"./constantsPool":52,"./invokeFunction":53}],55:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const constantsPool_1 = require("../constantsPool");
@@ -3663,7 +4610,7 @@ exports.contentStdFunctions = [
     },
 ];
 
-},{"../Interpreter":35,"../constantsPool":39,"./utils":49}],43:[function(require,module,exports){
+},{"../Interpreter":48,"../constantsPool":52,"./utils":63}],56:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const constantsPool_1 = require("../constantsPool");
@@ -3729,7 +4676,7 @@ exports.debugStdFunctions = [
     },
 ];
 
-},{"../Interpreter":35,"../WTCDError":37,"../constantsPool":39,"../invokeFunction":40,"./utils":49}],44:[function(require,module,exports){
+},{"../Interpreter":48,"../WTCDError":50,"../constantsPool":52,"../invokeFunction":53,"./utils":63}],57:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const content_1 = require("./content");
@@ -3737,6 +4684,7 @@ const debug_1 = require("./debug");
 const list_1 = require("./list");
 const math_1 = require("./math");
 const random_1 = require("./random");
+const reader_1 = require("./reader");
 const string_1 = require("./string");
 exports.stdFunctions = [
     ...content_1.contentStdFunctions,
@@ -3744,10 +4692,11 @@ exports.stdFunctions = [
     ...list_1.listStdFunctions,
     ...math_1.mathStdFunctions,
     ...random_1.randomStdFunctions,
+    ...reader_1.readerStdFunctions,
     ...string_1.stringStdFunctions,
 ];
 
-},{"./content":42,"./debug":43,"./list":45,"./math":46,"./random":47,"./string":48}],45:[function(require,module,exports){
+},{"./content":55,"./debug":56,"./list":58,"./math":59,"./random":60,"./reader":61,"./string":62}],58:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const constantsPool_1 = require("../constantsPool");
@@ -4013,7 +4962,7 @@ exports.listStdFunctions = [
     },
 ];
 
-},{"../Interpreter":35,"../WTCDError":37,"../constantsPool":39,"../invokeFunction":40,"./utils":49}],46:[function(require,module,exports){
+},{"../Interpreter":48,"../WTCDError":50,"../constantsPool":52,"../invokeFunction":53,"./utils":63}],59:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const constantsPool_1 = require("../constantsPool");
@@ -4047,7 +4996,7 @@ exports.mathStdFunctions = [
     },
 ];
 
-},{"../constantsPool":39,"./utils":49}],47:[function(require,module,exports){
+},{"../constantsPool":52,"./utils":63}],60:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const constantsPool_1 = require("../constantsPool");
@@ -4100,7 +5049,37 @@ exports.randomStdFunctions = [
     },
 ];
 
-},{"../constantsPool":39,"./utils":49}],48:[function(require,module,exports){
+},{"../constantsPool":52,"./utils":63}],61:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const constantsPool_1 = require("../constantsPool");
+const utils_1 = require("./utils");
+exports.readerStdFunctions = [
+    function readerSetPinned(args, interpreterHandle) {
+        utils_1.assertArgsLength(args, 1);
+        utils_1.assertArgType(args, 0, 'function');
+        interpreterHandle.setPinnedFunction(args[0]);
+        return constantsPool_1.getMaybePooled('null', null);
+    },
+    function readerUnsetPinned(args, interpreterHandle) {
+        utils_1.assertArgsLength(args, 0);
+        interpreterHandle.setPinnedFunction(null);
+        return constantsPool_1.getMaybePooled('null', null);
+    },
+    function readerSetStateDesc(args, interpreterHandle) {
+        utils_1.assertArgsLength(args, 1);
+        const stateDesc = utils_1.assertArgType(args, 0, 'string');
+        interpreterHandle.setStateDesc(stateDesc);
+        return constantsPool_1.getMaybePooled('null', null);
+    },
+    function readerUnsetStateDesc(args, interpreterHandle) {
+        utils_1.assertArgsLength(args, 0);
+        interpreterHandle.setStateDesc(null);
+        return constantsPool_1.getMaybePooled('null', null);
+    },
+];
+
+},{"../constantsPool":52,"./utils":63}],62:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const constantsPool_1 = require("../constantsPool");
@@ -4133,7 +5112,7 @@ exports.stringStdFunctions = [
     },
 ];
 
-},{"../constantsPool":39,"./utils":49}],49:[function(require,module,exports){
+},{"../constantsPool":52,"./utils":63}],63:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const constantsPool_1 = require("../constantsPool");
@@ -4179,7 +5158,7 @@ function assertArgType(args, index, type, defaultValue) {
 }
 exports.assertArgType = assertArgType;
 
-},{"../Interpreter":35,"../constantsPool":39}],50:[function(require,module,exports){
+},{"../Interpreter":48,"../constantsPool":52}],64:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 function flat(arr) {
@@ -4200,4 +5179,4 @@ function arrayEquals(arr0, arr1, comparator = (e0, e1) => e0 === e1) {
 }
 exports.arrayEquals = arrayEquals;
 
-},{}]},{},[23]);
+},{}]},{},[30]);

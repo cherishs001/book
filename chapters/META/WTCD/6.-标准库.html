@@ -155,3 +155,14 @@ stringFormatNumberPrecision::[1234 2] == &quot;1.2e+3&quot;
 <h3>6.6.5 <code>timeEnd</code></h3>
 <p>接受 0 - 1 个参数：<code>string timerName = &quot;default&quot;</code>。</p>
 <p>结束名为 <code>timerName</code> 的计时器，并将计时结果打印到浏览器控制台。</p>
+<h2>6.7 <code>reader*</code></h2>
+<h3>6.7.1 <code>readerSetPinned</code></h3>
+<p>接受 1 个参数：<code>function pinnedFunction</code>。</p>
+<p>设置 <code>pinnedFunction</code> 为当前的常驻函数。常驻函数是指在每次需要用户做出选择的时候被调用的函数。在这个函数内调用 <code>content*</code> 会把创建的内容添加到一个特殊的常驻区域。常驻区域的显示方式则是由具体的阅读器决定的。</p>
+<h3>6.7.2 <code>readerUnsetPinned</code></h3>
+<p>不接受参数。取消当前常驻函数。</p>
+<h3>6.7.3 <code>readerSetStateDesc</code></h3>
+<p>接受 1 个参数：<code>string stateDesc</code>。</p>
+<p>将当前的状态描述文本设置为 <code>stateDesc</code>。状态描述文本通常被用在支持多存档的阅读器的存档选择界面中来帮助区分存档。</p>
+<h3>6.7.4 <code>readerUnsetStateDesc</code></h3>
+<p>不接受参数。取消当前状态描述文本。</p>
