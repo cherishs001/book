@@ -32,7 +32,10 @@ export function selectNode(node: Node) {
   }
 }
 
-export function isAnyParent($element: HTMLElement | null, predicate: (node: HTMLElement) => boolean) {
+export function isAnyParent(
+  $element: HTMLElement | null,
+  predicate: (node: HTMLElement) => boolean,
+) {
   while ($element !== null) {
     if (predicate($element)) {
       return true;
@@ -40,4 +43,14 @@ export function isAnyParent($element: HTMLElement | null, predicate: (node: HTML
     $element = $element.parentElement;
   }
   return false;
+}
+
+export function insertAfter(
+  $newElement: HTMLElement,
+  $referencingElement: HTMLElement,
+) {
+  $referencingElement.parentElement!.insertBefore(
+    $newElement,
+    $referencingElement.nextSibling,
+  );
 }

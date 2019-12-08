@@ -74,7 +74,9 @@ export function loadComments(
     h('h1', COMMENTS_SECTION),
     $commentsStatus,
   ]) as HTMLDivElement;
-  const block = content.addBlock($comments);
+  const block = content.addBlock({
+    initElement: $comments,
+  });
 
   if (issueUrl === null) {
     $commentsStatus.innerText = COMMENTS_UNAVAILABLE;

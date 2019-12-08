@@ -140,14 +140,19 @@ export function loadChapter(
   const content = newContent(side);
 
   if (chapterCtx.chapter.isEarlyAccess) {
-    content.addBlock((
-      h('div', [
-        h('h1', EARLY_ACCESS_TITLE),
-        h('p', EARLY_ACCESS_DESC),
-      ])
-    ), ContentBlockStyle.WARNING);
+    content.addBlock({
+      initElement: (
+        h('div', [
+          h('h1', EARLY_ACCESS_TITLE),
+          h('p', EARLY_ACCESS_DESC),
+        ])
+      ),
+      style: ContentBlockStyle.WARNING,
+    });
   }
-  const chapterBlock = content.addBlock(h('.content') as HTMLDivElement);
+  const chapterBlock = content.addBlock({
+    initElement: h('.content') as HTMLDivElement,
+  });
 
   setLayout(Layout.MAIN);
 

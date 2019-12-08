@@ -1,4 +1,5 @@
 import { animation } from '../data/settings';
+import { h } from '../hs';
 import { id } from '../util/DOM';
 import { getCurrentLayout, Layout } from './layoutControl';
 
@@ -58,7 +59,7 @@ export function newContent(side: Side): Content {
         const oldContent = currentContent;
         setTimeout(() => {
           oldContent.destroy();
-        }, 2000);
+        }, 2500);
       }
       setSide(newContent.element, side);
       // Force reflow, so transition starts now
@@ -90,11 +91,8 @@ export class Content {
     $contentContainer.appendChild($content);
     this.element = $content;
   }
-  public addBlock(
-    $init: HTMLDivElement = document.createElement('div'),
-    style: ContentBlockStyle = ContentBlockStyle.REGULAR,
-  ) {
-    const block = new ContentBlock(this, $init, style);
+  public addBlock(opts: ContentBlockOpts = {}) {
+    const block = new ContentBlock(this, opts);
     this.blocks.push(block);
     return block;
   }
@@ -104,19 +102,38 @@ export class Content {
   }
 }
 
+interface ContentBlockOpts {
+  initElement?: HTMLDivElement;
+  style?: ContentBlockStyle;
+  slidable?: boolean;
+}
+
 class ContentBlock {
+  private slideContainer: HTMLDivElement | null = null;
+  private heightHolder: HTMLDivElement | null = null;
+  private sliding: number = 0;
+  public element: HTMLDivElement;
   public constructor(
     content: Content,
-    public readonly element: HTMLDivElement,
-    style: ContentBlockStyle,
+    {
+      initElement = new HTMLDivElement(),
+      style = ContentBlockStyle.REGULAR,
+      slidable = false,
+    }: ContentBlockOpts,
   ) {
-    element.classList.add('content-block');
+    this.element = initElement;
+    initElement.classList.add('content-block');
     switch (style) {
       case ContentBlockStyle.WARNING:
-        element.classList.add('warning');
+        initElement.classList.add('warning');
         break;
     }
-    content.element.appendChild(element);
+    if (slidable) {
+      this.slideContainer = h('.slide-container', initElement) as HTMLDivElement;
+      content.element.appendChild(this.slideContainer);
+    } else {
+      content.element.appendChild(initElement);
+    }
   }
   public onEnteringView(callback: () => void) {
     const observer = new IntersectionObserver(entries => {
@@ -130,5 +147,45 @@ class ContentBlock {
       threshold: 0,
     });
     observer.observe(this.element);
+  }
+  public slideReplace($newElement: HTMLDivElement = new HTMLDivElement()) {
+    const $container = this.slideContainer;
+    if ($container === null) {
+      throw new Error('Content block is not slidable.');
+    }
+    this.sliding++;
+    $container.classList.add('in-transition');
+    $newElement.classList.add('content-block');
+
+    const $oldElement = this.element;
+
+    $newElement.classList.add('right');
+    $container.prepend($newElement);
+    const newHeight = $newElement.offsetHeight; // This also forces reflow
+    $newElement.classList.remove('right');
+
+    if (this.heightHolder === null) {
+      this.heightHolder = h('.height-holder') as HTMLDivElement;
+      this.heightHolder.style.height = `${$oldElement.offsetHeight}px`;
+      $container.appendChild(this.heightHolder);
+      // tslint:disable-next-line:no-unused-expression
+      this.heightHolder.offsetWidth; // Forces reflow
+    }
+    this.heightHolder.style.height = `${newHeight}px`;
+
+    $oldElement.classList.add('left');
+
+    this.element = $newElement;
+    setTimeout(() => {
+      $oldElement.remove();
+      this.sliding--;
+      if (this.sliding === 0) {
+        $container.classList.remove('in-transition');
+        if (this.heightHolder !== null) {
+          this.heightHolder.remove();
+          this.heightHolder = null;
+        }
+      }
+    }, 2500);
   }
 }
