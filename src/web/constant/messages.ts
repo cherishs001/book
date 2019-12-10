@@ -2,7 +2,7 @@ export const EARLY_ACCESS_TITLE = '编写中章节';
 export const EARLY_ACCESS_DESC = '请注意，本文正在编写中，因此可能会含有未完成的句子或是尚未更新的信息。';
 
 export const PREVIOUS_CHAPTER = '上一章';
-export const GO_TO_MENU = '返回菜单';
+export const GO_TO_MENU = '返回';
 export const NEXT_CHAPTER = '下一章';
 
 export const CHAPTER_LOADING = '章节加载中...';
@@ -17,6 +17,27 @@ export const COMMENTS_FAILED = '评论加载失败，请检查网络连接。';
 
 export const NO_BLOCKED_USERS = '没有用户的评论被屏蔽';
 export const CLICK_TO_UNBLOCK = '(点击用户名以解除屏蔽)';
+
+export const WTCD_GAME_RESTART = '重置游戏';
+export const WTCD_GAME_RESTART_TITLE = '是否重置游戏种子';
+export const WTCD_GAME_RESTART_DESC = '游戏种子会决定游戏的随机因素。';
+export const WTCD_GAME_RESTART_ALL_DESC = '若选择【重置游戏种子与进度】，那么新游戏中的所有随机因素和本游戏不一致。';
+export const WTCD_GAME_RESTART_DECISION_ONLY_DESC = '若选择【仅重置进度】，那么新游戏中的随机因素将与本游戏完全一致。';
+export const WTCD_GAME_RESTART_ALL = '重置游戏种子与进度';
+export const WTCD_GAME_RESTART_DECISION_ONLY = '仅重置进度';
+export const WTCD_GAME_RESTART_CANCEL = '不重置任何内容';
+export const WTCD_GAME_SAVE = '存储';
+export const WTCD_GAME_SAVE_TITLE = '请选择要存储的位置';
+export const WTCD_GAME_SAVE_CANCEL = '取消';
+export const WTCD_GAME_SAVE_NEW = '- 新存档 -';
+export const WTCD_GAME_SAVE_OVERWRITE_TITLE = '是否覆盖？';
+export const WTCD_GAME_SAVE_OVERWRITE_CONFIRM = '确认覆盖';
+export const WTCD_GAME_SAVE_OVERWRITE_CANCEL = '取消';
+export const WTCD_GAME_LOAD = '读取';
+export const WTCD_GAME_QUICK_SAVE = '快速存储';
+export const WTCD_GAME_QUICK_LOAD = '快速读取';
+export const WTCD_GAME_NO_DESC = '无描述文本';
+export const WTCD_GAME_QUICK = '快速';
 
 export const WTCD_ERROR_COMPILE_TITLE = 'WTCD 编译失败';
 export const WTCD_ERROR_COMPILE_DESC = '该 WTCD 文档在编译时发生了错误。请检查是否有语法错误或是其他基本错误。';

@@ -5,7 +5,7 @@ const DAY = 24 * HOUR;
 
 const MAX_RELATIVE_TIME = 7 * DAY;
 
-export function formatTime(time: Date) {
+export function formatTimeRelative(time: Date) {
   const relativeTime = Date.now() - time.getTime();
   if (relativeTime > MAX_RELATIVE_TIME) {
     return `${time.getFullYear()}/${time.getMonth() + 1}/${time.getDate()}`;
@@ -20,4 +20,9 @@ export function formatTime(time: Date) {
     return `${Math.floor(relativeTime / MINUTE)} 分钟前`;
   }
   return `${Math.floor(relativeTime / SECOND)} 秒前`;
+}
+
+export function formatTimeSimple(time: Date) {
+  return `${time.getFullYear()}-${time.getMonth() + 1}-${time.getDate()} ` +
+    `${time.getHours()}:${time.getMinutes()}:${time.getSeconds()}`;
 }

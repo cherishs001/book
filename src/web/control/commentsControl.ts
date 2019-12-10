@@ -10,7 +10,7 @@ import { AutoCache } from '../data/AutoCache';
 import { useComments } from '../data/settings';
 import { DebugLogger } from '../DebugLogger';
 import { h } from '../hs';
-import { formatTime } from '../util/formatTime';
+import { formatTimeRelative } from '../util/formatTime';
 import { blockUser, isUserBlocked } from './commentBlockControl';
 import { Content } from './contentControl';
 
@@ -41,9 +41,9 @@ function createCommentElement(
       href: userUrl,
     }, userName),
     h('.time', createTime === updateTime
-      ? formatTime(new Date(createTime))
-      : `${formatTime(new Date(createTime))}` +
-        `（最后修改于 ${formatTime(new Date(updateTime))}）`),
+      ? formatTimeRelative(new Date(createTime))
+      : `${formatTimeRelative(new Date(createTime))}` +
+        `（最后修改于 ${formatTimeRelative(new Date(updateTime))}）`),
     h('a.block-user', {
       onclick: () => {
         blockUser(userName);

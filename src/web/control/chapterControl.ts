@@ -1,8 +1,6 @@
 import { Chapter } from '../../Data';
 import { FlowReader } from '../../wtcd/FlowReader';
-import { GameReader } from '../../wtcd/GameReader';
 import { WTCDParseResult } from '../../wtcd/types';
-import { WTCDError } from '../../wtcd/WTCDError';
 import { loadingText } from '../constant/loadingText';
 import {
   CHAPTER_FAILED,
@@ -11,16 +9,6 @@ import {
   GO_TO_MENU,
   NEXT_CHAPTER,
   PREVIOUS_CHAPTER,
-  WTCD_ERROR_COMPILE_TITLE,
-  WTCD_ERROR_INTERNAL_DESC,
-  WTCD_ERROR_INTERNAL_STACK_DESC,
-  WTCD_ERROR_INTERNAL_STACK_TITLE,
-  WTCD_ERROR_INTERNAL_TITLE,
-  WTCD_ERROR_MESSAGE,
-  WTCD_ERROR_RUNTIME_DESC,
-  WTCD_ERROR_RUNTIME_TITLE,
-  WTCD_ERROR_WTCD_STACK_DESC,
-  WTCD_ERROR_WTCD_STACK_TITLE,
 } from '../constant/messages';
 import { AutoCache } from '../data/AutoCache';
 import { relativePathLookUpMap } from '../data/data';
@@ -33,11 +21,13 @@ import { SwipeDirection, swipeEvent } from '../input/gestures';
 import { ArrowKey, arrowKeyPressEvent, escapeKeyPressEvent } from '../input/keyboard';
 import { getTextNodes, id } from '../util/DOM';
 import { loadComments } from './commentsControl';
-import { ContentBlockStyle, focusOnContainer, getCurrentContent, newContent, Side } from './contentControl';
+import { Content, ContentBlockStyle, focus, getCurrentContent, newContent, Side } from './contentControl';
+import { createWTCDErrorMessage } from './createWTCDErrorMessage';
+import { createWTCDErrorMessageFromError } from './createWTCDErrorMessageFromError';
 import { updateHistory } from './history';
 import { Layout, setLayout } from './layoutControl';
 import { processElements } from './processElements';
-import { scrollTo } from './scrollControl';
+import { WTCDGameReaderUI } from './WTCDGameReaderUI';
 
 const debugLogger = new DebugLogger('Chapter Control');
 
@@ -74,12 +64,6 @@ const select = ([
   if (element !== null && (typeof element.scrollIntoView) === 'function') {
     element.scrollIntoView();
   }
-};
-
-const getFlexOneSpan = () => {
-  const $span = document.createElement('span');
-  $span.style.flex = '1';
-  return $span;
 };
 
 const canChapterShown = (chapter: Chapter) =>
@@ -124,8 +108,6 @@ export function loadChapter(
   selection?: Selection,
   side: Side = Side.LEFT,
 ) {
-  scrollTo(0);
-
   debugLogger.log(
     'Load chapter',
     chapterHtmlRelativePath,
@@ -150,13 +132,13 @@ export function loadChapter(
       style: ContentBlockStyle.WARNING,
     });
   }
-  const chapterBlock = content.addBlock({
+  const loadingBlock = content.addBlock({
     initElement: h('.content') as HTMLDivElement,
   });
 
   setLayout(Layout.MAIN);
 
-  chapterBlock.element.innerText = loadingText;
+  loadingBlock.element.innerText = loadingText;
   chaptersCache.get(chapterHtmlRelativePath).then(text => {
     if (content.isDestroyed) {
       debugLogger.log('Chapter loaded, but abandoned since the original ' +
@@ -165,10 +147,10 @@ export function loadChapter(
     }
     debugLogger.log('Chapter loaded.');
 
-    insertContent(chapterBlock.element, text, chapterCtx.chapter);
-    processElements(chapterBlock.element);
+    loadingBlock.directRemove();
+    const mainBlock = insertContent(content, text, chapterCtx.chapter);
 
-    state.chapterTextNodes = getTextNodes(chapterBlock.element);
+    state.chapterTextNodes = getTextNodes(loadingBlock.element);
     if (selection !== undefined) {
       if (id('warning') === null) {
         select(selection);
@@ -182,7 +164,10 @@ export function loadChapter(
     const chapterIndex = chapterCtx.inFolderIndex;
     const prevChapter = chapterCtx.folder.chapters[chapterIndex - 1];
     const nextChapter = chapterCtx.folder.chapters[chapterIndex + 1];
-    chapterBlock.element.appendChild(h('div.page-switcher', [
+    ((mainBlock === undefined)
+      ? content.addBlock()
+      : mainBlock
+    ).element.appendChild(h('div.page-switcher', [
       // 上一章
       (prevChapter !== undefined && canChapterShown(prevChapter))
         ? h('a.to-prev', {
@@ -192,7 +177,7 @@ export function loadChapter(
             loadPrevChapter();
           },
         }, PREVIOUS_CHAPTER)
-        : h('a'),
+        : null,
 
       // 返回菜单
       h('a.to-menu', {
@@ -213,27 +198,18 @@ export function loadChapter(
             loadNextChapter();
           },
         }, NEXT_CHAPTER)
-        : h('a'),
+        : null,
     ]));
-
-    // fix for stupid scrolling issues under iOS
-    // id('rect').style.overflow = 'hidden';
-    // setTimeout(() => {
-    //   id('rect').style.overflow = '';
-    //   if (selection === undefined) {
-    //     id('rect').scrollTo(0, 0);
-    //   }
-    // }, 1);
 
     // Re-focus the rect so it is arrow-scrollable
     setTimeout(() => {
-      focusOnContainer();
+      focus();
     }, 1);
     loadComments(getCurrentContent()!, chapterCtx.chapter.commentsUrl);
   })
   .catch(error => {
     debugLogger.error(`Failed to load chapter.`, error);
-    chapterBlock.element.innerText = CHAPTER_FAILED;
+    loadingBlock.element.innerText = CHAPTER_FAILED;
   });
 }
 
@@ -263,101 +239,29 @@ escapeKeyPressEvent.on(() => {
   updateHistory(true);
 });
 
-enum ErrorType {
+export enum ErrorType {
   COMPILE,
   RUNTIME,
   INTERNAL,
 }
 
-function createWTCDErrorMessage({
-  errorType,
-  message,
-  internalStack,
-  wtcdStack,
-}: {
-  errorType: ErrorType;
-  message: string;
-  internalStack?: string;
-  wtcdStack?: string;
-}): HTMLElement {
-  const $target = document.createElement('div');
-  const $title = document.createElement('h1');
-  const $desc = document.createElement('p');
-  switch (errorType) {
-    case ErrorType.COMPILE:
-      $title.innerText = WTCD_ERROR_COMPILE_TITLE;
-      $desc.innerText = WTCD_ERROR_COMPILE_TITLE;
-      break;
-    case ErrorType.RUNTIME:
-      $title.innerText = WTCD_ERROR_RUNTIME_TITLE;
-      $desc.innerText = WTCD_ERROR_RUNTIME_DESC;
-      break;
-    case ErrorType.INTERNAL:
-      $title.innerText = WTCD_ERROR_INTERNAL_TITLE;
-      $desc.innerText = WTCD_ERROR_INTERNAL_DESC;
-      break;
-  }
-  $target.appendChild($title);
-  $target.appendChild($desc);
-  const $message = document.createElement('p');
-  $message.innerText = WTCD_ERROR_MESSAGE + message;
-  $target.appendChild($message);
-  if (wtcdStack !== undefined) {
-    const $stackTitle = document.createElement('h2');
-    $stackTitle.innerText = WTCD_ERROR_WTCD_STACK_TITLE;
-    $target.appendChild($stackTitle);
-    const $stackDesc = document.createElement('p');
-    $stackDesc.innerText = WTCD_ERROR_WTCD_STACK_DESC;
-    $target.appendChild($stackDesc);
-    const $pre = document.createElement('pre');
-    const $code = document.createElement('code');
-    $code.innerText = wtcdStack;
-    $pre.appendChild($code);
-    $target.appendChild($pre);
-  }
-  if (internalStack !== undefined) {
-    const $stackTitle = document.createElement('h2');
-    $stackTitle.innerText = WTCD_ERROR_INTERNAL_STACK_TITLE;
-    $target.appendChild($stackTitle);
-    const $stackDesc = document.createElement('p');
-    $stackDesc.innerText = WTCD_ERROR_INTERNAL_STACK_DESC;
-    $target.appendChild($stackDesc);
-    const $pre = document.createElement('pre');
-    const $code = document.createElement('code');
-    $code.innerText = internalStack;
-    $pre.appendChild($code);
-    $target.appendChild($pre);
-  }
-  return $target;
-}
-
-function createWTCDErrorMessageFromError(error: Error) {
-  return createWTCDErrorMessage({
-    errorType: (error instanceof WTCDError)
-      ? ErrorType.RUNTIME
-      : ErrorType.INTERNAL,
-    message: error.message,
-    internalStack: error.stack,
-    wtcdStack: (error instanceof WTCDError)
-      ? error.wtcdStack
-      : undefined,
-  });
-}
-
-function insertContent($target: HTMLDivElement, content: string, chapter: Chapter) {
+function insertContent(content: Content, text: string, chapter: Chapter) {
   switch (chapter.type) {
     case 'Markdown':
-      $target.innerHTML = content;
-      break;
+      const block = content.addBlock();
+      block.element.innerHTML = text;
+      processElements(block.element);
+      return block;
     case 'WTCD': {
-      $target.innerHTML = '';
-      const wtcdParseResult: WTCDParseResult = JSON.parse(content);
+      const wtcdParseResult: WTCDParseResult = JSON.parse(text);
       if (wtcdParseResult.error === true) {
-        $target.appendChild(createWTCDErrorMessage({
-          errorType: ErrorType.COMPILE,
-          message: wtcdParseResult.message,
-          internalStack: wtcdParseResult.internalStack,
-        }));
+        content.addBlock({
+          initElement: createWTCDErrorMessage({
+            errorType: ErrorType.COMPILE,
+            message: wtcdParseResult.message,
+            internalStack: wtcdParseResult.internalStack,
+          }),
+        });
         break;
       }
       switch (chapter.preferredReader) {
@@ -368,21 +272,16 @@ function insertContent($target: HTMLDivElement, content: string, chapter: Chapte
             createWTCDErrorMessageFromError,
             processElements,
           );
-          const $wtcdContainer = document.createElement('div');
+          const $wtcdContainer = content.addBlock().element;
           flowReader.renderTo($wtcdContainer);
-          $target.appendChild($wtcdContainer);
           break;
         }
         case 'game': {
-          const gameReader = new GameReader(
+          new WTCDGameReaderUI(
+            content,
             chapter.htmlRelativePath,
             wtcdParseResult.wtcdRoot,
-            createWTCDErrorMessageFromError,
-            processElements,
-          );
-          const $wtcdContainer = document.createElement('div');
-          gameReader.renderTo($wtcdContainer);
-          $target.appendChild($wtcdContainer);
+          ).start();
           break;
         }
       }

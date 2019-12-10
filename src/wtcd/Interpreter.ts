@@ -980,6 +980,9 @@ export class Interpreter {
   public getPinned() {
     return this.pinned;
   }
+  public getStateDesc() {
+    return this.stateDesc;
+  }
   public *start(): Generator<ContentOutput, ContentOutput, number> {
     const stdScope = this.pushScope();
     for (const stdFunction of stdFunctions) {

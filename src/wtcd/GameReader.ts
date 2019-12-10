@@ -73,8 +73,23 @@ export class GameReader {
   private interpreter!: Interpreter;
   /** The iterator of the interpreter */
   private interpreterIterator!: Iterator<ContentOutput, ContentOutput, number>;
-  /** Where to render the output */
-  private target!: HTMLElement;
+  public constructor(
+    docIdentifier: string,
+    private wtcdRoot: WTCDRoot,
+    private onOutput: (content: HTMLDivElement) => void,
+    private onError: (error: Error) => void,
+  ) {
+    this.storageKey = `wtcd.gr.${docIdentifier}`;
+    this.data = this.parseData(
+      window.localStorage.getItem(this.storageKey),
+    ) || {
+      saves: [null, null, null],
+      current: {
+        random: String(Math.random()),
+        decisions: [],
+      },
+    };
+  }
   private parseData(data: any): Data | null {
     if (typeof data !== 'string') {
       return null;
@@ -102,6 +117,30 @@ export class GameReader {
       },
     );
   }
+  public reset(reseed: boolean) {
+    this.data.current.decisions = [];
+    if (reseed) {
+      this.data.current.random = String(Math.random());
+    }
+    this.restoreGameState();
+    this.persist();
+  }
+  public save(saveIndex: number) {
+    const save = this.data.saves[saveIndex];
+    if (save === undefined) {
+      throw new Error(`Illegal save index: ${saveIndex}`);
+    }
+    this.data.saves[saveIndex] = {
+      date: Date.now(),
+      desc: this.interpreter.getStateDesc() || '',
+      random: this.data.current.random,
+      decisions: this.data.current.decisions.slice(),
+    };
+    if (this.data.saves[this.data.saves.length - 1] !== null) {
+      this.data.saves.push(null);
+    }
+    this.persist();
+  }
   public load(saveIndex: number) {
     const save = this.data.saves[saveIndex];
     if (save === undefined || save === null) {
@@ -110,6 +149,7 @@ export class GameReader {
     this.data.current.random = save.random;
     this.data.current.decisions = save.decisions.slice();
     this.restoreGameState();
+    this.persist();
   }
   /** Calls this.interpreterIterator.next() and handles error. */
   private next(
@@ -118,9 +158,7 @@ export class GameReader {
     try {
       return this.interpreterIterator.next(decision as any);
     } catch (error) {
-      const $errorMessage = this.errorMessageCreator(error);
-      this.target.innerHTML = '';
-      this.target.appendChild($errorMessage);
+      this.onError(error);
       return {
         done: true,
         value: {
@@ -135,19 +173,19 @@ export class GameReader {
       this.data.current.random,
     ));
     this.interpreterIterator = this.interpreter.start();
-    let lastOutput = this.interpreterIterator.next();
+    let lastOutput = this.next();
     this.data.current.decisions.forEach(decision =>
-      lastOutput = this.interpreterIterator.next(decision),
+      lastOutput = this.next(decision),
     );
     this.handleOutput(lastOutput.value);
   }
   private handleOutput(output: ContentOutput) {
-    this.target.innerHTML = '';
-    output.content.forEach($element =>
-      this.target.appendChild($element));
-    this.interpreter.getPinned().forEach($element =>
-      this.target.appendChild($element));
-    output.choices.forEach((choice, choiceIndex) => {
+    const $output = document.createElement('div');
+    output.content.forEach($element => $output.appendChild($element));
+    this.interpreter.getPinned()
+      .forEach($element => $output.appendChild($element));
+    const decisionIndex = this.data.current.decisions.length;
+    const buttons = output.choices.map((choice, choiceIndex) => {
       const $button = document.createElement('div');
       $button.classList.add('wtcd-button');
       $button.innerText = choice.content;
@@ -156,39 +194,32 @@ export class GameReader {
       } else {
         $button.classList.add('candidate');
         $button.addEventListener('click', () => {
+          if (decisionIndex !== this.data.current.decisions.length) {
+            return;
+          }
           this.data.current.decisions.push(choiceIndex);
+          buttons.forEach($eachButton => {
+            if ($eachButton === $button) {
+              $eachButton.classList.add('selected');
+            } else {
+              $eachButton.classList.add('unselected');
+            }
+          });
           this.handleOutput(this.next(choiceIndex).value);
           this.persist();
         });
       }
-      this.target.appendChild($button);
+      $output.appendChild($button);
+      return $button;
     });
-    this.elementPreprocessor(this.target);
+    this.onOutput($output);
   }
   private started = false;
-  public constructor(
-    docIdentifier: string,
-    private wtcdRoot: WTCDRoot,
-    private errorMessageCreator: (error: Error) => HTMLElement,
-    private elementPreprocessor: ($element: HTMLElement) => void,
-  ) {
-    this.storageKey = `wtcd.gr.${docIdentifier}`;
-    this.data = this.parseData(
-      window.localStorage.getItem(this.storageKey),
-    ) || {
-      saves: [null, null, null],
-      current: {
-        random: String(Math.random()),
-        decisions: [],
-      },
-    };
-  }
-  public renderTo($target: HTMLElement) {
+  public start() {
     if (this.started) {
       throw new Error('Game reader already started.');
     }
     this.started = true;
-    this.target = $target;
     this.restoreGameState();
   }
 }

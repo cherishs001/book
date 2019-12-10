@@ -51,7 +51,7 @@ class Style {
     attemptInsertRule(`.menu .button:active::after { background-color: ${key}; }`);
     attemptInsertRule(`.button::after { background-color: ${key}; }`);
     attemptInsertRule(`body { background-color: ${this.def.paperBgColor}; }`);
-    attemptInsertRule(`.rect { background-color: ${this.def.rectBgColor}; }`);
+    // attemptInsertRule(`.rect { background-color: ${this.def.rectBgColor}; }`);
 
     // attemptInsertRule(`.rect.reading>div { background-color: ${this.def.paperBgColor}; }`);
     // attemptInsertRule(`.rect.reading>div { color: ${key}; }`);
@@ -67,6 +67,7 @@ class Style {
     attemptInsertRule(`:root { --comment-color:${this.def.commentColor}; }`);
     attemptInsertRule(`:root { --content-block-warning-color:${this.def.contentBlockWarningColor}; }`);
 
+    attemptInsertRule(`:root { --rect-bg-color: ${this.def.rectBgColor}; }`);
     attemptInsertRule(`:root { --paper-bg-color: ${this.def.paperBgColor}; }`);
     attemptInsertRule(`:root { --link-color: ${this.def.linkColor}; }`);
     attemptInsertRule(`:root { --link-hover-color: ${this.def.linkHoverColor}; }`);
