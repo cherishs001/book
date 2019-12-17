@@ -1,5 +1,6 @@
 import { animation } from '../data/settings';
 import { h } from '../hs';
+import { escapeKeyPressEvent } from '../input/keyboard';
 import { id } from '../util/DOM';
 
 const $modalHolder = id('modal-holder');
@@ -32,6 +33,25 @@ export class Modal {
     } else {
       this.modalContainer.remove();
     }
+    if (this.escKeyListener !== null) {
+      escapeKeyPressEvent.off(this.escKeyListener);
+    }
+  }
+  private dismissSet = false;
+  private escKeyListener: (() => void) | null = null;
+  public setDismissible(onDismiss: () => void = () => {
+    this.close();
+  }) {
+    if (this.dismissSet) {
+      throw new Error('Dismissible already set.');
+    }
+    this.dismissSet = true;
+    escapeKeyPressEvent.on(onDismiss);
+    this.modalContainer.addEventListener('click', event => {
+      if (event.target === this.modalContainer) {
+        onDismiss();
+      }
+    });
   }
 }
 

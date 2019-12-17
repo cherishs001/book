@@ -99,3 +99,4 @@ export const developerMode = new BooleanSetting('developerMode', false);
 export const charCount = new BooleanSetting('charCount', true, value => {
   document.body.classList.toggle('char-count-disabled', !value);
 });
+export const wtcdGameQuickLoadConfirm = new BooleanSetting('wtcdGameQuickLoadConfirm', true);

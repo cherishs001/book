@@ -2,9 +2,20 @@ import { GameReader } from '../../wtcd/GameReader';
 import { WTCDRoot } from '../../wtcd/types';
 import {
   WTCD_GAME_LOAD,
+  WTCD_GAME_LOAD_CANCEL,
+  WTCD_GAME_LOAD_OK,
+  WTCD_GAME_LOAD_QUICK,
+  WTCD_GAME_LOAD_TITLE,
   WTCD_GAME_NO_DESC,
   WTCD_GAME_QUICK_LOAD,
+  WTCD_GAME_QUICK_LOAD_CONFIRM_CANCEL,
+  WTCD_GAME_QUICK_LOAD_CONFIRM_CONFIRM,
+  WTCD_GAME_QUICK_LOAD_CONFIRM_DESC,
+  WTCD_GAME_QUICK_LOAD_CONFIRM_TITLE,
+  WTCD_GAME_QUICK_LOAD_NOT_EXIST,
+  WTCD_GAME_QUICK_LOAD_OK,
   WTCD_GAME_QUICK_SAVE,
+  WTCD_GAME_QUICK_SAVE_OK,
   WTCD_GAME_RESTART,
   WTCD_GAME_RESTART_ALL,
   WTCD_GAME_RESTART_ALL_DESC,
@@ -12,20 +23,24 @@ import {
   WTCD_GAME_RESTART_DECISION_ONLY,
   WTCD_GAME_RESTART_DECISION_ONLY_DESC,
   WTCD_GAME_RESTART_DESC,
+  WTCD_GAME_RESTART_OK,
   WTCD_GAME_RESTART_TITLE,
   WTCD_GAME_SAVE,
   WTCD_GAME_SAVE_CANCEL,
   WTCD_GAME_SAVE_NEW,
+  WTCD_GAME_SAVE_OK,
   WTCD_GAME_SAVE_OVERWRITE_CANCEL,
   WTCD_GAME_SAVE_OVERWRITE_CONFIRM,
   WTCD_GAME_SAVE_OVERWRITE_TITLE,
   WTCD_GAME_SAVE_TITLE,
 } from '../constant/messages';
+import { wtcdGameQuickLoadConfirm } from '../data/settings';
 import { DebugLogger } from '../DebugLogger';
 import { h } from '../hs';
 import { formatTimeSimple } from '../util/formatTime';
 import { Content, ContentBlock } from './contentControl';
 import { createWTCDErrorMessageFromError } from './createWTCDErrorMessageFromError';
+import { createHint } from './hintControl';
 import { confirm, Modal } from './modalControl';
 
 const debugLogger = new DebugLogger('WTCD Game Reader UI');
@@ -78,15 +93,18 @@ export class WTCDGameReaderUI {
       h('.button-container', [
         h('div', { onclick: () => {
           this.reader.reset(true);
+          createHint(WTCD_GAME_RESTART_OK, 1000);
           modal.close();
         }}, WTCD_GAME_RESTART_ALL),
         h('div', { onclick: () => {
           this.reader.reset(false);
+          createHint(WTCD_GAME_RESTART_OK, 1000);
           modal.close();
         }}, WTCD_GAME_RESTART_DECISION_ONLY),
         h('div', { onclick: () => modal.close() }, WTCD_GAME_RESTART_CANCEL),
       ]),
     ]));
+    modal.setDismissible();
     modal.open();
   }
   private onClickSave = () => {
@@ -101,6 +119,7 @@ export class WTCDGameReaderUI {
             return h('.new', {
               onclick: () => {
                 this.reader.save(saveIndex);
+                createHint(WTCD_GAME_SAVE_OK, 1000);
                 modal.close();
               },
             }, WTCD_GAME_SAVE_NEW);
@@ -115,6 +134,7 @@ export class WTCDGameReaderUI {
                 ).then(result => {
                   if (result) {
                     this.reader.save(saveIndex);
+                    createHint(WTCD_GAME_SAVE_OK, 1000);
                     modal.close();
                   }
                 });
@@ -135,16 +155,68 @@ export class WTCDGameReaderUI {
         h('div', { onclick: () => modal.close() }, WTCD_GAME_SAVE_CANCEL),
       ]),
     ]));
+    modal.setDismissible();
     modal.open();
   }
   private onClickLoad = () => {
-    new Modal().open();
+    const modal = new Modal(h('div', [
+      h('h1', WTCD_GAME_LOAD_TITLE),
+      h('.wtcd-save-button-list', this.reader.getSaves().map(
+        (save, saveIndex) => {
+          if (save === null)  {
+            return null;
+          }
+          return h('.save', {
+            onclick: () => {
+              this.reader.load(saveIndex);
+              createHint(WTCD_GAME_LOAD_OK, 1000);
+              modal.close();
+            },
+          }, [
+            saveIndex !== 0
+              ? h('.id', String(saveIndex))
+              : h('.small.id', WTCD_GAME_LOAD_QUICK),
+            h('.info', [
+              h('.state-desc', save.desc === ''
+                ? WTCD_GAME_NO_DESC
+                : save.desc),
+              h('.date', formatTimeSimple(save.date)),
+            ]),
+          ]);
+        },
+      )),
+      h('.button-container', { style: { 'margin-top': '1.2vh' } }, [
+        h('div', { onclick: () => modal.close() }, WTCD_GAME_LOAD_CANCEL),
+      ]),
+    ]));
+    modal.setDismissible();
+    modal.open();
   }
   private onClickQuickSave = () => {
     this.reader.save(0);
+    createHint(WTCD_GAME_QUICK_SAVE_OK, 1000);
   }
   private onClickQuickLoad = () => {
-    this.reader.load(0);
+    if (this.reader.getSaves()[0] === null) {
+      createHint(WTCD_GAME_QUICK_LOAD_NOT_EXIST, 3000);
+      return;
+    }
+    if (wtcdGameQuickLoadConfirm.getValue()) {
+      confirm(
+        WTCD_GAME_QUICK_LOAD_CONFIRM_TITLE,
+        WTCD_GAME_QUICK_LOAD_CONFIRM_DESC,
+        WTCD_GAME_QUICK_LOAD_CONFIRM_CONFIRM,
+        WTCD_GAME_QUICK_LOAD_CONFIRM_CANCEL,
+      ).then(result => {
+        if (result) {
+          this.reader.load(0);
+          createHint(WTCD_GAME_QUICK_LOAD_OK, 1000);
+        }
+      });
+    } else {
+      this.reader.load(0);
+      createHint(WTCD_GAME_QUICK_LOAD_OK, 1000);
+    }
   }
   private onOutput = (content: HTMLDivElement) => {
     if (this.mainBlock === null) {
