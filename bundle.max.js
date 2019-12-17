@@ -416,7 +416,7 @@ class DebugLogger {
 }
 exports.DebugLogger = DebugLogger;
 
-},{"./constant/materialDarkColors":10,"./data/settings":27,"./util/stringHash":45}],7:[function(require,module,exports){
+},{"./constant/materialDarkColors":10,"./data/settings":31,"./util/stringHash":49}],7:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class Event {
@@ -708,7 +708,7 @@ class Menu {
 }
 exports.Menu = Menu;
 
-},{"./DebugLogger":6,"./Event":7,"./control/layoutControl":21}],9:[function(require,module,exports){
+},{"./DebugLogger":6,"./Event":7,"./control/layoutControl":25}],9:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.loadingText = '加载中...';
@@ -753,7 +753,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.EARLY_ACCESS_TITLE = '编写中章节';
 exports.EARLY_ACCESS_DESC = '请注意，本文正在编写中，因此可能会含有未完成的句子或是尚未更新的信息。';
 exports.PREVIOUS_CHAPTER = '上一章';
-exports.GO_TO_MENU = '返回菜单';
+exports.GO_TO_MENU = '返回';
 exports.NEXT_CHAPTER = '下一章';
 exports.CHAPTER_LOADING = '章节加载中...';
 exports.CHAPTER_FAILED = '章节加载失败，请检查网络连接。';
@@ -765,6 +765,38 @@ exports.COMMENTS_LOADED = '以下为本章节的评论区。';
 exports.COMMENTS_FAILED = '评论加载失败，请检查网络连接。';
 exports.NO_BLOCKED_USERS = '没有用户的评论被屏蔽';
 exports.CLICK_TO_UNBLOCK = '(点击用户名以解除屏蔽)';
+exports.WTCD_GAME_RESTART = '重置游戏';
+exports.WTCD_GAME_RESTART_TITLE = '是否重置游戏种子';
+exports.WTCD_GAME_RESTART_DESC = '游戏种子会决定游戏的随机因素。';
+exports.WTCD_GAME_RESTART_ALL_DESC = '若选择【重置游戏种子与进度】，那么新游戏中的所有随机因素和本游戏不一致。';
+exports.WTCD_GAME_RESTART_DECISION_ONLY_DESC = '若选择【仅重置进度】，那么新游戏中的随机因素将与本游戏完全一致。';
+exports.WTCD_GAME_RESTART_ALL = '重置游戏种子与进度';
+exports.WTCD_GAME_RESTART_DECISION_ONLY = '仅重置进度';
+exports.WTCD_GAME_RESTART_CANCEL = '不重置任何内容';
+exports.WTCD_GAME_RESTART_OK = '游戏重置成功';
+exports.WTCD_GAME_SAVE = '存储';
+exports.WTCD_GAME_SAVE_TITLE = '请选择要存储的位置';
+exports.WTCD_GAME_SAVE_CANCEL = '取消';
+exports.WTCD_GAME_SAVE_NEW = '- 新存档 -';
+exports.WTCD_GAME_SAVE_OVERWRITE_TITLE = '是否覆盖？';
+exports.WTCD_GAME_SAVE_OVERWRITE_CONFIRM = '确认覆盖';
+exports.WTCD_GAME_SAVE_OVERWRITE_CANCEL = '取消';
+exports.WTCD_GAME_SAVE_OK = '存储成功';
+exports.WTCD_GAME_LOAD = '读取';
+exports.WTCD_GAME_LOAD_TITLE = '请选择要读取的存档';
+exports.WTCD_GAME_LOAD_CANCEL = '取消';
+exports.WTCD_GAME_LOAD_QUICK = '快';
+exports.WTCD_GAME_LOAD_OK = '读取成功';
+exports.WTCD_GAME_QUICK_SAVE = '快速存储';
+exports.WTCD_GAME_QUICK_SAVE_OK = '快速存储成功';
+exports.WTCD_GAME_QUICK_LOAD = '快速读取';
+exports.WTCD_GAME_QUICK_LOAD_OK = '快速读取成功';
+exports.WTCD_GAME_QUICK_LOAD_NOT_EXIST = '没有可用的快速存档，请先使用【快速存储】来创建快速存档。';
+exports.WTCD_GAME_QUICK_LOAD_CONFIRM_TITLE = '是否快速读取？';
+exports.WTCD_GAME_QUICK_LOAD_CONFIRM_DESC = '这会丢失当前未保存的数据。（可在【设置】中禁用此确认）';
+exports.WTCD_GAME_QUICK_LOAD_CONFIRM_CONFIRM = '确认读取';
+exports.WTCD_GAME_QUICK_LOAD_CONFIRM_CANCEL = '取消';
+exports.WTCD_GAME_NO_DESC = '无描述文本';
 exports.WTCD_ERROR_COMPILE_TITLE = 'WTCD 编译失败';
 exports.WTCD_ERROR_COMPILE_DESC = '该 WTCD 文档在编译时发生了错误。请检查是否有语法错误或是其他基本错误。';
 exports.WTCD_ERROR_RUNTIME_TITLE = 'WTCD 运行时错误';
@@ -930,9 +962,192 @@ exports.MonoDimensionTransitionControl = MonoDimensionTransitionControl;
 },{}],15:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const FlowReader_1 = require("../../wtcd/FlowReader");
 const GameReader_1 = require("../../wtcd/GameReader");
-const WTCDError_1 = require("../../wtcd/WTCDError");
+const messages_1 = require("../constant/messages");
+const settings_1 = require("../data/settings");
+const DebugLogger_1 = require("../DebugLogger");
+const hs_1 = require("../hs");
+const formatTime_1 = require("../util/formatTime");
+const createWTCDErrorMessageFromError_1 = require("./createWTCDErrorMessageFromError");
+const hintControl_1 = require("./hintControl");
+const modalControl_1 = require("./modalControl");
+const debugLogger = new DebugLogger_1.DebugLogger('WTCD Game Reader UI');
+class WTCDGameReaderUI {
+    constructor(content, docIdentifier, wtcdRoot) {
+        this.content = content;
+        this.mainBlock = null;
+        this.started = false;
+        this.onClickRestart = () => {
+            const modal = new modalControl_1.Modal(hs_1.h('div', [
+                hs_1.h('h1', messages_1.WTCD_GAME_RESTART_TITLE),
+                hs_1.h('p', messages_1.WTCD_GAME_RESTART_DESC),
+                hs_1.h('ul', [
+                    hs_1.h('li', messages_1.WTCD_GAME_RESTART_ALL_DESC),
+                    hs_1.h('li', messages_1.WTCD_GAME_RESTART_DECISION_ONLY_DESC),
+                ]),
+                hs_1.h('.button-container', [
+                    hs_1.h('div', { onclick: () => {
+                            this.reader.reset(true);
+                            hintControl_1.createHint(messages_1.WTCD_GAME_RESTART_OK, 1000);
+                            modal.close();
+                        } }, messages_1.WTCD_GAME_RESTART_ALL),
+                    hs_1.h('div', { onclick: () => {
+                            this.reader.reset(false);
+                            hintControl_1.createHint(messages_1.WTCD_GAME_RESTART_OK, 1000);
+                            modal.close();
+                        } }, messages_1.WTCD_GAME_RESTART_DECISION_ONLY),
+                    hs_1.h('div', { onclick: () => modal.close() }, messages_1.WTCD_GAME_RESTART_CANCEL),
+                ]),
+            ]));
+            modal.setDismissible();
+            modal.open();
+        };
+        this.onClickSave = () => {
+            const modal = new modalControl_1.Modal(hs_1.h('div', [
+                hs_1.h('h1', messages_1.WTCD_GAME_SAVE_TITLE),
+                hs_1.h('.wtcd-save-button-list', this.reader.getSaves().map((save, saveIndex) => {
+                    if (saveIndex === 0) {
+                        return null; // quick save
+                    }
+                    if (save === null) {
+                        return hs_1.h('.new', {
+                            onclick: () => {
+                                this.reader.save(saveIndex);
+                                hintControl_1.createHint(messages_1.WTCD_GAME_SAVE_OK, 1000);
+                                modal.close();
+                            },
+                        }, messages_1.WTCD_GAME_SAVE_NEW);
+                    }
+                    else {
+                        return hs_1.h('.save', {
+                            onclick: () => {
+                                modalControl_1.confirm(messages_1.WTCD_GAME_SAVE_OVERWRITE_TITLE, '', messages_1.WTCD_GAME_SAVE_OVERWRITE_CONFIRM, messages_1.WTCD_GAME_SAVE_OVERWRITE_CANCEL).then(result => {
+                                    if (result) {
+                                        this.reader.save(saveIndex);
+                                        hintControl_1.createHint(messages_1.WTCD_GAME_SAVE_OK, 1000);
+                                        modal.close();
+                                    }
+                                });
+                            },
+                        }, [
+                            hs_1.h('.id', String(saveIndex)),
+                            hs_1.h('.info', [
+                                hs_1.h('.state-desc', save.desc === ''
+                                    ? messages_1.WTCD_GAME_NO_DESC
+                                    : save.desc),
+                                hs_1.h('.date', formatTime_1.formatTimeSimple(save.date)),
+                            ]),
+                        ]);
+                    }
+                })),
+                hs_1.h('.button-container', { style: { 'margin-top': '1.2vh' } }, [
+                    hs_1.h('div', { onclick: () => modal.close() }, messages_1.WTCD_GAME_SAVE_CANCEL),
+                ]),
+            ]));
+            modal.setDismissible();
+            modal.open();
+        };
+        this.onClickLoad = () => {
+            const modal = new modalControl_1.Modal(hs_1.h('div', [
+                hs_1.h('h1', messages_1.WTCD_GAME_LOAD_TITLE),
+                hs_1.h('.wtcd-save-button-list', this.reader.getSaves().map((save, saveIndex) => {
+                    if (save === null) {
+                        return null;
+                    }
+                    return hs_1.h('.save', {
+                        onclick: () => {
+                            this.reader.load(saveIndex);
+                            hintControl_1.createHint(messages_1.WTCD_GAME_LOAD_OK, 1000);
+                            modal.close();
+                        },
+                    }, [
+                        saveIndex !== 0
+                            ? hs_1.h('.id', String(saveIndex))
+                            : hs_1.h('.small.id', messages_1.WTCD_GAME_LOAD_QUICK),
+                        hs_1.h('.info', [
+                            hs_1.h('.state-desc', save.desc === ''
+                                ? messages_1.WTCD_GAME_NO_DESC
+                                : save.desc),
+                            hs_1.h('.date', formatTime_1.formatTimeSimple(save.date)),
+                        ]),
+                    ]);
+                })),
+                hs_1.h('.button-container', { style: { 'margin-top': '1.2vh' } }, [
+                    hs_1.h('div', { onclick: () => modal.close() }, messages_1.WTCD_GAME_LOAD_CANCEL),
+                ]),
+            ]));
+            modal.setDismissible();
+            modal.open();
+        };
+        this.onClickQuickSave = () => {
+            this.reader.save(0);
+            hintControl_1.createHint(messages_1.WTCD_GAME_QUICK_SAVE_OK, 1000);
+        };
+        this.onClickQuickLoad = () => {
+            if (this.reader.getSaves()[0] === null) {
+                hintControl_1.createHint(messages_1.WTCD_GAME_QUICK_LOAD_NOT_EXIST, 3000);
+                return;
+            }
+            if (settings_1.wtcdGameQuickLoadConfirm.getValue()) {
+                modalControl_1.confirm(messages_1.WTCD_GAME_QUICK_LOAD_CONFIRM_TITLE, messages_1.WTCD_GAME_QUICK_LOAD_CONFIRM_DESC, messages_1.WTCD_GAME_QUICK_LOAD_CONFIRM_CONFIRM, messages_1.WTCD_GAME_QUICK_LOAD_CONFIRM_CANCEL).then(result => {
+                    if (result) {
+                        this.reader.load(0);
+                        hintControl_1.createHint(messages_1.WTCD_GAME_QUICK_LOAD_OK, 1000);
+                    }
+                });
+            }
+            else {
+                this.reader.load(0);
+                hintControl_1.createHint(messages_1.WTCD_GAME_QUICK_LOAD_OK, 1000);
+            }
+        };
+        this.onOutput = (content) => {
+            if (this.mainBlock === null) {
+                debugLogger.log('Initialize main block.');
+                this.mainBlock = this.content.addBlock({
+                    initElement: content,
+                    slidable: true,
+                });
+            }
+            else {
+                debugLogger.log('Updating main block.');
+                this.content.scrollTo(this.controlsBlock.element.offsetTop);
+                this.mainBlock.slideReplace(content);
+            }
+        };
+        this.onError = (error) => {
+            debugLogger.warn('Game reader reported error.');
+            this.content.addBlock({
+                initElement: createWTCDErrorMessageFromError_1.createWTCDErrorMessageFromError(error),
+            });
+        };
+        this.reader = new GameReader_1.GameReader(docIdentifier, wtcdRoot, this.onOutput, this.onError);
+    }
+    start() {
+        if (this.started) {
+            throw new Error('Already started.');
+        }
+        this.started = true;
+        this.controlsBlock = this.content.addBlock({
+            initElement: hs_1.h('div.wtcd-game-control', hs_1.h('.button-container', [
+                hs_1.h('div', { onclick: this.onClickRestart }, messages_1.WTCD_GAME_RESTART),
+                hs_1.h('div', { onclick: this.onClickSave }, messages_1.WTCD_GAME_SAVE),
+                hs_1.h('div', { onclick: this.onClickLoad }, messages_1.WTCD_GAME_LOAD),
+                hs_1.h('div', { onclick: this.onClickQuickSave }, messages_1.WTCD_GAME_QUICK_SAVE),
+                hs_1.h('div', { onclick: this.onClickQuickLoad }, messages_1.WTCD_GAME_QUICK_LOAD),
+            ])),
+        });
+        const startTime = Date.now();
+        this.reader.start();
+        debugLogger.log(`Game loaded in ${Date.now() - startTime}ms.`);
+    }
+}
+exports.WTCDGameReaderUI = WTCDGameReaderUI;
+
+},{"../../wtcd/GameReader":51,"../DebugLogger":6,"../constant/messages":11,"../data/settings":31,"../hs":33,"../util/formatTime":47,"./createWTCDErrorMessageFromError":21,"./hintControl":23,"./modalControl":26}],16:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const FlowReader_1 = require("../../wtcd/FlowReader");
 const loadingText_1 = require("../constant/loadingText");
 const messages_1 = require("../constant/messages");
 const AutoCache_1 = require("../data/AutoCache");
@@ -947,10 +1162,12 @@ const keyboard_1 = require("../input/keyboard");
 const DOM_1 = require("../util/DOM");
 const commentsControl_1 = require("./commentsControl");
 const contentControl_1 = require("./contentControl");
+const createWTCDErrorMessage_1 = require("./createWTCDErrorMessage");
+const createWTCDErrorMessageFromError_1 = require("./createWTCDErrorMessageFromError");
 const history_1 = require("./history");
 const layoutControl_1 = require("./layoutControl");
 const processElements_1 = require("./processElements");
-const scrollControl_1 = require("./scrollControl");
+const WTCDGameReaderUI_1 = require("./WTCDGameReaderUI");
 const debugLogger = new DebugLogger_1.DebugLogger('Chapter Control');
 exports.loadChapterEvent = new Event_1.Event();
 function closeChapter() {
@@ -974,11 +1191,6 @@ const select = ([anchorNodeIndex, anchorOffset, focusNodeIndex, focusOffset,]) =
     if (element !== null && (typeof element.scrollIntoView) === 'function') {
         element.scrollIntoView();
     }
-};
-const getFlexOneSpan = () => {
-    const $span = document.createElement('span');
-    $span.style.flex = '1';
-    return $span;
 };
 const canChapterShown = (chapter) => settings_1.earlyAccess.getValue() || !chapter.isEarlyAccess;
 function loadPrevChapter() {
@@ -1013,7 +1225,6 @@ const chaptersCache = new AutoCache_1.AutoCache(chapterHtmlRelativePath => {
     return fetch(url).then(response => response.text());
 }, new DebugLogger_1.DebugLogger('Chapters Cache'));
 function loadChapter(chapterHtmlRelativePath, selection, side = contentControl_1.Side.LEFT) {
-    scrollControl_1.scrollTo(0);
     debugLogger.log('Load chapter', chapterHtmlRelativePath, 'with selection', selection);
     exports.loadChapterEvent.emit(chapterHtmlRelativePath);
     window.localStorage.setItem('lastRead', chapterHtmlRelativePath);
@@ -1021,14 +1232,19 @@ function loadChapter(chapterHtmlRelativePath, selection, side = contentControl_1
     state_1.state.currentChapter = chapterCtx;
     const content = contentControl_1.newContent(side);
     if (chapterCtx.chapter.isEarlyAccess) {
-        content.addBlock((hs_1.h('div', [
-            hs_1.h('h1', messages_1.EARLY_ACCESS_TITLE),
-            hs_1.h('p', messages_1.EARLY_ACCESS_DESC),
-        ])), contentControl_1.ContentBlockStyle.WARNING);
+        content.addBlock({
+            initElement: (hs_1.h('div', [
+                hs_1.h('h1', messages_1.EARLY_ACCESS_TITLE),
+                hs_1.h('p', messages_1.EARLY_ACCESS_DESC),
+            ])),
+            style: contentControl_1.ContentBlockStyle.WARNING,
+        });
     }
-    const chapterBlock = content.addBlock(hs_1.h('.content'));
+    const loadingBlock = content.addBlock({
+        initElement: hs_1.h('.content'),
+    });
     layoutControl_1.setLayout(layoutControl_1.Layout.MAIN);
-    chapterBlock.element.innerText = loadingText_1.loadingText;
+    loadingBlock.element.innerText = loadingText_1.loadingText;
     chaptersCache.get(chapterHtmlRelativePath).then(text => {
         if (content.isDestroyed) {
             debugLogger.log('Chapter loaded, but abandoned since the original ' +
@@ -1036,9 +1252,9 @@ function loadChapter(chapterHtmlRelativePath, selection, side = contentControl_1
             return;
         }
         debugLogger.log('Chapter loaded.');
-        insertContent(chapterBlock.element, text, chapterCtx.chapter);
-        processElements_1.processElements(chapterBlock.element);
-        state_1.state.chapterTextNodes = DOM_1.getTextNodes(chapterBlock.element);
+        loadingBlock.directRemove();
+        const mainBlock = insertContent(content, text, chapterCtx.chapter);
+        state_1.state.chapterTextNodes = DOM_1.getTextNodes(loadingBlock.element);
         if (selection !== undefined) {
             if (DOM_1.id('warning') === null) {
                 select(selection);
@@ -1052,7 +1268,9 @@ function loadChapter(chapterHtmlRelativePath, selection, side = contentControl_1
         const chapterIndex = chapterCtx.inFolderIndex;
         const prevChapter = chapterCtx.folder.chapters[chapterIndex - 1];
         const nextChapter = chapterCtx.folder.chapters[chapterIndex + 1];
-        chapterBlock.element.appendChild(hs_1.h('div.page-switcher', [
+        ((mainBlock === undefined)
+            ? content.addBlock()
+            : mainBlock).element.appendChild(hs_1.h('div.page-switcher', [
             // 上一章
             (prevChapter !== undefined && canChapterShown(prevChapter))
                 ? hs_1.h('a.to-prev', {
@@ -1062,7 +1280,7 @@ function loadChapter(chapterHtmlRelativePath, selection, side = contentControl_1
                         loadPrevChapter();
                     },
                 }, messages_1.PREVIOUS_CHAPTER)
-                : hs_1.h('a'),
+                : null,
             // 返回菜单
             hs_1.h('a.to-menu', {
                 href: window.location.pathname,
@@ -1081,25 +1299,17 @@ function loadChapter(chapterHtmlRelativePath, selection, side = contentControl_1
                         loadNextChapter();
                     },
                 }, messages_1.NEXT_CHAPTER)
-                : hs_1.h('a'),
+                : null,
         ]));
-        // fix for stupid scrolling issues under iOS
-        // id('rect').style.overflow = 'hidden';
-        // setTimeout(() => {
-        //   id('rect').style.overflow = '';
-        //   if (selection === undefined) {
-        //     id('rect').scrollTo(0, 0);
-        //   }
-        // }, 1);
         // Re-focus the rect so it is arrow-scrollable
         setTimeout(() => {
-            contentControl_1.focusOnContainer();
+            contentControl_1.focus();
         }, 1);
         commentsControl_1.loadComments(contentControl_1.getCurrentContent(), chapterCtx.chapter.commentsUrl);
     })
         .catch(error => {
         debugLogger.error(`Failed to load chapter.`, error);
-        chapterBlock.element.innerText = messages_1.CHAPTER_FAILED;
+        loadingBlock.element.innerText = messages_1.CHAPTER_FAILED;
     });
 }
 exports.loadChapter = loadChapter;
@@ -1133,21 +1343,428 @@ var ErrorType;
     ErrorType[ErrorType["COMPILE"] = 0] = "COMPILE";
     ErrorType[ErrorType["RUNTIME"] = 1] = "RUNTIME";
     ErrorType[ErrorType["INTERNAL"] = 2] = "INTERNAL";
-})(ErrorType || (ErrorType = {}));
+})(ErrorType = exports.ErrorType || (exports.ErrorType = {}));
+function insertContent(content, text, chapter) {
+    switch (chapter.type) {
+        case 'Markdown':
+            const block = content.addBlock();
+            block.element.innerHTML = text;
+            processElements_1.processElements(block.element);
+            return block;
+        case 'WTCD': {
+            const wtcdParseResult = JSON.parse(text);
+            if (wtcdParseResult.error === true) {
+                content.addBlock({
+                    initElement: createWTCDErrorMessage_1.createWTCDErrorMessage({
+                        errorType: ErrorType.COMPILE,
+                        message: wtcdParseResult.message,
+                        internalStack: wtcdParseResult.internalStack,
+                    }),
+                });
+                break;
+            }
+            switch (chapter.preferredReader) {
+                case 'flow': {
+                    const flowReader = new FlowReader_1.FlowReader(chapter.htmlRelativePath, wtcdParseResult.wtcdRoot, createWTCDErrorMessageFromError_1.createWTCDErrorMessageFromError, processElements_1.processElements);
+                    const $wtcdContainer = content.addBlock().element;
+                    flowReader.renderTo($wtcdContainer);
+                    break;
+                }
+                case 'game': {
+                    new WTCDGameReaderUI_1.WTCDGameReaderUI(content, chapter.htmlRelativePath, wtcdParseResult.wtcdRoot).start();
+                    break;
+                }
+            }
+        }
+    }
+}
+
+},{"../../wtcd/FlowReader":50,"../DebugLogger":6,"../Event":7,"../constant/loadingText":9,"../constant/messages":11,"../data/AutoCache":29,"../data/data":30,"../data/settings":31,"../data/state":32,"../hs":33,"../input/gestures":35,"../input/keyboard":36,"../util/DOM":46,"./WTCDGameReaderUI":15,"./commentsControl":18,"./contentControl":19,"./createWTCDErrorMessage":20,"./createWTCDErrorMessageFromError":21,"./history":24,"./layoutControl":25,"./processElements":27}],17:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const Event_1 = require("../Event");
+const blockedUsers = new Set(JSON.parse(window.localStorage.getItem('blockedUsers') || '[]'));
+exports.blockedUserUpdateEvent = new Event_1.Event();
+function saveBlockedUsers() {
+    window.localStorage.setItem('blockedUsers', JSON.stringify(Array.from(blockedUsers)));
+    exports.blockedUserUpdateEvent.emit();
+}
+function blockUser(userName) {
+    blockedUsers.add(userName);
+    saveBlockedUsers();
+}
+exports.blockUser = blockUser;
+function unblockUser(userName) {
+    blockedUsers.delete(userName);
+    saveBlockedUsers();
+}
+exports.unblockUser = unblockUser;
+function isUserBlocked(userName) {
+    return blockedUsers.has(userName);
+}
+exports.isUserBlocked = isUserBlocked;
+function getBlockedUsers() {
+    return Array.from(blockedUsers);
+}
+exports.getBlockedUsers = getBlockedUsers;
+
+},{"../Event":7}],18:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const messages_1 = require("../constant/messages");
+const AutoCache_1 = require("../data/AutoCache");
+const settings_1 = require("../data/settings");
+const DebugLogger_1 = require("../DebugLogger");
+const hs_1 = require("../hs");
+const formatTime_1 = require("../util/formatTime");
+const commentBlockControl_1 = require("./commentBlockControl");
+const debugLogger = new DebugLogger_1.DebugLogger('Comments Control');
+const getApiUrlRegExp = /^https:\/\/github\.com\/([a-zA-Z0-9-_]+)\/([a-zA-Z0-9-_]+)\/issues\/([1-9][0-9]*)$/;
+// Input sample: https://github.com/SCLeoX/Wearable-Technology/issues/1
+// Output sample: https://api.github.com/repos/SCLeoX/Wearable-Technology/issues/1/comments
+function getApiUrl(issueUrl) {
+    const result = getApiUrlRegExp.exec(issueUrl);
+    if (result === null) {
+        throw new Error(`Bad issue url: ${issueUrl}.`);
+    }
+    return `https://api.github.com/repos/${result[1]}/${result[2]}/issues/${result[3]}/comments`;
+}
+function createCommentElement(userAvatarUrl, userName, userUrl, createTime, updateTime, content) {
+    const $comment = hs_1.h('.comment', [
+        hs_1.h('img.avatar', { src: userAvatarUrl }),
+        hs_1.h('a.author', {
+            target: '_blank',
+            href: userUrl,
+        }, userName),
+        hs_1.h('.time', createTime === updateTime
+            ? formatTime_1.formatTimeRelative(new Date(createTime))
+            : `${formatTime_1.formatTimeRelative(new Date(createTime))}` +
+                `（最后修改于 ${formatTime_1.formatTimeRelative(new Date(updateTime))}）`),
+        hs_1.h('a.block-user', {
+            onclick: () => {
+                commentBlockControl_1.blockUser(userName);
+                $comment.remove();
+            },
+        }, '屏蔽此人'),
+        ...content.split('\n\n').map(paragraph => hs_1.h('p', paragraph)),
+    ]);
+    return $comment;
+}
+const commentsCache = new AutoCache_1.AutoCache(apiUrl => {
+    debugLogger.log(`Loading comments from ${apiUrl}.`);
+    return fetch(apiUrl).then(response => response.json());
+}, new DebugLogger_1.DebugLogger('Comments Cache'));
+function loadComments(content, issueUrl) {
+    if (settings_1.useComments.getValue() === false) {
+        return;
+    }
+    const $commentsStatus = hs_1.h('p', messages_1.COMMENTS_LOADING);
+    const $comments = hs_1.h('.comments', [
+        hs_1.h('h1', messages_1.COMMENTS_SECTION),
+        $commentsStatus,
+    ]);
+    const block = content.addBlock({
+        initElement: $comments,
+    });
+    if (issueUrl === null) {
+        $commentsStatus.innerText = messages_1.COMMENTS_UNAVAILABLE;
+        return;
+    }
+    block.onEnteringView(() => {
+        const apiUrl = getApiUrl(issueUrl);
+        commentsCache.get(apiUrl).then(data => {
+            if (content.isDestroyed) {
+                debugLogger.log('Comments loaded, but abandoned since the original ' +
+                    'content page is already destroyed.');
+                return;
+            }
+            debugLogger.log('Comments loaded.');
+            $commentsStatus.innerText = messages_1.COMMENTS_LOADED;
+            data.forEach((comment) => {
+                if (commentBlockControl_1.isUserBlocked(comment.user.login)) {
+                    return;
+                }
+                $comments.appendChild(createCommentElement(comment.user.avatar_url, comment.user.login, comment.user.html_url, comment.created_at, comment.updated_at, comment.body));
+            });
+            $comments.appendChild(hs_1.h('.create-comment', {
+                onclick: () => {
+                    window.open(issueUrl, '_blank');
+                },
+            }, messages_1.COMMENTS_CREATE));
+        })
+            .catch(() => {
+            $commentsStatus.innerText = messages_1.COMMENTS_FAILED;
+        });
+    });
+}
+exports.loadComments = loadComments;
+
+},{"../DebugLogger":6,"../constant/messages":11,"../data/AutoCache":29,"../data/settings":31,"../hs":33,"../util/formatTime":47,"./commentBlockControl":17}],19:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const settings_1 = require("../data/settings");
+const DebugLogger_1 = require("../DebugLogger");
+const hs_1 = require("../hs");
+const keyboard_1 = require("../input/keyboard");
+const DOM_1 = require("../util/DOM");
+const layoutControl_1 = require("./layoutControl");
+const MonoDimensionTransitionControl_1 = require("./MonoDimensionTransitionControl");
+const $contentContainer = DOM_1.id('content-container');
+const debugLogger = new DebugLogger_1.DebugLogger('Content Control');
+var Side;
+(function (Side) {
+    Side[Side["LEFT"] = 0] = "LEFT";
+    Side[Side["RIGHT"] = 1] = "RIGHT";
+})(Side = exports.Side || (exports.Side = {}));
+function setSide($element, side) {
+    if (side === Side.LEFT) {
+        $element.classList.add('left');
+        $element.classList.remove('right');
+    }
+    else {
+        $element.classList.add('right');
+        $element.classList.remove('left');
+    }
+}
+function otherSide(side) {
+    return side === Side.LEFT ? Side.RIGHT : Side.LEFT;
+}
+let currentContent = null;
+function getCurrentContent() {
+    return currentContent;
+}
+exports.getCurrentContent = getCurrentContent;
+function focus() {
+    if (currentContent !== null) {
+        currentContent.element.focus({
+            // Why:
+            // https://stackoverflow.com/questions/26782998/why-does-calling-focus-break-my-css-transition
+            preventScroll: true,
+        });
+    }
+}
+exports.focus = focus;
+/**
+ * 创建一个新的 Content 并替换之前的 Content。
+ *
+ * @param side 如果有动画，那么入场位置。
+ * @returns 创建的 Content 对象
+ */
+function newContent(side) {
+    const newContent = new Content();
+    if (layoutControl_1.getCurrentLayout() === layoutControl_1.Layout.OFF) {
+        if (currentContent !== null) {
+            currentContent.destroy();
+        }
+    }
+    else {
+        if (settings_1.animation.getValue()) {
+            // Animation is enabled
+            if (currentContent !== null) {
+                setSide(currentContent.element, otherSide(side));
+                // Remove the content after a timeout instead of listening for
+                // transition event
+                const oldContent = currentContent;
+                setTimeout(() => {
+                    oldContent.destroy();
+                }, 2500);
+            }
+            setSide(newContent.element, side);
+            // Force reflow, so transition starts now
+            // tslint:disable-next-line:no-unused-expression
+            newContent.element.offsetWidth;
+            newContent.element.classList.remove('left', 'right');
+        }
+        else {
+            if (currentContent !== null) {
+                currentContent.destroy();
+            }
+        }
+    }
+    currentContent = newContent;
+    return newContent;
+}
+exports.newContent = newContent;
+var ContentBlockStyle;
+(function (ContentBlockStyle) {
+    ContentBlockStyle[ContentBlockStyle["REGULAR"] = 0] = "REGULAR";
+    ContentBlockStyle[ContentBlockStyle["WARNING"] = 1] = "WARNING";
+})(ContentBlockStyle = exports.ContentBlockStyle || (exports.ContentBlockStyle = {}));
+class Content {
+    constructor() {
+        this.isDestroyed = false;
+        this.blocks = [];
+        this.scrollTransition = null;
+        this.onKeyPress = (key) => {
+            if (key === keyboard_1.ArrowKey.UP || key === keyboard_1.ArrowKey.DOWN) {
+                this.interruptScrolling();
+            }
+        };
+        this.interruptScrolling = () => {
+            if (this.scrollTransition !== null) {
+                this.scrollTransition = null;
+                debugLogger.log('Transition interrupted.');
+            }
+        };
+        this.scrollAnimation = () => {
+            if (this.scrollTransition === null) {
+                return;
+            }
+            const now = Date.now();
+            this.element.scrollTop = this.scrollTransition.getValue(now);
+            if (this.scrollTransition.isFinished(now)) {
+                debugLogger.log('Transition finished.');
+                this.scrollTransition = null;
+            }
+            else {
+                requestAnimationFrame(this.scrollAnimation);
+            }
+        };
+        const $content = hs_1.h('div.content', { tabIndex: -1 });
+        $contentContainer.appendChild($content);
+        this.element = $content;
+        window.addEventListener('wheel', this.interruptScrolling);
+        keyboard_1.arrowKeyPressEvent.on(this.onKeyPress);
+    }
+    addBlock(opts = {}) {
+        const block = new ContentBlock(this, opts);
+        this.blocks.push(block);
+        return block;
+    }
+    destroy() {
+        this.isDestroyed = true;
+        this.element.remove();
+        window.removeEventListener('wheel', this.interruptScrolling);
+        keyboard_1.arrowKeyPressEvent.off(this.onKeyPress);
+    }
+    scrollTo(target) {
+        if (!settings_1.animation.getValue() || layoutControl_1.getCurrentLayout() === layoutControl_1.Layout.OFF) {
+            debugLogger.log(`Scroll to ${target}, no animation.`);
+            this.element.scrollTop = target;
+            return;
+        }
+        if (this.scrollTransition === null) {
+            debugLogger.log(`Scrolling to ${target}, new transition stared.`);
+            this.scrollTransition = new MonoDimensionTransitionControl_1.MonoDimensionTransitionControl(this.element.scrollTop, 20000);
+            this.scrollTransition.setTarget(target);
+            requestAnimationFrame(this.scrollAnimation);
+        }
+        else {
+            debugLogger.log(`Scrolling to ${target}, existing transition updated.`);
+            this.scrollTransition.setTarget(target);
+        }
+    }
+}
+exports.Content = Content;
+class ContentBlock {
+    constructor(content, { initElement = hs_1.h('div'), style = ContentBlockStyle.REGULAR, slidable = false, }) {
+        this.slideContainer = null;
+        this.heightHolder = null;
+        this.sliding = 0;
+        this.element = initElement;
+        initElement.classList.add('content-block');
+        switch (style) {
+            case ContentBlockStyle.WARNING:
+                initElement.classList.add('warning');
+                break;
+        }
+        if (slidable) {
+            this.slideContainer = hs_1.h('.slide-container', initElement);
+            content.element.appendChild(this.slideContainer);
+        }
+        else {
+            content.element.appendChild(initElement);
+        }
+    }
+    onEnteringView(callback) {
+        const observer = new IntersectionObserver(entries => {
+            const entry = entries[0];
+            if (entry.isIntersecting) {
+                observer.disconnect();
+                callback();
+            }
+        }, {
+            root: $contentContainer,
+            threshold: 0,
+        });
+        observer.observe(this.element);
+    }
+    directRemove() {
+        if (this.slideContainer !== null) {
+            this.slideContainer.remove();
+        }
+        else {
+            this.element.remove();
+        }
+    }
+    directReplace($newElement = hs_1.h('div')) {
+        $newElement.classList.add('content-block');
+        this.element.parentElement.replaceChild($newElement, this.element);
+        this.element = $newElement;
+    }
+    slideReplace($newElement = hs_1.h('div')) {
+        if (!settings_1.animation.getValue()) {
+            this.directReplace($newElement);
+            return;
+        }
+        const $container = this.slideContainer;
+        if ($container === null) {
+            throw new Error('Content block is not slidable.');
+        }
+        this.sliding++;
+        $container.classList.add('in-transition');
+        $newElement.classList.add('content-block');
+        const $oldElement = this.element;
+        $newElement.classList.add('right');
+        // $newElement.style.top = `${$contentContainer.scrollTop - $container.offsetTop + 30}px`;
+        $container.prepend($newElement);
+        const newHeight = $newElement.offsetHeight; // This also forces reflow
+        $newElement.classList.remove('right');
+        // $newElement.style.top = null;
+        if (this.heightHolder === null) {
+            this.heightHolder = hs_1.h('.height-holder');
+            this.heightHolder.style.height = `${$oldElement.offsetHeight}px`;
+            $container.appendChild(this.heightHolder);
+            // tslint:disable-next-line:no-unused-expression
+            this.heightHolder.offsetWidth; // Forces reflow
+        }
+        this.heightHolder.style.height = `${newHeight}px`;
+        $oldElement.classList.add('left');
+        this.element = $newElement;
+        setTimeout(() => {
+            $oldElement.remove();
+            this.sliding--;
+            if (this.sliding === 0) {
+                $container.classList.remove('in-transition');
+                if (this.heightHolder !== null) {
+                    this.heightHolder.remove();
+                    this.heightHolder = null;
+                }
+            }
+        }, 2500);
+    }
+}
+exports.ContentBlock = ContentBlock;
+
+},{"../DebugLogger":6,"../data/settings":31,"../hs":33,"../input/keyboard":36,"../util/DOM":46,"./MonoDimensionTransitionControl":14,"./layoutControl":25}],20:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const messages_1 = require("../constant/messages");
+const chapterControl_1 = require("./chapterControl");
 function createWTCDErrorMessage({ errorType, message, internalStack, wtcdStack, }) {
     const $target = document.createElement('div');
     const $title = document.createElement('h1');
     const $desc = document.createElement('p');
     switch (errorType) {
-        case ErrorType.COMPILE:
+        case chapterControl_1.ErrorType.COMPILE:
             $title.innerText = messages_1.WTCD_ERROR_COMPILE_TITLE;
             $desc.innerText = messages_1.WTCD_ERROR_COMPILE_TITLE;
             break;
-        case ErrorType.RUNTIME:
+        case chapterControl_1.ErrorType.RUNTIME:
             $title.innerText = messages_1.WTCD_ERROR_RUNTIME_TITLE;
             $desc.innerText = messages_1.WTCD_ERROR_RUNTIME_DESC;
             break;
-        case ErrorType.INTERNAL:
+        case chapterControl_1.ErrorType.INTERNAL:
             $title.innerText = messages_1.WTCD_ERROR_INTERNAL_TITLE;
             $desc.innerText = messages_1.WTCD_ERROR_INTERNAL_DESC;
             break;
@@ -1185,11 +1802,19 @@ function createWTCDErrorMessage({ errorType, message, internalStack, wtcdStack, 
     }
     return $target;
 }
+exports.createWTCDErrorMessage = createWTCDErrorMessage;
+
+},{"../constant/messages":11,"./chapterControl":16}],21:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const WTCDError_1 = require("../../wtcd/WTCDError");
+const chapterControl_1 = require("./chapterControl");
+const createWTCDErrorMessage_1 = require("./createWTCDErrorMessage");
 function createWTCDErrorMessageFromError(error) {
-    return createWTCDErrorMessage({
+    return createWTCDErrorMessage_1.createWTCDErrorMessage({
         errorType: (error instanceof WTCDError_1.WTCDError)
-            ? ErrorType.RUNTIME
-            : ErrorType.INTERNAL,
+            ? chapterControl_1.ErrorType.RUNTIME
+            : chapterControl_1.ErrorType.INTERNAL,
         message: error.message,
         internalStack: error.stack,
         wtcdStack: (error instanceof WTCDError_1.WTCDError)
@@ -1197,291 +1822,9 @@ function createWTCDErrorMessageFromError(error) {
             : undefined,
     });
 }
-function insertContent($target, content, chapter) {
-    switch (chapter.type) {
-        case 'Markdown':
-            $target.innerHTML = content;
-            break;
-        case 'WTCD': {
-            $target.innerHTML = '';
-            const wtcdParseResult = JSON.parse(content);
-            if (wtcdParseResult.error === true) {
-                $target.appendChild(createWTCDErrorMessage({
-                    errorType: ErrorType.COMPILE,
-                    message: wtcdParseResult.message,
-                    internalStack: wtcdParseResult.internalStack,
-                }));
-                break;
-            }
-            switch (chapter.preferredReader) {
-                case 'flow': {
-                    const flowReader = new FlowReader_1.FlowReader(chapter.htmlRelativePath, wtcdParseResult.wtcdRoot, createWTCDErrorMessageFromError, processElements_1.processElements);
-                    const $wtcdContainer = document.createElement('div');
-                    flowReader.renderTo($wtcdContainer);
-                    $target.appendChild($wtcdContainer);
-                    break;
-                }
-                case 'game': {
-                    const gameReader = new GameReader_1.GameReader(chapter.htmlRelativePath, wtcdParseResult.wtcdRoot, createWTCDErrorMessageFromError, processElements_1.processElements);
-                    const $wtcdContainer = document.createElement('div');
-                    gameReader.renderTo($wtcdContainer);
-                    $target.appendChild($wtcdContainer);
-                    break;
-                }
-            }
-        }
-    }
-}
+exports.createWTCDErrorMessageFromError = createWTCDErrorMessageFromError;
 
-},{"../../wtcd/FlowReader":46,"../../wtcd/GameReader":47,"../../wtcd/WTCDError":50,"../DebugLogger":6,"../Event":7,"../constant/loadingText":9,"../constant/messages":11,"../data/AutoCache":25,"../data/data":26,"../data/settings":27,"../data/state":28,"../hs":29,"../input/gestures":31,"../input/keyboard":32,"../util/DOM":42,"./commentsControl":17,"./contentControl":18,"./history":20,"./layoutControl":21,"./processElements":22,"./scrollControl":23}],16:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const Event_1 = require("../Event");
-const blockedUsers = new Set(JSON.parse(window.localStorage.getItem('blockedUsers') || '[]'));
-exports.blockedUserUpdateEvent = new Event_1.Event();
-function saveBlockedUsers() {
-    window.localStorage.setItem('blockedUsers', JSON.stringify(Array.from(blockedUsers)));
-    exports.blockedUserUpdateEvent.emit();
-}
-function blockUser(userName) {
-    blockedUsers.add(userName);
-    saveBlockedUsers();
-}
-exports.blockUser = blockUser;
-function unblockUser(userName) {
-    blockedUsers.delete(userName);
-    saveBlockedUsers();
-}
-exports.unblockUser = unblockUser;
-function isUserBlocked(userName) {
-    return blockedUsers.has(userName);
-}
-exports.isUserBlocked = isUserBlocked;
-function getBlockedUsers() {
-    return Array.from(blockedUsers);
-}
-exports.getBlockedUsers = getBlockedUsers;
-
-},{"../Event":7}],17:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const messages_1 = require("../constant/messages");
-const AutoCache_1 = require("../data/AutoCache");
-const settings_1 = require("../data/settings");
-const DebugLogger_1 = require("../DebugLogger");
-const hs_1 = require("../hs");
-const formatTime_1 = require("../util/formatTime");
-const commentBlockControl_1 = require("./commentBlockControl");
-const debugLogger = new DebugLogger_1.DebugLogger('Comments Control');
-const getApiUrlRegExp = /^https:\/\/github\.com\/([a-zA-Z0-9-_]+)\/([a-zA-Z0-9-_]+)\/issues\/([1-9][0-9]*)$/;
-// Input sample: https://github.com/SCLeoX/Wearable-Technology/issues/1
-// Output sample: https://api.github.com/repos/SCLeoX/Wearable-Technology/issues/1/comments
-function getApiUrl(issueUrl) {
-    const result = getApiUrlRegExp.exec(issueUrl);
-    if (result === null) {
-        throw new Error(`Bad issue url: ${issueUrl}.`);
-    }
-    return `https://api.github.com/repos/${result[1]}/${result[2]}/issues/${result[3]}/comments`;
-}
-function createCommentElement(userAvatarUrl, userName, userUrl, createTime, updateTime, content) {
-    const $comment = hs_1.h('.comment', [
-        hs_1.h('img.avatar', { src: userAvatarUrl }),
-        hs_1.h('a.author', {
-            target: '_blank',
-            href: userUrl,
-        }, userName),
-        hs_1.h('.time', createTime === updateTime
-            ? formatTime_1.formatTime(new Date(createTime))
-            : `${formatTime_1.formatTime(new Date(createTime))}` +
-                `（最后修改于 ${formatTime_1.formatTime(new Date(updateTime))}）`),
-        hs_1.h('a.block-user', {
-            onclick: () => {
-                commentBlockControl_1.blockUser(userName);
-                $comment.remove();
-            },
-        }, '屏蔽此人'),
-        ...content.split('\n\n').map(paragraph => hs_1.h('p', paragraph)),
-    ]);
-    return $comment;
-}
-const commentsCache = new AutoCache_1.AutoCache(apiUrl => {
-    debugLogger.log(`Loading comments from ${apiUrl}.`);
-    return fetch(apiUrl).then(response => response.json());
-}, new DebugLogger_1.DebugLogger('Comments Cache'));
-function loadComments(content, issueUrl) {
-    if (settings_1.useComments.getValue() === false) {
-        return;
-    }
-    const $commentsStatus = hs_1.h('p', messages_1.COMMENTS_LOADING);
-    const $comments = hs_1.h('.comments', [
-        hs_1.h('h1', messages_1.COMMENTS_SECTION),
-        $commentsStatus,
-    ]);
-    const block = content.addBlock($comments);
-    if (issueUrl === null) {
-        $commentsStatus.innerText = messages_1.COMMENTS_UNAVAILABLE;
-        return;
-    }
-    block.onEnteringView(() => {
-        const apiUrl = getApiUrl(issueUrl);
-        commentsCache.get(apiUrl).then(data => {
-            if (content.isDestroyed) {
-                debugLogger.log('Comments loaded, but abandoned since the original ' +
-                    'content page is already destroyed.');
-                return;
-            }
-            debugLogger.log('Comments loaded.');
-            $commentsStatus.innerText = messages_1.COMMENTS_LOADED;
-            data.forEach((comment) => {
-                if (commentBlockControl_1.isUserBlocked(comment.user.login)) {
-                    return;
-                }
-                $comments.appendChild(createCommentElement(comment.user.avatar_url, comment.user.login, comment.user.html_url, comment.created_at, comment.updated_at, comment.body));
-            });
-            $comments.appendChild(hs_1.h('.create-comment', {
-                onclick: () => {
-                    window.open(issueUrl, '_blank');
-                },
-            }, messages_1.COMMENTS_CREATE));
-        })
-            .catch(() => {
-            $commentsStatus.innerText = messages_1.COMMENTS_FAILED;
-        });
-    });
-}
-exports.loadComments = loadComments;
-
-},{"../DebugLogger":6,"../constant/messages":11,"../data/AutoCache":25,"../data/settings":27,"../hs":29,"../util/formatTime":43,"./commentBlockControl":16}],18:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const settings_1 = require("../data/settings");
-const DOM_1 = require("../util/DOM");
-const layoutControl_1 = require("./layoutControl");
-const $contentContainer = DOM_1.id('content-container');
-var Side;
-(function (Side) {
-    Side[Side["LEFT"] = 0] = "LEFT";
-    Side[Side["RIGHT"] = 1] = "RIGHT";
-})(Side = exports.Side || (exports.Side = {}));
-function setSide($element, side) {
-    if (side === Side.LEFT) {
-        $element.classList.add('left');
-        $element.classList.remove('right');
-    }
-    else {
-        $element.classList.add('right');
-        $element.classList.remove('left');
-    }
-}
-function otherSide(side) {
-    return side === Side.LEFT ? Side.RIGHT : Side.LEFT;
-}
-let currentContent = null;
-function getCurrentContent() {
-    return currentContent;
-}
-exports.getCurrentContent = getCurrentContent;
-function focusOnContainer() {
-    $contentContainer.focus({
-        // Why:
-        // https://stackoverflow.com/questions/26782998/why-does-calling-focus-break-my-css-transition
-        preventScroll: true,
-    });
-}
-exports.focusOnContainer = focusOnContainer;
-/**
- * 创建一个新的 Content 并替换之前的 Content。
- *
- * @param side 如果有动画，那么入场位置。
- * @returns 创建的 Content 对象
- */
-function newContent(side) {
-    const newContent = new Content();
-    if (layoutControl_1.getCurrentLayout() === layoutControl_1.Layout.OFF) {
-        if (currentContent !== null) {
-            currentContent.destroy();
-        }
-    }
-    else {
-        if (settings_1.animation.getValue()) {
-            // Animation is enabled
-            if (currentContent !== null) {
-                setSide(currentContent.element, otherSide(side));
-                // Remove the content after a timeout instead of listening for
-                // transition event
-                const oldContent = currentContent;
-                setTimeout(() => {
-                    oldContent.destroy();
-                }, 2000);
-            }
-            setSide(newContent.element, side);
-            // Force reflow, so transition starts now
-            // tslint:disable-next-line:no-unused-expression
-            newContent.element.offsetWidth;
-            newContent.element.classList.remove('left', 'right');
-        }
-        else {
-            if (currentContent !== null) {
-                currentContent.destroy();
-            }
-        }
-    }
-    currentContent = newContent;
-    return newContent;
-}
-exports.newContent = newContent;
-var ContentBlockStyle;
-(function (ContentBlockStyle) {
-    ContentBlockStyle[ContentBlockStyle["REGULAR"] = 0] = "REGULAR";
-    ContentBlockStyle[ContentBlockStyle["WARNING"] = 1] = "WARNING";
-})(ContentBlockStyle = exports.ContentBlockStyle || (exports.ContentBlockStyle = {}));
-class Content {
-    constructor() {
-        this.isDestroyed = false;
-        this.blocks = [];
-        const $content = document.createElement('div');
-        $content.classList.add('content');
-        $contentContainer.appendChild($content);
-        this.element = $content;
-    }
-    addBlock($init = document.createElement('div'), style = ContentBlockStyle.REGULAR) {
-        const block = new ContentBlock(this, $init, style);
-        this.blocks.push(block);
-        return block;
-    }
-    destroy() {
-        this.isDestroyed = true;
-        this.element.remove();
-    }
-}
-exports.Content = Content;
-class ContentBlock {
-    constructor(content, element, style) {
-        this.element = element;
-        element.classList.add('content-block');
-        switch (style) {
-            case ContentBlockStyle.WARNING:
-                element.classList.add('warning');
-                break;
-        }
-        content.element.appendChild(element);
-    }
-    onEnteringView(callback) {
-        const observer = new IntersectionObserver(entries => {
-            const entry = entries[0];
-            if (entry.isIntersecting) {
-                observer.disconnect();
-                callback();
-            }
-        }, {
-            root: $contentContainer,
-            threshold: 0,
-        });
-        observer.observe(this.element);
-    }
-}
-
-},{"../data/settings":27,"../util/DOM":42,"./layoutControl":21}],19:[function(require,module,exports){
+},{"../../wtcd/WTCDError":54,"./chapterControl":16,"./createWTCDErrorMessage":20}],22:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const data_1 = require("../data/data");
@@ -1523,7 +1866,38 @@ function followQuery() {
 }
 exports.followQuery = followQuery;
 
-},{"../data/data":26,"../data/state":28,"./chapterControl":15,"./contentControl":18,"./history":20}],20:[function(require,module,exports){
+},{"../data/data":30,"../data/state":32,"./chapterControl":16,"./contentControl":19,"./history":24}],23:[function(require,module,exports){
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const hs_1 = require("../hs");
+// Promise queue
+let current = Promise.resolve();
+function createHint(text, timeMs = 2000) {
+    current = current.then(() => __awaiter(this, void 0, void 0, function* () {
+        const $hint = hs_1.h('.hint', text);
+        document.body.appendChild($hint);
+        $hint.style.opacity = '0';
+        // tslint:disable-next-line:no-unused-expression
+        $hint.offsetWidth;
+        $hint.style.opacity = null;
+        yield new Promise(resolve => setTimeout(resolve, timeMs));
+        $hint.style.opacity = '0';
+        yield new Promise(resolve => setTimeout(resolve, 500));
+        $hint.remove();
+    }));
+}
+exports.createHint = createHint;
+
+},{"../hs":33}],24:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const state_1 = require("../data/state");
@@ -1550,7 +1924,7 @@ function updateHistory(push) {
 }
 exports.updateHistory = updateHistory;
 
-},{"../data/state":28}],21:[function(require,module,exports){
+},{"../data/state":32}],25:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const DebugLogger_1 = require("../DebugLogger");
@@ -1613,7 +1987,93 @@ function setLayout(newLayout) {
 }
 exports.setLayout = setLayout;
 
-},{"../DebugLogger":6,"../Event":7}],22:[function(require,module,exports){
+},{"../DebugLogger":6,"../Event":7}],26:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const settings_1 = require("../data/settings");
+const hs_1 = require("../hs");
+const keyboard_1 = require("../input/keyboard");
+const DOM_1 = require("../util/DOM");
+const $modalHolder = DOM_1.id('modal-holder');
+class Modal {
+    constructor($initElement = hs_1.h('div')) {
+        this.dismissSet = false;
+        this.escKeyListener = null;
+        $initElement.classList.add('modal');
+        this.modal = $initElement;
+        this.modalContainer = hs_1.h('.modal-container.closed', $initElement);
+        $modalHolder.appendChild(this.modalContainer);
+    }
+    open() {
+        // tslint:disable-next-line:no-unused-expression
+        this.modalContainer.offsetWidth; // Force reflow
+        this.modalContainer.classList.remove('closed');
+    }
+    close() {
+        if (settings_1.animation.getValue()) {
+            this.modalContainer.classList.add('closed');
+            setTimeout(() => {
+                this.modalContainer.remove();
+            }, 400);
+        }
+        else {
+            this.modalContainer.remove();
+        }
+        if (this.escKeyListener !== null) {
+            keyboard_1.escapeKeyPressEvent.off(this.escKeyListener);
+        }
+    }
+    setDismissible(onDismiss = () => {
+        this.close();
+    }) {
+        if (this.dismissSet) {
+            throw new Error('Dismissible already set.');
+        }
+        this.dismissSet = true;
+        keyboard_1.escapeKeyPressEvent.on(onDismiss);
+        this.modalContainer.addEventListener('click', event => {
+            if (event.target === this.modalContainer) {
+                onDismiss();
+            }
+        });
+    }
+}
+exports.Modal = Modal;
+function confirm(title, desc, yes, no) {
+    let resolved = false;
+    return new Promise(resolve => {
+        const modal = new Modal(hs_1.h('div', [
+            hs_1.h('h1', title),
+            desc === '' ? null : hs_1.h('p', desc),
+            hs_1.h('.button-container', [
+                hs_1.h('div', {
+                    onclick: () => {
+                        if (resolved) {
+                            return;
+                        }
+                        resolved = true;
+                        modal.close();
+                        resolve(true);
+                    },
+                }, yes),
+                hs_1.h('div', {
+                    onclick: () => {
+                        if (resolved) {
+                            return;
+                        }
+                        resolved = true;
+                        modal.close();
+                        resolve(false);
+                    },
+                }, no),
+            ]),
+        ]));
+        modal.open();
+    });
+}
+exports.confirm = confirm;
+
+},{"../data/settings":31,"../hs":33,"../input/keyboard":36,"../util/DOM":46}],27:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const DOM_1 = require("../util/DOM");
@@ -1638,66 +2098,7 @@ function processElements($parent) {
 }
 exports.processElements = processElements;
 
-},{"../util/DOM":42}],23:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const settings_1 = require("../data/settings");
-const DebugLogger_1 = require("../DebugLogger");
-const keyboard_1 = require("../input/keyboard");
-const DOM_1 = require("../util/DOM");
-const layoutControl_1 = require("./layoutControl");
-const MonoDimensionTransitionControl_1 = require("./MonoDimensionTransitionControl");
-const debugLogger = new DebugLogger_1.DebugLogger('Scroll Control');
-const $contentContainer = DOM_1.id('content-container');
-let scrollTransition = null;
-function interruptTransition() {
-    if (scrollTransition !== null) {
-        scrollTransition = null;
-        debugLogger.log('Transition interrupted.');
-    }
-}
-$contentContainer.addEventListener('wheel', () => {
-    interruptTransition();
-});
-keyboard_1.arrowKeyPressEvent.on(key => {
-    if (key === keyboard_1.ArrowKey.UP || key === keyboard_1.ArrowKey.DOWN) {
-        interruptTransition();
-    }
-});
-function scrollAnimation() {
-    if (scrollTransition === null) {
-        return;
-    }
-    const now = Date.now();
-    $contentContainer.scrollTop = scrollTransition.getValue(now);
-    if (scrollTransition.isFinished(now)) {
-        debugLogger.log('Transition finished.');
-        scrollTransition = null;
-    }
-    else {
-        requestAnimationFrame(scrollAnimation);
-    }
-}
-function scrollTo(target) {
-    if (!settings_1.animation.getValue() || layoutControl_1.getCurrentLayout() === layoutControl_1.Layout.OFF) {
-        debugLogger.log(`Scroll to ${target}, no animation.`);
-        $contentContainer.scrollTop = target;
-        return;
-    }
-    if (scrollTransition === null) {
-        debugLogger.log(`Scrolling to ${target}, new transition stared.`);
-        scrollTransition = new MonoDimensionTransitionControl_1.MonoDimensionTransitionControl($contentContainer.scrollTop, 50000);
-        scrollTransition.setTarget(target);
-        requestAnimationFrame(scrollAnimation);
-    }
-    else {
-        debugLogger.log(`Scrolling to ${target}, existing transition updated.`);
-        scrollTransition.setTarget(target);
-    }
-}
-exports.scrollTo = scrollTo;
-
-},{"../DebugLogger":6,"../data/settings":27,"../input/keyboard":32,"../util/DOM":42,"./MonoDimensionTransitionControl":14,"./layoutControl":21}],24:[function(require,module,exports){
+},{"../util/DOM":46}],28:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const state_1 = require("../data/state");
@@ -1750,7 +2151,7 @@ function updateSelection() {
 }
 exports.updateSelection = updateSelection;
 
-},{"../data/state":28,"./history":20}],25:[function(require,module,exports){
+},{"../data/state":32,"./history":24}],29:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class AutoCache {
@@ -1778,7 +2179,7 @@ class AutoCache {
 }
 exports.AutoCache = AutoCache;
 
-},{}],26:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.data = window.DATA;
@@ -1797,7 +2198,7 @@ function iterateFolder(folder) {
 }
 iterateFolder(exports.data.chapterTree);
 
-},{}],27:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const noop = () => { };
@@ -1897,8 +2298,9 @@ exports.developerMode = new BooleanSetting('developerMode', false);
 exports.charCount = new BooleanSetting('charCount', true, value => {
     document.body.classList.toggle('char-count-disabled', !value);
 });
+exports.wtcdGameQuickLoadConfirm = new BooleanSetting('wtcdGameQuickLoadConfirm', true);
 
-},{}],28:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.state = {
@@ -1907,13 +2309,13 @@ exports.state = {
     chapterTextNodes: null,
 };
 
-},{}],29:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const hs = require("hyperscript");
 exports.h = hs;
 
-},{"hyperscript":4}],30:[function(require,module,exports){
+},{"hyperscript":4}],34:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const followQuery_1 = require("./control/followQuery");
@@ -1947,7 +2349,7 @@ window.addEventListener('popstate', () => {
 });
 followQuery_1.followQuery();
 
-},{"./control/followQuery":19,"./control/updateSelection":24,"./data/data":26,"./data/settings":27,"./menu/MainMenu":36,"./util/DOM":42}],31:[function(require,module,exports){
+},{"./control/followQuery":22,"./control/updateSelection":28,"./data/data":30,"./data/settings":31,"./menu/MainMenu":40,"./util/DOM":46}],35:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const DebugLogger_1 = require("../DebugLogger");
@@ -2031,7 +2433,7 @@ exports.swipeEvent.on(direction => {
     swipeEventDebugLogger.log(SwipeDirection[direction]);
 });
 
-},{"../DebugLogger":6,"../Event":7,"../util/DOM":42}],32:[function(require,module,exports){
+},{"../DebugLogger":6,"../Event":7,"../util/DOM":46}],36:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const DebugLogger_1 = require("../DebugLogger");
@@ -2072,7 +2474,7 @@ exports.arrowKeyPressEvent.on(arrowKey => {
     arrowEventDebugLogger.log(ArrowKey[arrowKey]);
 });
 
-},{"../DebugLogger":6,"../Event":7}],33:[function(require,module,exports){
+},{"../DebugLogger":6,"../Event":7}],37:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const messages_1 = require("../constant/messages");
@@ -2103,7 +2505,7 @@ class BlockMenu extends Menu_1.Menu {
 }
 exports.BlockMenu = BlockMenu;
 
-},{"../Menu":8,"../constant/messages":11,"../control/commentBlockControl":16}],34:[function(require,module,exports){
+},{"../Menu":8,"../constant/messages":11,"../control/commentBlockControl":17}],38:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const chapterControl_1 = require("../control/chapterControl");
@@ -2163,7 +2565,7 @@ class ChaptersMenu extends Menu_1.Menu {
 }
 exports.ChaptersMenu = ChaptersMenu;
 
-},{"../Menu":8,"../control/chapterControl":15,"../control/history":20,"../data/data":26,"../util/shortNumber":44}],35:[function(require,module,exports){
+},{"../Menu":8,"../control/chapterControl":16,"../control/history":24,"../data/data":30,"../util/shortNumber":48}],39:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const Menu_1 = require("../Menu");
@@ -2198,7 +2600,7 @@ class ContactMenu extends Menu_1.Menu {
 }
 exports.ContactMenu = ContactMenu;
 
-},{"../Menu":8}],36:[function(require,module,exports){
+},{"../Menu":8}],40:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const Menu_1 = require("../Menu");
@@ -2222,7 +2624,7 @@ class MainMenu extends Menu_1.Menu {
 }
 exports.MainMenu = MainMenu;
 
-},{"../Menu":8,"./ChaptersMenu":34,"./ContactMenu":35,"./SettingsMenu":37,"./StatsMenu":39,"./StyleMenu":40,"./ThanksMenu":41}],37:[function(require,module,exports){
+},{"../Menu":8,"./ChaptersMenu":38,"./ContactMenu":39,"./SettingsMenu":41,"./StatsMenu":43,"./StyleMenu":44,"./ThanksMenu":45}],41:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const stylePreviewArticle_1 = require("../constant/stylePreviewArticle");
@@ -2267,6 +2669,7 @@ class SettingsMenu extends Menu_1.Menu {
         this.addBooleanSetting('手势切换章节（仅限手机）', settings_1.gestureSwitchChapter);
         this.addEnumSetting('字体', settings_1.fontFamily, true);
         this.addBooleanSetting('显示每个章节的字数', settings_1.charCount);
+        this.addBooleanSetting('WTCD 游戏快速读取前确认', settings_1.wtcdGameQuickLoadConfirm);
         this.addBooleanSetting('开发人员模式', settings_1.developerMode);
         this.addLink(new BlockMenu_1.BlockMenu(this), true);
     }
@@ -2291,7 +2694,7 @@ class SettingsMenu extends Menu_1.Menu {
 }
 exports.SettingsMenu = SettingsMenu;
 
-},{"../Menu":8,"../constant/stylePreviewArticle":12,"../control/contentControl":18,"../control/layoutControl":21,"../data/settings":27,"./BlockMenu":33}],38:[function(require,module,exports){
+},{"../Menu":8,"../constant/stylePreviewArticle":12,"../control/contentControl":19,"../control/layoutControl":25,"../data/settings":31,"./BlockMenu":37}],42:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const data_1 = require("../data/data");
@@ -2312,7 +2715,7 @@ class StatsKeywordsCountMenu extends Menu_1.Menu {
 }
 exports.StatsKeywordsCountMenu = StatsKeywordsCountMenu;
 
-},{"../Menu":8,"../data/data":26}],39:[function(require,module,exports){
+},{"../Menu":8,"../data/data":30}],43:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const data_1 = require("../data/data");
@@ -2329,7 +2732,7 @@ class StatsMenu extends Menu_1.Menu {
 }
 exports.StatsMenu = StatsMenu;
 
-},{"../Menu":8,"../data/data":26,"./StatsKeywordsCountMenu":38}],40:[function(require,module,exports){
+},{"../Menu":8,"../data/data":30,"./StatsKeywordsCountMenu":42}],44:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const stylePreviewArticle_1 = require("../constant/stylePreviewArticle");
@@ -2364,7 +2767,7 @@ class Style {
         attemptInsertRule(`.menu .button:active::after { background-color: ${key}; }`);
         attemptInsertRule(`.button::after { background-color: ${key}; }`);
         attemptInsertRule(`body { background-color: ${this.def.paperBgColor}; }`);
-        attemptInsertRule(`.rect { background-color: ${this.def.rectBgColor}; }`);
+        // attemptInsertRule(`.rect { background-color: ${this.def.rectBgColor}; }`);
         // attemptInsertRule(`.rect.reading>div { background-color: ${this.def.paperBgColor}; }`);
         // attemptInsertRule(`.rect.reading>div { color: ${key}; }`);
         // attemptInsertRule(`.rect.reading>.content a { color: ${this.def.linkColor}; }`);
@@ -2376,6 +2779,7 @@ class Style {
         // attemptInsertRule(`.rect>.comments>.create-comment::before { background-color: ${key}; }`);
         attemptInsertRule(`:root { --comment-color:${this.def.commentColor}; }`);
         attemptInsertRule(`:root { --content-block-warning-color:${this.def.contentBlockWarningColor}; }`);
+        attemptInsertRule(`:root { --rect-bg-color: ${this.def.rectBgColor}; }`);
         attemptInsertRule(`:root { --paper-bg-color: ${this.def.paperBgColor}; }`);
         attemptInsertRule(`:root { --link-color: ${this.def.linkColor}; }`);
         attemptInsertRule(`:root { --link-hover-color: ${this.def.linkHoverColor}; }`);
@@ -2453,7 +2857,7 @@ class StyleMenu extends Menu_1.Menu {
 }
 exports.StyleMenu = StyleMenu;
 
-},{"../DebugLogger":6,"../Menu":8,"../constant/stylePreviewArticle":12,"../control/contentControl":18,"../control/layoutControl":21}],41:[function(require,module,exports){
+},{"../DebugLogger":6,"../Menu":8,"../constant/stylePreviewArticle":12,"../control/contentControl":19,"../control/layoutControl":25}],45:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const thanks_1 = require("../constant/thanks");
@@ -2470,7 +2874,7 @@ class ThanksMenu extends Menu_1.Menu {
 }
 exports.ThanksMenu = ThanksMenu;
 
-},{"../Menu":8,"../constant/thanks":13}],42:[function(require,module,exports){
+},{"../Menu":8,"../constant/thanks":13}],46:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const DebugLogger_1 = require("../DebugLogger");
@@ -2517,8 +2921,12 @@ function isAnyParent($element, predicate) {
     return false;
 }
 exports.isAnyParent = isAnyParent;
+function insertAfter($newElement, $referencingElement) {
+    $referencingElement.parentElement.insertBefore($newElement, $referencingElement.nextSibling);
+}
+exports.insertAfter = insertAfter;
 
-},{"../DebugLogger":6}],43:[function(require,module,exports){
+},{"../DebugLogger":6}],47:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const SECOND = 1000;
@@ -2526,7 +2934,7 @@ const MINUTE = 60 * SECOND;
 const HOUR = 60 * MINUTE;
 const DAY = 24 * HOUR;
 const MAX_RELATIVE_TIME = 7 * DAY;
-function formatTime(time) {
+function formatTimeRelative(time) {
     const relativeTime = Date.now() - time.getTime();
     if (relativeTime > MAX_RELATIVE_TIME) {
         return `${time.getFullYear()}/${time.getMonth() + 1}/${time.getDate()}`;
@@ -2542,9 +2950,14 @@ function formatTime(time) {
     }
     return `${Math.floor(relativeTime / SECOND)} 秒前`;
 }
-exports.formatTime = formatTime;
+exports.formatTimeRelative = formatTimeRelative;
+function formatTimeSimple(time) {
+    return `${time.getFullYear()}-${time.getMonth() + 1}-${time.getDate()} ` +
+        `${time.getHours()}:${time.getMinutes()}:${time.getSeconds()}`;
+}
+exports.formatTimeSimple = formatTimeSimple;
 
-},{}],44:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 function shortNumber(input) {
@@ -2558,7 +2971,7 @@ function shortNumber(input) {
 }
 exports.shortNumber = shortNumber;
 
-},{}],45:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 // https://stackoverflow.com/a/7616484
@@ -2575,7 +2988,7 @@ function stringHash(str) {
 }
 exports.stringHash = stringHash;
 
-},{}],46:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const Interpreter_1 = require("./Interpreter");
@@ -2785,7 +3198,7 @@ class FlowReader {
 }
 exports.FlowReader = FlowReader;
 
-},{"./Interpreter":48,"./Random":49}],47:[function(require,module,exports){
+},{"./Interpreter":52,"./Random":53}],51:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const Interpreter_1 = require("./Interpreter");
@@ -2842,10 +3255,10 @@ function isData(data) {
  * all decisions too.
  */
 class GameReader {
-    constructor(docIdentifier, wtcdRoot, errorMessageCreator, elementPreprocessor) {
+    constructor(docIdentifier, wtcdRoot, onOutput, onError) {
         this.wtcdRoot = wtcdRoot;
-        this.errorMessageCreator = errorMessageCreator;
-        this.elementPreprocessor = elementPreprocessor;
+        this.onOutput = onOutput;
+        this.onError = onError;
         this.started = false;
         this.storageKey = `wtcd.gr.${docIdentifier}`;
         this.data = this.parseData(window.localStorage.getItem(this.storageKey)) || {
@@ -2883,6 +3296,30 @@ class GameReader {
                 date: new Date(save.date),
             });
     }
+    reset(reseed) {
+        this.data.current.decisions = [];
+        if (reseed) {
+            this.data.current.random = String(Math.random());
+        }
+        this.restoreGameState();
+        this.persist();
+    }
+    save(saveIndex) {
+        const save = this.data.saves[saveIndex];
+        if (save === undefined) {
+            throw new Error(`Illegal save index: ${saveIndex}`);
+        }
+        this.data.saves[saveIndex] = {
+            date: Date.now(),
+            desc: this.interpreter.getStateDesc() || '',
+            random: this.data.current.random,
+            decisions: this.data.current.decisions.slice(),
+        };
+        if (this.data.saves[this.data.saves.length - 1] !== null) {
+            this.data.saves.push(null);
+        }
+        this.persist();
+    }
     load(saveIndex) {
         const save = this.data.saves[saveIndex];
         if (save === undefined || save === null) {
@@ -2891,6 +3328,7 @@ class GameReader {
         this.data.current.random = save.random;
         this.data.current.decisions = save.decisions.slice();
         this.restoreGameState();
+        this.persist();
     }
     /** Calls this.interpreterIterator.next() and handles error. */
     next(decision) {
@@ -2898,9 +3336,7 @@ class GameReader {
             return this.interpreterIterator.next(decision);
         }
         catch (error) {
-            const $errorMessage = this.errorMessageCreator(error);
-            this.target.innerHTML = '';
-            this.target.appendChild($errorMessage);
+            this.onError(error);
             return {
                 done: true,
                 value: {
@@ -2913,15 +3349,17 @@ class GameReader {
     restoreGameState() {
         this.interpreter = new Interpreter_1.Interpreter(this.wtcdRoot, new Random_1.Random(this.data.current.random));
         this.interpreterIterator = this.interpreter.start();
-        let lastOutput = this.interpreterIterator.next();
-        this.data.current.decisions.forEach(decision => lastOutput = this.interpreterIterator.next(decision));
+        let lastOutput = this.next();
+        this.data.current.decisions.forEach(decision => lastOutput = this.next(decision));
         this.handleOutput(lastOutput.value);
     }
     handleOutput(output) {
-        this.target.innerHTML = '';
-        output.content.forEach($element => this.target.appendChild($element));
-        this.interpreter.getPinned().forEach($element => this.target.appendChild($element));
-        output.choices.forEach((choice, choiceIndex) => {
+        const $output = document.createElement('div');
+        output.content.forEach($element => $output.appendChild($element));
+        this.interpreter.getPinned()
+            .forEach($element => $output.appendChild($element));
+        const decisionIndex = this.data.current.decisions.length;
+        const buttons = output.choices.map((choice, choiceIndex) => {
             const $button = document.createElement('div');
             $button.classList.add('wtcd-button');
             $button.innerText = choice.content;
@@ -2931,27 +3369,38 @@ class GameReader {
             else {
                 $button.classList.add('candidate');
                 $button.addEventListener('click', () => {
+                    if (decisionIndex !== this.data.current.decisions.length) {
+                        return;
+                    }
                     this.data.current.decisions.push(choiceIndex);
+                    buttons.forEach($eachButton => {
+                        if ($eachButton === $button) {
+                            $eachButton.classList.add('selected');
+                        }
+                        else {
+                            $eachButton.classList.add('unselected');
+                        }
+                    });
                     this.handleOutput(this.next(choiceIndex).value);
                     this.persist();
                 });
             }
-            this.target.appendChild($button);
+            $output.appendChild($button);
+            return $button;
         });
-        this.elementPreprocessor(this.target);
+        this.onOutput($output);
     }
-    renderTo($target) {
+    start() {
         if (this.started) {
             throw new Error('Game reader already started.');
         }
         this.started = true;
-        this.target = $target;
         this.restoreGameState();
     }
 }
 exports.GameReader = GameReader;
 
-},{"./Interpreter":48,"./Random":49}],48:[function(require,module,exports){
+},{"./Interpreter":52,"./Random":53}],52:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const constantsPool_1 = require("./constantsPool");
@@ -3714,6 +4163,9 @@ class Interpreter {
     getPinned() {
         return this.pinned;
     }
+    getStateDesc() {
+        return this.stateDesc;
+    }
     *start() {
         const stdScope = this.pushScope();
         for (const stdFunction of std_1.stdFunctions) {
@@ -3778,7 +4230,7 @@ class Interpreter {
 }
 exports.Interpreter = Interpreter;
 
-},{"./WTCDError":50,"./constantsPool":52,"./invokeFunction":53,"./operators":54,"./std":57,"./utils":64}],49:[function(require,module,exports){
+},{"./WTCDError":54,"./constantsPool":56,"./invokeFunction":57,"./operators":58,"./std":61,"./utils":68}],53:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 /**
@@ -3841,7 +4293,7 @@ class Random {
 }
 exports.Random = Random;
 
-},{}],50:[function(require,module,exports){
+},{}],54:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const empty = {};
@@ -3887,7 +4339,7 @@ class WTCDError extends Error {
 }
 exports.WTCDError = WTCDError;
 
-},{}],51:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 function autoEvaluated(fn) {
@@ -3899,7 +4351,7 @@ function autoEvaluated(fn) {
 }
 exports.autoEvaluated = autoEvaluated;
 
-},{}],52:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 // Your typical immature optimization
@@ -3935,7 +4387,7 @@ function getMaybePooled(type, value) {
 }
 exports.getMaybePooled = getMaybePooled;
 
-},{}],53:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const autoEvaluated_1 = require("./autoEvaluated");
@@ -4107,7 +4559,7 @@ exports.reverseInvocation = autoEvaluated_1.autoEvaluated((arg0, arg1, expr, int
     }
 });
 
-},{"./Interpreter":48,"./WTCDError":50,"./autoEvaluated":51,"./constantsPool":52,"./std/utils":63}],54:[function(require,module,exports){
+},{"./Interpreter":52,"./WTCDError":54,"./autoEvaluated":55,"./constantsPool":56,"./std/utils":67}],58:[function(require,module,exports){
 "use strict";
 // This file defines all infix and prefix operators in WTCD.
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -4511,7 +4963,7 @@ exports.binaryOperators = new Map([
 exports.conditionalOperatorPrecedence = 4;
 exports.operators = new Set([...exports.unaryOperators.keys(), ...exports.binaryOperators.keys(), '?', ':', '...']);
 
-},{"./Interpreter":48,"./WTCDError":50,"./autoEvaluated":51,"./constantsPool":52,"./invokeFunction":53}],55:[function(require,module,exports){
+},{"./Interpreter":52,"./WTCDError":54,"./autoEvaluated":55,"./constantsPool":56,"./invokeFunction":57}],59:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const constantsPool_1 = require("../constantsPool");
@@ -4610,7 +5062,7 @@ exports.contentStdFunctions = [
     },
 ];
 
-},{"../Interpreter":48,"../constantsPool":52,"./utils":63}],56:[function(require,module,exports){
+},{"../Interpreter":52,"../constantsPool":56,"./utils":67}],60:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const constantsPool_1 = require("../constantsPool");
@@ -4676,7 +5128,7 @@ exports.debugStdFunctions = [
     },
 ];
 
-},{"../Interpreter":48,"../WTCDError":50,"../constantsPool":52,"../invokeFunction":53,"./utils":63}],57:[function(require,module,exports){
+},{"../Interpreter":52,"../WTCDError":54,"../constantsPool":56,"../invokeFunction":57,"./utils":67}],61:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const content_1 = require("./content");
@@ -4696,7 +5148,7 @@ exports.stdFunctions = [
     ...string_1.stringStdFunctions,
 ];
 
-},{"./content":55,"./debug":56,"./list":58,"./math":59,"./random":60,"./reader":61,"./string":62}],58:[function(require,module,exports){
+},{"./content":59,"./debug":60,"./list":62,"./math":63,"./random":64,"./reader":65,"./string":66}],62:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const constantsPool_1 = require("../constantsPool");
@@ -4962,7 +5414,7 @@ exports.listStdFunctions = [
     },
 ];
 
-},{"../Interpreter":48,"../WTCDError":50,"../constantsPool":52,"../invokeFunction":53,"./utils":63}],59:[function(require,module,exports){
+},{"../Interpreter":52,"../WTCDError":54,"../constantsPool":56,"../invokeFunction":57,"./utils":67}],63:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const constantsPool_1 = require("../constantsPool");
@@ -4996,7 +5448,7 @@ exports.mathStdFunctions = [
     },
 ];
 
-},{"../constantsPool":52,"./utils":63}],60:[function(require,module,exports){
+},{"../constantsPool":56,"./utils":67}],64:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const constantsPool_1 = require("../constantsPool");
@@ -5049,7 +5501,7 @@ exports.randomStdFunctions = [
     },
 ];
 
-},{"../constantsPool":52,"./utils":63}],61:[function(require,module,exports){
+},{"../constantsPool":56,"./utils":67}],65:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const constantsPool_1 = require("../constantsPool");
@@ -5079,7 +5531,7 @@ exports.readerStdFunctions = [
     },
 ];
 
-},{"../constantsPool":52,"./utils":63}],62:[function(require,module,exports){
+},{"../constantsPool":56,"./utils":67}],66:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const constantsPool_1 = require("../constantsPool");
@@ -5112,7 +5564,7 @@ exports.stringStdFunctions = [
     },
 ];
 
-},{"../constantsPool":52,"./utils":63}],63:[function(require,module,exports){
+},{"../constantsPool":56,"./utils":67}],67:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const constantsPool_1 = require("../constantsPool");
@@ -5158,7 +5610,7 @@ function assertArgType(args, index, type, defaultValue) {
 }
 exports.assertArgType = assertArgType;
 
-},{"../Interpreter":48,"../constantsPool":52}],64:[function(require,module,exports){
+},{"../Interpreter":52,"../constantsPool":56}],68:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 function flat(arr) {
@@ -5179,4 +5631,4 @@ function arrayEquals(arr0, arr1, comparator = (e0, e1) => e0 === e1) {
 }
 exports.arrayEquals = arrayEquals;
 
-},{}]},{},[30]);
+},{}]},{},[34]);
