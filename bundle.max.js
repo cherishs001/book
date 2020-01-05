@@ -873,6 +873,7 @@ exports.thanks = [
     { name: '重水时雨', link: 'https://t.me/boatmasteronD2O' },
     { name: '神楽坂 紫' },
     { name: 'Runian Lee', link: 'https://t.me/Runian' },
+    { name: '琥珀' },
 ].sort(() => Math.random() - 0.5);
 
 },{}],14:[function(require,module,exports){
