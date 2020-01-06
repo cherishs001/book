@@ -361,6 +361,8 @@ section main {
   assert::[mathMax::[ 1 2 3 4 0 ] == 4]
   assert::[mathFloor::[ 11.8 ] == 11]
   assert::[mathFloor::[ -11.8 ] == -12]
+  assert::[mathCeil::[ 11.8 ] == 12]
+  assert::[mathCeil::[ -11.8 ] == -11]
 
   // std string*
   assert::[stringLength::["Hello~"] == 6]
@@ -547,6 +549,13 @@ section main {
     assert::[a::#getName == "A2"]
     assert::[a::#getAge == 40]
     assert::[a::#info == "A2: 40"]
+  }
+
+  // Optional Invocation
+  {
+    declare function sum = $[number a number b] a + b
+    assert::[sum?::[1 2] == 3]
+    assert::[null?::[1 2] == null]
   }
 
   timeEnd::[]

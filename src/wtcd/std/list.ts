@@ -153,9 +153,9 @@ export const listStdFunctions: Array<NativeFunction> = [
       throw new NativeFunctionError('Start index must be an integer, ' +
         `provided: ${start}`);
     }
-    if (start < 0 || start >= source.length) {
+    if (start < 0 || start > source.length) {
       throw new NativeFunctionError(`Start index must be in the bounds of ` +
-        `the list given (0 - ${source.length - 1}), provided: ${start}`);
+        `the list given (0 - ${source.length}), provided: ${start}`);
     }
     if (length % 1 !== 0) {
       throw new NativeFunctionError('Start must be an integer.');
@@ -182,9 +182,9 @@ export const listStdFunctions: Array<NativeFunction> = [
       throw new NativeFunctionError('Start index must be an integer, ' +
         `provided: ${start}`);
     }
-    if (start < 0 || start >= source.length) {
+    if (start < 0 || start > source.length) {
       throw new NativeFunctionError(`Start index must be in the bounds of ` +
-        `the list given (0 - ${source.length - 1}), provided: ${start}`);
+        `the list given (0 - ${source.length}), provided: ${start}`);
     }
     if (end % 1 !== 0) {
       throw new NativeFunctionError('End index must be an integer, ' +

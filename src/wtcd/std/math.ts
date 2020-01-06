@@ -32,4 +32,11 @@ export const mathStdFunctions: Array<NativeFunction> = [
       Math.floor(assertArgType(args, 0, 'number')),
     );
   },
+  function mathCeil(args) {
+    assertArgsLength(args, 1);
+    return getMaybePooled(
+      'number',
+      Math.ceil(assertArgType(args, 0, 'number')),
+    );
+  }
 ];

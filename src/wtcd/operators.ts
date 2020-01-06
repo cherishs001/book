@@ -3,7 +3,7 @@
 import { autoEvaluated } from './autoEvaluated';
 import { getMaybePooled } from './constantsPool';
 import { assignValueToVariable, describe, InterpreterHandle, isEqual, RuntimeValue, RuntimeValueRaw, RuntimeValueType } from './Interpreter';
-import { pipelineInvocation, regularInvocation, reverseInvocation } from './invokeFunction';
+import {pipelineInvocation, regularInvocation, regularInvocationRaw, reverseInvocation} from './invokeFunction';
 import { BinaryExpression, UnaryExpression } from './types';
 import { WTCDError } from './WTCDError';
 
@@ -410,6 +410,22 @@ export const binaryOperators = new Map<string, BinaryOperatorDefinition>([
   ['::', {
     precedence: 20,
     fn: regularInvocation,
+  }],
+  ['?::', {
+    precedence: 20,
+    fn: (expr, interpreterHandle) => {
+      const { evaluator } = interpreterHandle;
+      const arg0 = evaluator(expr.arg0);
+      if (arg0.type === 'null') {
+        return arg0; // Short circuit
+      }
+      return regularInvocationRaw(
+        arg0,
+        evaluator(expr.arg1),
+        expr,
+        interpreterHandle,
+      );
+    },
   }],
   ['.:', {
     precedence: 20,

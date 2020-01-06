@@ -133,26 +133,30 @@ function handleError(expr: BinaryExpression, error: any): never {
   throw error;
 }
 
-export const regularInvocation = autoEvaluated((
-  arg0,
-  arg1,
-  expr,
-  interpreterHandle,
+export const regularInvocationRaw = (
+  arg0: RuntimeValue,
+  arg1: RuntimeValue,
+  expr: BinaryExpression,
+  interpreterHandle: InterpreterHandle,
 ) => {
   if (arg0.type !== 'function') {
-    throw WTCDError.atLocation(expr, `Left side of function invocation "::" ` +
-      `is expected to be a function, received: ${describe(arg0)}`);
+    throw WTCDError.atLocation(expr, `Left side of function invocation ` +
+      `"${expr.operator}" is expected to be a function, received: ` +
+      `${describe(arg0)}`);
   }
   if (arg1.type !== 'list') {
-    throw WTCDError.atLocation(expr, `Right side of function invocation "::" ` +
-      `is expected to be a list, received: ${describe(arg1)}`);
+    throw WTCDError.atLocation(expr, `Right side of function invocation ` +
+      `"${expr.operator}" is expected to be a list, received: ` +
+      `${describe(arg1)}`);
   }
   try {
     return invokeFunctionRaw(arg0.value, arg1.value, interpreterHandle);
   } catch (error) {
     return handleError(expr, error);
   }
-});
+};
+
+export const regularInvocation = autoEvaluated(regularInvocationRaw);
 
 export const pipelineInvocation = autoEvaluated((
   arg0,
