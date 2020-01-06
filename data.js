@@ -303,15 +303,15 @@ window.DATA={
         "isRoot": false,
         "chapters": [
           {
-            "displayName": "概述",
+            "displayName": "道具集投稿要求",
             "displayIndex": 0,
-            "name": "0 - 概述",
-            "sourceRelativePath": "4 - 道具集/0 - 概述.md",
+            "name": "0 - 道具集投稿要求",
+            "sourceRelativePath": "4 - 道具集/0 - 道具集投稿要求.md",
             "type": "Markdown",
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/36",
-            "htmlRelativePath": "道具集/概述.html",
-            "chapterCharCount": 641
+            "htmlRelativePath": "道具集/道具集投稿要求.html",
+            "chapterCharCount": 929
           },
           {
             "displayName": "mWatch",
@@ -436,7 +436,7 @@ window.DATA={
           }
         ],
         "subFolders": [],
-        "folderCharCount": 44251
+        "folderCharCount": 44539
       },
       {
         "displayName": "META",
@@ -455,6 +455,17 @@ window.DATA={
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/64",
             "htmlRelativePath": "META/人名请求.html",
             "chapterCharCount": 415
+          },
+          {
+            "displayName": "投稿须知及简易 Markdown 教程",
+            "displayIndex": 2,
+            "name": "2 - 投稿须知及简易 Markdown 教程",
+            "sourceRelativePath": "5 - META/2 - 投稿须知及简易 Markdown 教程.md",
+            "type": "Markdown",
+            "isEarlyAccess": false,
+            "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/97",
+            "htmlRelativePath": "META/投稿须知及简易-Markdown-教程.html",
+            "chapterCharCount": 4783
           }
         ],
         "subFolders": [
@@ -485,7 +496,7 @@ window.DATA={
                 "isEarlyAccess": false,
                 "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/72",
                 "htmlRelativePath": "META/WTCD/2.-变量、表达式及语句.html",
-                "chapterCharCount": 5715
+                "chapterCharCount": 5772
               },
               {
                 "displayName": "3. Section",
@@ -529,7 +540,7 @@ window.DATA={
                 "isEarlyAccess": false,
                 "commentsUrl": null,
                 "htmlRelativePath": "META/WTCD/6.-标准库.html",
-                "chapterCharCount": 4917
+                "chapterCharCount": 5027
               },
               {
                 "displayName": "7. 流程控制",
@@ -562,7 +573,7 @@ window.DATA={
                 "isEarlyAccess": false,
                 "commentsUrl": null,
                 "htmlRelativePath": "META/WTCD/变化日志.html",
-                "chapterCharCount": 498
+                "chapterCharCount": 609
               },
               {
                 "displayName": "计划功能",
@@ -721,10 +732,10 @@ window.DATA={
                 "folderCharCount": 3489
               }
             ],
-            "folderCharCount": 30777
+            "folderCharCount": 31055
           }
         ],
-        "folderCharCount": 31192
+        "folderCharCount": 36253
       },
       {
         "displayName": "杂项",
@@ -749,10 +760,10 @@ window.DATA={
         "folderCharCount": 1361
       }
     ],
-    "folderCharCount": 186360
+    "folderCharCount": 191709
   },
-  "charsCount": 186360,
-  "paragraphsCount": 3619,
+  "charsCount": 191709,
+  "paragraphsCount": 3665,
   "keywordsCount": [
     [
       "高潮",
@@ -772,7 +783,7 @@ window.DATA={
     ],
     [
       "陈志鹏",
-      60
+      78
     ],
     [
       "陈变态",
@@ -827,5 +838,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "357"
+  "buildNumber": "359"
 };

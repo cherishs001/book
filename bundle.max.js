@@ -4519,14 +4519,16 @@ function handleError(expr, error) {
     }
     throw error;
 }
-exports.regularInvocation = autoEvaluated_1.autoEvaluated((arg0, arg1, expr, interpreterHandle) => {
+exports.regularInvocationRaw = (arg0, arg1, expr, interpreterHandle) => {
     if (arg0.type !== 'function') {
-        throw WTCDError_1.WTCDError.atLocation(expr, `Left side of function invocation "::" ` +
-            `is expected to be a function, received: ${Interpreter_1.describe(arg0)}`);
+        throw WTCDError_1.WTCDError.atLocation(expr, `Left side of function invocation ` +
+            `"${expr.operator}" is expected to be a function, received: ` +
+            `${Interpreter_1.describe(arg0)}`);
     }
     if (arg1.type !== 'list') {
-        throw WTCDError_1.WTCDError.atLocation(expr, `Right side of function invocation "::" ` +
-            `is expected to be a list, received: ${Interpreter_1.describe(arg1)}`);
+        throw WTCDError_1.WTCDError.atLocation(expr, `Right side of function invocation ` +
+            `"${expr.operator}" is expected to be a list, received: ` +
+            `${Interpreter_1.describe(arg1)}`);
     }
     try {
         return invokeFunctionRaw(arg0.value, arg1.value, interpreterHandle);
@@ -4534,7 +4536,8 @@ exports.regularInvocation = autoEvaluated_1.autoEvaluated((arg0, arg1, expr, int
     catch (error) {
         return handleError(expr, error);
     }
-});
+};
+exports.regularInvocation = autoEvaluated_1.autoEvaluated(exports.regularInvocationRaw);
 exports.pipelineInvocation = autoEvaluated_1.autoEvaluated((arg0, arg1, expr, interpreterHandle) => {
     if (arg1.type !== 'function') {
         throw WTCDError_1.WTCDError.atLocation(expr, `Left side of pipeline invocation "|>" ` +
@@ -4913,6 +4916,17 @@ exports.binaryOperators = new Map([
     ['::', {
             precedence: 20,
             fn: invokeFunction_1.regularInvocation,
+        }],
+    ['?::', {
+            precedence: 20,
+            fn: (expr, interpreterHandle) => {
+                const { evaluator } = interpreterHandle;
+                const arg0 = evaluator(expr.arg0);
+                if (arg0.type === 'null') {
+                    return arg0; // Short circuit
+                }
+                return invokeFunction_1.regularInvocationRaw(arg0, evaluator(expr.arg1), expr, interpreterHandle);
+            },
         }],
     ['.:', {
             precedence: 20,
@@ -5315,9 +5329,9 @@ exports.listStdFunctions = [
             throw new utils_1.NativeFunctionError('Start index must be an integer, ' +
                 `provided: ${start}`);
         }
-        if (start < 0 || start >= source.length) {
+        if (start < 0 || start > source.length) {
             throw new utils_1.NativeFunctionError(`Start index must be in the bounds of ` +
-                `the list given (0 - ${source.length - 1}), provided: ${start}`);
+                `the list given (0 - ${source.length}), provided: ${start}`);
         }
         if (length % 1 !== 0) {
             throw new utils_1.NativeFunctionError('Start must be an integer.');
@@ -5344,9 +5358,9 @@ exports.listStdFunctions = [
             throw new utils_1.NativeFunctionError('Start index must be an integer, ' +
                 `provided: ${start}`);
         }
-        if (start < 0 || start >= source.length) {
+        if (start < 0 || start > source.length) {
             throw new utils_1.NativeFunctionError(`Start index must be in the bounds of ` +
-                `the list given (0 - ${source.length - 1}), provided: ${start}`);
+                `the list given (0 - ${source.length}), provided: ${start}`);
         }
         if (end % 1 !== 0) {
             throw new utils_1.NativeFunctionError('End index must be an integer, ' +
@@ -5450,6 +5464,10 @@ exports.mathStdFunctions = [
     function mathFloor(args) {
         utils_1.assertArgsLength(args, 1);
         return constantsPool_1.getMaybePooled('number', Math.floor(utils_1.assertArgType(args, 0, 'number')));
+    },
+    function mathCeil(args) {
+        utils_1.assertArgsLength(args, 1);
+        return constantsPool_1.getMaybePooled('number', Math.ceil(utils_1.assertArgType(args, 0, 'number')));
     },
 ];
 
