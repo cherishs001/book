@@ -657,6 +657,7 @@ class Menu {
         if (options.button && options.link !== undefined) {
             $element = document.createElement('a');
             $element.href = options.link;
+            $element.rel = 'noopener noreferrer';
             $element.target = '_blank';
         }
         else {
@@ -1254,8 +1255,8 @@ function loadChapter(chapterHtmlRelativePath, selection, side = contentControl_1
         }
         debugLogger.log('Chapter loaded.');
         loadingBlock.directRemove();
-        const mainBlock = insertContent(content, text, chapterCtx.chapter);
-        state_1.state.chapterTextNodes = DOM_1.getTextNodes(loadingBlock.element);
+        const mainBlock = insertContent(content, text, chapterCtx.chapter) || content.addBlock();
+        state_1.state.chapterTextNodes = DOM_1.getTextNodes(mainBlock.element);
         if (selection !== undefined) {
             if (DOM_1.id('warning') === null) {
                 select(selection);
@@ -1269,9 +1270,7 @@ function loadChapter(chapterHtmlRelativePath, selection, side = contentControl_1
         const chapterIndex = chapterCtx.inFolderIndex;
         const prevChapter = chapterCtx.folder.chapters[chapterIndex - 1];
         const nextChapter = chapterCtx.folder.chapters[chapterIndex + 1];
-        ((mainBlock === undefined)
-            ? content.addBlock()
-            : mainBlock).element.appendChild(hs_1.h('div.page-switcher', [
+        mainBlock.element.appendChild(hs_1.h('div.page-switcher', [
             // 上一章
             (prevChapter !== undefined && canChapterShown(prevChapter))
                 ? hs_1.h('a.to-prev', {
@@ -1306,7 +1305,7 @@ function loadChapter(chapterHtmlRelativePath, selection, side = contentControl_1
         setTimeout(() => {
             contentControl_1.focus();
         }, 1);
-        commentsControl_1.loadComments(contentControl_1.getCurrentContent(), chapterCtx.chapter.commentsUrl);
+        commentsControl_1.loadComments(content, chapterCtx.chapter.commentsUrl);
     })
         .catch(error => {
         debugLogger.error(`Failed to load chapter.`, error);
@@ -1436,6 +1435,7 @@ function createCommentElement(userAvatarUrl, userName, userUrl, createTime, upda
         hs_1.h('a.author', {
             target: '_blank',
             href: userUrl,
+            rel: 'noopener noreferrer',
         }, userName),
         hs_1.h('.time', createTime === updateTime
             ? formatTime_1.formatTimeRelative(new Date(createTime))
@@ -2079,7 +2079,11 @@ exports.confirm = confirm;
 Object.defineProperty(exports, "__esModule", { value: true });
 const DOM_1 = require("../util/DOM");
 function processElements($parent) {
-    Array.from($parent.getElementsByTagName('a')).forEach($anchor => $anchor.target = '_blank');
+    Array.from($parent.getElementsByTagName('a')).forEach(($anchor) => {
+        $anchor.target = '_blank';
+        $anchor.rel = 'noopener noreferrer';
+        $anchor.className = 'regular';
+    });
     Array.from($parent.getElementsByTagName('code')).forEach($code => $code.addEventListener('dblclick', () => {
         if (!($code.parentNode instanceof HTMLPreElement)) {
             DOM_1.selectNode($code);

@@ -535,13 +535,13 @@ body.animation-enabled .content-container > .content .content-block {
 .content-container > .content .content-block .page-switcher a + a {
   margin-left: 0.8em;
 }
-.content-container > .content .content-block.content a {
+.content-container > .content .content-block a.regular {
   color: var(--link-color);
 }
-.content-container > .content .content-block.content a:hover {
+.content-container > .content .content-block a.regular:hover {
   color: var(--link-hover-color);
 }
-.content-container > .content .content-block.content a:active {
+.content-container > .content .content-block a.regular:active {
   color: var(--link-active-color);
 }
 @media (min-width: 901px) {
