@@ -8,6 +8,8 @@
   user-select: none;
   text-align: center;
 
+  color: var(--key);
+
   &::before {
     position: absolute;
     top: 0;
@@ -25,10 +27,13 @@
       transition: opacity 0.12s;
     }
   }
+
   &:hover::before {
     opacity: 0.1;
+    color: var(--key);
   }
   &:active::before {
     opacity: 0.04;
+    color: var(--key);
   }
 }
