@@ -38,5 +38,5 @@ export const mathStdFunctions: Array<NativeFunction> = [
       'number',
       Math.ceil(assertArgType(args, 0, 'number')),
     );
-  }
+  },
 ];
