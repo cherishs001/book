@@ -1,7 +1,11 @@
 import { selectNode } from '../util/DOM';
 
 export function processElements($parent: HTMLElement) {
-  Array.from($parent.getElementsByTagName('a')).forEach($anchor => ($anchor as HTMLAnchorElement).target = '_blank');
+  Array.from($parent.getElementsByTagName('a')).forEach(($anchor: HTMLAnchorElement) => {
+    $anchor.target = '_blank';
+    $anchor.rel = 'noopener noreferrer';
+    $anchor.className = 'regular';
+  });
   Array.from($parent.getElementsByTagName('code')).forEach($code => $code.addEventListener('dblclick', () => {
     if (!($code.parentNode instanceof HTMLPreElement)) {
       selectNode($code);
