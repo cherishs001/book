@@ -39,6 +39,7 @@ function createCommentElement(
     h('a.author', {
       target: '_blank',
       href: userUrl,
+      rel: 'noopener noreferrer',
     }, userName),
     h('.time', createTime === updateTime
       ? formatTimeRelative(new Date(createTime))
