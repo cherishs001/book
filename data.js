@@ -465,7 +465,7 @@ window.DATA={
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/97",
             "htmlRelativePath": "META/投稿须知及简易-Markdown-教程.html",
-            "chapterCharCount": 4783
+            "chapterCharCount": 4785
           }
         ],
         "subFolders": [
@@ -735,7 +735,7 @@ window.DATA={
             "folderCharCount": 31055
           }
         ],
-        "folderCharCount": 36253
+        "folderCharCount": 36255
       },
       {
         "displayName": "杂项",
@@ -760,9 +760,9 @@ window.DATA={
         "folderCharCount": 1361
       }
     ],
-    "folderCharCount": 191709
+    "folderCharCount": 191711
   },
-  "charsCount": 191709,
+  "charsCount": 191711,
   "paragraphsCount": 3665,
   "keywordsCount": [
     [
@@ -838,5 +838,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "359"
+  "buildNumber": "360"
 };
