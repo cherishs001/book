@@ -148,9 +148,9 @@ export function loadChapter(
     debugLogger.log('Chapter loaded.');
 
     loadingBlock.directRemove();
-    const mainBlock = insertContent(content, text, chapterCtx.chapter);
+    const mainBlock = insertContent(content, text, chapterCtx.chapter) || content.addBlock();
 
-    state.chapterTextNodes = getTextNodes(loadingBlock.element);
+    state.chapterTextNodes = getTextNodes(mainBlock.element);
     if (selection !== undefined) {
       if (id('warning') === null) {
         select(selection);
@@ -164,10 +164,7 @@ export function loadChapter(
     const chapterIndex = chapterCtx.inFolderIndex;
     const prevChapter = chapterCtx.folder.chapters[chapterIndex - 1];
     const nextChapter = chapterCtx.folder.chapters[chapterIndex + 1];
-    ((mainBlock === undefined)
-      ? content.addBlock()
-      : mainBlock
-    ).element.appendChild(h('div.page-switcher', [
+    mainBlock.element.appendChild(h('div.page-switcher', [
       // 上一章
       (prevChapter !== undefined && canChapterShown(prevChapter))
         ? h('a.to-prev', {
