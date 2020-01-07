@@ -104,6 +104,8 @@ Markdown 本身功能也不强大，但是除了这边介绍的还是有很多�
 - [StackEdit](https://stackedit.io/)
 - [Dillinger](https://dillinger.io/)
 
+如果想要学习其他的 Markdown 语法，你可以查看这篇[发布在掘金上的教程](https://juejin.im/post/5ad6e09e518825557b4d451c)。
+
 ## 3. 基本排版规则
 学会了 Markdown，这边还有几个比较重要的排版规则。其中很多规则都是从[中文文案排版指北](https://github.com/mzlogin/chinese-copywriting-guidelines)继承来的。这些规则都不复杂，但是遵循这些规则可以让你的文章看起来舒服许多。
 
