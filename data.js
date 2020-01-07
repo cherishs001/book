@@ -391,6 +391,17 @@ window.DATA={
             "chapterCharCount": 9030
           },
           {
+            "displayName": "可穿戴科技的其他版本②",
+            "displayIndex": 667,
+            "name": "667 - 可穿戴科技的其他版本②",
+            "sourceRelativePath": "4 - 道具集/667 - 可穿戴科技的其他版本②.md",
+            "type": "Markdown",
+            "isEarlyAccess": false,
+            "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/99",
+            "htmlRelativePath": "道具集/可穿戴科技的其他版本②.html",
+            "chapterCharCount": 7998
+          },
+          {
             "displayName": "末日病毒治疗仪器",
             "displayIndex": 721,
             "name": "721 - 末日病毒治疗仪器",
@@ -436,7 +447,7 @@ window.DATA={
           }
         ],
         "subFolders": [],
-        "folderCharCount": 44539
+        "folderCharCount": 52537
       },
       {
         "displayName": "META",
@@ -760,14 +771,14 @@ window.DATA={
         "folderCharCount": 1361
       }
     ],
-    "folderCharCount": 191853
+    "folderCharCount": 199851
   },
-  "charsCount": 191853,
-  "paragraphsCount": 3666,
+  "charsCount": 199851,
+  "paragraphsCount": 3750,
   "keywordsCount": [
     [
       "高潮",
-      355
+      377
     ],
     [
       "按摩棒",
@@ -775,7 +786,7 @@ window.DATA={
     ],
     [
       "贞操带",
-      181
+      195
     ],
     [
       "WTCD",
@@ -838,5 +849,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "372"
+  "buildNumber": "375"
 };
