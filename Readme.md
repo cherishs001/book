@@ -4,7 +4,7 @@
 《可穿戴科技》是一部关于一名社会恐惧症美少女和某智能贞操带斗智斗勇的色情小说。
 
 ## [点此在线阅读 (GitHub Pages)](https://scleox.github.io/Wearable-Technology/) | [镜像站](https://wt.0x77.cf/)
-
+### 其他链接：[读者投稿](https://scleox.github.io/Wearable-Technology/#META/%E6%8A%95%E7%A8%BF%E9%A1%BB%E7%9F%A5%E5%8F%8A%E7%AE%80%E6%98%93-Markdown-%E6%95%99%E7%A8%8B.html) | [读者客串](https://scleox.github.io/Wearable-Technology/#META/%E4%BA%BA%E5%90%8D%E8%AF%B7%E6%B1%82.html) | [WTCD 语言](https://scleox.github.io/Wearable-Technology/#META/WTCD/1.-%E6%A6%82%E8%BF%B0.html)
 本小说[原先是放在 Google Docs 上](https://docs.google.com/document/d/1Pp5CtO8c77DnWGqbXg-3e7w9Q3t88P35FOl6iIJvMfo/edit?usp=sharing)的，但是由于篇幅变长，Google Docs 越来越卡，因此转移到 GitHub。
 
 更新推送频道：https://t.me/joinchat/AAAAAEpkRVwZ-3s5V3YHjA
