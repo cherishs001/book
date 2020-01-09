@@ -39,7 +39,7 @@
     },
     "devDependencies": {
         "@types/hyperscript": "0.0.3",
-        "@types/yargs": "^13.0.3",
+        "@types/yargs": "^15.0.0",
         "chokidar-cli": "^2.0.0",
         "concurrently": "^5.0.0",
         "csscomb": "^4.3.0",
