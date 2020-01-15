@@ -2,6 +2,7 @@ import { stylePreviewArticle } from '../constant/stylePreviewArticle';
 import { newContent, Side } from '../control/contentControl';
 import { Layout } from '../control/layoutControl';
 import { DebugLogger } from '../DebugLogger';
+import { h } from '../hs';
 import { ItemDecoration, ItemHandle, Menu } from '../Menu';
 
 interface StyleDef {
@@ -20,6 +21,7 @@ interface StyleDef {
 
 class Style {
   public static currentlyEnabled: Style | null = null;
+  private static themeColorMetaTag: HTMLMetaElement | null = null;
   private styleSheet: StyleSheet | null = null;
   private debugLogger: DebugLogger;
   public itemHandle!: ItemHandle;
@@ -97,6 +99,17 @@ class Style {
     this.styleSheet!.disabled = false;
     this.itemHandle.setSelected(true);
     window.localStorage.setItem('style', this.name);
+
+    if (Style.themeColorMetaTag === null) {
+      Style.themeColorMetaTag = h('meta', {
+        name: 'theme-color',
+        content: this.def.paperBgColor,
+      });
+      document.head.appendChild(Style.themeColorMetaTag);
+    } else {
+      Style.themeColorMetaTag.content = this.def.paperBgColor;
+    }
+
     Style.currentlyEnabled = this;
   }
 }
