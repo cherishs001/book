@@ -2744,6 +2744,7 @@ const stylePreviewArticle_1 = require("../constant/stylePreviewArticle");
 const contentControl_1 = require("../control/contentControl");
 const layoutControl_1 = require("../control/layoutControl");
 const DebugLogger_1 = require("../DebugLogger");
+const hs_1 = require("../hs");
 const Menu_1 = require("../Menu");
 class Style {
     constructor(name, def) {
@@ -2811,10 +2812,21 @@ class Style {
         this.styleSheet.disabled = false;
         this.itemHandle.setSelected(true);
         window.localStorage.setItem('style', this.name);
+        if (Style.themeColorMetaTag === null) {
+            Style.themeColorMetaTag = hs_1.h('meta', {
+                name: 'theme-color',
+                content: this.def.paperBgColor,
+            });
+            document.head.appendChild(Style.themeColorMetaTag);
+        }
+        else {
+            Style.themeColorMetaTag.content = this.def.paperBgColor;
+        }
         Style.currentlyEnabled = this;
     }
 }
 Style.currentlyEnabled = null;
+Style.themeColorMetaTag = null;
 const darkKeyLinkColors = {
     linkColor: '#00E',
     linkHoverColor: '#F00',
@@ -2862,7 +2874,7 @@ class StyleMenu extends Menu_1.Menu {
 }
 exports.StyleMenu = StyleMenu;
 
-},{"../DebugLogger":6,"../Menu":8,"../constant/stylePreviewArticle":12,"../control/contentControl":19,"../control/layoutControl":25}],45:[function(require,module,exports){
+},{"../DebugLogger":6,"../Menu":8,"../constant/stylePreviewArticle":12,"../control/contentControl":19,"../control/layoutControl":25,"../hs":33}],45:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const thanks_1 = require("../constant/thanks");
