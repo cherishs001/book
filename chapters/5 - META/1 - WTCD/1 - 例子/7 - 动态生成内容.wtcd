@@ -1,0 +1,22 @@
+WTCD 1.1
+section main {
+  contentAddHeader::["动态生成内容演示"]
+  contentAddHeader::["段落" 2]
+  contentAddParagraph::["Lorem ipsum dolor sit amet, consectetur adipiscing elit. In ultrices aliquet elit sed posuere. Phasellus accumsan felis massa, eu ultrices arcu hendrerit in."]
+
+  contentAddHeader::["图片" 2]
+  contentAddImage::["./chapters/META/WTCD/例子/image.png"]
+
+  contentAddHeader::["无序列表" 2]
+  contentAddUnorderedList::["一个东西" "另一个东西" "剩下一个东西"]
+
+  contentAddHeader::["有序列表" 2]
+  contentAddOrderedList::["第 1 个东西" "第 2 个东西" "第 3 个东西"]
+
+  contentAddHeader::["表格" 2]
+  contentAddTable::[
+    [ "名字" "年龄" "性别" ]
+    [ "琳"   "16"   "女"   ]
+    [ "czp"  "？"   "男"   ]
+  ]
+} then exit

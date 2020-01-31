@@ -1,18 +1,26 @@
 import * as MDI from 'markdown-it';
+import { RuntimeValueType } from './Interpreter';
 import { BinaryOperator, binaryOperators, conditionalOperatorPrecedence, UnaryOperator, unaryOperators } from './operators';
 import { SimpleIdGenerator } from './SimpleIdGenerator';
+import { stdFunctions } from './std';
 import { Token, TokenStream } from './TokenStream';
 import {
   BinaryExpression,
   BlockExpression,
   BooleanLiteral,
+  BreakStatement,
   ChoiceExpression,
   ConditionalExpression,
+  ContinueStatement,
   DeclarationStatement,
   ExitAction,
   Expression,
   ExpressionStatement,
+  FunctionArgument,
+  FunctionExpression,
   GotoAction,
+  IfExpression,
+  ListExpression,
   NullLiteral,
   NumberLiteral,
   OneVariableDeclaration,
@@ -20,15 +28,21 @@ import {
   RegisterName,
   ReturnStatement,
   Section,
-  Selection,
+  SelectionAction,
+  SetBreakStatement,
   SetReturnStatement,
   SetYieldStatement,
   SingleSectionContent,
+  SpreadExpression,
   Statement,
   StringLiteral,
+  SwitchCase,
+  SwitchExpression,
+  TagExpression,
   UnaryExpression,
   VariableReference,
   VariableType,
+  WhileExpression,
   WTCDParseResult,
   WTCDRoot,
   YieldStatement,
@@ -36,9 +50,32 @@ import {
 import { WTCDError } from './WTCDError';
 
 const CURRENT_MAJOR_VERSION = 1;
-const CURRENT_MINOR_VERSION = 0;
+const CURRENT_MINOR_VERSION = 3;
 
 const CURRENT_VERSION_STR = CURRENT_MAJOR_VERSION + '.' + CURRENT_MINOR_VERSION;
+
+const variableTypes = [
+  'null',
+  'number',
+  'boolean',
+  'string',
+  'action',
+  'choice',
+  'selection',
+  'list',
+  'function',
+];
+
+// V1.1 removed selection type and combined it into action
+function backwardsCompTypeTransformer(
+  variableType: RuntimeValueType | 'selection',
+): RuntimeValueType {
+  if (variableType === 'selection') {
+    return 'action';
+  } else {
+    return variableType;
+  }
+}
 
 export interface SimpleLogger {
   info(...stuff: any): void;
@@ -52,9 +89,14 @@ export interface SimpleLogger {
 class LexicalScope {
   private declaredVariables: Set<string> = new Set();
   private registers: Set<RegisterName> = new Set();
+  private onVariableReferenceNotFoundTriggers: Array<(variableName: string) => void> = [];
   /** Whether this lexical scope contains the given variable */
   public hasVariable(variableName: string) {
-    return this.declaredVariables.has(variableName);
+    const result = this.declaredVariables.has(variableName);
+    if (!result) {
+      this.onVariableReferenceNotFoundTriggers.forEach(trigger => trigger(variableName));
+    }
+    return result;
   }
   /** Add a variable to this lexical scope */
   public addVariable(variableName: string) {
@@ -68,6 +110,9 @@ class LexicalScope {
   public addRegister(registerName: RegisterName) {
     this.registers.add(registerName);
   }
+  public addOnVariableReferenceNotFoundTrigger(trigger: (variableName: string) => void) {
+    this.onVariableReferenceNotFoundTriggers.push(trigger);
+  }
 }
 
 /**
@@ -77,6 +122,11 @@ class LexicalScope {
 class LexicalScopeProvider {
   private scopes: Array<LexicalScope> = [];
   public constructor() {
+    this.enterScope(); // Std scope
+    stdFunctions.forEach(
+      stdFunction => this.addVariableToCurrentScope(stdFunction.name),
+    );
+
     this.enterScope(); // Global scope
   }
   private getCurrentScope() {
@@ -94,8 +144,26 @@ class LexicalScopeProvider {
   public addVariableToCurrentScope(variableName: string) {
     this.getCurrentScope().addVariable(variableName);
   }
+  /**
+   * Add a callback function when a variable lookup is crossing the boundary of
+   * this scope.
+   *
+   * This is currently used to detect variables that require capture in a
+   * closure.
+   *
+   * @param trigger Callback
+   */
+  public addOnVariableReferenceNotFoundTriggerToCurrentScope(trigger: (variableName: string) => void) {
+    this.getCurrentScope().addOnVariableReferenceNotFoundTrigger(trigger);
+  }
   public hasVariableReference(variableName: string): boolean {
-    return this.scopes.some(scope => scope.hasVariable(variableName));
+    // Use a manual for loop instead of Array.prototype.some to ensure access order
+    for (let i = this.scopes.length - 1; i >= 0; i--) {
+      if (this.scopes[i].hasVariable(variableName)) {
+        return true;
+      }
+    }
+    return false;
   }
   public addRegisterToCurrentScope(registerName: RegisterName) {
     this.getCurrentScope().addRegister(registerName);
@@ -129,6 +197,19 @@ class LogicParser {
       target.column = token.column;
     }
     return target;
+  }
+
+  private parseVariableType(): VariableType {
+    if (!this.tokenStream.isNext('keyword', variableTypes)) {
+      return null;
+    }
+    const types: Array<RuntimeValueType> = [];
+    do {
+      types.push(backwardsCompTypeTransformer(
+        this.tokenStream.next().content as RuntimeValueType,
+      ));
+    } while (this.tokenStream.isNext('keyword', variableTypes));
+    return types;
   }
 
   private parseChoice() {
@@ -165,6 +246,210 @@ class LogicParser {
     });
   }
 
+  private parseList() {
+    const leftBracket = this.tokenStream.assertAndSkipNext('punctuation', '[');
+    const elements: Array<Expression | SpreadExpression> = [];
+    while (!this.tokenStream.isNext('punctuation', ']')) {
+      if (this.tokenStream.isNext('operator', '...')) {
+        elements.push(this.attachLocationInfo<SpreadExpression>(
+          this.tokenStream.next(), {
+            type: 'spread',
+            expression: this.parseExpression(),
+          },
+        ));
+      } else {
+        elements.push(this.parseExpression());
+      }
+    }
+    this.tokenStream.assertAndSkipNext('punctuation', ']');
+    return this.attachLocationInfo<ListExpression>(leftBracket, {
+      type: 'list',
+      elements,
+    });
+  }
+
+  private parseFunctionCore(isFull: boolean): FunctionExpression {
+    const functionArguments: Array<FunctionArgument> = [];
+    this.lexicalScopeProvider.enterScope();
+    this.lexicalScopeProvider.addRegisterToCurrentScope('return');
+    const capturesSet: Set<string> = new Set();
+    this.lexicalScopeProvider
+      .addOnVariableReferenceNotFoundTriggerToCurrentScope(
+        variableName => capturesSet.add(variableName),
+      );
+    let restArgName: string | null = null;
+    let expression: null | Expression = null;
+    // If is full, parameter list is mandatory
+    if (isFull || this.tokenStream.isNext('punctuation', '[')) {
+      // Function switch
+      if (this.tokenStream.isNext('keyword', 'switch')) {
+        const switchToken = this.tokenStream.assertAndSkipNext(
+          'keyword',
+          'switch',
+        );
+        functionArguments.push(this.attachLocationInfo<FunctionArgument>(
+          switchToken, {
+            type: null,
+            name: '$switch',
+            defaultValue: null,
+          },
+        ));
+        expression = this.parseSwitchCore(
+          switchToken,
+          this.attachLocationInfo<VariableReference>(switchToken, {
+            type: 'variableReference',
+            variableName: '$switch',
+          }),
+        );
+      } else {
+        this.tokenStream.assertAndSkipNext('punctuation', '[');
+        const usedArgumentNames: Set<string> = new Set();
+        while (!this.tokenStream.isNext('punctuation', ']')) {
+          if (this.tokenStream.isNext('operator', '...')) {
+            this.tokenStream.next(); // Skip over ...
+            // Rest arguments
+            const restArgToken = this.tokenStream.assertAndSkipNext('identifier');
+            if (usedArgumentNames.has(restArgToken.content)) {
+              throw WTCDError.atLocation(restArgToken, `Argument ` +
+                `"${restArgToken.content}" already existed.`);
+            }
+            restArgName = restArgToken.content;
+            break; // Stop reading any more arguments
+          }
+          const argType = this.parseVariableType();
+          const argNameToken = this.tokenStream.assertAndSkipNext('identifier');
+
+          if (usedArgumentNames.has(argNameToken.content)) {
+            throw WTCDError.atLocation(argNameToken, `Argument ` +
+              `"${argNameToken.content}" already existed.`);
+          }
+          usedArgumentNames.add(argNameToken.content);
+
+          let defaultValue: null | Expression = null;
+          if (this.tokenStream.isNext('operator', '=')) {
+            this.tokenStream.next();
+            defaultValue = this.parseExpression();
+          }
+          functionArguments.push(this.attachLocationInfo<FunctionArgument>(
+            argNameToken, {
+              type: argType,
+              name: argNameToken.content,
+              defaultValue,
+            },
+          ));
+        }
+        this.tokenStream.assertAndSkipNext('punctuation', ']');
+      }
+    }
+    functionArguments.forEach(
+      argument => this.lexicalScopeProvider.addVariableToCurrentScope(
+        argument.name,
+      ),
+    );
+    if (restArgName !== null) {
+      this.lexicalScopeProvider.addVariableToCurrentScope(restArgName);
+    }
+    if (expression === null) {
+      expression = this.parseExpression();
+    }
+    this.lexicalScopeProvider.exitScope();
+    return {
+      type: 'function',
+      arguments: functionArguments,
+      restArgName,
+      captures: Array.from(capturesSet),
+      expression,
+    };
+  }
+
+  // function [...] ...
+  private parseFullFunctionExpression() {
+    return this.attachLocationInfo<FunctionExpression>(
+      this.tokenStream.assertAndSkipNext('keyword', 'function'),
+      this.parseFunctionCore(true),
+    );
+  }
+
+  private parseShortFunctionExpression() {
+    return this.attachLocationInfo<FunctionExpression>(
+      this.tokenStream.assertAndSkipNext('punctuation', '$'),
+      this.parseFunctionCore(false),
+    );
+  }
+
+  private parseSwitchCore(switchToken: Token, expression: Expression) {
+    this.tokenStream.assertAndSkipNext('punctuation', '[');
+    const cases: Array<SwitchCase> = [];
+    let defaultCase: Expression | null = null;
+    while (!this.tokenStream.isNext('punctuation', ']')) {
+      const matches = this.parseExpression();
+      if (this.tokenStream.isNext('punctuation', ']')) {
+        // Default case
+        defaultCase = matches;
+        break;
+      }
+      const returns = this.parseExpression();
+      cases.push({ matches, returns });
+    }
+    this.tokenStream.assertAndSkipNext('punctuation', ']');
+    return this.attachLocationInfo<SwitchExpression>(switchToken, {
+      type: 'switch',
+      expression,
+      cases,
+      defaultCase,
+    });
+  }
+
+  private parseSwitchExpression() {
+    const switchToken = this.tokenStream.assertAndSkipNext('keyword', 'switch');
+    const expression = this.parseExpression();
+    return this.parseSwitchCore(switchToken, expression);
+  }
+
+  private parseWhileExpression(): WhileExpression {
+    const mainToken = this.tokenStream.peek();
+    this.lexicalScopeProvider.enterScope();
+    this.lexicalScopeProvider.addRegisterToCurrentScope('break');
+    let preExpr: Expression | null = null;
+    if (this.tokenStream.isNext('keyword', 'do')) {
+      this.tokenStream.next();
+      preExpr = this.parseExpression();
+    }
+    this.tokenStream.assertAndSkipNext('keyword', 'while');
+    const condition = this.parseExpression();
+    let postExpr: Expression | null = null;
+    if (preExpr === null) {
+      postExpr = this.parseExpression();
+    } else if (this.tokenStream.isNext('keyword', 'then')) {
+      this.tokenStream.next();
+      postExpr = this.parseExpression();
+    }
+    this.lexicalScopeProvider.exitScope();
+    return this.attachLocationInfo<WhileExpression>(mainToken, {
+      type: 'while',
+      preExpr,
+      condition,
+      postExpr,
+    });
+  }
+
+  private parseIfExpression(): IfExpression {
+    const ifToken = this.tokenStream.assertAndSkipNext('keyword', 'if');
+    const condition = this.parseExpression();
+    const then = this.parseExpression();
+    let otherwise: Expression | null = null;
+    if (this.tokenStream.isNext('keyword', 'else')) {
+      this.tokenStream.next();
+      otherwise = this.parseExpression();
+    }
+    return this.attachLocationInfo<IfExpression>(ifToken, {
+      type: 'if',
+      condition,
+      then,
+      otherwise,
+    });
+  }
+
   /**
    * Try to parse an atom node, which includes:
    * - number literals
@@ -176,7 +461,13 @@ class LogicParser {
    * - goto actions
    * - exit actions
    * - groups
+   * - lists
+   * - functions
    * - variables
+   * - switches
+   * - while loops
+   * - if
+   * - tags
    * - block expressions
    * - unary expressions
    *
@@ -219,9 +510,9 @@ class LogicParser {
 
     // Selection
     if (this.tokenStream.isNext('keyword', 'selection')) {
-      return this.attachLocationInfo<Selection>(this.tokenStream.next(), {
+      return this.attachLocationInfo<SelectionAction>(this.tokenStream.next(), {
         type: 'selection',
-        choices: this.parseListOrSingleElement(this.parseExpression),
+        choices: this.parseExpression(),
       });
     }
 
@@ -248,6 +539,44 @@ class LogicParser {
       const result = this.parseExpression();
       this.tokenStream.assertAndSkipNext('punctuation', ')');
       return result;
+    }
+
+    // List
+    if (this.tokenStream.isNext('punctuation', '[')) {
+      return this.parseList();
+    }
+
+    // Function
+    if (this.tokenStream.isNext('keyword', 'function')) {
+      return this.parseFullFunctionExpression();
+    }
+
+    // Short function
+    if (this.tokenStream.isNext('punctuation', '$')) {
+      return this.parseShortFunctionExpression();
+    }
+
+    // Switch
+    if (this.tokenStream.isNext('keyword', 'switch')) {
+      return this.parseSwitchExpression();
+    }
+
+    // While
+    if (this.tokenStream.isNext('keyword', ['while', 'do'])) {
+      return this.parseWhileExpression();
+    }
+
+    // If
+    if (this.tokenStream.isNext('keyword', 'if')) {
+      return this.parseIfExpression();
+    }
+
+    // Tag
+    if (this.tokenStream.isNext('tag')) {
+      return this.attachLocationInfo<TagExpression>(
+        this.tokenStream.peek(),
+        { type: 'tag', name: this.tokenStream.next().content },
+      );
     }
 
     // Block expression
@@ -358,6 +687,31 @@ class LogicParser {
     }
   }
 
+  private parseBreakOrSetBreakStatement(): BreakStatement | SetBreakStatement {
+    const breakToken = this.tokenStream.assertAndSkipNext('keyword', 'break');
+    this.assertHasRegister('break', breakToken);
+    if (this.tokenStream.isNext('operator', '=')) {
+      // Set return
+      this.tokenStream.next();
+      return this.attachLocationInfo<SetBreakStatement>(breakToken, {
+        type: 'setBreak',
+        value: this.parseExpression(),
+      });
+    } else {
+      // Return
+      return this.attachLocationInfo<BreakStatement>(breakToken, {
+        type: 'break',
+        value: this.parseExpressionImpliedNull(breakToken),
+      });
+    }
+  }
+
+  private parseContinueStatement(): ContinueStatement {
+    return this.attachLocationInfo<ContinueStatement>(this.tokenStream.next(), {
+      type: 'continue',
+    });
+  }
+
   private parseExpressionImpliedNull(location: OptionalLocationInfo) {
     const atom = this.parseAtom(true);
     if (atom === null) {
@@ -405,7 +759,7 @@ class LogicParser {
     const nextPrecedence = isConditional
       ? conditionalOperatorPrecedence
       : binaryOperators.get(operatorToken.content)!.precedence;
-    if (nextPrecedence <= precedenceMin || nextPrecedence > precedenceMax) {
+    if (nextPrecedence <= precedenceMin || (isConditional && nextPrecedence > precedenceMax)) {
       return left;
     }
     this.tokenStream.next(); // Read in operator
@@ -413,7 +767,7 @@ class LogicParser {
       // Implementation here might contain bug. It works for all my cases though.
       const then = this.parseExpression();
       this.tokenStream.assertAndSkipNext('operator', ':');
-      const otherwise = this.parseExpression(this.parseAtom(), 0, nextPrecedence);
+      const otherwise = this.parseExpression(this.parseAtom(), precedenceMin, nextPrecedence);
       const conditional = this.attachLocationInfo<ConditionalExpression>(operatorToken, {
         type: 'conditionalExpression',
         condition: left,
@@ -422,7 +776,7 @@ class LogicParser {
       });
       return this.parseExpression(conditional, precedenceMin, precedenceMax);
     } else {
-      const right = this.parseExpression(this.parseAtom(), nextPrecedence);
+      const right = this.parseExpression(this.parseAtom(), nextPrecedence, precedenceMax);
       const binary = this.attachLocationInfo<BinaryExpression>(operatorToken, {
         type: 'binaryExpression',
         operator: operatorToken.content as BinaryOperator,
@@ -446,6 +800,10 @@ class LogicParser {
       return this.parseReturnOrSetReturnStatement();
     } else if (this.tokenStream.isNext('keyword', 'yield')) {
       return this.parseYieldOrSetYieldExpression();
+    } else if (this.tokenStream.isNext('keyword', 'break')) {
+      return this.parseBreakOrSetBreakStatement();
+    } else if (this.tokenStream.isNext('keyword', 'continue')) {
+      return this.parseContinueStatement();
     } else {
       return this.attachLocationInfo<ExpressionStatement>(this.tokenStream.peek(), {
         type: 'expression',
@@ -455,30 +813,38 @@ class LogicParser {
   }
 
   private parseOneDeclaration: () => OneVariableDeclaration = () => {
-    const typeToken = this.tokenStream.assertAndSkipNext('keyword', [
-      'number',
-      'boolean',
-      'string',
-      'action',
-      'choice',
-      'selection',
-    ]);
+    const type = this.parseVariableType();
     const variableNameToken = this.tokenStream.assertAndSkipNext('identifier');
     let initialValue: Expression | null = null;
     if (this.tokenStream.isNext('operator', '=')) {
+      // Explicit initialization (number a = 123)
       this.tokenStream.next();
       initialValue = this.parseExpression();
-      if (this.lexicalScopeProvider.currentScopeHasVariable(variableNameToken.content)) {
-        throw WTCDError.atLocation(
-          typeToken,
-          `Variable "${variableNameToken.content}" has already been declared within the same lexical scope`,
-        );
-      }
+    } else if (
+      (
+        (this.tokenStream.isNext('punctuation', '[')) ||
+        (this.tokenStream.isNext('keyword', 'switch'))
+      ) &&
+      (type !== null) &&
+      (type.length === 1) &&
+      (type[0] = 'function')
+    ) {
+      // Simplified function declaration (declare function test[ ... ] ...)
+      initialValue = this.attachLocationInfo<FunctionExpression>(
+        variableNameToken,
+        this.parseFunctionCore(true),
+      );
+    }
+    if (this.lexicalScopeProvider.currentScopeHasVariable(variableNameToken.content)) {
+      throw WTCDError.atLocation(
+        variableNameToken,
+        `Variable "${variableNameToken.content}" has already been declared within the same lexical scope`,
+      );
     }
     this.lexicalScopeProvider.addVariableToCurrentScope(variableNameToken.content);
-    return this.attachLocationInfo<OneVariableDeclaration>(typeToken, {
+    return this.attachLocationInfo<OneVariableDeclaration>(variableNameToken, {
       variableName: variableNameToken.content,
-      variableType: typeToken.content as VariableType,
+      variableType: type,
       initialValue,
     });
   }

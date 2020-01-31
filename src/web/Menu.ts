@@ -1,6 +1,6 @@
+import { Layout, layoutChangeEvent, setLayout } from './control/layoutControl';
 import { DebugLogger } from './DebugLogger';
 import { Event } from './Event';
-import { RectMode, rectModeChangeEvent, setRectMode } from './RectMode';
 
 export enum ItemDecoration {
   SELECTABLE,
@@ -100,9 +100,9 @@ export class Menu {
   public constructor(
     public readonly name: string,
     private parent: Menu | null,
-    public readonly rectMode: RectMode = RectMode.OFF,
+    public readonly layout: Layout = Layout.OFF,
   ) {
-    this.debugLogger = new DebugLogger('Menu', { name });
+    this.debugLogger = new DebugLogger(`Menu (${name})`);
 
     this.fullPath = parent === null ? [] : parent.fullPath.slice();
     if (name !== '') {
@@ -123,13 +123,13 @@ export class Menu {
     document.body.appendChild(this.container);
 
     // 当显示模式变化时
-    rectModeChangeEvent.on(({ newRectMode }) => {
+    layoutChangeEvent.on(({ newLayout }) => {
       // 如果自己是当前激活的菜单并且显示模式正在变化为全屏阅读器
-      if (this.active && newRectMode === RectMode.MAIN) {
+      if (this.active && newLayout === Layout.MAIN) {
         // 设置自己为非激活模式
         this.setActive(false);
         // 等待显示模式再次变化时
-        rectModeChangeEvent.expect().then(() => {
+        layoutChangeEvent.expect().then(() => {
           // 设置自己为激活模式
           this.setActive(true);
         });
@@ -140,7 +140,7 @@ export class Menu {
   public navigateTo(targetMenu: Menu) {
     this.setActive(false);
     targetMenu.setActive(true);
-    setRectMode(targetMenu.rectMode);
+    setLayout(targetMenu.layout);
   }
 
   protected exit() {
@@ -168,6 +168,7 @@ export class Menu {
     if (options.button && options.link !== undefined) {
       $element = document.createElement('a');
       $element.href = options.link;
+      $element.rel = 'noopener noreferrer';
       $element.target = '_blank';
     } else {
       $element = document.createElement('div');

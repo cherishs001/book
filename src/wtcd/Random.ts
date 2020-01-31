@@ -52,7 +52,7 @@ export class Random {
   public nextBool() {
     return this.rng() < 0.5;
   }
-  public nextInt(low = 0, high = 1) {
+  public nextInt(low: number, high: number) {
     return Math.floor(this.next(low, high));
   }
 }

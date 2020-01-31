@@ -5,17 +5,32 @@ export interface Node {
   sourceRelativePath: string;
 }
 
-export type ChapterType
-  = 'Markdown' // Markdown based static chapter
+export type ChapterType =
+  | 'Markdown' // Markdown based static chapter
   | 'WTCD';   // WTCD based interactive chapter
 
-export interface Chapter extends Node {
+export interface ChapterBase extends Node {
   type: ChapterType;
   isEarlyAccess: boolean;
   commentsUrl: string | null;
   htmlRelativePath: string;
   chapterCharCount: number;
 }
+
+export interface MarkdownChapter extends ChapterBase {
+  type: 'Markdown';
+}
+
+export type WTCDReader =
+  | 'flow'
+  | 'game';
+
+export interface WTCDChapter extends ChapterBase {
+  type: 'WTCD';
+  preferredReader: WTCDReader;
+}
+
+export type Chapter = MarkdownChapter | WTCDChapter;
 
 export interface Folder extends Node {
   chapters: Array<Chapter>;

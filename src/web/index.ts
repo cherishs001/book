@@ -1,9 +1,9 @@
-import { data } from './data';
-import { id } from './DOM';
-import { followQuery } from './followQuery';
-import { MainMenu } from './MainMenu';
-import { animation } from './settings';
-import { updateSelection } from './updateSelection';
+import { followQuery } from './control/followQuery';
+import { updateSelection } from './control/updateSelection';
+import { data } from './data/data';
+import { animation } from './data/settings';
+import { MainMenu } from './menu/MainMenu';
+import { id } from './util/DOM';
 
 const $warning = id('warning');
 

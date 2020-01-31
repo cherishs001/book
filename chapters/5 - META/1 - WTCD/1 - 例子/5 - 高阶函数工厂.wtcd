@@ -1,0 +1,24 @@
+WTCD 1.1
+
+section main {
+  // 包裹一个函数，返回一个新的函数。新的函数被调用时会打印指定的内容，并调用原先的函数。
+  declare function withPrint[string msg] function[function callback] function[...args] {
+    print::["开始" + msg]
+    return = callback::args
+    print::["结束" + msg]
+  }
+  declare function square[number n] n * n
+  declare function wrapped = square |> withPrint::["【square 函数】"]
+  print::[wrapped::[16]]
+
+  declare function wrapped2 = square |> withPrint::["【同一个 square 函数】"]
+  print::[wrapped2::[12]]
+} then exit
+
+---<<< main >>>---
+# 高阶函数工厂
+一个函数被调用后返回一个高阶函数的例子。
+
+工厂是指传入一个非函数，返回一个函数的函数。高阶函数是指传入一个函数，返回一个调用时会调用传入函数的函数。
+
+按 F12 打开浏览器控制台以查看运行结果。

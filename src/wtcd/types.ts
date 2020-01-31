@@ -1,3 +1,4 @@
+import { InterpreterHandle, RuntimeValue, RuntimeValueType } from './Interpreter';
 import { BinaryOperator, UnaryOperator } from './operators';
 
 /**
@@ -93,9 +94,9 @@ export interface ExitAction extends OptionalLocationInfo {
  *   choice "B" goto b
  * ]
  */
-export interface Selection extends OptionalLocationInfo {
+export interface SelectionAction extends OptionalLocationInfo {
   type: 'selection';
-  choices: Array<Expression>;
+  choices: Expression;
 }
 
 /** e.g. { a += 3 b -= 10 } */
@@ -143,20 +144,124 @@ export interface SetYieldStatement extends OptionalLocationInfo {
   value: Expression;
 }
 
+export interface BreakStatement extends OptionalLocationInfo {
+  type: 'break';
+  value: Expression;
+}
+
+export interface SetBreakStatement extends OptionalLocationInfo {
+  type: 'setBreak';
+  value: Expression;
+}
+
+export interface ContinueStatement extends OptionalLocationInfo {
+  type: 'continue';
+}
+
 export interface ExpressionStatement extends OptionalLocationInfo {
   type: 'expression';
   expression: Expression;
 }
 
-export type Literal = NumberLiteral | BooleanLiteral | StringLiteral | NullLiteral;
+export interface FunctionArgument extends OptionalLocationInfo {
+  name: string;
+  type: VariableType;
+  defaultValue: Expression | null;
+}
 
-export type OperatorExpression = BinaryExpression | UnaryExpression | ConditionalExpression;
+export interface FunctionExpression extends OptionalLocationInfo {
+  type: 'function';
+  arguments: Array<FunctionArgument>;
+  restArgName: string | null;
+  captures: Array<string>;
+  expression: Expression;
+}
 
-export type Action = GotoAction | ExitAction;
+// NOTE: This is not an expression
+export interface SpreadExpression extends OptionalLocationInfo {
+  type: 'spread';
+  expression: Expression;
+}
 
-export type Expression = Literal | OperatorExpression | Selection | Action | BlockExpression | ChoiceExpression | VariableReference;
+export interface ListExpression extends OptionalLocationInfo {
+  type: 'list';
+  elements: Array<Expression | SpreadExpression>;
+}
 
-export type Statement = DeclarationStatement | ReturnStatement | SetReturnStatement | YieldStatement | SetYieldStatement | ExpressionStatement;
+export interface SwitchCase extends OptionalLocationInfo {
+  matches: Expression;
+  returns: Expression;
+}
+
+export interface SwitchExpression extends OptionalLocationInfo {
+  type: 'switch';
+  expression: Expression;
+  cases: Array<SwitchCase>;
+  defaultCase: Expression | null;
+}
+
+export interface WhileExpression extends OptionalLocationInfo {
+  type: 'while';
+  preExpr: Expression | null;
+  condition: Expression;
+  postExpr: Expression | null;
+}
+
+export interface IfExpression extends OptionalLocationInfo {
+  type: 'if';
+  condition: Expression;
+  then: Expression;
+  otherwise: Expression | null;
+}
+
+export interface TagExpression extends OptionalLocationInfo {
+  type: 'tag';
+  name: string;
+}
+
+export type Literal
+  = NumberLiteral
+  | BooleanLiteral
+  | StringLiteral
+  | NullLiteral;
+
+export type OperatorExpression
+  = BinaryExpression
+  | UnaryExpression
+  | ConditionalExpression;
+
+export type Action
+  = GotoAction
+  | ExitAction
+  | SelectionAction;
+
+type FlowControl
+  = SwitchExpression
+  | WhileExpression
+  | IfExpression;
+
+export type Expression
+  = Literal
+  | OperatorExpression
+  | Action
+  | BlockExpression
+  | ChoiceExpression
+  | VariableReference
+  | FunctionExpression
+  | ListExpression
+  | FlowControl
+  | TagExpression;
+
+export type Statement
+  = DeclarationStatement
+  | ReturnStatement
+  | SetReturnStatement
+  | YieldStatement
+  | SetYieldStatement
+  | BreakStatement
+  | SetBreakStatement
+  | ContinueStatement
+  | ExpressionStatement;
 
 export interface Section extends OptionalLocationInfo {
   name: string;
@@ -164,8 +269,6 @@ export interface Section extends OptionalLocationInfo {
   executes: Expression | null;
   then: Expression;
 }
-
-export type VariableType = 'number' | 'boolean' | 'string' | 'action' | 'choice' | 'selection';
 
 export interface OneVariableDeclaration extends OptionalLocationInfo {
   variableName: string;
@@ -187,4 +290,11 @@ export type WTCDParseResult = {
   internalStack: string;
 };
 
-export type RegisterName = 'yield' | 'return';
+export type RegisterName = 'yield' | 'return' | 'break';
+
+export type NativeFunction = (
+  args: ReadonlyArray<RuntimeValue>,
+  interpreterHandle: InterpreterHandle,
+) => RuntimeValue;
+
+export type VariableType = null | Array<RuntimeValueType>;

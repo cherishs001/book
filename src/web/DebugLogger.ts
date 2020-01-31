@@ -1,46 +1,36 @@
-import { developerMode } from './settings';
-
-function simpleToString(value: string | number | boolean) {
-  switch (typeof value) {
-    case 'string':
-      return `"${value}"`;
-    default:
-      return String(value);
-  }
-}
+import { materialDarkColors } from './constant/materialDarkColors';
+import { developerMode } from './data/settings';
+import { stringHash } from './util/stringHash';
 
 export class DebugLogger {
   private prefix: string;
+  private css: string;
   public constructor(
     name: string,
-    parameters: { [key: string]: string | number | boolean } = {},
   ) {
-    this.prefix = name + '('
-     + Object.keys(parameters).map(key => `${key}=${simpleToString(parameters[key])}`).join(',')
-     + ')';
+    this.prefix = '%c' + name;
+    this.css = `background-color: #` +
+      materialDarkColors[
+        Math.abs(stringHash(name)) % materialDarkColors.length
+      ] +
+      '; border-radius: 0.3em; padding: 0 0.3em; color: white';
   }
   public log(...stuff: any) {
     if (!developerMode.getValue()) {
       return;
     }
-    console.info(this.prefix, ...stuff);
-  }
-  public info(...stuff: any) {
-    if (!developerMode.getValue()) {
-      return;
-    }
-    console.info(this.prefix, ...stuff);
+    console.info(this.prefix, this.css, ...stuff);
   }
   public warn(...stuff: any) {
     if (!developerMode.getValue()) {
       return;
     }
-    console.warn(this.prefix, ...stuff);
+    console.warn(this.prefix, this.css, ...stuff);
   }
   public error(...stuff: any) {
     if (!developerMode.getValue()) {
       return;
     }
-    console.error(this.prefix, ...stuff);
+    console.error(this.prefix, this.css, ...stuff);
   }
 }

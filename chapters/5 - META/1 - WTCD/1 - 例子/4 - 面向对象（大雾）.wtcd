@@ -1,0 +1,31 @@
+WTCD 1.1
+
+declare number mGetName = 0
+declare number mIsMale = 1
+declare number mSetName = 2
+declare number mSetIsMale = 3
+
+declare function newPerson[string name boolean isMale] {
+  return function[number method] switch method [
+    [mGetName] name
+    [mIsMale] isMale
+    [mSetName] function[string newName] name = newName
+    [mSetIsMale] function[boolean newIsMale] isMale = newIsMale
+  ]
+}
+
+section main {
+  declare function person = newPerson::["czp" true]
+  print::[person::[mGetName] person::[mIsMale]]
+
+  person::[mSetName]::["Rin"]
+  person::[mSetIsMale]::[false]
+
+  print::[person::[mGetName] person::[mIsMale]]
+} then exit
+
+---<<< main >>>---
+# 面向对象（大雾）
+利用引用闭包可以实现假的面向对象。
+
+按 F12 打开浏览器控制台以查看运行结果。

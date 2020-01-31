@@ -1,9 +1,9 @@
-import { copy, copyFile, ensureDir, mkdirp, readdir, readFile, stat, writeFile } from 'fs-extra';
+import { copy, copyFile, ensureDir, exists, mkdirp, pathExists, readdir, readFile, stat, writeFile } from 'fs-extra';
 import * as MDI from 'markdown-it';
 import * as mdiReplaceLinkPlugin from 'markdown-it-replace-link';
-import { basename, dirname, posix, relative, resolve } from 'path';
+import { basename, dirname, parse as parsePath, posix, relative, resolve } from 'path';
 import yargs = require('yargs');
-import { Chapter, Data, Folder, Node } from '../Data';
+import { Chapter, Data, Folder, Node, WTCDReader } from '../Data';
 import { parse } from '../wtcd/parse';
 import { countCertainWord } from './countCertainWord';
 import { countChars } from './countChars';
@@ -37,10 +37,10 @@ const argv = yargs.options({
   await copy(staticDir, distDir);
   const indexPath = resolve(distDir, 'index.html');
   const nowTime = new Date().getTime();
-  let result = await readFile(indexPath, 'utf-8');
+  let result = await readFile(indexPath, 'utf8');
   result = result.replace(new RegExp('js" defer>', 'g'), 'js?v=' + nowTime + '" defer>');
   result = result.replace(new RegExp('css">', 'g'), 'css?v=' + nowTime + '">');
-  await writeFile(indexPath, result, 'utf-8');
+  await writeFile(indexPath, result, 'utf8');
   console.info('Static copied.');
 
   const chapterDefaultNamer = (displayIndex: number) => `第 ${displayIndex} 章`;
@@ -99,7 +99,7 @@ const argv = yargs.options({
   }
 
   async function loadMarkdownChapter(path: string, parentHtmlRelativePath: string): Promise<Chapter> {
-    let markdown = (await readFile(path)).toString();
+    let markdown = (await readFile(path, 'utf8'));
     let isEarlyAccess = false;
     if (markdown.startsWith(earlyAccessFlag)) {
       isEarlyAccess = true;
@@ -150,6 +150,36 @@ const argv = yargs.options({
   }
 
   async function loadWTCDChapter(path: string, parentHtmlRelativePath: string): Promise<Chapter> {
+    const parsedPath = parsePath(path);
+    const metaPath = resolve(parsedPath.dir, parsedPath.name + '.meta.json');
+    const meta: {
+      isEarlyAccess: boolean,
+      commentsUrl: null | string,
+      preferredReader: WTCDReader,
+    } = {
+      isEarlyAccess: false,
+      commentsUrl: null,
+      preferredReader: 'flow',
+    };
+    if (await pathExists(metaPath)) {
+      const content = JSON.parse(await readFile(metaPath, 'utf8'));
+      if (typeof content.isEarlyAccess === 'boolean') {
+        meta.isEarlyAccess = content.isEarlyAccess;
+      }
+      if (typeof content.commentsUrl === 'string') {
+        meta.commentsUrl = content.commentsUrl;
+      }
+      if (typeof content.preferredReader === 'string') {
+        if (
+          content.preferredReader !== 'flow' &&
+          content.preferredReader !== 'game'
+        ) {
+          throw new Error(`Unknown reader type: ${content.preferredReader}.`);
+        }
+        meta.preferredReader = content.preferredReader;
+      }
+    }
+
     const source = (await readFile(path, 'utf8'));
     const node = destructPath(path, false);
     const htmlRelativePath = getHtmlRelativePath(parentHtmlRelativePath, node.displayName + '.html');
@@ -187,9 +217,8 @@ const argv = yargs.options({
 
     return {
       ...node,
+      ...meta,
       type: 'WTCD',
-      isEarlyAccess: false,
-      commentsUrl: null,
       htmlRelativePath,
       chapterCharCount,
     };

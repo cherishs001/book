@@ -10,8 +10,8 @@
   <link rel="stylesheet" type="text/css" href="index.css">
   <link rel="icon" type="image/png" href="./favicon.png">
 </head>
-<body>
-  <div id="warning" class="warning">
+<body class="layout-off">
+  <div id="warning" class="nsfw-warning">
     <div class="warning-backdrop"></div>
     <div class="warning-container">
       <div class="title">NSFW 警告</div>
@@ -19,7 +19,7 @@
         《可穿戴科技》是一部重口味色情小说。因其中含有露骨的非常规性行为描写，本小说可能不适合所有年龄段，亦不宜在工作期间访问。
       </div>
       <div class="disable">
-        点击屏幕以关闭
+        点击屏幕以关闭此警告
       </div>
     </div>
   </div>
@@ -28,26 +28,19 @@
       document.getElementById('warning').remove();
     }
   </script>
-  <div id="rect" class="rect" tabindex="-1">
-    <div id="content" class="content">
-      我能吞下玻璃而不伤身体。
-    </div>
-    <div id="comments" class="comments">
-      <h1>评论区</h1>
-      <p id="comments-status">正在加载评论...</p>
-      <div id="create-comment" class="create-comment">+ 添加评论</div>
-    </div>
-  </div>
+  <div id="rect" class="rect off"></div>
+  <div id="content-container" class="content-container"></div>
   <div class="container">
     <div class="english-title">Wearable Technology</div>
     <div class="title">可穿戴科技</div>
     <div class="build-author-container">
-      <a target="_blank" href="https://travis-ci.org/SCLeoX/Wearable-Technology">
+      <a target="_blank" href="https://travis-ci.org/SCLeoX/Wearable-Technology" rel="noopener noreferrer">
         <div id="build-number" class="button build"></div>
       </a>
       <div class="author">琳 缇佩斯</div>
     </div>
   </div>
+  <div class="modal-holder" id="modal-holder"></div>
   <script src="./data.js" defer></script>
   <script src="./bundle.js" defer></script>
 </body>

@@ -12,8 +12,11 @@
 		{ "include": "#braces" },
 		{ "include": "#blockExpressions" },
 		{ "include": "#operators" },
+		{ "include": "#tags" },
 		{ "include": "#strings" },
-		{ "include": "#variables" }
+		{ "include": "#stdFunctions" },
+		{ "include": "#variables" },
+		{ "include": "#semicolon" }
 	],
 	"repository": {
 		"contentSection": {
@@ -37,11 +40,21 @@
 			}
 		},
 		"goto": {
-			"name": "keyword.control.wtcd",
-			"match": "\\goto\\s+([a-zA-Z_][a-zA-Z_0-9]*)",
-			"captures": {
-				"1": { "name": "entity.name.type.class.section.wtcd" }
-			}
+		  "patterns": [{
+				"name": "keyword.control.wtcd",
+				"match": "\\bgoto\\s+([a-zA-Z_][a-zA-Z_0-9]*)",
+				"captures": {
+					"1": { "name": "entity.name.type.class.section.wtcd" }
+				}
+			}, {
+				"name": "keyword.control.wtcd",
+				"match": "\\bgoto\\s*(\\[)((?:\\s*[a-zA-Z_][a-zA-Z_0-9]*)*\\s*)(\\])",
+				"captures": {
+					"1": { "name": "meta.brace.wtcd" },
+					"2": { "name": "entity.name.type.class.section.wtcd" },
+					"3": { "name": "meta.brace.wtcd" }
+				}
+			}]
 		},
 		"declare": {
 			"name": "storage.type.class.declare.wtcd",
@@ -49,7 +62,7 @@
 		},
 		"keywords": {
 			"name": "keyword.control.wtcd",
-			"match": "\\b(number|boolean|string|action|then|selection|choice|yield|exit)\\b"
+			"match": "\\$|\\b(number|boolean|string|action|then|selection|choice|yield|exit|return|function|switch|list|while|do|if|else|continue|break)\\b"
 		},
 		"languageConstants": {
 			"patterns": [{
@@ -74,7 +87,11 @@
 		},
 		"operators": {
 			"name": "keyword.operator.wtcd",
-			"match": "[+\\-*\\/^&|=><!?:%]+"
+			"match": "[+\\-*\\/^&|=><!?:%.]+"
+		},
+		"tags": {
+			"name": "variable.other.object.property",
+			"match": "#[a-zA-Z_][a-zA-Z_0-9]*"
 		},
 		"strings": {
 			"name": "string.quoted.double.wtcd",
@@ -87,9 +104,17 @@
 				}
 			]
 		},
+		"stdFunctions": {
+			"name": "support.function",
+			"match": "\\b(?:contentAddParagraph|contentAddImage|contentAddUnorderedList|contentAddOrderedList|contentAddHeader|contentAddTable|print|assert|assertError|timeStart|timeEnd|listSet|listForEach|listMap|listCreateFilled|listChunk|listFilter|listSplice|listSlice|listLength|listIndexOf|listIncludes|listFindIndex|mathMin|mathMax|mathFloor|mathCeil|random|randomInt|randomBoolean|randomBiased|stringLength|stringFormatNumberFixed|stringFormatNumberPrecision|readerSetPinned|readerUnsetPinned|readerSetStateDesc|readerUnsetStateDesc)\\b"
+		},
 		"variables": {
 			"name": "variable.other.readwrite.wtcd",
 			"match": "\\b[a-zA-Z_][a-zA-Z_0-9]*\\b"
+		},
+		"semicolon": {
+			"name": "invalid.illegal",
+			"match": ";"
 		}
 	},
 	"scopeName": "source.wtcd"

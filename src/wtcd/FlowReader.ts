@@ -9,7 +9,7 @@ interface Data {
 }
 
 /**
- * This is one of the possible implementation of a WTCD reader.
+ * This is one of the possible implementations of a WTCD reader.
  *
  * In this implementation, all new content and buttons are appended to a single
  * HTML element. The user is expected to continuously scroll down the page in
@@ -25,6 +25,8 @@ interface Data {
  * will potentially lag user's interface every time the user undoes a decision.
  */
 export class FlowReader {
+  /** The interpreter */
+  private interpreter!: Interpreter;
   /** The iterator of the interpreter */
   private interpreterIterator!: Iterator<ContentOutput, ContentOutput, number>;
   /** Key in local storage */
@@ -88,13 +90,17 @@ export class FlowReader {
   }
   /** Restart the interpreter and reset the interpreterIterator */
   public resetInterpreter() {
-    const interpreter = new Interpreter(this.wtcdRoot, new Random(this.data.random));
-    this.interpreterIterator = interpreter.start();
+    this.interpreter = new Interpreter(
+      this.wtcdRoot,
+      new Random(this.data.random),
+    );
+    this.interpreterIterator = this.interpreter.start();
   }
   public constructor(
     docIdentifier: string,
     private wtcdRoot: WTCDRoot,
     private errorMessageCreator: (error: Error) => HTMLElement,
+    private elementPreprocessor: ($element: HTMLElement) => void,
   ) {
     this.storageKey = `wtcd.fr.${docIdentifier}`;
     this.data = this.parseData(window.localStorage.getItem(this.storageKey)) || {
@@ -175,7 +181,11 @@ export class FlowReader {
   private handleOutput(output: ContentOutput) {
     // Create a container for all elements involved so deletion will be easier.
     const $container = document.createElement('div');
+    $container.classList.add('wtcd-group-container');
     output.content.forEach($element => $container.appendChild($element));
+    this.interpreter.getPinned().forEach($element =>
+      $container.appendChild($element),
+    );
     const decisionIndex = this.currentDecisionIndex;
     this.buttons.push(output.choices.map((choice, choiceIndex) => {
       const $button = document.createElement('div');
@@ -201,12 +211,13 @@ export class FlowReader {
 
     this.contents.push($container);
     this.target.appendChild($container);
+    this.elementPreprocessor($container);
   }
 
   private started: boolean = false;
   public renderTo($target: HTMLElement) {
     if (this.started) {
-      throw new Error('Flow Interface already started.');
+      throw new Error('Flow reader already started.');
     }
     this.started = true;
     this.target = $target;

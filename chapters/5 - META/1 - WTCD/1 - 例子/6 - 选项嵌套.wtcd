@@ -1,0 +1,31 @@
+WTCD 1.1
+section main then selection [
+  choice "1. a" selection [
+    choice "2. a" goto aa
+    choice "2. b" goto ab
+  ]
+  choice "1. b" selection [
+    choice "2. a" goto ba
+    choice "2. b" goto bb
+  ]
+]
+
+section aa then exit
+section ab then exit
+section ba then exit
+section bb then exit
+
+---<<< main >>>---
+# 选项嵌套
+
+---<<< aa >>>---
+## aa
+
+---<<< ab >>>---
+## ab
+
+---<<< ba >>>---
+## ba
+
+---<<< bb >>>---
+## bb

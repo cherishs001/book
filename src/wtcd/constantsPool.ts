@@ -1,4 +1,4 @@
-import { BooleanValue, NullValue, NumberValue, RuntimeValue, RuntimeValueRaw, RuntimeValueType } from './Interpreter';
+import { BooleanValue, NullValue, NumberValue, RuntimeValue, RuntimeValueRaw, RuntimeValueType, Variable } from './Interpreter';
 
 // Your typical immature optimization
 // Caches null values, boolean values, and small integers to somewhat reduce GC
@@ -26,7 +26,7 @@ export function getMaybePooled<T extends RuntimeValueType>(
   if (type === 'boolean') {
     return booleanValue(value as boolean) as any;
   }
-  if (type === 'number' && (value as number) >= 0 && (value as number) <= 100) {
+  if (type === 'number' && (value as number) >= 0 && (value as number) <= 100 && ((value as number) % 1 === 0)) {
     return smallIntegers[value as number] as any;
   }
   return {

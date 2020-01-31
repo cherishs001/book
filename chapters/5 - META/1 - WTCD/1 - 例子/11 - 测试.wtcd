@@ -1,0 +1,569 @@
+WTCD 1.1
+
+section main {
+  timeStart::[]
+
+  // Equality
+  assert::[true == true]
+  assert::[false == false]
+  assert::[1 == 1]
+  assert::[1000 == 1000]
+  assert::["asd" == "asd"]
+  assert::[[ 1 ] == [ 1 ]]
+  assert::[[ [ 1 ] true ] == [ [ 1 ] true ]]
+  assert::[[ 1 2 3 ] == [ 1 2 3 ]]
+  assert::[goto dummy1 == goto dummy1]
+  assert::[goto [ dummy1 dummy2 dummy1 ] == goto [ dummy1 dummy2 dummy1 ]]
+  assert::[exit == exit]
+  assert::[null == null]
+  assert::[(choice "a" goto dummy1) == (choice "a" goto dummy1)]
+  assert::[(choice "b" goto [ dummy1 dummy2 ]) == (choice "b" goto [ dummy1 dummy2 ])]
+  assert::[(selection [ choice "a" goto dummy1 choice "b" goto dummy2 choice "c" exit ]) == (selection [ choice "a" goto dummy1 choice "b" goto dummy2 choice "c" exit ])]
+
+  // Inequality
+  assert::[true != false]
+  assert::[false != true]
+  assert::[1 != 0]
+  assert::[1000 != 1]
+  assert::["asd" != "asd2"]
+  assert::[[ 1 2 ] != [ 1 ]]
+  assert::[[ 1 ] != [ 1 2 ]]
+  assert::[[ 1 2 ] != [ 1 3 ]]
+  assert::[[ [ 1 ] false ] != [ [ 1 ] true ]]
+  assert::[[ [ 1 ] true ] != [ [ 2 ] true ]]
+  assert::[goto dummy1 != goto dummy2]
+  assert::[goto [ dummy1 dummy2 dummy1 ] != goto [ dummy2 dummy1 dummy1 ]]
+  assert::[goto [ dummy1 dummy2 ] != goto [ dummy1 dummy2 dummy2 ]]
+  assert::[exit != goto dummy1]
+  assert::[null != 1]
+  assert::[(choice "a" goto dummy1) != (choice "b" goto dummy1)]
+  assert::[(choice "a" goto dummy1) != (choice "a" goto dummy2)]
+  assert::[(choice "b" goto [ dummy1 dummy2 ]) != (choice "b" goto [ dummy1 dummy1 ])]
+  assert::[(selection [ choice "a" goto dummy1 choice "b" goto dummy2 choice "c" exit ]) != (selection [ choice "a" goto dummy1 choice "b" goto dummy1 choice "c" exit ])]
+
+
+  // Selection creation with list
+  {
+    declare list a = [ choice "a" goto dummy1 ]
+    assert::[(selection a) == selection [ choice "a" goto dummy1 ]]
+  }
+
+  // 简单算术
+  assert::[(1 + 1) == 2]
+  assert::[(2 - 1) == 1]
+  assert::[(2 * 5) == 10]
+  assert::[(8 / 2) == 4]
+
+  assert::[(2 ** 3 ** 2) == 64]
+
+  // 三元
+  assert::[(9 > 8
+    ? 9 > 8 
+      ? 1
+      : 2
+    : 9 > 8
+      ? 3
+      : 4) == 1 ]
+  assert::[(9 > 8
+    ? 9 < 8 
+      ? 1
+      : 2
+    : 9 < 8
+      ? 3
+      : 4) == 2 ]
+  assert::[(9 < 8
+    ? 9 > 8 
+      ? 1
+      : 2
+    : 9 > 8
+      ? 3
+      : 4) == 3 ]
+  assert::[(9 < 8
+    ? 9 < 8 
+      ? 1
+      : 2
+    : 9 < 8
+      ? 3
+      : 4) == 4 ]
+  
+  // operator assignment
+  {
+    declare number a = 10
+    assert::[(a += 5) == 15]
+    assert::[a == 15]
+    assert::[(a -= 10) == 5]
+    assert::[a == 5]
+    assert::[(a *= 5) == 25]
+    assert::[a == 25]
+    assert::[(a /= 5) == 5]
+    assert::[a == 5]
+  }
+
+  // yield
+  assert::[{
+    yield 2
+    yield 3
+  } == 2]
+
+  // set yield
+  assert::[{
+    yield = 2
+    yield = 3
+  } == 3]
+
+  // Defaults
+  {
+    declare number a
+    assert::[ a == 0 ]
+    declare boolean b
+    assert::[ b == false ]
+    declare string c
+    assert::[ c == "" ]
+    declare list d
+    assert::[ d == [] ]
+
+    declare any
+    assert::[ any == null ]
+    declare number null nullable
+    assert::[ nullable == null ]
+  }
+
+  // Type checking
+  {
+    assertError::[function[] {
+      declare number a = "test"
+    }]
+    declare number string a = "test"
+    assertError::[function[] {
+      declare number string list boolean b = choice "a" goto dummy1
+    }]
+  }
+
+  // Function equality
+  {
+    declare number a = 1
+    declare function fn[number b] b * a
+    declare function fn2[number b] b * a
+    assert::[fn == fn]
+    assert::[fn != fn2] // 函数不指向同一个就算不一样
+  }
+
+  // return + yield
+  {
+    declare function f1[number n] n * n
+    declare function f2[number n] {
+      yield n * n
+    }
+    declare function f3[number n] {
+      yield = "Wrong"
+      return = n * n // Return 优先
+    }
+    declare function f4[number n] {
+      {{{{{ return n * n }}}}}
+    }
+    assert[f1::[12] == 144]
+    assert[f2::[12] == 144]
+    assert[f3::[12] == 144]
+    assert[f4::[12] == 144]
+  }
+
+  {
+    declare function solveQuad[number a number b number c] {
+      declare number delta = b ** 2 - 4 * a * c
+      delta > 0 ? {
+        return [
+          (-b - delta ** 0.5) / 2 / a
+          (-b + delta ** 0.5) / 2 / a
+        ]
+      } : delta == 0 ? {
+        return [ -b / 2 / a ]
+      } : {
+        return []
+      }
+    }
+    assert::[solveQuad::[1 (-3) 2] == [ 1 2 ]]
+    assert::[solveQuad::[1 2 1] == [ -1 ]]
+    assert::[solveQuad::[1 2 100] == []]
+  }
+
+  // Function factory
+  {
+    declare function maker[number base] function[number inc] {
+      base += inc
+      return base
+    }
+    declare function f1 = maker::[10]
+    assert::[f1::[5] == 15]
+    assert::[f1::[5] == 20]
+    declare function f2 = maker::[1000]
+    assert::[f2::[5] == 1005]
+    assert::[f2::[5] == 1010]
+    declare function f1d = f1
+    assert::[f1 == f1]
+    assert::[f2 == f2]
+    assert::[f1 == f1d]
+    assert::[f1 != f2]
+    assert::[f1d != f2]
+  }
+
+  // Rest arguments
+  {
+    declare function rest[number a number b boolean c ...rest] {
+      assert::[a == 1]
+      assert::[b == 2]
+      assert::[c == false]
+      assert::[rest == [ 4 true "HA!" ]]
+    }
+    rest::[ 1 2 false 4 true "HA!" ]
+  }
+
+  // High order
+  {
+    declare function comp[function f function g] function[...rest] f::[g::rest]
+    declare function square[number input] input * input
+    declare function plusFive[number input] input + 5
+    declare function squareOPlusFive = comp::[square plusFive]
+    assert::[squareOPlusFive::[5] == 100]
+    declare function plusFiveOSquare = comp::[plusFive square]
+    assert::[plusFiveOSquare::[5] == 30]
+  }
+
+  // List spread
+  assert::[[ 1 ...[ 2  3 ] 4 ] == [ 1 2 3 4 ]]
+  assert::[[ 1 ...[ ...[ ...[2] ] 3 ] 4 ] == [ 1 2 3 4 ]]
+  {
+    declare list l1 = [ 4 5 6 ]
+    assert::[[ 1 2 3 ...l1 7 8 9 ] == [ 1 2 3 4 5 6 7 8 9 ]]
+    assert::[[ 1 ...l1 ...l1 ...l1 1 ] == [ 1 4 5 6 4 5 6 4 5 6 1 ]]
+  }
+
+  // Boolean
+  assert::[true && true]
+  assert::[(false && assert::[false]) == false] // Short circuit
+  assert::[(false || false) == false]
+  assert::[true || assert::[false]] // Short circuit
+
+  // List member access
+  assert::[[ 0 1 2 3 4 ].(3) == 3]
+  assertError::[function[] [ 0 1 2 3 4 ].(5)]
+  assert::[[ 0 1 2 null 4 ].(3) == null]
+  assertError::[function[] null.(5)]
+
+  assert::[[ 0 1 2 3 4 ].?(3) == 3]
+  assert::[[ 0 1 2 3 4 ].?(5) == null]
+  assert::[[ 0 1 2 null 4 ].?(3) == null]
+  assertError::[function[] null.?(5)]
+
+  assert::[[ 0 1 2 3 4 ]?.(3) == 3]
+  assertError::[function[] [ 0 1 2 3 4 ]?.(5)]
+  assert::[[ 0 1 2 null 4 ]?.(3) == null]
+  assert::[null?.(assert::[false]) == null] // Short circuit
+
+  assert::[[ 0 1 2 3 4 ]?.?(3) == 3]
+  assert::[[ 0 1 2 3 4 ]?.?(5) == null]
+  assert::[[ 0 1 2 null 4 ]?.?(3) == null]
+  assert::[null?.?(assert::[false]) == null] // Short circuit
+
+  // Null coalescing
+  assert::[(1 ?! assert::[false]) == 1] // Short circuit
+  assert::[(null ?! 2) == 2]
+  assertError::[function[] null ?! null]
+
+  assert::[(1 ?? assert::[false]) == 1] // Short circuit
+  assert::[(null ?? 2) == 2]
+  assert::[(null ?? null) == null]
+
+  // std listSet
+  {
+    declare list l1 = [ 0 1 2 3 4 5 ]
+    declare list l2 = listSet::[l1 3 "Nice"]
+    assert::[l1 == [ 0 1 2 3 4 5 ]]
+    assert::[l2 == [ 0 1 2 "Nice" 4 5 ]]
+  }
+
+  // std listForEach
+  {
+    declare number contentSum = 0
+    declare number indexSum = 0
+    listForEach::[[ 1 2 3 4 100 ] function[number item number index] {
+      contentSum += item
+      indexSum += index
+    }]
+    assert::[contentSum == 110]
+    assert::[indexSum == 10]
+  }
+
+  // std listMap
+  {
+    declare list l1 = [ 0 1 2 4 20 ]
+    declare list l2 = listMap::[l1 function[number item] item * item]
+    assert::[l1 == [ 0 1 2 4 20 ]]
+    assert::[l2 == [ 0 1 4 16 400 ]]
+  }
+
+  // std listCreateFilled
+  {
+    declare list l1 = listCreateFilled::[ 5 ]
+    assert::[l1 == [ null null null null null ]]
+    declare list l2 = listCreateFilled::[ 5 8 ]
+    assert::[l2 == [ 8 8 8 8 8 ]]
+  }
+
+  // std listChunk
+  {
+    declare list l = listChunk::[[ 1 2 3 4 5 6 7 8 9 10 ] 3 ]
+    assert::[l == [ [ 1 2 3 ] [ 4 5 6 ] [ 7 8 9 ] [ 10 ] ]]
+  }
+
+  // std listSplice
+  {
+    assert::[listSplice::[[ 0 1 2 3 ] 1 2] == [ 0 3 ]]
+    assert::[listSplice::[[ 0 1 2 3 ] 1 2 [ "Wow1" "Wow2" ]] == [ 0 "Wow1" "Wow2" 3]]
+  }
+
+  // std listSlice
+  {
+    assert::[listSlice::[[ 0 1 2 3 4 5 ] 2] == [ 2 3 4 5 ]]
+    assert::[listSlice::[[ 0 1 2 3 4 5 ] 2 4] == [ 2 3 ]]
+  }
+
+  // std listLength
+  {
+    assert::[listLength::[[ 0 1 2 3 4 ]] == 5]
+  }
+
+  // std listIndexOf
+  {
+    assert::[listIndexOf::[[ 0 1 2 3 ] 2] == 2]
+    assert::[listIndexOf::[[ 0 1 2 3 ] 4] == -1]
+  }
+
+  // std listIncludes
+  {
+    assert::[listIncludes::[[ 0 1 2 3 ] 2] == true]
+    assert::[listIncludes::[[ 0 1 2 3 ] 4] == false]
+    assert::[listIncludes::[[ 0 1 [ "a" "b" ] 3 ] [ "a" "b" ]] == true]
+    assert::[listIncludes::[[ 0 1 [ "a" "b" ] 3 ] [ "a" "c" ]] == false]
+  }
+
+  // std listFindIndex
+  {
+    assert::[listFindIndex::[[ 1 3 5 8 9 11 14 ] $[item] item % 2 == 0] == 3]
+    assert::[listFindIndex::[[ 1 3 5 8 9 11 14 ] $[item index] index == 4] == 4]
+    assert::[listFindIndex::[[ 1 3 5 8 9 11 14 ] $[item] false] == -1]
+  }
+
+  // std listFilter
+  assert::[listFilter::[[ 1 2 3 4 5 6 7 8 ] function[number a] a % 2 == 0] == [ 2 4 6 8 ]]
+
+  // std math*
+  assert::[mathMin::[ 10 1 2 3 4 ] == 1]
+  assert::[mathMax::[ 1 2 3 4 0 ] == 4]
+  assert::[mathFloor::[ 11.8 ] == 11]
+  assert::[mathFloor::[ -11.8 ] == -12]
+  assert::[mathCeil::[ 11.8 ] == 12]
+  assert::[mathCeil::[ -11.8 ] == -11]
+
+  // std string*
+  assert::[stringLength::["Hello~"] == 6]
+  assert::[stringFormatNumberFixed::[1.235 2] == "1.24"]
+  assert::[stringFormatNumberFixed::[1.235 4] == "1.2350"]
+  assert::[stringFormatNumberFixed::[1.235 6] == "1.235000"]
+  assert::[stringFormatNumberPrecision::[1.235 2] == "1.2"]
+  assert::[stringFormatNumberPrecision::[1.235 4] == "1.235"]
+  assert::[stringFormatNumberPrecision::[1.235 6] == "1.23500"]
+  assert::[stringFormatNumberPrecision::[1234 2] == "1.2e+3"]
+
+  // Partial application
+  assert::[([ 0 1 2 3 ] |> listSet.:[2 "Wow"]) == [ 0 1 "Wow" 3 ]]
+  assert::[("Wow" |> listSet:.[[ 0 1 2 3 ] 2]) == [ 0 1 "Wow" 3 ]]
+  assert::[listSet == listSet.:[]]
+  assert::[listSet == listSet:.[]]
+  assert::[listSet != listSet.:[1]]
+  assert::[listSet != listSet:.[1]]
+  assert::[listSet.:[1] == listSet.:[1]]
+  assert::[listSet:.[1] == listSet:.[1]]
+  assert::[listSet:.[1] != listSet.:[1]]
+  assert::[listSet.:[1] != listSet.:[2]]
+  assert::[listSet:.[1] != listSet:.[2]]
+  assert::[listSet:.[[ 0 1 2 3 ]].:["Wow"]:.[2]::[] == [ 0 1 "Wow" 3 ]]
+  assert::[listSet.:["Wow"].:[2]:.[[ 0 1 2 3 ]]::[] == [ 0 1 "Wow" 3 ]]
+
+  // Function shorthand
+  {
+    declare function fn = $100
+    declare function add = $[a b] a + b
+    declare function addTyped = $[number a number b] a + b
+    assert::[fn::[] == 100]
+    assert::[add::[1 2] == 3]
+    assert::[addTyped::[1 2] == 3]
+    declare number counter = 100
+    declare function closure = $counter
+    assert::[closure::[] == 100]
+    counter = 300
+    assert::[closure::[] == 300]
+  }
+
+  assert::[([ 1 2 3 4 5 ] |> listMap.:[$[v] v ** 2]) == [ 1 4 9 16 25 ]]
+
+  // While loop
+  {
+    declare number i = 0
+    while i < 10 {
+      i += 1
+    }
+    assert::[i == 10]
+  }
+  {
+    declare number i = 0
+    do {
+      i += 1
+    } while i < 10
+    assert::[i == 10]
+  }
+  {
+    declare number i = 0
+    declare number j = 0
+    do {
+      i += 1
+    } while i < 10 then {
+      j += 1
+    }
+    assert::[i == 10]
+    assert::[j == 9]
+  }
+  
+  // While loop with break
+  {
+    declare number i = 0
+    declare number result = while i < 100 {
+      (i < 50) ? null : {
+        break 1000
+      }
+      i += 1
+    }
+    assert::[result == 1000]
+    assert::[i == 50]
+  }
+  {
+    declare number i = 0
+    declare number result = while i < 100 {
+      (i > 50) ? null : {
+        break = i
+      }
+      i += 1
+    }
+    assert::[result == 50]
+    assert::[i == 100]
+  }
+
+  // While loop with continue
+  {
+    declare number i = 0
+    declare number j = 0
+    while i < 100 {
+      i += 1
+      (i > 50) ? null : {
+        continue
+      }
+      j += 1
+    }
+    assert::[j == 50]
+    assert::[i == 100]
+  }
+  {
+    declare number i = 0
+    declare number j = 0
+    do {
+      i += 1
+      (i > 50) ? null : {
+        continue
+      }
+      j += 1
+    } while i < 100
+    assert::[j == 50]
+    assert::[i == 100]
+  }
+  {
+    declare number i = 0
+    declare number j = 0
+    do {
+      i += 1
+    } while j < 10 then {
+      j += 1
+      continue
+    }
+    assert::[i == 1]
+    assert::[j == 10]
+  }
+
+  // Function switch
+  {
+    declare function normal = function switch [
+      [ 1 ] 100
+      [ 2 3 ] 200
+      300
+    ]
+    assert::[normal::[1] == 100]
+    assert::[normal::[2] == 200]
+    assert::[normal::[3] == 200]
+    assert::[normal::[4] == 300]
+
+    declare function sugar switch [
+      [ 1 ] 100
+      [ 2 3 ] 200
+      300
+    ]
+    assert::[sugar::[1] == 100]
+    assert::[sugar::[2] == 200]
+    assert::[sugar::[3] == 200]
+    assert::[sugar::[4] == 300]
+  }
+
+  // If
+  assert::[(if 5 > 3 100) == 100]
+  assert::[(if 5 > 8 100) == null]
+  assert::[(if 5 > 3 100 else 200) == 100]
+  assert::[(if 5 > 8 100 else 200) == 200]
+  assert::[(if (5 > 3) {
+    yield 100
+  } else {
+    yield 200
+  }) == 100]
+
+  // ObJeCt OrIeNtEd PrOgRaMmInG
+  {
+    declare function Person[string name number age] function switch [
+      #getName name
+      #getAge age
+      #setName $[string newName] name = newName
+      #setAge $[number newAge] age = newAge
+      #info name + ": " + stringFormatNumberFixed::[age 0]
+    ]
+    declare function a = Person::["A" 20]
+    assert::[a::#getName == "A"]
+    assert::[a::#getAge == 20]
+    assert::[a::#info == "A: 20"]
+    a::#setName::["A2"]
+    a::#setAge::[40]
+    assert::[a::#getName == "A2"]
+    assert::[a::#getAge == 40]
+    assert::[a::#info == "A2: 40"]
+  }
+
+  // Optional Invocation
+  {
+    declare function sum = $[number a number b] a + b
+    assert::[sum?::[1 2] == 3]
+    assert::[null?::[1 2] == null]
+  }
+
+  timeEnd::[]
+} then exit
+
+section dummy1 then exit
+section dummy2 then exit
+
+---<<< main >>>---
+# 测试
+如果你看到这行字那么就代表所有测试都通过了。
