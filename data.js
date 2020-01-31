@@ -755,48 +755,48 @@ window.DATA={
         "isRoot": false,
         "chapters": [
           {
-            "displayName": "第 NaN 章",
-            "displayIndex": null,
-            "name": "其他角色",
-            "sourceRelativePath": "6 - 人设卡/其他角色.md",
-            "type": "Markdown",
-            "isEarlyAccess": false,
-            "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/109",
-            "htmlRelativePath": "人设卡/第-NaN-章.html",
-            "chapterCharCount": 446
-          },
-          {
-            "displayName": "第 NaN 章",
-            "displayIndex": null,
-            "name": "晴梦慧",
-            "sourceRelativePath": "6 - 人设卡/晴梦慧.md",
-            "type": "Markdown",
-            "isEarlyAccess": false,
-            "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/108",
-            "htmlRelativePath": "人设卡/第-NaN-章.html",
-            "chapterCharCount": 515
-          },
-          {
-            "displayName": "第 NaN 章",
-            "displayIndex": null,
-            "name": "琳",
-            "sourceRelativePath": "6 - 人设卡/琳.md",
+            "displayName": "琳",
+            "displayIndex": 1,
+            "name": "1 - 琳",
+            "sourceRelativePath": "6 - 人设卡/1 - 琳.md",
             "type": "Markdown",
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/106",
-            "htmlRelativePath": "人设卡/第-NaN-章.html",
+            "htmlRelativePath": "人设卡/琳.html",
             "chapterCharCount": 318
           },
           {
-            "displayName": "第 NaN 章",
-            "displayIndex": null,
-            "name": "石倚",
-            "sourceRelativePath": "6 - 人设卡/石倚.md",
+            "displayName": "晴梦慧",
+            "displayIndex": 2,
+            "name": "2 - 晴梦慧",
+            "sourceRelativePath": "6 - 人设卡/2 - 晴梦慧.md",
+            "type": "Markdown",
+            "isEarlyAccess": false,
+            "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/108",
+            "htmlRelativePath": "人设卡/晴梦慧.html",
+            "chapterCharCount": 515
+          },
+          {
+            "displayName": "石倚",
+            "displayIndex": 3,
+            "name": "3 - 石倚",
+            "sourceRelativePath": "6 - 人设卡/3 - 石倚.md",
             "type": "Markdown",
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/107",
-            "htmlRelativePath": "人设卡/第-NaN-章.html",
+            "htmlRelativePath": "人设卡/石倚.html",
             "chapterCharCount": 489
+          },
+          {
+            "displayName": "其他角色",
+            "displayIndex": 999,
+            "name": "999 - 其他角色",
+            "sourceRelativePath": "6 - 人设卡/999 - 其他角色.md",
+            "type": "Markdown",
+            "isEarlyAccess": false,
+            "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/109",
+            "htmlRelativePath": "人设卡/其他角色.html",
+            "chapterCharCount": 446
           }
         ],
         "subFolders": [],
@@ -903,5 +903,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "393"
+  "buildNumber": "395"
 };
