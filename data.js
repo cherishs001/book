@@ -5,19 +5,7 @@ window.DATA={
     "name": "",
     "sourceRelativePath": "",
     "isRoot": true,
-    "chapters": [
-      {
-        "displayName": "出场人员名单",
-        "displayIndex": 99999,
-        "name": "99999 - 出场人员名单",
-        "sourceRelativePath": "99999 - 出场人员名单.md",
-        "type": "Markdown",
-        "isEarlyAccess": true,
-        "commentsUrl": null,
-        "htmlRelativePath": "出场人员名单.html",
-        "chapterCharCount": 999
-      }
-    ],
+    "chapters": [],
     "subFolders": [
       {
         "displayName": "主线",
@@ -760,6 +748,61 @@ window.DATA={
         "folderCharCount": 36397
       },
       {
+        "displayName": "人设卡",
+        "displayIndex": 6,
+        "name": "6 - 人设卡",
+        "sourceRelativePath": "6 - 人设卡",
+        "isRoot": false,
+        "chapters": [
+          {
+            "displayName": "第 NaN 章",
+            "displayIndex": null,
+            "name": "其他角色",
+            "sourceRelativePath": "6 - 人设卡/其他角色.md",
+            "type": "Markdown",
+            "isEarlyAccess": false,
+            "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/109",
+            "htmlRelativePath": "人设卡/第-NaN-章.html",
+            "chapterCharCount": 446
+          },
+          {
+            "displayName": "第 NaN 章",
+            "displayIndex": null,
+            "name": "晴梦慧",
+            "sourceRelativePath": "6 - 人设卡/晴梦慧.md",
+            "type": "Markdown",
+            "isEarlyAccess": false,
+            "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/108",
+            "htmlRelativePath": "人设卡/第-NaN-章.html",
+            "chapterCharCount": 515
+          },
+          {
+            "displayName": "第 NaN 章",
+            "displayIndex": null,
+            "name": "琳",
+            "sourceRelativePath": "6 - 人设卡/琳.md",
+            "type": "Markdown",
+            "isEarlyAccess": false,
+            "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/106",
+            "htmlRelativePath": "人设卡/第-NaN-章.html",
+            "chapterCharCount": 318
+          },
+          {
+            "displayName": "第 NaN 章",
+            "displayIndex": null,
+            "name": "石倚",
+            "sourceRelativePath": "6 - 人设卡/石倚.md",
+            "type": "Markdown",
+            "isEarlyAccess": false,
+            "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/107",
+            "htmlRelativePath": "人设卡/第-NaN-章.html",
+            "chapterCharCount": 489
+          }
+        ],
+        "subFolders": [],
+        "folderCharCount": 1768
+      },
+      {
         "displayName": "杂项",
         "displayIndex": 10,
         "name": "10 - 杂项",
@@ -782,10 +825,10 @@ window.DATA={
         "folderCharCount": 1361
       }
     ],
-    "folderCharCount": 207152
+    "folderCharCount": 207921
   },
-  "charsCount": 207152,
-  "paragraphsCount": 3925,
+  "charsCount": 207921,
+  "paragraphsCount": 3934,
   "keywordsCount": [
     [
       "高潮",
@@ -860,5 +903,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "391"
+  "buildNumber": "393"
 };
