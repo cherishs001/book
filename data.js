@@ -258,8 +258,31 @@ window.DATA={
             "chapterCharCount": 3893
           }
         ],
-        "subFolders": [],
-        "folderCharCount": 18972
+        "subFolders": [
+          {
+            "displayName": "水晶永耀线",
+            "displayIndex": 1,
+            "name": "1 - 水晶永耀线",
+            "sourceRelativePath": "2 - 支线/1 - 水晶永耀线",
+            "isRoot": false,
+            "chapters": [
+              {
+                "displayName": "第 1 章",
+                "displayIndex": 1,
+                "name": "1",
+                "sourceRelativePath": "2 - 支线/1 - 水晶永耀线/1.md",
+                "type": "Markdown",
+                "isEarlyAccess": false,
+                "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/113",
+                "htmlRelativePath": "支线/水晶永耀线/第-1-章.html",
+                "chapterCharCount": 2602
+              }
+            ],
+            "subFolders": [],
+            "folderCharCount": 2602
+          }
+        ],
+        "folderCharCount": 21574
       },
       {
         "displayName": "小作品",
@@ -825,18 +848,18 @@ window.DATA={
         "folderCharCount": 1361
       }
     ],
-    "folderCharCount": 207921
+    "folderCharCount": 210523
   },
-  "charsCount": 207921,
-  "paragraphsCount": 3934,
+  "charsCount": 210523,
+  "paragraphsCount": 3978,
   "keywordsCount": [
     [
       "高潮",
-      385
+      394
     ],
     [
       "贞操带",
-      204
+      208
     ],
     [
       "按摩棒",
@@ -903,5 +926,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "395"
+  "buildNumber": "396"
 };
