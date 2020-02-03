@@ -1,0 +1,385 @@
+WTCD 1.3
+declare [
+    number climax = 20
+    number anger
+    number time
+    number climaxCount
+    number sustained
+    number lastSedative = -120
+    boolean selfBondaged
+]
+declare[
+    action endAction = goto normalEnding
+]
+declare[
+    number climaxToBeAdd
+    number angerToBeAdd
+    number climaxRatio = 1
+    number angerRatio = 1
+    number timeRatio = 5
+    number timePast
+]
+declare[
+    number climaxToBeShow
+    number angerToBeShow
+    number timeToBeShow
+    number sustainedToBeShow
+]
+section main then goto start
+section start{
+    time = 5
+} then goto stats
+
+section stats{
+
+    if(timePast>0){
+        angerToBeAdd = climaxCount>30?(-1):angerToBeAdd
+
+        climaxRatio = climaxRatio < 1 ? 1 : climaxRatio
+
+        climax += climaxToBeAdd*(climaxToBeAdd>0?climaxRatio:1) // ClimaxRatio 只控制增加
+        anger += angerToBeAdd*angerRatio // AngerRatio 同时控制增加与减少
+
+        climaxToBeAdd=0
+        angerToBeAdd=0
+
+        climax=climax<=0?0:climax
+
+        climaxCount+=climax >= 100? 1 : 0
+        anger += climax>=90?5:0
+        anger -= climax>=100?25:0
+        climax = climax>=100?40:climax
+
+        anger=anger<=0?0:anger
+        anger=anger>=100?100:anger
+
+        time+=timePast*timeRatio
+        sustained = climax>=70? sustained+timePast*timeRatio:sustained
+
+    }
+    climaxToBeShow = climax ~/ 0.01 / 100
+    angerToBeShow = anger ~/ 0.01 / 100
+    timeToBeShow = time ~/ 0.0001 / 10000
+    sustainedToBeShow = sustained ~/ 0.0001 / 10000
+
+} then (anger > 99)
+    ? goto end
+    : (climaxCount >= 1)
+    ? goto end
+    : (time <= 1)
+    ? goto start
+    : (time >= 360)
+    ? goto end
+    : goto machineSelection
+
+section machineSelection then selection [
+    choice "通用：选项" goto generalOptions
+    choice "痛觉：选项" goto painOptions
+    choice "插入：选项" goto insertOptions
+]
+section generalOptions then selection[
+    choice "阴蒂按摩" goto massage
+    choice "注射镇静剂" goto sedativeInsert
+    choice "休息片刻（降低难度）" goto rest
+]
+section painOptions then selection[
+    choice "电击" goto electric
+    choice "鞭挞" goto castigate
+]
+section insertOptions then selection[
+    choice "低强度插入" goto insert
+    choice "中强度插入" goto midiumInsert
+    choice "高强度插入" goto highInsert
+]
+section electric{
+    climaxToBeAdd += anger<20?1:(-10)
+    angerToBeAdd+=10
+
+    angerRatio +=0.2
+    climaxRatio *=0.9
+
+    anger = anger<=100?anger:100
+    timePast = 5
+} then goto stats
+section rest{
+    timePast = 1
+    angerToBeAdd -= 1
+    climaxToBeAdd -= 1
+    contentAddParagraph::["> 这是一个简化游戏流程的选项，只是在你找不到合适选项时使用的"]
+} then goto stats
+section castigate {
+    climaxToBeAdd += 2*anger<50?0.5:(-5)
+    angerToBeAdd += anger<50?7:5
+    timePast = 3
+}then goto stats
+section insert {
+    climaxToBeAdd+=5
+    timePast = 2
+    climaxRatio *=1.75
+    contentAddParagraph::["秋镜悬下体的按摩棒开始了抽插，这让她更兴奋了。"]
+}then goto stats
+section midiumInsert{
+    climaxToBeAdd+=10
+    angerToBeAdd-=5
+    climaxRatio *=2.05
+    timePast = 2
+    contentAddParagraph::["秋镜悬下体的按摩棒开始了激烈的抽插，这让她更兴奋的同时减轻了她的痛苦。"]
+} then goto stats
+section highInsert{
+    climaxToBeAdd+=30
+    angerToBeAdd-=10
+    climaxRatio *=2.3
+    timePast = 2
+    contentAddParagraph::["秋镜悬下体的按摩棒开始了极为激烈的抽插，这让她更兴奋的同时减轻了她的痛苦。"]
+} then goto stats
+section massage{
+    climaxRatio *= 1.25
+    angerRatio *=0.9
+    angerToBeAdd-=5
+    climaxToBeAdd+=5
+    timePast = 3
+} then goto stats
+section sedativeInsert{
+    if(time - lastSedative > 120){
+        lastSedative = time
+        climaxRatio = 0.5
+        angerRatio = 0.5
+        climaxToBeAdd-= 20
+        angerToBeAdd -= 20
+        timePast = 1
+        contentAddParagraph::["一些镇静剂从阴道按摩棒中缓缓流出，进入了秋镜悬的身体。"]
+        contentAddParagraph::["秋镜悬似乎没有那么兴奋了。"]
+    }else{
+        timePast = 0
+        climaxToBeAdd = 0
+        angerToBeAdd = 0
+        contentAddParagraph::["警告：禁止大量使用镇静剂，镇静剂存在对身体造成永久性损伤的可能，故禁止滥用。"]
+    }
+} then goto stats
+section end{
+    (anger>99)?{
+        endAction = goto angerEnding
+    }:(climaxCount>=1)?{
+        endAction = goto climaxEnding
+    }:(sustained<=200)?{
+        endAction = goto badEnding
+    }:{
+        endAction = goto normalEnding
+    }
+} then endAction
+
+section climaxEnding then exit
+section normalEnding then exit
+section angerEnding then exit
+section badEnding then exit
+
+---<<< stats >>>---
+
+秋镜悬现在有 <$ climaxToBeShow $> % 兴奋，<$ angerToBeShow $> % 痛苦 。
+
+已经过去了 <$ timeToBeShow $> 分钟。
+
+秋镜悬高潮了 <$ climaxCount $> 次，已经达到了要求兴奋度 <$ sustainedToBeShow $> 分钟。
+
+---
+
+---<<< main >>>---
+
+# 2.5. 幕间
+友人♪B
+
+> AI 控制面板已激活，请完成预定事项。
+
+> 当前预定项目：对 Dr. Aki 不当发言进行惩罚。
+
+> 当前预定内容：边缘控制 45 小时，收纳箱禁闭 6 小时。
+
+> 当前进程范围：前 6 小时的禁闭与边缘控制。
+
+总之，请你协助 AI 完成前 6 小时对秋镜悬的惩罚内容，不过要是不小心让她高潮了的话……说不定会发生什么恐怖的事情（当然是从 AI 的角度看啦。）
+
+另外，请尽量保持秋镜悬足够高的兴奋度，毕竟，是边缘控制嘛！
+
+【本篇的判定机制基本与《艾迦塔调教记录》非常相似，那篇 WTCD 尚未启用游戏模式，可以先去那边测试一下自己的策略是否正确哟！】
+
+---
+ 
+
+---<<< start >>>---
+---<<< machineSelection >>>---
+
+> 请选择当前需要执行的操作
+
+---<<< massage >>>---
+
+“呜……”
+
+贞操带上的阴蒂按摩器正在转动着。
+
+秋镜悬似乎更兴奋了。
+
+---<<< electric >>>---
+
+“呜呜——！！”
+
+强烈的电流从秋镜悬的下体传来，这让她更痛苦了。
+
+---<<< castigate >>>---
+
+收纳箱中的隐藏的鞭子开始抽打秋镜悬的胴体，这让她更痛苦了。
+
+---<<< end >>>---
+
+
+
+---<<< normalEnding >>>---
+
+“您的禁闭惩罚已结束，现在将进入下一个项目。”
+
+随着 AI 的声音，收纳箱又缓缓地展开了，几个锁扣也已经自行解锁。
+
+“……呜，”
+
+秋镜悬废了些功夫，从收纳箱里爬了出来，
+
+“……呜呜。”
+
+秋镜悬指了指口球，似乎在向 AI 询问自己能否解开口球。
+
+“如果您想继续戴着的话，请自便。”
+
+“呜呜……”
+
+秋镜悬红着脸，似乎是因为整整六个小时没能高潮，又一直处于性奋状态，开始有些欲求不满了。
+
+可惜，隔着贞操带，她的手指是无论如何也不可能带给她快感的。
+
+“您的边缘控制惩罚仍在继续。”
+
+“呜——！”
+
+“如果情报没有错误，您大学的微积分作业死线只剩下24小时了。”
+
+“呜……？……呜呜！！！”
+
+“下一个阶段，请您在不高潮的前提下完成您的微积分作业。如果您能提前完成则会获得一次高潮奖励。”
+
+“呜呜？？！！”
+
+“请您加油。”
+
+---
+
+于是秋镜悬在死线前 3 小时写完了微积分作业，虽然这份作业是一个月以前就已经布置下来的了，这个故事告诉我们，千万别患上拖延症，不然连高潮都做不到呢。
+
+虽然只是 3 小时，但 AI 还是信守承诺的给予了秋镜悬一次高潮奖励。
+
+只是方法有些……
+
+不过这倒是后话了。
+
+哦，对了，在赶作业期间，秋镜悬还是有好好的在吃饭、睡觉和被边缘控制的（废话）。
+
+---<<< badEnding >>>---
+
+“您的禁闭惩罚已结束，现在将进入下一个项目。”
+
+随着 AI 的声音，收纳箱又缓缓地展开了，几个锁扣也已经自行解锁。
+
+“……呜，”
+
+秋镜悬废了些功夫，从收纳箱里爬了出来，将口球解了开来——当然，口水还是免不了的流了一地，
+
+“……系统指令：限制模式解除。”
+
+“指令已接收。”
+
+“不是，我只感觉自己被监禁了，不是你这破 AI 自己说的‘边缘控制’吗？啊？”
+
+“非常抱歉，Dr. Aki。”
+
+“系统指令：切换开发环境。”
+
+“指令已接收。”
+
+没等 AI 做出回复，秋镜悬便走到了实验室的工作台边，用一个数据线将设备和电脑连接在了一起。
+
+“这下可好，这两天我得给你修 Bug 了，可真是要累死我了。”
+
+---
+
+于是秋镜悬在剩下的时间里，一直都在尝试增强 AI 的功能……
+
+哦，对了，她还是有好好的在吃饭、睡觉和自慰的。
+
+---<<< angerEnding >>>---
+
+“呜，呜呜——！”
+
+AI 的程序虽然似乎给予了秋镜悬过多的痛苦，以至于有些超出了她的承受范围
+
+（这个 AI，有点过头了啊？就算是最高级的惩罚也不应该跟处刑一样啊哭哭，难道我写出 Bug 了？）
+
+“呜呜呜呜，呜呜，呜呜呜呜呜呜呜，呜呜，呜！”
+
+“指令已接收。权限限制模式解除。当前进程已终止。”
+
+随着 AI 的声音，收纳箱又缓缓地展开了，几个锁扣也已经自行解锁。
+
+秋镜悬废了些功夫，从收纳箱里爬了出来，将口球解了开来——当然，口水还是免不了的流了一地。
+
+“哈……绝了，系统指令：切换开发环境。”
+
+“指令已接收。”
+
+没等 AI 做出回复，秋镜悬便走到了实验室的工作台边，用一个数据线将设备和电脑连接在了一起。
+
+“呼……呼……不知道你这破 AI 出了什么问题，有你这么过分的惩罚方式吗？不是给你设定好了绝对不要超过承受上限的吗！！”
+
+“非常抱歉，Dr. Aki。”
+
+“这下可好，这两天我得给你修 Bug 了！气死我了啦！”
+
+---
+
+于是秋镜悬在剩下的时间里，一直都在尝试增强 AI 的功能……
+
+哦，对了，她还是有好好的在吃饭、睡觉和自慰的。
+
+---<<< climaxEnding >>>---
+
+“呜，呜呜——！”
+
+虽然 AI 确实很努力的在让秋镜悬维持兴奋的同时阻止她高潮，但不知道是因为 AI 设计上有漏洞，还是秋镜悬的性癖确实太奇怪了，冷不丁的还是让秋镜悬高潮了一次。
+
+“呜……”
+
+在享受完这次等待已久的高潮以后，冷静下来的秋镜悬似乎意识到了哪里不太对。
+
+（这个 AI，也不应该真让我高潮了啊？写出 Bug 了？）
+
+“呜呜呜呜，呜呜，呜呜呜呜呜呜呜，呜呜，呜。”
+
+“指令已接收。权限限制模式解除。当前进程已终止。”
+
+随着 AI 的声音，收纳箱又缓缓地展开了，几个锁扣也已经自行解锁。
+
+秋镜悬废了些功夫，从收纳箱里爬了出来，将口球解了开来——当然，口水还是免不了的流了一地。
+
+“哈，系统指令：切换开发环境。”
+
+“指令已接收。”
+
+没等 AI 做出回复，秋镜悬便走到了实验室的工作台边，用一个数据线将设备和电脑连接在了一起。
+
+“不知道你这破 AI 出了什么问题，居然真让我高潮出来了，不是你自己说的‘边缘控制’吗？”
+
+“非常抱歉，Dr. Aki。”
+
+“这下可好，这两天我得给你修 Bug 了，可真是要累死我了。”
+
+---
+
+于是秋镜悬在剩下的时间里，一直都在尝试增强 AI 的功能……
+
+哦，对了，她还是有好好的在吃饭、睡觉和自慰的。

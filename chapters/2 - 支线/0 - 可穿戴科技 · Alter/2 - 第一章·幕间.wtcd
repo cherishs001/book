@@ -1,0 +1,230 @@
+WTCD 1.3
+declare[
+    boolean roomKey = false
+    boolean inRoom = true
+    boolean nearDoor = false
+    boolean nearTable = false
+    boolean gagKey = false
+    boolean scisorGained = false
+]
+declare[
+    boolean gag = false
+    number handNodeProgress = 0
+    number footNodeProgress = 0
+]
+declare[
+    number time = 0
+    number left
+]
+declare[
+    string temp = ""
+    boolean canMove = false
+]
+declare[
+    action operationAction = goto operation
+    action endAction = goto failed
+]
+section main then goto stats
+section stats {
+    left = 193 - time 
+    (gag && handNodeProgress>=100 && footNodeProgress >= 100)?{
+        operationAction = goto success
+        endAction = goto success
+    }:{}
+} then (time<193)
+    ? operationAction
+    : endAction
+section operation then selection[
+    choice "试图移动" goto movement
+    choice "查看周围" goto lookAround
+    choice "搜索周围" goto search
+    choice "挣扎" selection[
+        choice "挣扎-腕部" goto struggleWrist
+        choice "挣扎-脚踝" goto struggleFoot
+        choice "挣扎-口球" goto struggleGag
+    ]
+]
+section movement{
+    canMove = true
+    (inRoom && roomKey) ? {
+        temp = "门外"
+    } : (inRoom &&nearDoor&& !roomKey) ? {
+        temp = "床边"
+    } : (!inRoom && roomKey) ? {
+        temp = "餐桌旁"
+    } : (!nearTable)?{
+        temp = "门边"
+    } : {
+        canMove = false
+    }
+    (footNodeProgress >= 70&&canMove) ? {
+        time += 1
+        contentAddParagraph::["因为腿上的绳子基本上松开了，秋镜悬只花了一会儿就到达了" + temp]
+    } : (footNodeProgress >= 30&&canMove)? {
+        time += randomInt::[3 6]
+        contentAddParagraph::["因为腿上的绳子有些松开了，秋镜悬花了一些便到达了" + temp]
+    } : (footNodeProgress >= 10&&canMove)? {
+        time += randomInt::[10 16]
+        contentAddParagraph::["腿上的绳子依然很紧，秋镜悬只能挪动着、跳着移动，过了很久才到达" + temp]
+    } : (canMove)?{
+        contentAddParagraph::["秋镜悬想要移动到" + temp + "，但腿上的绳子实在是太紧了，根本无法移动"]
+        canMove = false
+    } :{
+        contentAddParagraph::["秋镜悬已经在餐桌旁了，在去其他地方前还是先解开束缚为妙。"]
+    }
+    (canMove) ? {
+        (inRoom&&nearDoor&& !roomKey) ?{
+            nearDoor = false
+        } : (inRoom&&roomKey) ? {
+            inRoom = false
+            nearDoor = false
+        } : (inRoom) ? {
+            nearDoor = true
+        } : {
+            nearTable = true
+        }
+    }:{}
+    (inRoom&&nearDoor&& !roomKey) ? {
+        contentAddParagraph::["试图开门的秋镜悬发现门被锁上了，只得先去找房门钥匙。"]
+    }:{}
+} then goto stats
+section lookAround {
+    (inRoom && !nearDoor) ? {
+        contentAddParagraph::["这是秋镜悬的床边，床边有一个床头柜，而床头柜上则是今早被秋镜悬丢出窗外又被李随物捡回来的闹钟。"]
+    } : (inRoom && nearDoor) ? {
+        contentAddParagraph::["这是秋镜悬的房间门边，门在之前被李随物从外面锁上了，只有用钥匙才能打开房门。"]
+    } : (!inRoom && !nearTable) ? {
+        contentAddParagraph::["这是秋镜悬房间门口，前面不远就是餐厅了，李随物正在厨房里处理着今天的午饭。"]
+    } : (nearTable) ? {
+        contentAddParagraph::["这是秋镜悬家的餐桌，"+(scisorGained?"":"桌上摆着一把剪刀和一个钥匙，")+"而李随物正在厨房里坏笑着看着她。"]
+    } : {
+        contentAddParagraph::["秋镜悬发现自己似乎在一个奇怪的地方。"]
+    }
+}then goto stats
+section search {
+    canMove = true
+    (handNodeProgress >= 20)? {
+        time += randomInt::[3 6]
+        contentAddParagraph::["因为身上的绳子并没有那么紧了，过了不久，"]
+    } : (handNodeProgress >= 10)? {
+        time += randomInt::[10 16]
+        contentAddParagraph::["秋镜悬十分努力地搜索着周围，经过了很久，"]
+    } : {
+        contentAddParagraph::["秋镜悬的双手被紧紧的捆在了身后，并不能搜索周围的物品。"]
+        canMove = false
+    }
+    canMove ? {
+        (inRoom && !nearDoor) ? {
+            roomKey = true
+            contentAddParagraph::["秋镜悬在床头柜里找到了房间的钥匙"]
+        } : (inRoom && nearDoor) ? {
+            contentAddParagraph::["秋镜悬什么也没找到。"]
+        } : (!inRoom && !nearTable) ? {
+            contentAddParagraph::["秋镜悬什么也没找到。"]
+        } : (nearTable) ? {
+            gagKey = true
+            scisorGained = true
+            contentAddParagraph::["秋镜悬捡起了桌上的剪刀和口球的钥匙。"]
+        } : {
+            contentAddParagraph::["秋镜悬发现自己似乎在一个奇怪的地方。"]
+        }
+    }:{}
+}then goto stats
+section struggleWrist{
+    scisorGained ? {
+        time += 1
+        handNodeProgress = 100
+        contentAddParagraph::["秋镜悬用剪刀轻而易举的剪开了身上的束缚。"]
+    } : {
+        time += randomInt::[3 6]
+        handNodeProgress += randomInt::[0 3]
+        contentAddParagraph::["李随物在捆绑时似乎格外的用心，所以秋镜悬的挣扎没能起什么效果。"]
+    }
+} then goto stats
+section struggleFoot{
+    scisorGained ? {
+        time += 1
+        footNodeProgress = 100
+        contentAddParagraph::["秋镜悬用剪刀轻而易举的剪开了腿上的束缚。"]
+    }: handNodeProgress>=100 ?{
+        time += randomInt::[4 7]
+        footNodeProgress = 100
+        contentAddParagraph::["秋镜悬花了些时间解开了腿上的束缚。"]
+    }: {
+        time += randomInt::[4 7]
+        footNodeProgress += randomInt::[3 7]
+        contentAddParagraph::["秋镜悬努力地挣扎着，或许是因为李随物在捆绑她的腿时并没有特别的认真，进度增加了不少。"]
+    }
+} then goto stats
+section struggleGag{
+    (gagKey && handNodeProgress>=100) ? {
+        gag = true
+        contentAddParagraph::["秋镜悬用钥匙打开了口球。"]
+    } : (gagKey) ? {
+        contentAddParagraph::["双手被束缚在身后的秋镜悬似乎并不能够到口球的钥匙孔。"]
+    }:{
+        contentAddParagraph::["秋镜悬意识到自己手上并没有口球的钥匙，她应该先去餐桌边上找到李随物放下的钥匙。"]   
+    }
+} then goto stats
+section failed then goto end
+section success then goto end
+section end then exit
+
+---<<< main >>>---
+
+# 1.5. 幕间
+友人♪B
+
+秋镜悬知道自己的妹妹一旦开启抖S模式，那是绝对不会留手的，再三权衡以后，还是觉得自己应该尽早挣脱开微妙。
+
+毕竟谁也不知道，李随物口中那“小小的惩罚”究竟是什么。
+
+距离十二点半还有 193 分钟。
+
+---<<< stats >>>---
+
+现在经过了 <$ time $> 分钟。
+
+秋镜悬的手腕已经挣脱了 <$ handNodeProgress $>%。
+
+秋镜悬的脚踝已经挣脱了 <$ footNodeProgress $>%。
+
+---<<< operation >>>---
+
+秋镜悬现在打算：
+
+---<<< failed >>>---
+
+经过了 193 分钟，秋镜悬并没有能把身上所有的拘束都卸下来。
+
+“那么，镜悬姐，愿赌服输~”
+
+说着，李随物将秋镜悬身上的拘束全部重新捆绑了一遍后，将口球摘了下来，
+
+“那这个‘小小的惩罚’，就是让你捆着吃午饭哟！”
+
+“诶？这我怎么吃嘛！”
+
+“这就是镜悬姐你自己的事情了。”
+
+“呜哇，超过分！”
+
+---<<< success >>>---
+
+还没到达规定的时间，秋镜悬就已经挣脱出了束缚，于是她便向厨房里的李随物搭话到：
+
+“诶嘿，挣脱完成！”
+
+“不错嘛镜悬姐，对了，今天的午饭吃咖喱哦。”
+
+---<<< end >>>---
+
+---
+
+总之，吃完午饭的秋镜悬躺回了床上，而当她看见床头的闹钟时——
+
+“我*！光顾着捆绑 Play，忘记*那东西*的试验机已经送到了！”
+
+*那东西*？啥啊？
+
+且听下回分解。
