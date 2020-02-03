@@ -260,6 +260,74 @@ window.DATA={
         ],
         "subFolders": [
           {
+            "displayName": "可穿戴科技 · Alter",
+            "displayIndex": 0,
+            "name": "0 - 可穿戴科技 · Alter",
+            "sourceRelativePath": "2 - 支线/0 - 可穿戴科技 · Alter",
+            "isRoot": false,
+            "chapters": [
+              {
+                "displayName": "序章",
+                "displayIndex": 0,
+                "name": "0 - 序章",
+                "sourceRelativePath": "2 - 支线/0 - 可穿戴科技 · Alter/0 - 序章.md",
+                "type": "Markdown",
+                "isEarlyAccess": false,
+                "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/115",
+                "htmlRelativePath": "支线/可穿戴科技-·-Alter/序章.html",
+                "chapterCharCount": 800
+              },
+              {
+                "displayName": "第一章",
+                "displayIndex": 1,
+                "name": "1 - 第一章",
+                "sourceRelativePath": "2 - 支线/0 - 可穿戴科技 · Alter/1 - 第一章.md",
+                "type": "Markdown",
+                "isEarlyAccess": false,
+                "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/116",
+                "htmlRelativePath": "支线/可穿戴科技-·-Alter/第一章.html",
+                "chapterCharCount": 1757
+              },
+              {
+                "displayName": "第一章·幕间",
+                "displayIndex": 2,
+                "name": "2 - 第一章·幕间",
+                "sourceRelativePath": "2 - 支线/0 - 可穿戴科技 · Alter/2 - 第一章·幕间.wtcd",
+                "isEarlyAccess": false,
+                "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/117",
+                "preferredReader": "game",
+                "type": "WTCD",
+                "htmlRelativePath": "支线/可穿戴科技-·-Alter/第一章·幕间.html",
+                "chapterCharCount": 477
+              },
+              {
+                "displayName": "第二章",
+                "displayIndex": 3,
+                "name": "3 - 第二章",
+                "sourceRelativePath": "2 - 支线/0 - 可穿戴科技 · Alter/3 - 第二章.md",
+                "type": "Markdown",
+                "isEarlyAccess": false,
+                "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/118",
+                "htmlRelativePath": "支线/可穿戴科技-·-Alter/第二章.html",
+                "chapterCharCount": 3891
+              },
+              {
+                "displayName": "第二章·幕间",
+                "displayIndex": 4,
+                "name": "4 - 第二章·幕间",
+                "sourceRelativePath": "2 - 支线/0 - 可穿戴科技 · Alter/4 - 第二章·幕间.wtcd",
+                "isEarlyAccess": false,
+                "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/119",
+                "preferredReader": "game",
+                "type": "WTCD",
+                "htmlRelativePath": "支线/可穿戴科技-·-Alter/第二章·幕间.html",
+                "chapterCharCount": 2242
+              }
+            ],
+            "subFolders": [],
+            "folderCharCount": 9167
+          },
+          {
             "displayName": "水晶永耀线",
             "displayIndex": 1,
             "name": "1 - 水晶永耀线",
@@ -282,7 +350,7 @@ window.DATA={
             "folderCharCount": 2602
           }
         ],
-        "folderCharCount": 21574
+        "folderCharCount": 30741
       },
       {
         "displayName": "小作品",
@@ -848,26 +916,26 @@ window.DATA={
         "folderCharCount": 1361
       }
     ],
-    "folderCharCount": 210523
+    "folderCharCount": 219690
   },
-  "charsCount": 210523,
-  "paragraphsCount": 3978,
+  "charsCount": 219690,
+  "paragraphsCount": 4319,
   "keywordsCount": [
     [
       "高潮",
-      394
+      408
     ],
     [
       "贞操带",
-      208
+      218
     ],
     [
       "按摩棒",
-      198
+      199
     ],
     [
       "WTCD",
-      101
+      102
     ],
     [
       "陈志鹏",
@@ -879,7 +947,7 @@ window.DATA={
     ],
     [
       "按摩器",
-      27
+      28
     ],
     [
       "仙女棒",
@@ -926,5 +994,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "396"
+  "buildNumber": "399"
 };
