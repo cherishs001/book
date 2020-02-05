@@ -887,7 +887,7 @@ window.DATA={
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/107",
             "htmlRelativePath": "人设卡/石倚.html",
-            "chapterCharCount": 489
+            "chapterCharCount": 551
           },
           {
             "displayName": "其他角色",
@@ -902,7 +902,7 @@ window.DATA={
           }
         ],
         "subFolders": [],
-        "folderCharCount": 1768
+        "folderCharCount": 1830
       },
       {
         "displayName": "杂项",
@@ -927,9 +927,9 @@ window.DATA={
         "folderCharCount": 1361
       }
     ],
-    "folderCharCount": 221312
+    "folderCharCount": 221374
   },
-  "charsCount": 221312,
+  "charsCount": 221374,
   "paragraphsCount": 4370,
   "keywordsCount": [
     [
@@ -1005,5 +1005,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "400"
+  "buildNumber": "402"
 };
