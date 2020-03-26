@@ -56,7 +56,7 @@ window.DATA={
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/10",
             "htmlRelativePath": "主线/第-3-章.html",
-            "chapterCharCount": 3477
+            "chapterCharCount": 3547
           },
           {
             "displayName": "第 4 章",
@@ -225,7 +225,7 @@ window.DATA={
           }
         ],
         "subFolders": [],
-        "folderCharCount": 97529
+        "folderCharCount": 97599
       },
       {
         "displayName": "支线",
@@ -905,6 +905,28 @@ window.DATA={
         "folderCharCount": 1830
       },
       {
+        "displayName": "插图",
+        "displayIndex": 7,
+        "name": "7 - 插图",
+        "sourceRelativePath": "7 - 插图",
+        "isRoot": false,
+        "chapters": [
+          {
+            "displayName": "床上",
+            "displayIndex": 1,
+            "name": "1 - 床上",
+            "sourceRelativePath": "7 - 插图/1 - 床上.md",
+            "type": "Markdown",
+            "isEarlyAccess": false,
+            "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/124",
+            "htmlRelativePath": "插图/床上.html",
+            "chapterCharCount": 179
+          }
+        ],
+        "subFolders": [],
+        "folderCharCount": 179
+      },
+      {
         "displayName": "杂项",
         "displayIndex": 10,
         "name": "10 - 杂项",
@@ -927,10 +949,10 @@ window.DATA={
         "folderCharCount": 1361
       }
     ],
-    "folderCharCount": 221374
+    "folderCharCount": 221623
   },
-  "charsCount": 221374,
-  "paragraphsCount": 4370,
+  "charsCount": 221623,
+  "paragraphsCount": 4377,
   "keywordsCount": [
     [
       "高潮",
@@ -1005,5 +1027,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "402"
+  "buildNumber": "407"
 };

@@ -1889,7 +1889,7 @@ function createHint(text, timeMs = 2000) {
         $hint.style.opacity = '0';
         // tslint:disable-next-line:no-unused-expression
         $hint.offsetWidth;
-        $hint.style.opacity = null;
+        $hint.style.removeProperty('opacity');
         yield new Promise(resolve => setTimeout(resolve, timeMs));
         $hint.style.opacity = '0';
         yield new Promise(resolve => setTimeout(resolve, 500));
