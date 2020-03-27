@@ -218,14 +218,14 @@ window.DATA={
             "name": "18",
             "sourceRelativePath": "1 - 主线/18.md",
             "type": "Markdown",
-            "isEarlyAccess": true,
-            "commentsUrl": null,
+            "isEarlyAccess": false,
+            "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/126",
             "htmlRelativePath": "主线/第-18-章.html",
-            "chapterCharCount": 1622
+            "chapterCharCount": 7880
           }
         ],
         "subFolders": [],
-        "folderCharCount": 97599
+        "folderCharCount": 103857
       },
       {
         "displayName": "支线",
@@ -949,22 +949,22 @@ window.DATA={
         "folderCharCount": 1361
       }
     ],
-    "folderCharCount": 221623
+    "folderCharCount": 227881
   },
-  "charsCount": 221623,
-  "paragraphsCount": 4377,
+  "charsCount": 227881,
+  "paragraphsCount": 4559,
   "keywordsCount": [
     [
       "高潮",
-      409
+      410
     ],
     [
       "贞操带",
-      219
+      225
     ],
     [
       "按摩棒",
-      201
+      205
     ],
     [
       "WTCD",
@@ -972,15 +972,15 @@ window.DATA={
     ],
     [
       "陈志鹏",
-      78
+      80
     ],
     [
       "陈变态",
-      32
+      33
     ],
     [
       "按摩器",
-      28
+      30
     ],
     [
       "仙女棒",
@@ -1027,5 +1027,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "410"
+  "buildNumber": "412"
 };
