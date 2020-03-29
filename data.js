@@ -221,11 +221,11 @@ window.DATA={
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/126",
             "htmlRelativePath": "主线/第-18-章.html",
-            "chapterCharCount": 8555
+            "chapterCharCount": 8554
           }
         ],
         "subFolders": [],
-        "folderCharCount": 104532
+        "folderCharCount": 104531
       },
       {
         "displayName": "支线",
@@ -960,9 +960,9 @@ window.DATA={
         "folderCharCount": 1361
       }
     ],
-    "folderCharCount": 242888
+    "folderCharCount": 242887
   },
-  "charsCount": 242888,
+  "charsCount": 242887,
   "paragraphsCount": 4755,
   "keywordsCount": [
     [
@@ -1038,5 +1038,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "416"
+  "buildNumber": "417"
 };
