@@ -514,6 +514,17 @@ window.DATA={
             "chapterCharCount": 7470
           },
           {
+            "displayName": "可穿戴科技的其他版本 · Flexible (Episode 1)",
+            "displayIndex": 1001,
+            "name": "1001 - 可穿戴科技的其他版本 · Flexible (Episode 1)",
+            "sourceRelativePath": "4 - 道具集/1001 - 可穿戴科技的其他版本 · Flexible (Episode 1).md",
+            "type": "Markdown",
+            "isEarlyAccess": false,
+            "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/127",
+            "htmlRelativePath": "道具集/可穿戴科技的其他版本-·-Flexible-(Episode-1).html",
+            "chapterCharCount": 14332
+          },
+          {
             "displayName": "家庭用多功能放置架套装",
             "displayIndex": 10000,
             "name": "10000 - 家庭用多功能放置架套装",
@@ -548,7 +559,7 @@ window.DATA={
           }
         ],
         "subFolders": [],
-        "folderCharCount": 52537
+        "folderCharCount": 66869
       },
       {
         "displayName": "META",
@@ -949,18 +960,18 @@ window.DATA={
         "folderCharCount": 1361
       }
     ],
-    "folderCharCount": 227881
+    "folderCharCount": 242213
   },
-  "charsCount": 227881,
-  "paragraphsCount": 4559,
+  "charsCount": 242213,
+  "paragraphsCount": 4730,
   "keywordsCount": [
     [
       "高潮",
-      410
+      445
     ],
     [
       "贞操带",
-      225
+      238
     ],
     [
       "按摩棒",
@@ -975,12 +986,12 @@ window.DATA={
       80
     ],
     [
-      "陈变态",
-      33
+      "按摩器",
+      34
     ],
     [
-      "按摩器",
-      30
+      "陈变态",
+      33
     ],
     [
       "仙女棒",
@@ -1027,5 +1038,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "412"
+  "buildNumber": "415"
 };
