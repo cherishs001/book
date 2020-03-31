@@ -221,11 +221,11 @@ window.DATA={
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/126",
             "htmlRelativePath": "主线/第-18-章.html",
-            "chapterCharCount": 8555
+            "chapterCharCount": 8608
           }
         ],
         "subFolders": [],
-        "folderCharCount": 104532
+        "folderCharCount": 104585
       },
       {
         "displayName": "支线",
@@ -934,19 +934,19 @@ window.DATA={
             "chapterCharCount": 179
           },
           {
-            "displayName": "18章",
+            "displayName": "18 章",
             "displayIndex": 2,
-            "name": "2 - 18章",
-            "sourceRelativePath": "7 - 插图/2 - 18章.md",
+            "name": "2 - 18 章",
+            "sourceRelativePath": "7 - 插图/2 - 18 章.md",
             "type": "Markdown",
             "isEarlyAccess": false,
-            "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/124",
-            "htmlRelativePath": "插图/18章.html",
-            "chapterCharCount": 40
+            "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/131",
+            "htmlRelativePath": "插图/18-章.html",
+            "chapterCharCount": 41
           }
         ],
         "subFolders": [],
-        "folderCharCount": 219
+        "folderCharCount": 220
       },
       {
         "displayName": "杂项",
@@ -971,10 +971,10 @@ window.DATA={
         "folderCharCount": 1361
       }
     ],
-    "folderCharCount": 242928
+    "folderCharCount": 242982
   },
-  "charsCount": 242928,
-  "paragraphsCount": 4758,
+  "charsCount": 242982,
+  "paragraphsCount": 4760,
   "keywordsCount": [
     [
       "高潮",
@@ -1049,5 +1049,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "419"
+  "buildNumber": "420"
 };
