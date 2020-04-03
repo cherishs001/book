@@ -274,10 +274,10 @@ window.DATA={
             "name": "4 - 为霜的幸福♂♀生活",
             "sourceRelativePath": "2 - 支线/4 - 为霜的幸福♂♀生活.md",
             "type": "Markdown",
-            "isEarlyAccess": true,
+            "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/132",
             "htmlRelativePath": "支线/为霜的幸福♂♀生活.html",
-            "chapterCharCount": 672
+            "chapterCharCount": 2115
           }
         ],
         "subFolders": [
@@ -372,7 +372,7 @@ window.DATA={
             "folderCharCount": 2602
           }
         ],
-        "folderCharCount": 31413
+        "folderCharCount": 32856
       },
       {
         "displayName": "小作品",
@@ -982,14 +982,14 @@ window.DATA={
         "folderCharCount": 1361
       }
     ],
-    "folderCharCount": 243654
+    "folderCharCount": 245097
   },
-  "charsCount": 243654,
-  "paragraphsCount": 4773,
+  "charsCount": 245097,
+  "paragraphsCount": 4797,
   "keywordsCount": [
     [
       "高潮",
-      445
+      450
     ],
     [
       "贞操带",
@@ -1060,5 +1060,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "427"
+  "buildNumber": "429"
 };
