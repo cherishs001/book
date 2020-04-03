@@ -267,6 +267,17 @@ window.DATA={
             "type": "WTCD",
             "htmlRelativePath": "支线/艾迦塔调教录像.html",
             "chapterCharCount": 3893
+          },
+          {
+            "displayName": "为霜的幸福♂♀生活",
+            "displayIndex": 4,
+            "name": "4 - 为霜的幸福♂♀生活",
+            "sourceRelativePath": "2 - 支线/4 - 为霜的幸福♂♀生活.md",
+            "type": "Markdown",
+            "isEarlyAccess": true,
+            "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/132",
+            "htmlRelativePath": "支线/为霜的幸福♂♀生活.html",
+            "chapterCharCount": 672
           }
         ],
         "subFolders": [
@@ -361,7 +372,7 @@ window.DATA={
             "folderCharCount": 2602
           }
         ],
-        "folderCharCount": 30741
+        "folderCharCount": 31413
       },
       {
         "displayName": "小作品",
@@ -971,10 +982,10 @@ window.DATA={
         "folderCharCount": 1361
       }
     ],
-    "folderCharCount": 242982
+    "folderCharCount": 243654
   },
-  "charsCount": 242982,
-  "paragraphsCount": 4760,
+  "charsCount": 243654,
+  "paragraphsCount": 4773,
   "keywordsCount": [
     [
       "高潮",
@@ -1049,5 +1060,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "421"
+  "buildNumber": "427"
 };
