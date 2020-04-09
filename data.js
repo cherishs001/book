@@ -277,7 +277,7 @@ window.DATA={
             "isEarlyAccess": false,
             "commentsUrl": null,
             "htmlRelativePath": "支线/为霜的幸福♂♀生活.html",
-            "chapterCharCount": 8330
+            "chapterCharCount": 9246
           }
         ],
         "subFolders": [
@@ -372,7 +372,7 @@ window.DATA={
             "folderCharCount": 2602
           }
         ],
-        "folderCharCount": 39071
+        "folderCharCount": 39987
       },
       {
         "displayName": "小作品",
@@ -982,14 +982,14 @@ window.DATA={
         "folderCharCount": 1361
       }
     ],
-    "folderCharCount": 251312
+    "folderCharCount": 252228
   },
-  "charsCount": 251312,
-  "paragraphsCount": 4945,
+  "charsCount": 252228,
+  "paragraphsCount": 4963,
   "keywordsCount": [
     [
       "高潮",
-      452
+      453
     ],
     [
       "贞操带",
@@ -1060,5 +1060,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "439"
+  "buildNumber": "442"
 };
