@@ -267,17 +267,6 @@ window.DATA={
             "type": "WTCD",
             "htmlRelativePath": "支线/艾迦塔调教录像.html",
             "chapterCharCount": 3893
-          },
-          {
-            "displayName": "为霜的幸福♂♀生活",
-            "displayIndex": 4,
-            "name": "4 - 为霜的幸福♂♀生活",
-            "sourceRelativePath": "2 - 支线/4 - 为霜的幸福♂♀生活.md",
-            "type": "Markdown",
-            "isEarlyAccess": false,
-            "commentsUrl": null,
-            "htmlRelativePath": "支线/为霜的幸福♂♀生活.html",
-            "chapterCharCount": 9246
           }
         ],
         "subFolders": [
@@ -370,9 +359,76 @@ window.DATA={
             ],
             "subFolders": [],
             "folderCharCount": 2602
+          },
+          {
+            "displayName": "为霜和克西拉的日常",
+            "displayIndex": 2,
+            "name": "2 - 为霜和克西拉的日常",
+            "sourceRelativePath": "2 - 支线/2 - 为霜和克西拉的日常",
+            "isRoot": false,
+            "chapters": [
+              {
+                "displayName": "人设",
+                "displayIndex": 1,
+                "name": "1 - 人设",
+                "sourceRelativePath": "2 - 支线/2 - 为霜和克西拉的日常/1 - 人设.md",
+                "type": "Markdown",
+                "isEarlyAccess": false,
+                "commentsUrl": null,
+                "htmlRelativePath": "支线/为霜和克西拉的日常/人设.html",
+                "chapterCharCount": 1907
+              }
+            ],
+            "subFolders": [
+              {
+                "displayName": "为霜线",
+                "displayIndex": 1,
+                "name": "1 - 为霜线",
+                "sourceRelativePath": "2 - 支线/2 - 为霜和克西拉的日常/1 - 为霜线",
+                "isRoot": false,
+                "chapters": [
+                  {
+                    "displayName": "第一章",
+                    "displayIndex": 1,
+                    "name": "1 - 第一章 - 结束了",
+                    "sourceRelativePath": "2 - 支线/2 - 为霜和克西拉的日常/1 - 为霜线/1 - 第一章 - 结束了.md",
+                    "type": "Markdown",
+                    "isEarlyAccess": false,
+                    "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/132",
+                    "htmlRelativePath": "支线/为霜和克西拉的日常/为霜线/第一章.html",
+                    "chapterCharCount": 4334
+                  },
+                  {
+                    "displayName": "第二章",
+                    "displayIndex": 2,
+                    "name": "2 - 第二章 - Game Time！",
+                    "sourceRelativePath": "2 - 支线/2 - 为霜和克西拉的日常/1 - 为霜线/2 - 第二章 - Game Time！.md",
+                    "type": "Markdown",
+                    "isEarlyAccess": false,
+                    "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/132",
+                    "htmlRelativePath": "支线/为霜和克西拉的日常/为霜线/第二章.html",
+                    "chapterCharCount": 4836
+                  },
+                  {
+                    "displayName": "第三章",
+                    "displayIndex": 3,
+                    "name": "3 - 第三章 - 谁说neko不能养neko？",
+                    "sourceRelativePath": "2 - 支线/2 - 为霜和克西拉的日常/1 - 为霜线/3 - 第三章 - 谁说neko不能养neko？.md",
+                    "type": "Markdown",
+                    "isEarlyAccess": false,
+                    "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/132",
+                    "htmlRelativePath": "支线/为霜和克西拉的日常/为霜线/第三章.html",
+                    "chapterCharCount": 3858
+                  }
+                ],
+                "subFolders": [],
+                "folderCharCount": 13028
+              }
+            ],
+            "folderCharCount": 14935
           }
         ],
-        "folderCharCount": 39987
+        "folderCharCount": 45676
       },
       {
         "displayName": "小作品",
@@ -982,22 +1038,22 @@ window.DATA={
         "folderCharCount": 1361
       }
     ],
-    "folderCharCount": 252228
+    "folderCharCount": 257917
   },
-  "charsCount": 252228,
-  "paragraphsCount": 4963,
+  "charsCount": 257917,
+  "paragraphsCount": 5136,
   "keywordsCount": [
     [
       "高潮",
-      453
+      459
     ],
     [
       "贞操带",
-      241
+      242
     ],
     [
       "按摩棒",
-      208
+      209
     ],
     [
       "WTCD",
@@ -1060,5 +1116,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "442"
+  "buildNumber": "445"
 };
