@@ -376,7 +376,7 @@ window.DATA={
                 "isEarlyAccess": false,
                 "commentsUrl": null,
                 "htmlRelativePath": "支线/为霜和克西拉的日常/人设.html",
-                "chapterCharCount": 1907
+                "chapterCharCount": 2199
               }
             ],
             "subFolders": [
@@ -425,10 +425,10 @@ window.DATA={
                 "folderCharCount": 13028
               }
             ],
-            "folderCharCount": 14935
+            "folderCharCount": 15227
           }
         ],
-        "folderCharCount": 45676
+        "folderCharCount": 45968
       },
       {
         "displayName": "小作品",
@@ -1038,10 +1038,10 @@ window.DATA={
         "folderCharCount": 1361
       }
     ],
-    "folderCharCount": 257917
+    "folderCharCount": 258209
   },
-  "charsCount": 257917,
-  "paragraphsCount": 5136,
+  "charsCount": 258209,
+  "paragraphsCount": 5155,
   "keywordsCount": [
     [
       "高潮",
@@ -1116,5 +1116,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "447"
+  "buildNumber": "451"
 };
