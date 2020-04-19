@@ -421,6 +421,17 @@ window.DATA={
                     "chapterCharCount": 3858
                   },
                   {
+                    "displayName": "第四章",
+                    "displayIndex": 4,
+                    "name": "4 - 第四章 - 这么坏的孩子，一定要好好调教一下啊",
+                    "sourceRelativePath": "2 - 支线/2 - 为霜和克西拉的日常/1 - 为霜线/4 - 第四章 - 这么坏的孩子，一定要好好调教一下啊.md",
+                    "type": "Markdown",
+                    "isEarlyAccess": false,
+                    "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/132",
+                    "htmlRelativePath": "支线/为霜和克西拉的日常/为霜线/第四章.html",
+                    "chapterCharCount": 2753
+                  },
+                  {
                     "displayName": "第五章",
                     "displayIndex": 5,
                     "name": "5 - 第五章 - 结束了",
@@ -433,13 +444,13 @@ window.DATA={
                   }
                 ],
                 "subFolders": [],
-                "folderCharCount": 15894
+                "folderCharCount": 18647
               }
             ],
-            "folderCharCount": 18093
+            "folderCharCount": 20846
           }
         ],
-        "folderCharCount": 48834
+        "folderCharCount": 51587
       },
       {
         "displayName": "小作品",
@@ -1049,22 +1060,22 @@ window.DATA={
         "folderCharCount": 1361
       }
     ],
-    "folderCharCount": 261075
+    "folderCharCount": 263828
   },
-  "charsCount": 261075,
-  "paragraphsCount": 5192,
+  "charsCount": 263828,
+  "paragraphsCount": 5255,
   "keywordsCount": [
     [
       "高潮",
-      463
+      465
     ],
     [
       "贞操带",
-      242
+      244
     ],
     [
       "按摩棒",
-      209
+      210
     ],
     [
       "WTCD",
@@ -1127,5 +1138,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "455"
+  "buildNumber": "457"
 };
