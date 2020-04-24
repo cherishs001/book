@@ -1448,7 +1448,7 @@ function createCommentElement(userAvatarUrl, userName, userUrl, createTime, upda
                 $comment.remove();
             },
         }, '屏蔽此人'),
-        ...content.split('\n\n').map(paragraph => hs_1.h('p', paragraph)),
+        ...content.split(/\r?\n\r?\n/).map(paragraph => hs_1.h('p', paragraph)),
     ]);
     return $comment;
 }
