@@ -998,7 +998,7 @@ window.DATA={
             "isEarlyAccess": false,
             "commentsUrl": "https://github.com/SCLeoX/Wearable-Technology/issues/147",
             "htmlRelativePath": "人设卡/秋镜悬.html",
-            "chapterCharCount": 363
+            "chapterCharCount": 934
           },
           {
             "displayName": "其他角色",
@@ -1013,7 +1013,7 @@ window.DATA={
           }
         ],
         "subFolders": [],
-        "folderCharCount": 2193
+        "folderCharCount": 2764
       },
       {
         "displayName": "插图",
@@ -1071,10 +1071,10 @@ window.DATA={
         "folderCharCount": 1361
       }
     ],
-    "folderCharCount": 264191
+    "folderCharCount": 264762
   },
-  "charsCount": 264191,
-  "paragraphsCount": 5257,
+  "charsCount": 264762,
+  "paragraphsCount": 5274,
   "keywordsCount": [
     [
       "高潮",
@@ -1149,5 +1149,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "464"
+  "buildNumber": "466"
 };
