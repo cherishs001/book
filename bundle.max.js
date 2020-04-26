@@ -402,15 +402,9 @@ class DebugLogger {
         console.info(this.prefix, this.css, ...stuff);
     }
     warn(...stuff) {
-        if (!settings_1.developerMode.getValue()) {
-            return;
-        }
         console.warn(this.prefix, this.css, ...stuff);
     }
     error(...stuff) {
-        if (!settings_1.developerMode.getValue()) {
-            return;
-        }
         console.error(this.prefix, this.css, ...stuff);
     }
 }
