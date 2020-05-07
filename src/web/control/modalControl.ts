@@ -87,3 +87,7 @@ export function confirm(title: string, desc: string, yes: string, no: string) {
     modal.open();
   });
 }
+
+export function isAnyModalOpened() {
+  return $modalHolder.childElementCount > 0;
+}
