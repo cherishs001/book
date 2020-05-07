@@ -7,7 +7,7 @@ export class AutoCache<TKey, TValue> {
     private logger: DebugLogger,
   ) {}
   public delete(key: TKey){
-    this.map.delete(key)
+    this.map.delete(key);
   }
   public get(key: TKey): Promise<TValue> {
     let value = this.map.get(key);
