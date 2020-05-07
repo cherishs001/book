@@ -1163,6 +1163,7 @@ const createWTCDErrorMessage_1 = require("./createWTCDErrorMessage");
 const createWTCDErrorMessageFromError_1 = require("./createWTCDErrorMessageFromError");
 const history_1 = require("./history");
 const layoutControl_1 = require("./layoutControl");
+const modalControl_1 = require("./modalControl");
 const processElements_1 = require("./processElements");
 const WTCDGameReaderUI_1 = require("./WTCDGameReaderUI");
 const debugLogger = new DebugLogger_1.DebugLogger('Chapter Control');
@@ -1322,6 +1323,9 @@ gestures_1.swipeEvent.on(direction => {
     }
 });
 keyboard_1.arrowKeyPressEvent.on(arrowKey => {
+    if (modalControl_1.isAnyModalOpened()) {
+        return;
+    }
     if (arrowKey === keyboard_1.ArrowKey.LEFT) {
         loadPrevChapter();
     }
@@ -1330,6 +1334,9 @@ keyboard_1.arrowKeyPressEvent.on(arrowKey => {
     }
 });
 keyboard_1.escapeKeyPressEvent.on(() => {
+    if (modalControl_1.isAnyModalOpened()) {
+        return;
+    }
     closeChapter();
     history_1.updateHistory(true);
 });
@@ -1374,7 +1381,7 @@ function insertContent(content, text, chapter) {
     }
 }
 
-},{"../../wtcd/FlowReader":50,"../DebugLogger":6,"../Event":7,"../constant/loadingText":9,"../constant/messages":11,"../data/AutoCache":29,"../data/data":30,"../data/settings":31,"../data/state":32,"../hs":33,"../input/gestures":35,"../input/keyboard":36,"../util/DOM":46,"./WTCDGameReaderUI":15,"./commentsControl":18,"./contentControl":19,"./createWTCDErrorMessage":20,"./createWTCDErrorMessageFromError":21,"./history":24,"./layoutControl":25,"./processElements":27}],17:[function(require,module,exports){
+},{"../../wtcd/FlowReader":50,"../DebugLogger":6,"../Event":7,"../constant/loadingText":9,"../constant/messages":11,"../data/AutoCache":29,"../data/data":30,"../data/settings":31,"../data/state":32,"../hs":33,"../input/gestures":35,"../input/keyboard":36,"../util/DOM":46,"./WTCDGameReaderUI":15,"./commentsControl":18,"./contentControl":19,"./createWTCDErrorMessage":20,"./createWTCDErrorMessageFromError":21,"./history":24,"./layoutControl":25,"./modalControl":26,"./processElements":27}],17:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const Event_1 = require("../Event");
@@ -2068,6 +2075,10 @@ function confirm(title, desc, yes, no) {
     });
 }
 exports.confirm = confirm;
+function isAnyModalOpened() {
+    return $modalHolder.childElementCount > 0;
+}
+exports.isAnyModalOpened = isAnyModalOpened;
 
 },{"../data/settings":31,"../hs":33,"../input/keyboard":36,"../util/DOM":46}],27:[function(require,module,exports){
 "use strict";
