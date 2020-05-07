@@ -4,6 +4,7 @@ import { Layout } from '../control/layoutControl';
 import { animation, BooleanSetting, charCount, developerMode, earlyAccess, EnumSetting, fontFamily, gestureSwitchChapter, useComments, warning, wtcdGameQuickLoadConfirm } from '../data/settings';
 import { ItemDecoration, ItemHandle, Menu } from '../Menu';
 import { BlockMenu } from './BlockMenu';
+import { MakaiMenu } from './MakaiMenu';
 
 export class EnumSettingMenu extends Menu {
   public constructor(parent: Menu, label: string, setting: EnumSetting, usePreview: boolean) {
@@ -34,6 +35,8 @@ export class EnumSettingMenu extends Menu {
 export class SettingsMenu extends Menu {
   public constructor(parent: Menu) {
     super('设置', parent);
+
+    this.addLink(new MakaiMenu(this), true);
     this.addBooleanSetting('NSFW 警告', warning);
     this.addBooleanSetting('使用动画', animation);
     this.addBooleanSetting('显示编写中章节', earlyAccess);
