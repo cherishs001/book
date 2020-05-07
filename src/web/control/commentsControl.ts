@@ -51,7 +51,7 @@ function createCommentElement(
         $comment.remove();
       },
     }, '屏蔽此人'),
-    ...content.split('\n\n').map(paragraph => h('p', paragraph)),
+    ...content.split(/\r?\n\r?\n/).map(paragraph => h('p', paragraph)),
   ]);
   return $comment;
 }

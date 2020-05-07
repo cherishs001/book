@@ -2,14 +2,7 @@ import { Chapter } from '../../Data';
 import { FlowReader } from '../../wtcd/FlowReader';
 import { WTCDParseResult } from '../../wtcd/types';
 import { loadingText } from '../constant/loadingText';
-import {
-  CHAPTER_FAILED,
-  EARLY_ACCESS_DESC,
-  EARLY_ACCESS_TITLE,
-  GO_TO_MENU,
-  NEXT_CHAPTER,
-  PREVIOUS_CHAPTER,
-} from '../constant/messages';
+import { CHAPTER_FAILED, EARLY_ACCESS_DESC, EARLY_ACCESS_TITLE, GO_TO_MENU, NEXT_CHAPTER, PREVIOUS_CHAPTER } from '../constant/messages';
 import { AutoCache } from '../data/AutoCache';
 import { relativePathLookUpMap } from '../data/data';
 import { earlyAccess, gestureSwitchChapter } from '../data/settings';
@@ -21,11 +14,12 @@ import { SwipeDirection, swipeEvent } from '../input/gestures';
 import { ArrowKey, arrowKeyPressEvent, escapeKeyPressEvent } from '../input/keyboard';
 import { getTextNodes, id } from '../util/DOM';
 import { loadComments } from './commentsControl';
-import { Content, ContentBlockStyle, focus, getCurrentContent, newContent, Side } from './contentControl';
+import { Content, ContentBlockStyle, focus, newContent, Side } from './contentControl';
 import { createWTCDErrorMessage } from './createWTCDErrorMessage';
 import { createWTCDErrorMessageFromError } from './createWTCDErrorMessageFromError';
 import { updateHistory } from './history';
 import { Layout, setLayout } from './layoutControl';
+import { isAnyModalOpened } from './modalControl';
 import { processElements } from './processElements';
 import { WTCDGameReaderUI } from './WTCDGameReaderUI';
 
@@ -224,6 +218,9 @@ swipeEvent.on(direction => {
 });
 
 arrowKeyPressEvent.on(arrowKey => {
+  if (isAnyModalOpened()) {
+    return;
+  }
   if (arrowKey === ArrowKey.LEFT) {
     loadPrevChapter();
   } else if (arrowKey === ArrowKey.RIGHT) {
@@ -232,6 +229,9 @@ arrowKeyPressEvent.on(arrowKey => {
 });
 
 escapeKeyPressEvent.on(() => {
+  if (isAnyModalOpened()) {
+    return;
+  }
   closeChapter();
   updateHistory(true);
 });

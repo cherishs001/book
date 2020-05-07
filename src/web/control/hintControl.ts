@@ -10,7 +10,7 @@ export function createHint(text: string, timeMs = 2000) {
     $hint.style.opacity = '0';
     // tslint:disable-next-line:no-unused-expression
     $hint.offsetWidth;
-    $hint.style.opacity = null;
+    $hint.style.removeProperty('opacity');
     await new Promise(resolve => setTimeout(resolve, timeMs));
     $hint.style.opacity = '0';
     await new Promise(resolve => setTimeout(resolve, 500));

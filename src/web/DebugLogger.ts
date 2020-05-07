@@ -22,15 +22,9 @@ export class DebugLogger {
     console.info(this.prefix, this.css, ...stuff);
   }
   public warn(...stuff: any) {
-    if (!developerMode.getValue()) {
-      return;
-    }
     console.warn(this.prefix, this.css, ...stuff);
   }
   public error(...stuff: any) {
-    if (!developerMode.getValue()) {
-      return;
-    }
     console.error(this.prefix, this.css, ...stuff);
   }
 }
