@@ -410,7 +410,7 @@ class DebugLogger {
 }
 exports.DebugLogger = DebugLogger;
 
-},{"./constant/materialDarkColors":10,"./data/settings":31,"./util/stringHash":49}],7:[function(require,module,exports){
+},{"./constant/materialDarkColors":10,"./data/settings":33,"./util/stringHash":52}],7:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class Event {
@@ -703,7 +703,7 @@ class Menu {
 }
 exports.Menu = Menu;
 
-},{"./DebugLogger":6,"./Event":7,"./control/layoutControl":25}],9:[function(require,module,exports){
+},{"./DebugLogger":6,"./Event":7,"./control/layoutControl":26}],9:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.loadingText = '加载中...';
@@ -803,6 +803,43 @@ exports.WTCD_ERROR_WTCD_STACK_TITLE = 'WTCD 调用栈';
 exports.WTCD_ERROR_WTCD_STACK_DESC = 'WTCD 调用栈记录了在错误发生时 WTCD 的解释器状态。这可以帮助理解错误发生的上下文。';
 exports.WTCD_ERROR_INTERNAL_STACK_TITLE = '内部调用栈';
 exports.WTCD_ERROR_INTERNAL_STACK_DESC = '内部调用栈记录了出现该错误时编译器或是解释器的状态。请注意内部调用栈通常只在调试 WTCD 编译器或是解释器时有用。内部调用栈通常对调试 WTCD 文档没有作用。';
+exports.MAKAI_ERROR_INTERNET = '和 Makai 主机通讯时出现错误 OxO, 或许是你的网络环境出现了问题？';
+exports.MAKAI_ERROR_SUBMIT_COMMENT_INVALID_TOKEN = 'Oops！评论失败啦，或许是你的令牌过期啦？';
+exports.MAKAI_ERROR_DELETE_COMMENT_INVALID_TOKEN = 'Oops！删除失败啦，或许是你的令牌过期啦？';
+exports.MAKAI_ERROR_EMPTY_TOKEN = '嘿！请先把令牌输进来啦！';
+exports.MAKAI_ERROR_INVALID_TOKEN = 'Oops！你的令牌并没有被 Makai 记录在案！';
+exports.MAKAI_ERROR_INVALID_EMAIL = '你输入的邮箱格式有问题啦！';
+exports.MAKAI_ERROR_USER_EXIST = '这个名字已经被使用过了！如果之前使用的人是你的话，把用过的令牌找来吧！';
+exports.MAKAI_ERROR_UNKNOWN = 'Oops！发生了一些不该发生的问题！快去把友人♪B或者琳喊来！';
+exports.MAKAI_INFO_SET_TOKKEN_SUCCESS = '你的 Makai 令牌已经设置完毕啦！';
+exports.MAKAI_INFO_CONFIRM_TOKEN = '正在确认你的 Makai 令牌……';
+exports.MAKAI_INFO_OBTAIN_TOKEN = '正在获取 Makai 令牌……';
+exports.MAKAI_GENERIC_AS = '以 ';
+exports.MAKAI_GENERIC_SUBMIT = ' 的身份评论';
+exports.MAKAI_GENERIC_SUBMITED_AT = ' 的身份发表于 ';
+exports.MAKAI_GENERIC_LAST_MODIFIED = '（最后修改于 ';
+exports.MAKAI_GENERIC_LAST_MODIFIED_SUFFIX = ' ）';
+exports.MAKAI_BUTTON_BLOCK = '屏蔽此人';
+exports.MAKAI_BUTTON_DELETE = '删除评论';
+exports.MAKAI_MODAL_TITLE_WARNING = '警告！';
+exports.MAKAI_MODAL_TITLE_INFO = '提示';
+exports.MAKAI_MODAL_TITLE_WAITING = '请等一下';
+exports.MAKAI_MODAL_TITLE_TOKEN = 'Makai 令牌';
+exports.MAKAI_MODAL_TITLE_COMMENT = 'Makai - 添加评论';
+exports.MAKAI_MODAL_OK = '好的';
+exports.MAKAI_MODAL_CONFIRM = '是的';
+exports.MAKAI_MODAL_CANCEL = '算了';
+exports.MAKAI_MODAL_SAVE = '保存';
+exports.MAKAI_MODAL_SUBMIT = '发表';
+exports.MAKAI_MODAL_CONTENT_COMMENT_HINT = '想说些什么？直接写下来吧！';
+exports.MAKAI_MODAL_CONTENT_NAME_INPUT_PREFIX = '署名（必填）';
+exports.MAKAI_MODAL_CONTENT_EMAIL_INPUT_PREFIX = '邮箱（可选）：';
+exports.MAKAI_MODAL_CONTENT_TOKEN_INPUT_PREFIX = '令牌：';
+exports.MAKAI_MODAL_CONTENT_DELETION_CONFIRMATION = '你确定要删除这条评论吗？';
+exports.MAKAI_MODAL_CONTENT_THIS_IS_YOUR_MAKAI_TOKEN = '这是你的 Makai 令牌！';
+exports.MAKAI_MODAL_CONTENT_MAKAI_TOKEN_IS_USED_TO_SUBMIT_COMMENTS = '使用 Makai 令牌可以非常方便的在这里发表评论！';
+exports.MAKAI_MODAL_CONTENT_YOU_WILL_GET_MAKAI_TOKEN_ONCE_YOU_SUBMIT_FIRST_COMMENT = '当你发表第一个评论的时候，就会获得你的 Makai 令牌哟！';
+exports.MAKAI_MODAL_CONTENT_DEVELOPMENT_HINT = 'WTCD 存档同步正在开发中！ —— 来自魔法☆少女的玩具 友人♪B';
 
 },{}],12:[function(require,module,exports){
 "use strict";
@@ -873,6 +910,36 @@ exports.thanks = [
 ].sort(() => Math.random() - 0.5);
 
 },{}],14:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+class MakaiControl {
+    static tokenToUsername(token) {
+        const res = fetch(MakaiControl.url + '/username/' + token);
+        return null;
+    }
+    static validToken(token) {
+        return !(MakaiControl.tokenToUsername(token) == null);
+    }
+    static saveToken(token) {
+        window.localStorage.setItem('token', token);
+    }
+    static saveUsername(username) {
+        window.localStorage.setItem('username', username);
+    }
+    static getToken() {
+        return window.localStorage.getItem('token');
+    }
+    static getUsername() {
+        return window.localStorage.getItem('username');
+    }
+    static hasToken() {
+        return window.localStorage.getItem('token') != null;
+    }
+}
+exports.MakaiControl = MakaiControl;
+MakaiControl.url = 'https://c.makai.city';
+
+},{}],15:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 function sign(x) {
@@ -956,7 +1023,7 @@ class MonoDimensionTransitionControl {
 }
 exports.MonoDimensionTransitionControl = MonoDimensionTransitionControl;
 
-},{}],15:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const GameReader_1 = require("../../wtcd/GameReader");
@@ -1141,7 +1208,7 @@ class WTCDGameReaderUI {
 }
 exports.WTCDGameReaderUI = WTCDGameReaderUI;
 
-},{"../../wtcd/GameReader":51,"../DebugLogger":6,"../constant/messages":11,"../data/settings":31,"../hs":33,"../util/formatTime":47,"./createWTCDErrorMessageFromError":21,"./hintControl":23,"./modalControl":26}],16:[function(require,module,exports){
+},{"../../wtcd/GameReader":54,"../DebugLogger":6,"../constant/messages":11,"../data/settings":33,"../hs":35,"../util/formatTime":50,"./createWTCDErrorMessageFromError":22,"./hintControl":24,"./modalControl":27}],17:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const FlowReader_1 = require("../../wtcd/FlowReader");
@@ -1381,7 +1448,7 @@ function insertContent(content, text, chapter) {
     }
 }
 
-},{"../../wtcd/FlowReader":50,"../DebugLogger":6,"../Event":7,"../constant/loadingText":9,"../constant/messages":11,"../data/AutoCache":29,"../data/data":30,"../data/settings":31,"../data/state":32,"../hs":33,"../input/gestures":35,"../input/keyboard":36,"../util/DOM":46,"./WTCDGameReaderUI":15,"./commentsControl":18,"./contentControl":19,"./createWTCDErrorMessage":20,"./createWTCDErrorMessageFromError":21,"./history":24,"./layoutControl":25,"./modalControl":26,"./processElements":27}],17:[function(require,module,exports){
+},{"../../wtcd/FlowReader":53,"../DebugLogger":6,"../Event":7,"../constant/loadingText":9,"../constant/messages":11,"../data/AutoCache":31,"../data/data":32,"../data/settings":33,"../data/state":34,"../hs":35,"../input/gestures":37,"../input/keyboard":38,"../util/DOM":49,"./WTCDGameReaderUI":16,"./commentsControl":19,"./contentControl":20,"./createWTCDErrorMessage":21,"./createWTCDErrorMessageFromError":22,"./history":25,"./layoutControl":26,"./modalControl":27,"./processElements":28}],18:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const Event_1 = require("../Event");
@@ -1410,7 +1477,7 @@ function getBlockedUsers() {
 }
 exports.getBlockedUsers = getBlockedUsers;
 
-},{"../Event":7}],18:[function(require,module,exports){
+},{"../Event":7}],19:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const messages_1 = require("../constant/messages");
@@ -1420,40 +1487,79 @@ const DebugLogger_1 = require("../DebugLogger");
 const hs_1 = require("../hs");
 const formatTime_1 = require("../util/formatTime");
 const commentBlockControl_1 = require("./commentBlockControl");
+const contentControl_1 = require("./contentControl");
+const userControl_1 = require("./userControl");
+const state_1 = require("../data/state");
+const MakaiControl_1 = require("./MakaiControl");
+const modalControl_1 = require("./modalControl");
 const debugLogger = new DebugLogger_1.DebugLogger('Comments Control');
-const getApiUrlRegExp = /^https:\/\/github\.com\/([a-zA-Z0-9-_]+)\/([a-zA-Z0-9-_]+)\/issues\/([1-9][0-9]*)$/;
+// const getApiUrlRegExp = /^https:\/\/github\.com\/([a-zA-Z0-9-_]+)\/([a-zA-Z0-9-_]+)\/issues\/([1-9][0-9]*)$/;
 // Input sample: https://github.com/SCLeoX/Wearable-Technology/issues/1
 // Output sample: https://api.github.com/repos/SCLeoX/Wearable-Technology/issues/1/comments
 function getApiUrl(issueUrl) {
-    const result = getApiUrlRegExp.exec(issueUrl);
-    if (result === null) {
-        throw new Error(`Bad issue url: ${issueUrl}.`);
-    }
-    return `https://api.github.com/repos/${result[1]}/${result[2]}/issues/${result[3]}/comments`;
+    var _a;
+    return MakaiControl_1.MakaiControl.url + '/comment/github/' + ((_a = state_1.state.currentChapter) === null || _a === void 0 ? void 0 : _a.chapter.htmlRelativePath.replace(/\//g, '.')) + '/';
 }
-function createCommentElement(userAvatarUrl, userName, userUrl, createTime, updateTime, content) {
+exports.getApiUrl = getApiUrl;
+function createCommentElement(userAvatarUrl, userName, userUrl, createTime, updateTime, content, id, block, display) {
+    var _a;
+    const deleteButton = userName === ((_a = MakaiControl_1.MakaiControl.getUsername()) === null || _a === void 0 ? void 0 : _a.toLowerCase()) ? hs_1.h('a.block-user', {
+        onclick: () => {
+            modalControl_1.confirm(messages_1.MAKAI_MODAL_TITLE_WARNING, messages_1.MAKAI_MODAL_CONTENT_DELETION_CONFIRMATION, messages_1.MAKAI_MODAL_CONFIRM, messages_1.MAKAI_MODAL_CANCEL).then((result) => {
+                if (result) {
+                    const m = userControl_1.UserControl.showLoading(messages_1.MAKAI_INFO_CONFIRM_TOKEN);
+                    fetch(MakaiControl_1.MakaiControl.url + `/comment/` + id + `/` + MakaiControl_1.MakaiControl.getToken(), {
+                        cache: 'no-cache',
+                        credentials: 'same-origin',
+                        headers: new Headers({
+                            'Content-Type': 'application/json'
+                        }),
+                        method: 'DELETE',
+                        mode: 'cors',
+                        redirect: 'follow',
+                        referrer: 'no-referrer',
+                    }).then((response) => {
+                        return response.json();
+                    })
+                        .then((json) => {
+                        m.close();
+                        if (!json.success) {
+                            userControl_1.UserControl.showMessage(messages_1.MAKAI_ERROR_DELETE_COMMENT_INVALID_TOKEN);
+                        }
+                        else {
+                            $comment.remove();
+                        }
+                    }).catch((err) => {
+                        m.close();
+                        userControl_1.UserControl.showMessage(messages_1.MAKAI_ERROR_INTERNET);
+                    });
+                }
+            });
+        },
+    }, messages_1.MAKAI_BUTTON_DELETE) : null;
     const $comment = hs_1.h('.comment', [
         hs_1.h('img.avatar', { src: userAvatarUrl }),
         hs_1.h('a.author', {
             target: '_blank',
             href: userUrl,
             rel: 'noopener noreferrer',
-        }, userName),
-        hs_1.h('.time', createTime === updateTime
+        }, display),
+        hs_1.h('.time', messages_1.MAKAI_GENERIC_AS + userName + messages_1.MAKAI_GENERIC_SUBMITED_AT + ((createTime === updateTime)
             ? formatTime_1.formatTimeRelative(new Date(createTime))
             : `${formatTime_1.formatTimeRelative(new Date(createTime))}` +
-                `（最后修改于 ${formatTime_1.formatTimeRelative(new Date(updateTime))}）`),
-        hs_1.h('a.block-user', {
-            onclick: () => {
-                commentBlockControl_1.blockUser(userName);
-                $comment.remove();
-            },
-        }, '屏蔽此人'),
-        ...content.split(/\r?\n\r?\n/).map(paragraph => hs_1.h('p', paragraph)),
+                messages_1.MAKAI_GENERIC_LAST_MODIFIED + `${formatTime_1.formatTimeRelative(new Date(updateTime))}` + messages_1.MAKAI_GENERIC_LAST_MODIFIED_SUFFIX)), deleteButton === null ?
+            hs_1.h('a.block-user', {
+                onclick: () => {
+                    commentBlockControl_1.blockUser(userName);
+                    block.directRemove();
+                    loadComments(contentControl_1.getCurrentContent(), ``);
+                },
+            }, messages_1.MAKAI_BUTTON_BLOCK) : deleteButton,
+        ...content.split('\n\n').map(paragraph => hs_1.h('p', paragraph)),
     ]);
     return $comment;
 }
-const commentsCache = new AutoCache_1.AutoCache(apiUrl => {
+exports.commentsCache = new AutoCache_1.AutoCache(apiUrl => {
     debugLogger.log(`Loading comments from ${apiUrl}.`);
     return fetch(apiUrl).then(response => response.json());
 }, new DebugLogger_1.DebugLogger('Comments Cache'));
@@ -1475,7 +1581,7 @@ function loadComments(content, issueUrl) {
     }
     block.onEnteringView(() => {
         const apiUrl = getApiUrl(issueUrl);
-        commentsCache.get(apiUrl).then(data => {
+        exports.commentsCache.get(apiUrl).then(data => {
             if (content.isDestroyed) {
                 debugLogger.log('Comments loaded, but abandoned since the original ' +
                     'content page is already destroyed.');
@@ -1487,11 +1593,11 @@ function loadComments(content, issueUrl) {
                 if (commentBlockControl_1.isUserBlocked(comment.user.login)) {
                     return;
                 }
-                $comments.appendChild(createCommentElement(comment.user.avatar_url, comment.user.login, comment.user.html_url, comment.created_at, comment.updated_at, comment.body));
+                $comments.appendChild(createCommentElement(comment.user.avatar_url, comment.user.login, comment.user.html_url, comment.created_at, comment.updated_at, comment.body, comment.id, block, comment.user.display));
             });
             $comments.appendChild(hs_1.h('.create-comment', {
                 onclick: () => {
-                    window.open(issueUrl, '_blank');
+                    userControl_1.UserControl.showComment(block);
                 },
             }, messages_1.COMMENTS_CREATE));
         })
@@ -1502,7 +1608,7 @@ function loadComments(content, issueUrl) {
 }
 exports.loadComments = loadComments;
 
-},{"../DebugLogger":6,"../constant/messages":11,"../data/AutoCache":29,"../data/settings":31,"../hs":33,"../util/formatTime":47,"./commentBlockControl":17}],19:[function(require,module,exports){
+},{"../DebugLogger":6,"../constant/messages":11,"../data/AutoCache":31,"../data/settings":33,"../data/state":34,"../hs":35,"../util/formatTime":50,"./MakaiControl":14,"./commentBlockControl":18,"./contentControl":20,"./modalControl":27,"./userControl":30}],20:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const settings_1 = require("../data/settings");
@@ -1749,7 +1855,7 @@ class ContentBlock {
 }
 exports.ContentBlock = ContentBlock;
 
-},{"../DebugLogger":6,"../data/settings":31,"../hs":33,"../input/keyboard":36,"../util/DOM":46,"./MonoDimensionTransitionControl":14,"./layoutControl":25}],20:[function(require,module,exports){
+},{"../DebugLogger":6,"../data/settings":33,"../hs":35,"../input/keyboard":38,"../util/DOM":49,"./MonoDimensionTransitionControl":15,"./layoutControl":26}],21:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const messages_1 = require("../constant/messages");
@@ -1807,7 +1913,7 @@ function createWTCDErrorMessage({ errorType, message, internalStack, wtcdStack, 
 }
 exports.createWTCDErrorMessage = createWTCDErrorMessage;
 
-},{"../constant/messages":11,"./chapterControl":16}],21:[function(require,module,exports){
+},{"../constant/messages":11,"./chapterControl":17}],22:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const WTCDError_1 = require("../../wtcd/WTCDError");
@@ -1827,7 +1933,7 @@ function createWTCDErrorMessageFromError(error) {
 }
 exports.createWTCDErrorMessageFromError = createWTCDErrorMessageFromError;
 
-},{"../../wtcd/WTCDError":54,"./chapterControl":16,"./createWTCDErrorMessage":20}],22:[function(require,module,exports){
+},{"../../wtcd/WTCDError":57,"./chapterControl":17,"./createWTCDErrorMessage":21}],23:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const data_1 = require("../data/data");
@@ -1869,7 +1975,7 @@ function followQuery() {
 }
 exports.followQuery = followQuery;
 
-},{"../data/data":30,"../data/state":32,"./chapterControl":16,"./contentControl":19,"./history":24}],23:[function(require,module,exports){
+},{"../data/data":32,"../data/state":34,"./chapterControl":17,"./contentControl":20,"./history":25}],24:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -1900,7 +2006,7 @@ function createHint(text, timeMs = 2000) {
 }
 exports.createHint = createHint;
 
-},{"../hs":33}],24:[function(require,module,exports){
+},{"../hs":35}],25:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const state_1 = require("../data/state");
@@ -1927,7 +2033,7 @@ function updateHistory(push) {
 }
 exports.updateHistory = updateHistory;
 
-},{"../data/state":32}],25:[function(require,module,exports){
+},{"../data/state":34}],26:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const DebugLogger_1 = require("../DebugLogger");
@@ -1990,7 +2096,7 @@ function setLayout(newLayout) {
 }
 exports.setLayout = setLayout;
 
-},{"../DebugLogger":6,"../Event":7}],26:[function(require,module,exports){
+},{"../DebugLogger":6,"../Event":7}],27:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const settings_1 = require("../data/settings");
@@ -2080,7 +2186,7 @@ function isAnyModalOpened() {
 }
 exports.isAnyModalOpened = isAnyModalOpened;
 
-},{"../data/settings":31,"../hs":33,"../input/keyboard":36,"../util/DOM":46}],27:[function(require,module,exports){
+},{"../data/settings":33,"../hs":35,"../input/keyboard":38,"../util/DOM":49}],28:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const DOM_1 = require("../util/DOM");
@@ -2109,7 +2215,7 @@ function processElements($parent) {
 }
 exports.processElements = processElements;
 
-},{"../util/DOM":46}],28:[function(require,module,exports){
+},{"../util/DOM":49}],29:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const state_1 = require("../data/state");
@@ -2162,7 +2268,211 @@ function updateSelection() {
 }
 exports.updateSelection = updateSelection;
 
-},{"../data/state":32,"./history":24}],29:[function(require,module,exports){
+},{"../data/state":34,"./history":25}],30:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const hs_1 = require("../hs");
+const contentControl_1 = require("./contentControl");
+const modalControl_1 = require("./modalControl");
+const MakaiControl_1 = require("./MakaiControl");
+const state_1 = require("../data/state");
+const commentsControl_1 = require("./commentsControl");
+const messages_1 = require("../constant/messages");
+class UserControl {
+    static showMessage(message) {
+        const modal = new modalControl_1.Modal(hs_1.h('div', [
+            hs_1.h('h1', messages_1.MAKAI_MODAL_TITLE_INFO),
+            hs_1.h('p', message),
+            hs_1.h('.button-container', [
+                hs_1.h('div', {
+                    onclick: () => {
+                        modal.close();
+                    }
+                }, messages_1.MAKAI_MODAL_OK),
+            ]),
+        ]));
+        modal.setDismissible();
+        modal.open();
+    }
+    static showLoading(message) {
+        const m = new modalControl_1.Modal(hs_1.h('div', [
+            hs_1.h('h1', messages_1.MAKAI_MODAL_TITLE_WAITING),
+            hs_1.h('p', message),
+        ]));
+        m.open();
+        return m;
+    }
+    static showLogin() {
+        let token;
+        const modal = new modalControl_1.Modal(hs_1.h('div', [
+            hs_1.h('h1', messages_1.MAKAI_MODAL_TITLE_TOKEN),
+            hs_1.h('p', messages_1.MAKAI_MODAL_CONTENT_THIS_IS_YOUR_MAKAI_TOKEN),
+            hs_1.h('p', messages_1.MAKAI_MODAL_CONTENT_MAKAI_TOKEN_IS_USED_TO_SUBMIT_COMMENTS),
+            hs_1.h('p', messages_1.MAKAI_MODAL_CONTENT_YOU_WILL_GET_MAKAI_TOKEN_ONCE_YOU_SUBMIT_FIRST_COMMENT),
+            hs_1.h('i', messages_1.MAKAI_MODAL_CONTENT_DEVELOPMENT_HINT),
+            hs_1.h('ul', [
+                messages_1.MAKAI_MODAL_CONTENT_TOKEN_INPUT_PREFIX,
+                token = hs_1.h('input.makai-token', { value: MakaiControl_1.MakaiControl.getToken() === undefined ? '' : MakaiControl_1.MakaiControl.getToken() }),
+            ]),
+            hs_1.h('.button-container', [
+                hs_1.h('div', {
+                    onclick: () => {
+                        modal.close();
+                    }
+                }, messages_1.MAKAI_MODAL_CANCEL),
+                hs_1.h('div', {
+                    onclick: () => {
+                        if (token.value === '') {
+                            UserControl.showMessage(messages_1.MAKAI_ERROR_EMPTY_TOKEN);
+                            return;
+                        }
+                        const m = UserControl.showLoading(messages_1.MAKAI_INFO_CONFIRM_TOKEN);
+                        fetch(MakaiControl_1.MakaiControl.url + '/username/' + token.value).then((response) => {
+                            return response.json();
+                        })
+                            .then((json) => {
+                            m.close();
+                            if (json.username == null) {
+                                UserControl.showMessage(messages_1.MAKAI_ERROR_INVALID_TOKEN);
+                            }
+                            else {
+                                MakaiControl_1.MakaiControl.saveToken(token.value);
+                                MakaiControl_1.MakaiControl.saveUsername(json.username);
+                                modal.close();
+                                UserControl.showMessage(messages_1.MAKAI_INFO_SET_TOKKEN_SUCCESS);
+                            }
+                        }).catch((err) => {
+                            m.close();
+                            UserControl.showMessage(messages_1.MAKAI_ERROR_INTERNET);
+                        });
+                    }
+                }, messages_1.MAKAI_MODAL_SAVE),
+            ]),
+        ]));
+        modal.setDismissible();
+        modal.open();
+    }
+    static sendComment(textarea, block, modal) {
+        var _a;
+        if (!MakaiControl_1.MakaiControl.hasToken()) {
+            UserControl.showMessage(messages_1.MAKAI_ERROR_INVALID_TOKEN);
+            return;
+        }
+        const m = UserControl.showLoading(messages_1.MAKAI_INFO_CONFIRM_TOKEN);
+        fetch(MakaiControl_1.MakaiControl.url + '/comment/' + MakaiControl_1.MakaiControl.getToken(), {
+            body: JSON.stringify({ pageName: (_a = state_1.state.currentChapter) === null || _a === void 0 ? void 0 : _a.chapter.htmlRelativePath.replace(/\//g, '.'), content: textarea }),
+            cache: 'no-cache',
+            credentials: 'same-origin',
+            headers: new Headers({
+                'Content-Type': 'application/json'
+            }),
+            method: 'POST',
+            mode: 'cors',
+            redirect: 'follow',
+            referrer: 'no-referrer',
+        }).then((response) => {
+            return response.json();
+        })
+            .then((json) => {
+            m.close();
+            if (!json.success) {
+                UserControl.showMessage(messages_1.MAKAI_ERROR_SUBMIT_COMMENT_INVALID_TOKEN);
+            }
+            else {
+                block.directRemove();
+                commentsControl_1.commentsCache.delete(commentsControl_1.getApiUrl(''));
+                commentsControl_1.loadComments(contentControl_1.getCurrentContent(), '');
+                modal.close();
+            }
+        }).catch((err) => {
+            m.close();
+            UserControl.showMessage(messages_1.MAKAI_ERROR_INTERNET);
+        });
+    }
+    static showComment(block) {
+        const nameInput = hs_1.h('input.makai-input');
+        const emailInput = hs_1.h('input.makai-input');
+        const name = MakaiControl_1.MakaiControl.hasToken()
+            ? hs_1.h('ul', [messages_1.MAKAI_GENERIC_AS + MakaiControl_1.MakaiControl.getUsername() + messages_1.MAKAI_GENERIC_SUBMIT]) : hs_1.h('ul', [
+            messages_1.MAKAI_MODAL_CONTENT_NAME_INPUT_PREFIX,
+            nameInput,
+            hs_1.h('br'),
+            messages_1.MAKAI_MODAL_CONTENT_EMAIL_INPUT_PREFIX,
+            emailInput,
+        ]);
+        const textarea = hs_1.h('textarea.makai-comment');
+        const modal = new modalControl_1.Modal(hs_1.h('div', [
+            hs_1.h('h1', messages_1.MAKAI_MODAL_TITLE_COMMENT),
+            hs_1.h('p', messages_1.MAKAI_MODAL_CONTENT_COMMENT_HINT),
+            textarea,
+            name,
+            hs_1.h('.button-container', [
+                hs_1.h('div', {
+                    onclick: () => {
+                        modal.close();
+                    }
+                }, messages_1.MAKAI_MODAL_CANCEL),
+                hs_1.h('div', {
+                    onclick: () => {
+                        if (!MakaiControl_1.MakaiControl.hasToken()) {
+                            const m = UserControl.showLoading(messages_1.MAKAI_INFO_OBTAIN_TOKEN);
+                            const alpha = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+                            fetch(MakaiControl_1.MakaiControl.url + '/register/', {
+                                body: JSON.stringify({ username: nameInput.value, email: emailInput.value, encodedPassword: new Array(20).fill(undefined).map(() => alpha[Math.floor(Math.random() * alpha.length)]).join('') }),
+                                cache: 'no-cache',
+                                headers: new Headers({
+                                    'Content-Type': 'application/json'
+                                }),
+                                credentials: 'same-origin',
+                                method: 'POST',
+                                mode: 'cors',
+                                redirect: 'follow',
+                                referrer: 'no-referrer',
+                            }).then((response) => {
+                                return response.json();
+                            })
+                                .then((json) => {
+                                m.close();
+                                if (!json.success) {
+                                    switch (json.errorMessage) {
+                                        case 'Illegal email format.':
+                                            UserControl.showMessage(messages_1.MAKAI_ERROR_INVALID_EMAIL);
+                                            break;
+                                        case 'User exist.':
+                                            UserControl.showMessage(messages_1.MAKAI_ERROR_USER_EXIST);
+                                            break;
+                                        default:
+                                            UserControl.showMessage(messages_1.MAKAI_ERROR_UNKNOWN);
+                                            break;
+                                    }
+                                }
+                                else if (json.accessToken == null) {
+                                    UserControl.showMessage(messages_1.MAKAI_ERROR_UNKNOWN);
+                                }
+                                else {
+                                    MakaiControl_1.MakaiControl.saveToken(json.accessToken);
+                                    MakaiControl_1.MakaiControl.saveUsername(nameInput.value);
+                                    UserControl.sendComment(textarea.value, block, modal);
+                                }
+                            }).catch((err) => {
+                                m.close();
+                                UserControl.showMessage(messages_1.MAKAI_ERROR_INTERNET);
+                            });
+                        }
+                        else {
+                            this.sendComment(textarea.value, block, modal);
+                        }
+                    }
+                }, messages_1.MAKAI_MODAL_SUBMIT),
+            ]),
+        ]));
+        modal.setDismissible();
+        modal.open();
+    }
+}
+exports.UserControl = UserControl;
+
+},{"../constant/messages":11,"../data/state":34,"../hs":35,"./MakaiControl":14,"./commentsControl":19,"./contentControl":20,"./modalControl":27}],31:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class AutoCache {
@@ -2170,6 +2480,9 @@ class AutoCache {
         this.loader = loader;
         this.logger = logger;
         this.map = new Map();
+    }
+    delete(key) {
+        this.map.delete(key);
     }
     get(key) {
         let value = this.map.get(key);
@@ -2190,7 +2503,7 @@ class AutoCache {
 }
 exports.AutoCache = AutoCache;
 
-},{}],30:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.data = window.DATA;
@@ -2209,7 +2522,7 @@ function iterateFolder(folder) {
 }
 iterateFolder(exports.data.chapterTree);
 
-},{}],31:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const noop = () => { };
@@ -2311,7 +2624,7 @@ exports.charCount = new BooleanSetting('charCount', true, value => {
 });
 exports.wtcdGameQuickLoadConfirm = new BooleanSetting('wtcdGameQuickLoadConfirm', true);
 
-},{}],32:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.state = {
@@ -2320,13 +2633,13 @@ exports.state = {
     chapterTextNodes: null,
 };
 
-},{}],33:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const hs = require("hyperscript");
 exports.h = hs;
 
-},{"hyperscript":4}],34:[function(require,module,exports){
+},{"hyperscript":4}],36:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const followQuery_1 = require("./control/followQuery");
@@ -2360,7 +2673,7 @@ window.addEventListener('popstate', () => {
 });
 followQuery_1.followQuery();
 
-},{"./control/followQuery":22,"./control/updateSelection":28,"./data/data":30,"./data/settings":31,"./menu/MainMenu":40,"./util/DOM":46}],35:[function(require,module,exports){
+},{"./control/followQuery":23,"./control/updateSelection":29,"./data/data":32,"./data/settings":33,"./menu/MainMenu":42,"./util/DOM":49}],37:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const DebugLogger_1 = require("../DebugLogger");
@@ -2444,7 +2757,7 @@ exports.swipeEvent.on(direction => {
     swipeEventDebugLogger.log(SwipeDirection[direction]);
 });
 
-},{"../DebugLogger":6,"../Event":7,"../util/DOM":46}],36:[function(require,module,exports){
+},{"../DebugLogger":6,"../Event":7,"../util/DOM":49}],38:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const DebugLogger_1 = require("../DebugLogger");
@@ -2485,7 +2798,7 @@ exports.arrowKeyPressEvent.on(arrowKey => {
     arrowEventDebugLogger.log(ArrowKey[arrowKey]);
 });
 
-},{"../DebugLogger":6,"../Event":7}],37:[function(require,module,exports){
+},{"../DebugLogger":6,"../Event":7}],39:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const messages_1 = require("../constant/messages");
@@ -2516,7 +2829,7 @@ class BlockMenu extends Menu_1.Menu {
 }
 exports.BlockMenu = BlockMenu;
 
-},{"../Menu":8,"../constant/messages":11,"../control/commentBlockControl":17}],38:[function(require,module,exports){
+},{"../Menu":8,"../constant/messages":11,"../control/commentBlockControl":18}],40:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const chapterControl_1 = require("../control/chapterControl");
@@ -2576,7 +2889,7 @@ class ChaptersMenu extends Menu_1.Menu {
 }
 exports.ChaptersMenu = ChaptersMenu;
 
-},{"../Menu":8,"../control/chapterControl":16,"../control/history":24,"../data/data":30,"../util/shortNumber":48}],39:[function(require,module,exports){
+},{"../Menu":8,"../control/chapterControl":17,"../control/history":25,"../data/data":32,"../util/shortNumber":51}],41:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const Menu_1 = require("../Menu");
@@ -2611,7 +2924,7 @@ class ContactMenu extends Menu_1.Menu {
 }
 exports.ContactMenu = ContactMenu;
 
-},{"../Menu":8}],40:[function(require,module,exports){
+},{"../Menu":8}],42:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const Menu_1 = require("../Menu");
@@ -2635,7 +2948,44 @@ class MainMenu extends Menu_1.Menu {
 }
 exports.MainMenu = MainMenu;
 
-},{"../Menu":8,"./ChaptersMenu":38,"./ContactMenu":39,"./SettingsMenu":41,"./StatsMenu":43,"./StyleMenu":44,"./ThanksMenu":45}],41:[function(require,module,exports){
+},{"../Menu":8,"./ChaptersMenu":40,"./ContactMenu":41,"./SettingsMenu":44,"./StatsMenu":46,"./StyleMenu":47,"./ThanksMenu":48}],43:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const Menu_1 = require("../Menu");
+const userControl_1 = require("../control/userControl");
+const SettingsMenu_1 = require("./SettingsMenu");
+class MakaiMenu extends Menu_1.Menu {
+    constructor(parent) {
+        super('Makai 评论系统管理', parent);
+        this.addItem('Makai 令牌', {
+            small: true,
+            button: true,
+        }).onClick(() => {
+            userControl_1.UserControl.showLogin();
+        });
+    }
+    addBooleanSetting(label, setting) {
+        const getText = () => `${label}：${setting.getValue() ? '开' : '关'}`;
+        const handle = this.addItem(getText(), { small: true, button: true })
+            .onClick(() => {
+            setting.toggle();
+            handle.setInnerText(getText());
+        });
+    }
+    addEnumSetting(label, setting, usePreview) {
+        const getText = () => `${label}：${setting.getValueName()}`;
+        const handle = this.addItem(getText(), { small: true, button: true });
+        const enumSettingMenu = new SettingsMenu_1.EnumSettingMenu(this, label, setting, usePreview === true);
+        handle.linkTo(enumSettingMenu).onClick(() => {
+            this.activateEvent.once(() => {
+                handle.setInnerText(getText());
+            });
+        });
+    }
+}
+exports.MakaiMenu = MakaiMenu;
+
+},{"../Menu":8,"../control/userControl":30,"./SettingsMenu":44}],44:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const stylePreviewArticle_1 = require("../constant/stylePreviewArticle");
@@ -2644,6 +2994,7 @@ const layoutControl_1 = require("../control/layoutControl");
 const settings_1 = require("../data/settings");
 const Menu_1 = require("../Menu");
 const BlockMenu_1 = require("./BlockMenu");
+const MakaiMenu_1 = require("./MakaiMenu");
 class EnumSettingMenu extends Menu_1.Menu {
     constructor(parent, label, setting, usePreview) {
         super(`${label}设置`, parent, usePreview ? layoutControl_1.Layout.SIDE : layoutControl_1.Layout.MAIN);
@@ -2673,6 +3024,7 @@ exports.EnumSettingMenu = EnumSettingMenu;
 class SettingsMenu extends Menu_1.Menu {
     constructor(parent) {
         super('设置', parent);
+        this.addLink(new MakaiMenu_1.MakaiMenu(this), true);
         this.addBooleanSetting('NSFW 警告', settings_1.warning);
         this.addBooleanSetting('使用动画', settings_1.animation);
         this.addBooleanSetting('显示编写中章节', settings_1.earlyAccess);
@@ -2705,7 +3057,7 @@ class SettingsMenu extends Menu_1.Menu {
 }
 exports.SettingsMenu = SettingsMenu;
 
-},{"../Menu":8,"../constant/stylePreviewArticle":12,"../control/contentControl":19,"../control/layoutControl":25,"../data/settings":31,"./BlockMenu":37}],42:[function(require,module,exports){
+},{"../Menu":8,"../constant/stylePreviewArticle":12,"../control/contentControl":20,"../control/layoutControl":26,"../data/settings":33,"./BlockMenu":39,"./MakaiMenu":43}],45:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const data_1 = require("../data/data");
@@ -2726,7 +3078,7 @@ class StatsKeywordsCountMenu extends Menu_1.Menu {
 }
 exports.StatsKeywordsCountMenu = StatsKeywordsCountMenu;
 
-},{"../Menu":8,"../data/data":30}],43:[function(require,module,exports){
+},{"../Menu":8,"../data/data":32}],46:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const data_1 = require("../data/data");
@@ -2743,7 +3095,7 @@ class StatsMenu extends Menu_1.Menu {
 }
 exports.StatsMenu = StatsMenu;
 
-},{"../Menu":8,"../data/data":30,"./StatsKeywordsCountMenu":42}],44:[function(require,module,exports){
+},{"../Menu":8,"../data/data":32,"./StatsKeywordsCountMenu":45}],47:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const stylePreviewArticle_1 = require("../constant/stylePreviewArticle");
@@ -2880,7 +3232,7 @@ class StyleMenu extends Menu_1.Menu {
 }
 exports.StyleMenu = StyleMenu;
 
-},{"../DebugLogger":6,"../Menu":8,"../constant/stylePreviewArticle":12,"../control/contentControl":19,"../control/layoutControl":25,"../hs":33}],45:[function(require,module,exports){
+},{"../DebugLogger":6,"../Menu":8,"../constant/stylePreviewArticle":12,"../control/contentControl":20,"../control/layoutControl":26,"../hs":35}],48:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const thanks_1 = require("../constant/thanks");
@@ -2897,7 +3249,7 @@ class ThanksMenu extends Menu_1.Menu {
 }
 exports.ThanksMenu = ThanksMenu;
 
-},{"../Menu":8,"../constant/thanks":13}],46:[function(require,module,exports){
+},{"../Menu":8,"../constant/thanks":13}],49:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const DebugLogger_1 = require("../DebugLogger");
@@ -2949,7 +3301,7 @@ function insertAfter($newElement, $referencingElement) {
 }
 exports.insertAfter = insertAfter;
 
-},{"../DebugLogger":6}],47:[function(require,module,exports){
+},{"../DebugLogger":6}],50:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const SECOND = 1000;
@@ -2980,7 +3332,7 @@ function formatTimeSimple(time) {
 }
 exports.formatTimeSimple = formatTimeSimple;
 
-},{}],48:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 function shortNumber(input) {
@@ -2994,7 +3346,7 @@ function shortNumber(input) {
 }
 exports.shortNumber = shortNumber;
 
-},{}],49:[function(require,module,exports){
+},{}],52:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 // https://stackoverflow.com/a/7616484
@@ -3011,7 +3363,7 @@ function stringHash(str) {
 }
 exports.stringHash = stringHash;
 
-},{}],50:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const Interpreter_1 = require("./Interpreter");
@@ -3221,7 +3573,7 @@ class FlowReader {
 }
 exports.FlowReader = FlowReader;
 
-},{"./Interpreter":52,"./Random":53}],51:[function(require,module,exports){
+},{"./Interpreter":55,"./Random":56}],54:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const Interpreter_1 = require("./Interpreter");
@@ -3423,7 +3775,7 @@ class GameReader {
 }
 exports.GameReader = GameReader;
 
-},{"./Interpreter":52,"./Random":53}],52:[function(require,module,exports){
+},{"./Interpreter":55,"./Random":56}],55:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const constantsPool_1 = require("./constantsPool");
@@ -4253,7 +4605,7 @@ class Interpreter {
 }
 exports.Interpreter = Interpreter;
 
-},{"./WTCDError":54,"./constantsPool":56,"./invokeFunction":57,"./operators":58,"./std":61,"./utils":68}],53:[function(require,module,exports){
+},{"./WTCDError":57,"./constantsPool":59,"./invokeFunction":60,"./operators":61,"./std":64,"./utils":71}],56:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 /**
@@ -4316,7 +4668,7 @@ class Random {
 }
 exports.Random = Random;
 
-},{}],54:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const empty = {};
@@ -4362,7 +4714,7 @@ class WTCDError extends Error {
 }
 exports.WTCDError = WTCDError;
 
-},{}],55:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 function autoEvaluated(fn) {
@@ -4374,7 +4726,7 @@ function autoEvaluated(fn) {
 }
 exports.autoEvaluated = autoEvaluated;
 
-},{}],56:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 // Your typical immature optimization
@@ -4410,7 +4762,7 @@ function getMaybePooled(type, value) {
 }
 exports.getMaybePooled = getMaybePooled;
 
-},{}],57:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const autoEvaluated_1 = require("./autoEvaluated");
@@ -4585,7 +4937,7 @@ exports.reverseInvocation = autoEvaluated_1.autoEvaluated((arg0, arg1, expr, int
     }
 });
 
-},{"./Interpreter":52,"./WTCDError":54,"./autoEvaluated":55,"./constantsPool":56,"./std/utils":67}],58:[function(require,module,exports){
+},{"./Interpreter":55,"./WTCDError":57,"./autoEvaluated":58,"./constantsPool":59,"./std/utils":70}],61:[function(require,module,exports){
 "use strict";
 // This file defines all infix and prefix operators in WTCD.
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -5000,7 +5352,7 @@ exports.binaryOperators = new Map([
 exports.conditionalOperatorPrecedence = 4;
 exports.operators = new Set([...exports.unaryOperators.keys(), ...exports.binaryOperators.keys(), '?', ':', '...']);
 
-},{"./Interpreter":52,"./WTCDError":54,"./autoEvaluated":55,"./constantsPool":56,"./invokeFunction":57}],59:[function(require,module,exports){
+},{"./Interpreter":55,"./WTCDError":57,"./autoEvaluated":58,"./constantsPool":59,"./invokeFunction":60}],62:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const constantsPool_1 = require("../constantsPool");
@@ -5099,7 +5451,7 @@ exports.contentStdFunctions = [
     },
 ];
 
-},{"../Interpreter":52,"../constantsPool":56,"./utils":67}],60:[function(require,module,exports){
+},{"../Interpreter":55,"../constantsPool":59,"./utils":70}],63:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const constantsPool_1 = require("../constantsPool");
@@ -5165,7 +5517,7 @@ exports.debugStdFunctions = [
     },
 ];
 
-},{"../Interpreter":52,"../WTCDError":54,"../constantsPool":56,"../invokeFunction":57,"./utils":67}],61:[function(require,module,exports){
+},{"../Interpreter":55,"../WTCDError":57,"../constantsPool":59,"../invokeFunction":60,"./utils":70}],64:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const content_1 = require("./content");
@@ -5185,7 +5537,7 @@ exports.stdFunctions = [
     ...string_1.stringStdFunctions,
 ];
 
-},{"./content":59,"./debug":60,"./list":62,"./math":63,"./random":64,"./reader":65,"./string":66}],62:[function(require,module,exports){
+},{"./content":62,"./debug":63,"./list":65,"./math":66,"./random":67,"./reader":68,"./string":69}],65:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const constantsPool_1 = require("../constantsPool");
@@ -5451,7 +5803,7 @@ exports.listStdFunctions = [
     },
 ];
 
-},{"../Interpreter":52,"../WTCDError":54,"../constantsPool":56,"../invokeFunction":57,"./utils":67}],63:[function(require,module,exports){
+},{"../Interpreter":55,"../WTCDError":57,"../constantsPool":59,"../invokeFunction":60,"./utils":70}],66:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const constantsPool_1 = require("../constantsPool");
@@ -5489,7 +5841,7 @@ exports.mathStdFunctions = [
     },
 ];
 
-},{"../constantsPool":56,"./utils":67}],64:[function(require,module,exports){
+},{"../constantsPool":59,"./utils":70}],67:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const constantsPool_1 = require("../constantsPool");
@@ -5542,7 +5894,7 @@ exports.randomStdFunctions = [
     },
 ];
 
-},{"../constantsPool":56,"./utils":67}],65:[function(require,module,exports){
+},{"../constantsPool":59,"./utils":70}],68:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const constantsPool_1 = require("../constantsPool");
@@ -5572,7 +5924,7 @@ exports.readerStdFunctions = [
     },
 ];
 
-},{"../constantsPool":56,"./utils":67}],66:[function(require,module,exports){
+},{"../constantsPool":59,"./utils":70}],69:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const constantsPool_1 = require("../constantsPool");
@@ -5605,7 +5957,7 @@ exports.stringStdFunctions = [
     },
 ];
 
-},{"../constantsPool":56,"./utils":67}],67:[function(require,module,exports){
+},{"../constantsPool":59,"./utils":70}],70:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const constantsPool_1 = require("../constantsPool");
@@ -5651,7 +6003,7 @@ function assertArgType(args, index, type, defaultValue) {
 }
 exports.assertArgType = assertArgType;
 
-},{"../Interpreter":52,"../constantsPool":56}],68:[function(require,module,exports){
+},{"../Interpreter":55,"../constantsPool":59}],71:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 function flat(arr) {
@@ -5672,4 +6024,4 @@ function arrayEquals(arr0, arr1, comparator = (e0, e1) => e0 === e1) {
 }
 exports.arrayEquals = arrayEquals;
 
-},{}]},{},[34]);
+},{}]},{},[36]);
