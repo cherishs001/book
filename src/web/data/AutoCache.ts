@@ -6,6 +6,9 @@ export class AutoCache<TKey, TValue> {
     private loader: (key: TKey) => Promise<TValue>,
     private logger: DebugLogger,
   ) {}
+  public delete(key: TKey){
+    this.map.delete(key)
+  }
   public get(key: TKey): Promise<TValue> {
     let value = this.map.get(key);
     if (value === undefined) {
