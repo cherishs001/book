@@ -8,17 +8,17 @@ import { UserControl } from '../control/userControl';
 import { EnumSettingMenu } from './SettingsMenu';
 
 export class MakaiMenu extends Menu {
-    public constructor(parent: Menu) {
-      super("Makai 评论系统管理",parent);
-  
-      this.addItem("Makai 令牌",{
-        small: true,
-        button: true,
-      }).onClick(() => {
-        UserControl.showLogin()
-      });
-    }
-    
+  public constructor(parent: Menu) {
+    super('Makai 评论系统管理', parent);
+
+    this.addItem('Makai 令牌', {
+      small: true,
+      button: true,
+    }).onClick(() => {
+      UserControl.showLogin();
+    });
+  }
+
   public addBooleanSetting(label: string, setting: BooleanSetting) {
     const getText = () => `${label}：${setting.getValue() ? '开' : '关'}`;
     const handle = this.addItem(getText(), { small: true, button: true })
@@ -37,5 +37,4 @@ export class MakaiMenu extends Menu {
       });
     });
   }
-  }
-  
+}
