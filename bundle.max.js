@@ -1368,7 +1368,7 @@ function loadChapter(chapterHtmlRelativePath, selection, side = contentControl_1
         setTimeout(() => {
             contentControl_1.focus();
         }, 1);
-        commentsControl_1.loadComments(content, chapterCtx.chapter.commentsUrl);
+        commentsControl_1.loadComments(content);
     })
         .catch(error => {
         debugLogger.error(`Failed to load chapter.`, error);
@@ -1496,7 +1496,7 @@ const debugLogger = new DebugLogger_1.DebugLogger('Comments Control');
 // const getApiUrlRegExp = /^https:\/\/github\.com\/([a-zA-Z0-9-_]+)\/([a-zA-Z0-9-_]+)\/issues\/([1-9][0-9]*)$/;
 // Input sample: https://github.com/SCLeoX/Wearable-Technology/issues/1
 // Output sample: https://api.github.com/repos/SCLeoX/Wearable-Technology/issues/1/comments
-function getApiUrl(issueUrl) {
+function getApiUrl() {
     var _a;
     return MakaiControl_1.MakaiControl.url + '/comment/github/' + ((_a = state_1.state.currentChapter) === null || _a === void 0 ? void 0 : _a.chapter.htmlRelativePath.replace(/\//g, '.')) + '/';
 }
@@ -1552,7 +1552,7 @@ function createCommentElement(userAvatarUrl, userName, userUrl, createTime, upda
                 onclick: () => {
                     commentBlockControl_1.blockUser(userName);
                     block.directRemove();
-                    loadComments(contentControl_1.getCurrentContent(), ``);
+                    loadComments(contentControl_1.getCurrentContent());
                 },
             }, messages_1.MAKAI_BUTTON_BLOCK) : deleteButton,
         ...content.split('\n\n').map(paragraph => hs_1.h('p', paragraph)),
@@ -1563,7 +1563,7 @@ exports.commentsCache = new AutoCache_1.AutoCache(apiUrl => {
     debugLogger.log(`Loading comments from ${apiUrl}.`);
     return fetch(apiUrl).then(response => response.json());
 }, new DebugLogger_1.DebugLogger('Comments Cache'));
-function loadComments(content, issueUrl) {
+function loadComments(content) {
     if (settings_1.useComments.getValue() === false) {
         return;
     }
@@ -1575,12 +1575,8 @@ function loadComments(content, issueUrl) {
     const block = content.addBlock({
         initElement: $comments,
     });
-    if (issueUrl === null) {
-        $commentsStatus.innerText = messages_1.COMMENTS_UNAVAILABLE;
-        return;
-    }
     block.onEnteringView(() => {
-        const apiUrl = getApiUrl(issueUrl);
+        const apiUrl = getApiUrl();
         exports.commentsCache.get(apiUrl).then(data => {
             if (content.isDestroyed) {
                 debugLogger.log('Comments loaded, but abandoned since the original ' +
@@ -2380,8 +2376,8 @@ class UserControl {
             }
             else {
                 block.directRemove();
-                commentsControl_1.commentsCache.delete(commentsControl_1.getApiUrl(''));
-                commentsControl_1.loadComments(contentControl_1.getCurrentContent(), '');
+                commentsControl_1.commentsCache.delete(commentsControl_1.getApiUrl());
+                commentsControl_1.loadComments(contentControl_1.getCurrentContent());
                 modal.close();
             }
         }).catch((err) => {
