@@ -906,7 +906,9 @@ exports.thanks = [
     { name: '神楽坂 紫' },
     { name: 'Runian Lee', link: 'https://t.me/Runian' },
     { name: '琥珀' },
-    { name: '为霜，克西拉' }
+    { name: '为霜' },
+    { name: '冰蓮音' },
+    { name: 'Testingdoll01' }
 ].sort(() => Math.random() - 0.5);
 
 },{}],14:[function(require,module,exports){
