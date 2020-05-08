@@ -537,14 +537,14 @@ window.DATA={
             "chapterCharCount": 2533
           },
           {
-            "displayName": "擬真穿戴式貓耳貓尾",
+            "displayName": "拟真穿戴式猫耳猫尾",
             "displayIndex": 56,
-            "name": "56 - 擬真穿戴式貓耳貓尾",
-            "sourceRelativePath": "4 - 道具集/56 - 擬真穿戴式貓耳貓尾.md",
+            "name": "56 - 拟真穿戴式猫耳猫尾",
+            "sourceRelativePath": "4 - 道具集/56 - 拟真穿戴式猫耳猫尾.md",
             "type": "Markdown",
             "isEarlyAccess": false,
             "commentsUrl": null,
-            "htmlRelativePath": "道具集/擬真穿戴式貓耳貓尾.html",
+            "htmlRelativePath": "道具集/拟真穿戴式猫耳猫尾.html",
             "chapterCharCount": 3657
           },
           {
@@ -1171,5 +1171,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "484"
+  "buildNumber": "485"
 };
