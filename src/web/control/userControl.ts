@@ -119,8 +119,8 @@ export class UserControl {
           UserControl.showMessage(MAKAI_ERROR_SUBMIT_COMMENT_INVALID_TOKEN);
         } else {
           block.directRemove();
-          commentsCache.delete(getApiUrl(''));
-          loadComments(getCurrentContent()!, '');
+          commentsCache.delete(getApiUrl());
+          loadComments(getCurrentContent()!);
           modal.close();
         }
       }).catch((err) => {

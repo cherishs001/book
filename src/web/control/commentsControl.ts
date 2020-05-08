@@ -35,7 +35,7 @@ const debugLogger = new DebugLogger('Comments Control');
 // const getApiUrlRegExp = /^https:\/\/github\.com\/([a-zA-Z0-9-_]+)\/([a-zA-Z0-9-_]+)\/issues\/([1-9][0-9]*)$/;
 // Input sample: https://github.com/SCLeoX/Wearable-Technology/issues/1
 // Output sample: https://api.github.com/repos/SCLeoX/Wearable-Technology/issues/1/comments
-export function getApiUrl(issueUrl: string) {
+export function getApiUrl() {
   return MakaiControl.url + '/comment/github/' + state.currentChapter?.chapter.htmlRelativePath.replace(/\//g, '.') + '/';
 }
 
@@ -97,10 +97,9 @@ function createCommentElement(
       MAKAI_GENERIC_LAST_MODIFIED + `${formatTimeRelative(new Date(updateTime))}` + MAKAI_GENERIC_LAST_MODIFIED_SUFFIX)), deleteButton === null ?
       h('a.block-user', {
         onclick: () => {
-
           blockUser(userName);
           block.directRemove();
-          loadComments(getCurrentContent()!, ``);
+          loadComments(getCurrentContent()!);
         },
       }, MAKAI_BUTTON_BLOCK) : deleteButton,
     ...content.split('\n\n').map(paragraph => h('p', paragraph)),
@@ -115,10 +114,7 @@ export const commentsCache = new AutoCache<string, any>(
   },
   new DebugLogger('Comments Cache'),
 );
-export function loadComments(
-  content: Content,
-  issueUrl: string | null,
-) {
+export function loadComments(content: Content) {
   if (useComments.getValue() === false) {
     return;
   }
@@ -131,12 +127,8 @@ export function loadComments(
     initElement: $comments,
   });
 
-  if (issueUrl === null) {
-    $commentsStatus.innerText = COMMENTS_UNAVAILABLE;
-    return;
-  }
   block.onEnteringView(() => {
-    const apiUrl = getApiUrl(issueUrl);
+    const apiUrl = getApiUrl();
     commentsCache.get(apiUrl).then(data => {
       if (content.isDestroyed) {
         debugLogger.log('Comments loaded, but abandoned since the original ' +

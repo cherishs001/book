@@ -196,7 +196,7 @@ export function loadChapter(
     setTimeout(() => {
       focus();
     }, 1);
-    loadComments(content, chapterCtx.chapter.commentsUrl);
+    loadComments(content);
   })
   .catch(error => {
     debugLogger.error(`Failed to load chapter.`, error);
