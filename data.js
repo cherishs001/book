@@ -8,28 +8,6 @@ window.DATA={
     "chapters": [],
     "subFolders": [
       {
-        "displayName": "新建文件夹（NaN）",
-        "displayIndex": null,
-        "name": " 4 -道具集",
-        "sourceRelativePath": " 4 -道具集",
-        "isRoot": false,
-        "chapters": [
-          {
-            "displayName": "擬真穿戴式貓耳貓尾",
-            "displayIndex": 56,
-            "name": "56 - 擬真穿戴式貓耳貓尾",
-            "sourceRelativePath": " 4 -道具集/56 - 擬真穿戴式貓耳貓尾.md",
-            "type": "Markdown",
-            "isEarlyAccess": false,
-            "commentsUrl": null,
-            "htmlRelativePath": "新建文件夹（NaN）/擬真穿戴式貓耳貓尾.html",
-            "chapterCharCount": 3657
-          }
-        ],
-        "subFolders": [],
-        "folderCharCount": 3657
-      },
-      {
         "displayName": "主线",
         "displayIndex": 1,
         "name": "1 - 主线",
@@ -559,6 +537,17 @@ window.DATA={
             "chapterCharCount": 2533
           },
           {
+            "displayName": "擬真穿戴式貓耳貓尾",
+            "displayIndex": 56,
+            "name": "56 - 擬真穿戴式貓耳貓尾",
+            "sourceRelativePath": "4 - 道具集/56 - 擬真穿戴式貓耳貓尾.md",
+            "type": "Markdown",
+            "isEarlyAccess": false,
+            "commentsUrl": null,
+            "htmlRelativePath": "道具集/擬真穿戴式貓耳貓尾.html",
+            "chapterCharCount": 3657
+          },
+          {
             "displayName": "充电宝少女捕获器",
             "displayIndex": 79,
             "name": "79 - 充电宝少女捕获器",
@@ -681,7 +670,7 @@ window.DATA={
           }
         ],
         "subFolders": [],
-        "folderCharCount": 66869
+        "folderCharCount": 70526
       },
       {
         "displayName": "META",
@@ -1182,5 +1171,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "483"
+  "buildNumber": "484"
 };
