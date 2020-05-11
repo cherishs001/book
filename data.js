@@ -1031,7 +1031,7 @@ window.DATA={
             "isEarlyAccess": false,
             "commentsUrl": null,
             "htmlRelativePath": "人设卡/随物.html",
-            "chapterCharCount": 146
+            "chapterCharCount": 147
           },
           {
             "displayName": "其他角色",
@@ -1046,7 +1046,7 @@ window.DATA={
           }
         ],
         "subFolders": [],
-        "folderCharCount": 2910
+        "folderCharCount": 2911
       },
       {
         "displayName": "插图",
@@ -1104,9 +1104,9 @@ window.DATA={
         "folderCharCount": 1361
       }
     ],
-    "folderCharCount": 269997
+    "folderCharCount": 269998
   },
-  "charsCount": 269997,
+  "charsCount": 269998,
   "paragraphsCount": 5346,
   "keywordsCount": [
     [
@@ -1182,5 +1182,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "490"
+  "buildNumber": "491"
 };
