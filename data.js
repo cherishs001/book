@@ -1023,6 +1023,17 @@ window.DATA={
             "chapterCharCount": 934
           },
           {
+            "displayName": "随物",
+            "displayIndex": 5,
+            "name": "5 - 随物",
+            "sourceRelativePath": "6 - 人设卡/5 - 随物.md",
+            "type": "Markdown",
+            "isEarlyAccess": false,
+            "commentsUrl": null,
+            "htmlRelativePath": "人设卡/随物.html",
+            "chapterCharCount": 146
+          },
+          {
             "displayName": "其他角色",
             "displayIndex": 999,
             "name": "999 - 其他角色",
@@ -1035,7 +1046,7 @@ window.DATA={
           }
         ],
         "subFolders": [],
-        "folderCharCount": 2764
+        "folderCharCount": 2910
       },
       {
         "displayName": "插图",
@@ -1093,10 +1104,10 @@ window.DATA={
         "folderCharCount": 1361
       }
     ],
-    "folderCharCount": 269851
+    "folderCharCount": 269997
   },
-  "charsCount": 269851,
-  "paragraphsCount": 5344,
+  "charsCount": 269997,
+  "paragraphsCount": 5346,
   "keywordsCount": [
     [
       "高潮",
@@ -1171,5 +1182,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "487"
+  "buildNumber": "490"
 };
