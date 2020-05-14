@@ -1259,16 +1259,37 @@ const select = ([anchorNodeIndex, anchorOffset, focusNodeIndex, focusOffset,]) =
         element.scrollIntoView();
     }
 };
-const canChapterShown = (chapter) => settings_1.earlyAccess.getValue() || !chapter.isEarlyAccess;
+const canChapterShown = (chapter) => (settings_1.earlyAccess.getValue() || !chapter.isEarlyAccess) && (!chapter.hidden);
+function findNextChapter(chapterCtx) {
+    const index = chapterCtx.inFolderIndex;
+    const folderChapters = chapterCtx.folder.chapters;
+    for (let i = index + 1; i < folderChapters.length; i++) {
+        const chapter = folderChapters[i];
+        if (canChapterShown(chapter)) {
+            return chapter;
+        }
+    }
+    return null;
+}
+function findPreviousChapter(chapterCtx) {
+    const index = chapterCtx.inFolderIndex;
+    const folderChapters = chapterCtx.folder.chapters;
+    for (let i = index - 1; i >= 0; i--) {
+        const chapter = folderChapters[i];
+        if (canChapterShown(chapter)) {
+            return chapter;
+        }
+    }
+    return null;
+}
 function loadPrevChapter() {
     const chapterCtx = state_1.state.currentChapter;
     if (chapterCtx === null) {
         return;
     }
-    const chapterIndex = chapterCtx.inFolderIndex;
-    if (chapterIndex >= 1 && canChapterShown(chapterCtx.folder.chapters[chapterIndex - 1])) {
-        const prevChapter = chapterCtx.folder.chapters[chapterIndex - 1].htmlRelativePath;
-        loadChapter(prevChapter, undefined, contentControl_1.Side.LEFT);
+    const previousChapter = findPreviousChapter(chapterCtx);
+    if (previousChapter !== null) {
+        loadChapter(previousChapter.htmlRelativePath, undefined, contentControl_1.Side.LEFT);
         history_1.updateHistory(true);
     }
 }
@@ -1278,10 +1299,9 @@ function loadNextChapter() {
     if (chapterCtx === null) {
         return;
     }
-    const chapterIndex = chapterCtx.inFolderIndex;
-    if (chapterIndex < chapterCtx.folder.chapters.length - 1 && canChapterShown(chapterCtx.folder.chapters[chapterIndex + 1])) {
-        const nextChapter = chapterCtx.folder.chapters[chapterIndex + 1].htmlRelativePath;
-        loadChapter(nextChapter, undefined, contentControl_1.Side.RIGHT);
+    const nextChapter = findNextChapter(chapterCtx);
+    if (nextChapter !== null) {
+        loadChapter(nextChapter.htmlRelativePath, undefined, contentControl_1.Side.RIGHT);
         history_1.updateHistory(true);
     }
 }
@@ -1332,12 +1352,11 @@ function loadChapter(chapterHtmlRelativePath, selection, side = contentControl_1
                 });
             }
         }
-        const chapterIndex = chapterCtx.inFolderIndex;
-        const prevChapter = chapterCtx.folder.chapters[chapterIndex - 1];
-        const nextChapter = chapterCtx.folder.chapters[chapterIndex + 1];
+        const prevChapter = findPreviousChapter(chapterCtx);
+        const nextChapter = findNextChapter(chapterCtx);
         mainBlock.element.appendChild(hs_1.h('div.page-switcher', [
             // 上一章
-            (prevChapter !== undefined && canChapterShown(prevChapter))
+            (prevChapter !== null)
                 ? hs_1.h('a.to-prev', {
                     href: window.location.pathname + '#' + prevChapter.htmlRelativePath,
                     onclick: (event) => {
@@ -1356,7 +1375,7 @@ function loadChapter(chapterHtmlRelativePath, selection, side = contentControl_1
                 },
             }, messages_1.GO_TO_MENU),
             // 下一章
-            (nextChapter !== undefined && canChapterShown(nextChapter))
+            (nextChapter !== null)
                 ? hs_1.h('a.to-next', {
                     href: window.location.pathname + '#' + nextChapter.htmlRelativePath,
                     onclick: (event) => {
@@ -2837,14 +2856,17 @@ const Menu_1 = require("../Menu");
 const shortNumber_1 = require("../util/shortNumber");
 const chapterSelectionButtonsMap = new Map();
 let currentLastReadLabelAt = null;
-function attachLastReadLabelTo(button, htmlRelativePath) {
+function attachLastReadLabelTo(button) {
+    if (button === undefined) {
+        return;
+    }
     currentLastReadLabelAt = button.append('[上次阅读]');
 }
 chapterControl_1.loadChapterEvent.on(newChapterHtmlRelativePath => {
     if (currentLastReadLabelAt !== null) {
         currentLastReadLabelAt.remove();
     }
-    attachLastReadLabelTo(chapterSelectionButtonsMap.get(newChapterHtmlRelativePath), newChapterHtmlRelativePath);
+    attachLastReadLabelTo(chapterSelectionButtonsMap.get(newChapterHtmlRelativePath));
 });
 function getDecorationForChapterType(chapterType) {
     switch (chapterType) {
@@ -2863,6 +2885,9 @@ class ChaptersMenu extends Menu_1.Menu {
             handle.append(`[${shortNumber_1.shortNumber(subfolder.folderCharCount)}]`, 'char-count');
         }
         for (const chapter of folder.chapters) {
+            if (chapter.hidden) {
+                continue;
+            }
             const handle = this.addItem(chapter.displayName, {
                 small: true,
                 button: true,
@@ -2879,7 +2904,7 @@ class ChaptersMenu extends Menu_1.Menu {
             handle.append(`[${shortNumber_1.shortNumber(chapter.chapterCharCount)}]`, 'char-count');
             const lastRead = window.localStorage.getItem('lastRead');
             if (lastRead === chapter.htmlRelativePath) {
-                attachLastReadLabelTo(handle, chapter.htmlRelativePath);
+                attachLastReadLabelTo(handle);
             }
             chapterSelectionButtonsMap.set(chapter.htmlRelativePath, handle);
         }
