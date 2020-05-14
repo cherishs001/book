@@ -94,4 +94,9 @@ export const contentStdFunctions: Array<NativeFunction> = [
     interpreterHandle.pushContent($table);
     return getMaybePooled('null', null);
   },
+  function contentAddHorizontalRule(args, interpreterHandle) {
+    assertArgsLength(args, 0);
+    interpreterHandle.pushContent(document.createElement('hr'));
+    return getMaybePooled('null', null);
+  },
 ];
