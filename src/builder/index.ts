@@ -1,8 +1,7 @@
-import { copy, copyFile, ensureDir, exists, mkdirp, pathExists, readdir, readFile, stat, writeFile } from 'fs-extra';
+import { copy, copyFile, ensureDir, mkdirp, pathExists, readdir, readFile, stat, writeFile } from 'fs-extra';
 import * as MDI from 'markdown-it';
 import * as mdiReplaceLinkPlugin from 'markdown-it-replace-link';
 import { basename, dirname, parse as parsePath, posix, relative, resolve } from 'path';
-import yargs = require('yargs');
 import { Chapter, Data, Folder, Node, WTCDReader } from '../Data';
 import { parse } from '../wtcd/parse';
 import { countCertainWord } from './countCertainWord';
@@ -11,12 +10,11 @@ import { countParagraphs } from './countParagraphs';
 import { isAttachment, isDocument } from './fileExtensions';
 import { keywords } from './keywords';
 import { PrefixedConsole } from './PrefixedConsole';
+import yargs = require('yargs');
 
 const { join } = posix;
 
 const earlyAccessFlag = '# 编写中';
-const commentsUrlBegin = '[评论](';
-const commentsUrlEnd = ')';
 
 const argv = yargs.options({
   debug: { type: 'boolean', default: false },
@@ -106,14 +104,6 @@ const argv = yargs.options({
       markdown = markdown.substr(earlyAccessFlag.length).trimLeft();
     }
 
-    let commentsUrl: string | null = null;
-    if (markdown.startsWith(commentsUrlBegin)) {
-      const commentsUrlBeginIndex = commentsUrlBegin.length;
-      const commentsUrlEndIndex = markdown.indexOf(commentsUrlEnd, commentsUrlBeginIndex);
-      commentsUrl = markdown.substring(commentsUrlBeginIndex, commentsUrlEndIndex);
-      markdown = markdown.substr(commentsUrlEndIndex + 1).trimLeft();
-    }
-
     const chapterCharCount = countChars(markdown);
     charsCount += chapterCharCount;
 
@@ -143,7 +133,6 @@ const argv = yargs.options({
       ...node,
       type: 'Markdown',
       isEarlyAccess,
-      commentsUrl,
       htmlRelativePath,
       chapterCharCount,
     };
@@ -154,20 +143,15 @@ const argv = yargs.options({
     const metaPath = resolve(parsedPath.dir, parsedPath.name + '.meta.json');
     const meta: {
       isEarlyAccess: boolean,
-      commentsUrl: null | string,
       preferredReader: WTCDReader,
     } = {
       isEarlyAccess: false,
-      commentsUrl: null,
       preferredReader: 'flow',
     };
     if (await pathExists(metaPath)) {
       const content = JSON.parse(await readFile(metaPath, 'utf8'));
       if (typeof content.isEarlyAccess === 'boolean') {
         meta.isEarlyAccess = content.isEarlyAccess;
-      }
-      if (typeof content.commentsUrl === 'string') {
-        meta.commentsUrl = content.commentsUrl;
       }
       if (typeof content.preferredReader === 'string') {
         if (

@@ -1,5 +1,3 @@
-[评论](https://github.com/SCLeoX/Wearable-Technology/issues/47)
-
 # 24 - mWatch
 AobaSeimukei
 

@@ -1,5 +1,3 @@
-[评论](https://github.com/SCLeoX/Wearable-Technology/issues/132)
-
 # 谁说 neko 不能养 neko？
 Frost_CN 为霜
 

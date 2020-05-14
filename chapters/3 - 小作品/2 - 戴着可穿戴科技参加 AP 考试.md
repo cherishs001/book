@@ -1,5 +1,3 @@
-[评论](https://github.com/SCLeoX/Wearable-Technology/issues/28)
-
 # 戴着可穿戴科技参加 AP 考试
 今天考 AP。
 

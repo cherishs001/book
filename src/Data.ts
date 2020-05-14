@@ -12,7 +12,6 @@ export type ChapterType =
 export interface ChapterBase extends Node {
   type: ChapterType;
   isEarlyAccess: boolean;
-  commentsUrl: string | null;
   htmlRelativePath: string;
   chapterCharCount: number;
 }

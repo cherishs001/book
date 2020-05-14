@@ -1,5 +1,3 @@
-[评论](https://github.com/SCLeoX/Wearable-Technology/issues/127)
-
 # 可穿戴科技的其他版本 · Flexible (Episode 1)
 作者：Darkside
 
