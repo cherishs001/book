@@ -8,7 +8,10 @@ import { shortNumber } from '../util/shortNumber';
 const chapterSelectionButtonsMap: Map<string, ItemHandle> = new Map();
 let currentLastReadLabelAt: HTMLSpanElement | null = null;
 
-function attachLastReadLabelTo(button: ItemHandle, htmlRelativePath: string) {
+function attachLastReadLabelTo(button: ItemHandle | undefined) {
+  if (button === undefined) {
+    return;
+  }
   currentLastReadLabelAt = button.append('[上次阅读]');
 }
 
@@ -16,7 +19,7 @@ loadChapterEvent.on(newChapterHtmlRelativePath => {
   if (currentLastReadLabelAt !== null) {
     currentLastReadLabelAt.remove();
   }
-  attachLastReadLabelTo(chapterSelectionButtonsMap.get(newChapterHtmlRelativePath)!, newChapterHtmlRelativePath);
+  attachLastReadLabelTo(chapterSelectionButtonsMap.get(newChapterHtmlRelativePath));
 });
 
 function getDecorationForChapterType(chapterType: ChapterType) {
@@ -37,6 +40,9 @@ export class ChaptersMenu extends Menu {
       handle.append(`[${shortNumber(subfolder.folderCharCount)}]`, 'char-count');
     }
     for (const chapter of folder.chapters) {
+      if (chapter.hidden) {
+        continue;
+      }
       const handle = this.addItem(chapter.displayName, {
         small: true,
         button: true,
@@ -54,7 +60,7 @@ export class ChaptersMenu extends Menu {
 
       const lastRead = window.localStorage.getItem('lastRead');
       if (lastRead === chapter.htmlRelativePath) {
-        attachLastReadLabelTo(handle, chapter.htmlRelativePath);
+        attachLastReadLabelTo(handle);
       }
 
       chapterSelectionButtonsMap.set(chapter.htmlRelativePath, handle);

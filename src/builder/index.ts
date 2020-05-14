@@ -2,7 +2,7 @@ import { copy, copyFile, ensureDir, mkdirp, pathExists, readdir, readFile, stat,
 import * as MDI from 'markdown-it';
 import * as mdiReplaceLinkPlugin from 'markdown-it-replace-link';
 import { basename, dirname, parse as parsePath, posix, relative, resolve } from 'path';
-import { Chapter, Data, Folder, Node, WTCDReader } from '../Data';
+import { Chapter, ChapterFlagsMapped, Data, Folder, Node, WTCDReader } from '../Data';
 import { parse } from '../wtcd/parse';
 import { countCertainWord } from './countCertainWord';
 import { countChars } from './countChars';
@@ -10,11 +10,10 @@ import { countParagraphs } from './countParagraphs';
 import { isAttachment, isDocument } from './fileExtensions';
 import { keywords } from './keywords';
 import { PrefixedConsole } from './PrefixedConsole';
+import { readMarkdownFlags } from './readMarkdownFlags';
 import yargs = require('yargs');
 
 const { join } = posix;
-
-const earlyAccessFlag = '# 编写中';
 
 const argv = yargs.options({
   debug: { type: 'boolean', default: false },
@@ -98,12 +97,8 @@ const argv = yargs.options({
 
   async function loadMarkdownChapter(path: string, parentHtmlRelativePath: string): Promise<Chapter> {
     let markdown = (await readFile(path, 'utf8'));
-    let isEarlyAccess = false;
-    if (markdown.startsWith(earlyAccessFlag)) {
-      isEarlyAccess = true;
-      markdown = markdown.substr(earlyAccessFlag.length).trimLeft();
-    }
-
+    let chapterFlagsMapped: ChapterFlagsMapped;
+    [markdown, chapterFlagsMapped] = readMarkdownFlags(markdown);
     const chapterCharCount = countChars(markdown);
     charsCount += chapterCharCount;
 
@@ -131,8 +126,8 @@ const argv = yargs.options({
 
     return {
       ...node,
+      ...chapterFlagsMapped,
       type: 'Markdown',
-      isEarlyAccess,
       htmlRelativePath,
       chapterCharCount,
     };
@@ -143,15 +138,20 @@ const argv = yargs.options({
     const metaPath = resolve(parsedPath.dir, parsedPath.name + '.meta.json');
     const meta: {
       isEarlyAccess: boolean,
+      hidden: boolean,
       preferredReader: WTCDReader,
     } = {
       isEarlyAccess: false,
+      hidden: false,
       preferredReader: 'flow',
     };
     if (await pathExists(metaPath)) {
       const content = JSON.parse(await readFile(metaPath, 'utf8'));
       if (typeof content.isEarlyAccess === 'boolean') {
         meta.isEarlyAccess = content.isEarlyAccess;
+      }
+      if (typeof content.hidden === 'boolean') {
+        meta.hidden = content.hidden;
       }
       if (typeof content.preferredReader === 'string') {
         if (

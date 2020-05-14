@@ -4,7 +4,7 @@ import { WTCDParseResult } from '../../wtcd/types';
 import { loadingText } from '../constant/loadingText';
 import { CHAPTER_FAILED, EARLY_ACCESS_DESC, EARLY_ACCESS_TITLE, GO_TO_MENU, NEXT_CHAPTER, PREVIOUS_CHAPTER } from '../constant/messages';
 import { AutoCache } from '../data/AutoCache';
-import { relativePathLookUpMap } from '../data/data';
+import { ChapterContext, relativePathLookUpMap } from '../data/data';
 import { earlyAccess, gestureSwitchChapter } from '../data/settings';
 import { Selection, state } from '../data/state';
 import { DebugLogger } from '../DebugLogger';
@@ -61,17 +61,40 @@ const select = ([
 };
 
 const canChapterShown = (chapter: Chapter) =>
-  earlyAccess.getValue() || !chapter.isEarlyAccess;
+  (earlyAccess.getValue() || !chapter.isEarlyAccess) && (!chapter.hidden);
+
+function findNextChapter(chapterCtx: ChapterContext) {
+  const index = chapterCtx.inFolderIndex;
+  const folderChapters = chapterCtx.folder.chapters;
+  for (let i = index + 1; i < folderChapters.length; i++) {
+    const chapter = folderChapters[i];
+    if (canChapterShown(chapter)) {
+      return chapter;
+    }
+  }
+  return null;
+}
+
+function findPreviousChapter(chapterCtx: ChapterContext) {
+  const index = chapterCtx.inFolderIndex;
+  const folderChapters = chapterCtx.folder.chapters;
+  for (let i = index - 1; i >= 0; i--) {
+    const chapter = folderChapters[i];
+    if (canChapterShown(chapter)) {
+      return chapter;
+    }
+  }
+  return null;
+}
 
 export function loadPrevChapter() {
   const chapterCtx = state.currentChapter;
   if (chapterCtx === null) {
     return;
   }
-  const chapterIndex = chapterCtx.inFolderIndex;
-  if (chapterIndex >= 1 && canChapterShown(chapterCtx.folder.chapters[chapterIndex - 1])) {
-    const prevChapter = chapterCtx.folder.chapters[chapterIndex - 1].htmlRelativePath;
-    loadChapter(prevChapter, undefined, Side.LEFT);
+  const previousChapter = findPreviousChapter(chapterCtx);
+  if (previousChapter !== null) {
+    loadChapter(previousChapter.htmlRelativePath, undefined, Side.LEFT);
     updateHistory(true);
   }
 }
@@ -81,10 +104,9 @@ export function loadNextChapter() {
   if (chapterCtx === null) {
     return;
   }
-  const chapterIndex = chapterCtx.inFolderIndex;
-  if (chapterIndex < chapterCtx.folder.chapters.length - 1 && canChapterShown(chapterCtx.folder.chapters[chapterIndex + 1])) {
-    const nextChapter = chapterCtx.folder.chapters[chapterIndex + 1].htmlRelativePath;
-    loadChapter(nextChapter, undefined, Side.RIGHT);
+  const nextChapter = findNextChapter(chapterCtx);
+  if (nextChapter !== null) {
+    loadChapter(nextChapter.htmlRelativePath, undefined, Side.RIGHT);
     updateHistory(true);
   }
 }
@@ -97,6 +119,7 @@ const chaptersCache = new AutoCache<string, string>(
   },
   new DebugLogger('Chapters Cache'),
 );
+
 export function loadChapter(
   chapterHtmlRelativePath: string,
   selection?: Selection,
@@ -155,12 +178,11 @@ export function loadChapter(
       }
     }
 
-    const chapterIndex = chapterCtx.inFolderIndex;
-    const prevChapter = chapterCtx.folder.chapters[chapterIndex - 1];
-    const nextChapter = chapterCtx.folder.chapters[chapterIndex + 1];
+    const prevChapter = findPreviousChapter(chapterCtx);
+    const nextChapter = findNextChapter(chapterCtx);
     mainBlock.element.appendChild(h('div.page-switcher', [
       // 上一章
-      (prevChapter !== undefined && canChapterShown(prevChapter))
+      (prevChapter !== null)
         ? h('a.to-prev', {
           href: window.location.pathname + '#' + prevChapter.htmlRelativePath,
           onclick: (event: MouseEvent) => {
@@ -181,7 +203,7 @@ export function loadChapter(
       }, GO_TO_MENU),
 
       // 下一章
-      (nextChapter !== undefined && canChapterShown(nextChapter))
+      (nextChapter !== null)
         ? h('a.to-next', {
           href: window.location.pathname + '#' + nextChapter.htmlRelativePath,
           onclick: (event: MouseEvent) => {

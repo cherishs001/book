@@ -9,9 +9,15 @@ export type ChapterType =
   | 'Markdown' // Markdown based static chapter
   | 'WTCD';   // WTCD based interactive chapter
 
-export interface ChapterBase extends Node {
-  type: ChapterType;
+export interface ChapterFlagsMapped {
   isEarlyAccess: boolean;
+  hidden: boolean;
+}
+
+export type ChapterFlags = keyof ChapterFlagsMapped;
+
+export interface ChapterBase extends Node, ChapterFlagsMapped {
+  type: ChapterType;
   htmlRelativePath: string;
   chapterCharCount: number;
 }
