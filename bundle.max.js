@@ -5447,6 +5447,11 @@ exports.contentStdFunctions = [
         interpreterHandle.pushContent($table);
         return constantsPool_1.getMaybePooled('null', null);
     },
+    function contentAddHorizontalRule(args, interpreterHandle) {
+        utils_1.assertArgsLength(args, 0);
+        interpreterHandle.pushContent(document.createElement('hr'));
+        return constantsPool_1.getMaybePooled('null', null);
+    },
 ];
 
 },{"../Interpreter":55,"../constantsPool":59,"./utils":70}],63:[function(require,module,exports){
