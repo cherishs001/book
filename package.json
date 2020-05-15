@@ -38,7 +38,7 @@
         "yargs": "^15.0.1"
     },
     "devDependencies": {
-        "@types/hyperscript": "0.0.3",
+        "@types/hyperscript": "0.0.4",
         "@types/yargs": "^15.0.0",
         "chokidar-cli": "^2.0.0",
         "concurrently": "^5.0.0",
