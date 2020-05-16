@@ -774,7 +774,7 @@ window.DATA={
                 "hidden": false,
                 "type": "Markdown",
                 "htmlRelativePath": "META/WTCD/6.-标准库.html",
-                "chapterCharCount": 5071
+                "chapterCharCount": 5511
               },
               {
                 "displayName": "7. 流程控制",
@@ -807,7 +807,7 @@ window.DATA={
                 "hidden": false,
                 "type": "Markdown",
                 "htmlRelativePath": "META/WTCD/变化日志.html",
-                "chapterCharCount": 636
+                "chapterCharCount": 697
               },
               {
                 "displayName": "计划功能",
@@ -960,16 +960,40 @@ window.DATA={
                     "type": "WTCD",
                     "htmlRelativePath": "META/WTCD/例子/测试.html",
                     "chapterCharCount": 24
+                  },
+                  {
+                    "displayName": "Flow 模式 Canvas",
+                    "displayIndex": 12,
+                    "name": "12 - Flow 模式 Canvas",
+                    "sourceRelativePath": "5 - META/1 - WTCD/1 - 例子/12 - Flow 模式 Canvas.wtcd",
+                    "isEarlyAccess": false,
+                    "hidden": false,
+                    "preferredReader": "flow",
+                    "type": "WTCD",
+                    "htmlRelativePath": "META/WTCD/例子/Flow-模式-Canvas.html",
+                    "chapterCharCount": 0
+                  },
+                  {
+                    "displayName": "Game 模式 Canvas",
+                    "displayIndex": 13,
+                    "name": "13 - Game 模式 Canvas",
+                    "sourceRelativePath": "5 - META/1 - WTCD/1 - 例子/13 - Game 模式 Canvas.wtcd",
+                    "isEarlyAccess": false,
+                    "hidden": false,
+                    "preferredReader": "game",
+                    "type": "WTCD",
+                    "htmlRelativePath": "META/WTCD/例子/Game-模式-Canvas.html",
+                    "chapterCharCount": 0
                   }
                 ],
                 "subFolders": [],
                 "folderCharCount": 3489
               }
             ],
-            "folderCharCount": 31126
+            "folderCharCount": 31627
           }
         ],
-        "folderCharCount": 35703
+        "folderCharCount": 36204
       },
       {
         "displayName": "人设卡",
@@ -1082,10 +1106,10 @@ window.DATA={
         "folderCharCount": 220
       }
     ],
-    "folderCharCount": 267604
+    "folderCharCount": 268105
   },
-  "charsCount": 267604,
-  "paragraphsCount": 5333,
+  "charsCount": 268105,
+  "paragraphsCount": 5342,
   "keywordsCount": [
     [
       "高潮",
@@ -1160,5 +1184,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "498"
+  "buildNumber": "499"
 };
