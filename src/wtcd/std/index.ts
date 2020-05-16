@@ -5,6 +5,7 @@ import { mathStdFunctions } from './math';
 import { randomStdFunctions } from './random';
 import { readerStdFunctions } from './reader';
 import { stringStdFunctions } from './string';
+import { canvasStdFunctions } from './canvas';
 
 export const stdFunctions = [
   ...contentStdFunctions,
@@ -14,4 +15,5 @@ export const stdFunctions = [
   ...randomStdFunctions,
   ...readerStdFunctions,
   ...stringStdFunctions,
+  ...canvasStdFunctions,
 ];

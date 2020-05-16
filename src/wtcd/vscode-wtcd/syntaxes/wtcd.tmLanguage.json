@@ -106,7 +106,7 @@
 		},
 		"stdFunctions": {
 			"name": "support.function",
-			"match": "\\b(?:contentAddParagraph|contentAddImage|contentAddUnorderedList|contentAddOrderedList|contentAddHeader|contentAddTable|contentAddHorizontalRule|print|assert|assertError|timeStart|timeEnd|listSet|listForEach|listMap|listCreateFilled|listChunk|listFilter|listSplice|listSlice|listLength|listIndexOf|listIncludes|listFindIndex|mathMin|mathMax|mathFloor|mathCeil|random|randomInt|randomBoolean|randomBiased|stringLength|stringFormatNumberFixed|stringFormatNumberPrecision|readerSetPinned|readerUnsetPinned|readerSetStateDesc|readerUnsetStateDesc)\\b"
+			"match": "\\b(?:contentAddParagraph|contentAddImage|contentAddUnorderedList|contentAddOrderedList|contentAddHeader|contentAddTable|contentAddHorizontalRule|print|assert|assertError|timeStart|timeEnd|listSet|listForEach|listMap|listCreateFilled|listChunk|listFilter|listSplice|listSlice|listLength|listIndexOf|listIncludes|listFindIndex|mathMin|mathMax|mathFloor|mathCeil|random|randomInt|randomBoolean|randomBiased|stringLength|stringFormatNumberFixed|stringFormatNumberPrecision|readerSetPinned|readerUnsetPinned|readerSetStateDesc|readerUnsetStateDesc|canvasCreate|canvasPutImage|canvasOutput|canvasClear)\\b"
 		},
 		"variables": {
 			"name": "variable.other.readwrite.wtcd",

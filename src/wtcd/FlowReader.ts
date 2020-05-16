@@ -1,6 +1,7 @@
 import { ContentOutput, Interpreter } from './Interpreter';
 import { Random } from './Random';
 import { WTCDRoot } from './types';
+import { NetworkController, disabled } from './NetworkController';
 
 /** Data persisted in the localStorage */
 interface Data {
@@ -93,6 +94,7 @@ export class FlowReader {
     this.interpreter = new Interpreter(
       this.wtcdRoot,
       new Random(this.data.random),
+      this.networkController,
     );
     this.interpreterIterator = this.interpreter.start();
   }
@@ -101,6 +103,7 @@ export class FlowReader {
     private wtcdRoot: WTCDRoot,
     private errorMessageCreator: (error: Error) => HTMLElement,
     private elementPreprocessor: ($element: HTMLElement) => void,
+    private networkController: NetworkController = disabled,
   ) {
     this.storageKey = `wtcd.fr.${docIdentifier}`;
     this.data = this.parseData(window.localStorage.getItem(this.storageKey)) || {

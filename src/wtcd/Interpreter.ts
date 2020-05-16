@@ -25,6 +25,8 @@ import {
 } from './types';
 import { arrayEquals, flat } from './utils';
 import { WTCDError } from './WTCDError';
+import { NetworkController } from './NetworkController';
+import { ChainedCanvas } from './ChainedCanvas';
 
 // Dispatching code for the runtime of WTCD
 
@@ -401,6 +403,8 @@ export interface InterpreterHandle {
   readonly timers: Map<string, number>;
   setPinnedFunction(pinnedFunction: FunctionValue | null): void;
   setStateDesc(stateDesc: string | null): void;
+  readonly networkController: NetworkController;
+  readonly canvases: Map<string, ChainedCanvas>;
 }
 
 export class Interpreter {
@@ -415,6 +419,8 @@ export class Interpreter {
     timers: this.timers,
     setPinnedFunction: this.setPinnedFunction.bind(this),
     setStateDesc: this.setStateDesc.bind(this),
+    networkController: this.networkController,
+    canvases: new Map(),
   };
   private pinnedFunction: FunctionValue | null = null;
   private pinned: Array<HTMLElement> = [];
@@ -428,6 +434,7 @@ export class Interpreter {
   public constructor(
     private wtcdRoot: WTCDRoot,
     private random: Random,
+    private networkController: NetworkController
   ) {
     this.sectionStack.push(this.wtcdRoot.sections[0]);
   }

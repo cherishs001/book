@@ -1,6 +1,7 @@
 import { ContentOutput, Interpreter } from './Interpreter';
 import { Random } from './Random';
 import { WTCDRoot } from './types';
+import { NetworkController, disabled } from './NetworkController';
 
 interface GameData {
   random: string;
@@ -78,6 +79,7 @@ export class GameReader {
     private wtcdRoot: WTCDRoot,
     private onOutput: (content: HTMLDivElement) => void,
     private onError: (error: Error) => void,
+    private networkController: NetworkController = disabled,
   ) {
     this.storageKey = `wtcd.gr.${docIdentifier}`;
     this.data = this.parseData(
@@ -169,9 +171,11 @@ export class GameReader {
     }
   }
   private restoreGameState() {
-    this.interpreter = new Interpreter(this.wtcdRoot, new Random(
-      this.data.current.random,
-    ));
+    this.interpreter = new Interpreter(
+      this.wtcdRoot,
+      new Random(this.data.current.random),
+      this.networkController,
+    );
     this.interpreterIterator = this.interpreter.start();
     let lastOutput = this.next();
     this.data.current.decisions.forEach(decision =>
