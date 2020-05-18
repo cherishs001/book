@@ -42,6 +42,7 @@ export const canvasStdFunctions: Array<NativeFunction> = [
     const $newCanvas = document.createElement('canvas');
     $newCanvas.width = canvas.getWidth();
     $newCanvas.height = canvas.getHeight();
+    $newCanvas.style.maxWidth = '100%';
     interpreterHandle.pushContent($newCanvas);
     canvas.onResolve(() => {
       if (document.body.contains($newCanvas)) {
