@@ -29,6 +29,13 @@ function getDecorationForChapterType(chapterType: ChapterType) {
   }
 }
 
+export function isEmptyFolder(folder: Folder) {
+  if (folder.chapters.length !== 0) {
+    return false;
+  }
+  return folder.subFolders.every(isEmptyFolder);
+}
+
 export class ChaptersMenu extends Menu {
   public constructor(parent: Menu, folder?: Folder) {
     if (folder === undefined) {
@@ -36,6 +43,9 @@ export class ChaptersMenu extends Menu {
     }
     super(folder.isRoot ? '章节选择' : folder.displayName, parent);
     for (const subfolder of folder.subFolders) {
+      if (isEmptyFolder(subfolder)) {
+        continue;
+      }
       const handle = this.addLink(new ChaptersMenu(this, subfolder), true, ItemDecoration.ICON_FOLDER);
       handle.append(`[${shortNumber(subfolder.folderCharCount)}]`, 'char-count');
     }
