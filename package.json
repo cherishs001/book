@@ -38,6 +38,7 @@
         "yargs": "^15.0.1"
     },
     "devDependencies": {
+        "@types/css-font-loading-module": "0.0.4",
         "@types/hyperscript": "0.0.4",
         "@types/yargs": "^15.0.0",
         "chokidar-cli": "^2.0.0",

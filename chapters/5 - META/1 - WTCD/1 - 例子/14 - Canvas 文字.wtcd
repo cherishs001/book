@@ -1,0 +1,8 @@
+WTCD 1.3
+section init {
+  canvasCreate::["id" 400 100]
+  canvasSetFont::["id" 20 "googleFonts:ZCOOL KuaiLe"]
+  canvasSetFillStyle::["id" "black"]
+  canvasFillText::["id" "小朋友们大家好，还记得...（wow）" 0 0]
+  canvasOutput::["id"]
+} then exit

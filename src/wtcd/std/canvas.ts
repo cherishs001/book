@@ -2,6 +2,15 @@ import { NativeFunction } from '../types';
 import { getMaybePooled } from '../constantsPool';
 import { assertArgsLength, assertArgType, NativeFunctionError } from './utils';
 import { ChainedCanvas } from '../ChainedCanvas';
+import { InterpreterHandle } from '../Interpreter';
+
+function obtainCanvas(interpreterHandle: InterpreterHandle, id: string) {
+  const canvas = interpreterHandle.canvases.get(id)!;
+  if (canvas === undefined) {
+    throw new NativeFunctionError(`Canvas with id="${id}" does not exist.`);
+  }
+  return canvas;
+}
 
 export const canvasStdFunctions: Array<NativeFunction> = [
   function canvasCreate(args, interpreterHandle) {
@@ -29,10 +38,7 @@ export const canvasStdFunctions: Array<NativeFunction> = [
   },
   function canvasOutput(args, interpreterHandle) {
     const id = assertArgType(args, 0, 'string');
-    const canvas = interpreterHandle.canvases.get(id);
-    if (canvas === undefined) {
-      throw new NativeFunctionError(`Canvas with id="${id}" does not exist.`);
-    }
+    const canvas = obtainCanvas(interpreterHandle, id);
     const $newCanvas = document.createElement('canvas');
     $newCanvas.width = canvas.getWidth();
     $newCanvas.height = canvas.getHeight();
@@ -46,10 +52,7 @@ export const canvasStdFunctions: Array<NativeFunction> = [
   },
   function canvasClear(args, interpreterHandle) {
     const id = assertArgType(args, 0, 'string');
-    const canvas = interpreterHandle.canvases.get(id);
-    if (canvas === undefined) {
-      throw new NativeFunctionError(`Canvas with id="${id}" does not exist.`);
-    }
+    const canvas = obtainCanvas(interpreterHandle, id);
     canvas.updatePromise(async () => {
       canvas.ctx.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
     });
@@ -61,10 +64,7 @@ export const canvasStdFunctions: Array<NativeFunction> = [
     const path = assertArgType(args, 1, 'string');
     const x = assertArgType(args, 2, 'number');
     const y = assertArgType(args, 3, 'number');
-    const canvas = interpreterHandle.canvases.get(id)!;
-    if (canvas === undefined) {
-      throw new NativeFunctionError(`Canvas with id="${id}" does not exist.`);
-    }
+    const canvas = obtainCanvas(interpreterHandle, id);
     canvas.updatePromise(async () => {
       try {
         const image = await interpreterHandle.featureProvider.loadImage(path);
@@ -72,6 +72,72 @@ export const canvasStdFunctions: Array<NativeFunction> = [
       } catch (error) {
         console.error(`WTCD failed to load image with path="${path}".`, error);
       }
+    });
+    return getMaybePooled('null', null);
+  },
+  function canvasSetFont(args, interpreterHandle) {
+    assertArgsLength(args, 3);
+    const id = assertArgType(args, 0, 'string');
+    const size = assertArgType(args, 1, 'number');
+    const fontIdentifier = assertArgType(args, 2, 'string');
+    const canvas = obtainCanvas(interpreterHandle, id);
+    canvas.updatePromise(async () => {
+      try {
+        const fontName = await interpreterHandle.featureProvider
+          .loadFont(fontIdentifier);
+        canvas.ctx.font = `${size}px ${fontName}`;
+      } catch (error) {
+        console.error(`WTCD failed to load font with ` +
+          `identifier="${fontIdentifier}".`, error);
+      }
+    });
+    return getMaybePooled('null', null);
+  },
+  function canvasSetFillStyle(args, interpreterHandle) {
+    assertArgsLength(args, 2);
+    const id = assertArgType(args, 0, 'string');
+    const color = assertArgType(args, 1, 'string');
+    const canvas = obtainCanvas(interpreterHandle, id);
+    canvas.updatePromise(async () => {
+      canvas.ctx.fillStyle = color;
+    });
+    return getMaybePooled('null', null);
+  },
+  function canvasFillText(args, interpreterHandle) {
+    assertArgsLength(args, 4, 6);
+    const id = assertArgType(args, 0, 'string');
+    const text = assertArgType(args, 1, 'string');
+    const x = assertArgType(args, 2, 'number');
+    const y = assertArgType(args, 3, 'number');
+    const hAlign = assertArgType(args, 4, 'string', 'start');
+    const vAlign = assertArgType(args, 5, 'string', 'alphabetic');
+    const canvas = obtainCanvas(interpreterHandle, id);
+    switch (hAlign) {
+      case 'left':
+      case 'center':
+      case 'right':
+      case 'start':
+      case 'end':
+        break;
+      default:
+        throw new NativeFunctionError(`Unknown text hAlign: ${hAlign}`);
+    }
+    switch (vAlign) {
+      case 'top':
+      case 'hanging':
+      case 'middle':
+      case 'alphabetic':
+      case 'ideographic':
+      case 'bottom':
+        break;
+      default:
+        throw new NativeFunctionError(`Unknown text vAlign: ${vAlign}`);
+    }
+    canvas.updatePromise(async () => {
+      const ctx = canvas.ctx;
+      ctx.textAlign = hAlign;
+      ctx.textBaseline = vAlign;
+      ctx.fillText(text, x, y);
     });
     return getMaybePooled('null', null);
   },

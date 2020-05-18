@@ -165,7 +165,7 @@ export const pipelineInvocation = autoEvaluated((
   interpreterHandle,
 ) => {
   if (arg1.type !== 'function') {
-    throw WTCDError.atLocation(expr, `Left side of pipeline invocation "|>" ` +
+    throw WTCDError.atLocation(expr, `Right side of pipeline invocation "|>" ` +
       `is expected to be a function, received: ${describe(arg1)}`);
   }
   try {
