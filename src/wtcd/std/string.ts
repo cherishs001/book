@@ -28,4 +28,13 @@ export const stringStdFunctions: Array<NativeFunction> = [
     }
     return getMaybePooled('string', num.toPrecision(digits));
   },
+  function stringSplit(args) {
+    assertArgsLength(args, 2);
+    const str = assertArgType(args, 0, 'string');
+    const separator = assertArgType(args, 1, 'string');
+    return getMaybePooled(
+      'list',
+      str.split(separator).map(str => getMaybePooled('string', str)),
+    );
+  },
 ];
