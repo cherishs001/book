@@ -410,7 +410,7 @@ class DebugLogger {
 }
 exports.DebugLogger = DebugLogger;
 
-},{"./constant/materialDarkColors":10,"./data/settings":33,"./util/stringHash":53}],7:[function(require,module,exports){
+},{"./constant/materialDarkColors":10,"./data/settings":34,"./util/stringHash":56}],7:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class Event {
@@ -703,7 +703,7 @@ class Menu {
 }
 exports.Menu = Menu;
 
-},{"./DebugLogger":6,"./Event":7,"./control/layoutControl":26}],9:[function(require,module,exports){
+},{"./DebugLogger":6,"./Event":7,"./control/layoutControl":27}],9:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.loadingText = '加载中...';
@@ -1028,6 +1028,59 @@ exports.MonoDimensionTransitionControl = MonoDimensionTransitionControl;
 },{}],16:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const FeatureProvider_1 = require("../../wtcd/FeatureProvider");
+const resolvePath_1 = require("../util/resolvePath");
+const DebugLogger_1 = require("../DebugLogger");
+const AutoCache_1 = require("../data/AutoCache");
+const loadGooleFonts_1 = require("../util/loadGooleFonts");
+const debugLogger = new DebugLogger_1.DebugLogger('WTCD Feature Provider');
+const imageCache = new AutoCache_1.AutoCache(url => {
+    return new Promise((resolve, reject) => {
+        const image = document.createElement('img');
+        image.onload = () => resolve(image);
+        image.onerror = () => reject(new Error(`Failed to load ${url}.`));
+        image.src = url;
+    });
+}, new DebugLogger_1.DebugLogger('WTCD Image Cache'));
+const fontsCache = new AutoCache_1.AutoCache(identifier => {
+    // Identifier should look like: "googleFonts:ZCOOL KuaiLe"
+    const modeSeparatorIndex = identifier.indexOf(':');
+    if (modeSeparatorIndex === -1) {
+        return Promise.reject(new Error('Cannot find mode separator ":".'));
+    }
+    const mode = identifier.substr(0, modeSeparatorIndex);
+    if (mode !== 'googleFonts') {
+        return Promise.reject(new Error(`Unknown mode: "${mode}".`));
+    }
+    return loadGooleFonts_1.loadGoogleFonts(identifier.substr(modeSeparatorIndex + 1));
+}, new DebugLogger_1.DebugLogger('WTCD Font Cache'));
+class WTCDFeatureProvider extends FeatureProvider_1.FeatureProvider {
+    constructor(chapter) {
+        super();
+        this.chapter = chapter;
+    }
+    loadImage(path) {
+        if (!path.startsWith('./')) {
+            return Promise.reject(new Error('Path has to be relative and start ' +
+                `with "./". Received: "${path}"`));
+        }
+        let resolved = resolvePath_1.resolvePath('chapters', this.chapter.htmlRelativePath, '..', path.substr(2));
+        if (resolved === null) {
+            return Promise.reject(new Error(`Failed to resolve path: "${path}".`));
+        }
+        resolved = '/' + resolved;
+        debugLogger.log('Resolved from:', path, 'to:', resolved);
+        return imageCache.get(resolved);
+    }
+    loadFont(identifier) {
+        return fontsCache.get(identifier);
+    }
+}
+exports.WTCDFeatureProvider = WTCDFeatureProvider;
+
+},{"../../wtcd/FeatureProvider":58,"../DebugLogger":6,"../data/AutoCache":32,"../util/loadGooleFonts":52,"../util/resolvePath":54}],17:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const GameReader_1 = require("../../wtcd/GameReader");
 const messages_1 = require("../constant/messages");
 const settings_1 = require("../data/settings");
@@ -1037,10 +1090,10 @@ const formatTime_1 = require("../util/formatTime");
 const createWTCDErrorMessageFromError_1 = require("./createWTCDErrorMessageFromError");
 const hintControl_1 = require("./hintControl");
 const modalControl_1 = require("./modalControl");
-const NetworkController_1 = require("../../wtcd/NetworkController");
+const FeatureProvider_1 = require("../../wtcd/FeatureProvider");
 const debugLogger = new DebugLogger_1.DebugLogger('WTCD Game Reader UI');
 class WTCDGameReaderUI {
-    constructor(content, docIdentifier, wtcdRoot, networkController = NetworkController_1.disabled) {
+    constructor(content, docIdentifier, wtcdRoot, featureProvider = FeatureProvider_1.defaultFeatureProvider) {
         this.content = content;
         this.mainBlock = null;
         this.started = false;
@@ -1188,7 +1241,7 @@ class WTCDGameReaderUI {
                 initElement: createWTCDErrorMessageFromError_1.createWTCDErrorMessageFromError(error),
             });
         };
-        this.reader = new GameReader_1.GameReader(docIdentifier, wtcdRoot, this.onOutput, this.onError, networkController);
+        this.reader = new GameReader_1.GameReader(docIdentifier, wtcdRoot, this.onOutput, this.onError, featureProvider);
     }
     start() {
         if (this.started) {
@@ -1211,7 +1264,7 @@ class WTCDGameReaderUI {
 }
 exports.WTCDGameReaderUI = WTCDGameReaderUI;
 
-},{"../../wtcd/GameReader":56,"../../wtcd/NetworkController":58,"../DebugLogger":6,"../constant/messages":11,"../data/settings":33,"../hs":35,"../util/formatTime":50,"./createWTCDErrorMessageFromError":22,"./hintControl":24,"./modalControl":27}],17:[function(require,module,exports){
+},{"../../wtcd/FeatureProvider":58,"../../wtcd/GameReader":60,"../DebugLogger":6,"../constant/messages":11,"../data/settings":34,"../hs":36,"../util/formatTime":51,"./createWTCDErrorMessageFromError":23,"./hintControl":25,"./modalControl":28}],18:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const FlowReader_1 = require("../../wtcd/FlowReader");
@@ -1235,8 +1288,8 @@ const history_1 = require("./history");
 const layoutControl_1 = require("./layoutControl");
 const modalControl_1 = require("./modalControl");
 const processElements_1 = require("./processElements");
+const WTCDFeatureProvider_1 = require("./WTCDFeatureProvider");
 const WTCDGameReaderUI_1 = require("./WTCDGameReaderUI");
-const resolvePath_1 = require("../util/resolvePath");
 const debugLogger = new DebugLogger_1.DebugLogger('Chapter Control');
 exports.loadChapterEvent = new Event_1.Event();
 function closeChapter() {
@@ -1436,7 +1489,6 @@ var ErrorType;
     ErrorType[ErrorType["RUNTIME"] = 1] = "RUNTIME";
     ErrorType[ErrorType["INTERNAL"] = 2] = "INTERNAL";
 })(ErrorType = exports.ErrorType || (exports.ErrorType = {}));
-const networkControllerLogger = new DebugLogger_1.DebugLogger('WTCD Network Controller');
 function insertContent(content, text, chapter) {
     switch (chapter.type) {
         case 'Markdown':
@@ -1456,33 +1508,16 @@ function insertContent(content, text, chapter) {
                 });
                 break;
             }
-            const networkController = {
-                redirect(path) {
-                    if (!path.startsWith('./')) {
-                        networkControllerLogger.warn('Path has to be relative and start ' +
-                            'with "./". Received:', path);
-                        return null;
-                    }
-                    let resolved = resolvePath_1.resolvePath('chapters', chapter.htmlRelativePath, '..', path.substr(2));
-                    if (resolved === null) {
-                        networkControllerLogger.warn('Failed to resolve path.' +
-                            'Received:', path);
-                        return null;
-                    }
-                    resolved = '/' + resolved;
-                    networkControllerLogger.log('Resolved from:', path, 'to:', resolved);
-                    return resolved;
-                }
-            };
+            const featureProvider = new WTCDFeatureProvider_1.WTCDFeatureProvider(chapter);
             switch (chapter.preferredReader) {
                 case 'flow': {
-                    const flowReader = new FlowReader_1.FlowReader(chapter.htmlRelativePath, wtcdParseResult.wtcdRoot, createWTCDErrorMessageFromError_1.createWTCDErrorMessageFromError, processElements_1.processElements, networkController);
+                    const flowReader = new FlowReader_1.FlowReader(chapter.htmlRelativePath, wtcdParseResult.wtcdRoot, createWTCDErrorMessageFromError_1.createWTCDErrorMessageFromError, processElements_1.processElements, featureProvider);
                     const $wtcdContainer = content.addBlock().element;
                     flowReader.renderTo($wtcdContainer);
                     break;
                 }
                 case 'game': {
-                    new WTCDGameReaderUI_1.WTCDGameReaderUI(content, chapter.htmlRelativePath, wtcdParseResult.wtcdRoot, networkController).start();
+                    new WTCDGameReaderUI_1.WTCDGameReaderUI(content, chapter.htmlRelativePath, wtcdParseResult.wtcdRoot, featureProvider).start();
                     break;
                 }
             }
@@ -1490,7 +1525,7 @@ function insertContent(content, text, chapter) {
     }
 }
 
-},{"../../wtcd/FlowReader":55,"../DebugLogger":6,"../Event":7,"../constant/loadingText":9,"../constant/messages":11,"../data/AutoCache":31,"../data/data":32,"../data/settings":33,"../data/state":34,"../hs":35,"../input/gestures":37,"../input/keyboard":38,"../util/DOM":49,"../util/resolvePath":51,"./WTCDGameReaderUI":16,"./commentsControl":19,"./contentControl":20,"./createWTCDErrorMessage":21,"./createWTCDErrorMessageFromError":22,"./history":25,"./layoutControl":26,"./modalControl":27,"./processElements":28}],18:[function(require,module,exports){
+},{"../../wtcd/FlowReader":59,"../DebugLogger":6,"../Event":7,"../constant/loadingText":9,"../constant/messages":11,"../data/AutoCache":32,"../data/data":33,"../data/settings":34,"../data/state":35,"../hs":36,"../input/gestures":38,"../input/keyboard":39,"../util/DOM":50,"./WTCDFeatureProvider":16,"./WTCDGameReaderUI":17,"./commentsControl":20,"./contentControl":21,"./createWTCDErrorMessage":22,"./createWTCDErrorMessageFromError":23,"./history":26,"./layoutControl":27,"./modalControl":28,"./processElements":29}],19:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const Event_1 = require("../Event");
@@ -1519,7 +1554,7 @@ function getBlockedUsers() {
 }
 exports.getBlockedUsers = getBlockedUsers;
 
-},{"../Event":7}],19:[function(require,module,exports){
+},{"../Event":7}],20:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const messages_1 = require("../constant/messages");
@@ -1646,7 +1681,7 @@ function loadComments(content) {
 }
 exports.loadComments = loadComments;
 
-},{"../DebugLogger":6,"../constant/messages":11,"../data/AutoCache":31,"../data/settings":33,"../data/state":34,"../hs":35,"../util/formatTime":50,"./MakaiControl":14,"./commentBlockControl":18,"./contentControl":20,"./modalControl":27,"./userControl":30}],20:[function(require,module,exports){
+},{"../DebugLogger":6,"../constant/messages":11,"../data/AutoCache":32,"../data/settings":34,"../data/state":35,"../hs":36,"../util/formatTime":51,"./MakaiControl":14,"./commentBlockControl":19,"./contentControl":21,"./modalControl":28,"./userControl":31}],21:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const settings_1 = require("../data/settings");
@@ -1893,7 +1928,7 @@ class ContentBlock {
 }
 exports.ContentBlock = ContentBlock;
 
-},{"../DebugLogger":6,"../data/settings":33,"../hs":35,"../input/keyboard":38,"../util/DOM":49,"./MonoDimensionTransitionControl":15,"./layoutControl":26}],21:[function(require,module,exports){
+},{"../DebugLogger":6,"../data/settings":34,"../hs":36,"../input/keyboard":39,"../util/DOM":50,"./MonoDimensionTransitionControl":15,"./layoutControl":27}],22:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const messages_1 = require("../constant/messages");
@@ -1951,7 +1986,7 @@ function createWTCDErrorMessage({ errorType, message, internalStack, wtcdStack, 
 }
 exports.createWTCDErrorMessage = createWTCDErrorMessage;
 
-},{"../constant/messages":11,"./chapterControl":17}],22:[function(require,module,exports){
+},{"../constant/messages":11,"./chapterControl":18}],23:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const WTCDError_1 = require("../../wtcd/WTCDError");
@@ -1971,7 +2006,7 @@ function createWTCDErrorMessageFromError(error) {
 }
 exports.createWTCDErrorMessageFromError = createWTCDErrorMessageFromError;
 
-},{"../../wtcd/WTCDError":60,"./chapterControl":17,"./createWTCDErrorMessage":21}],23:[function(require,module,exports){
+},{"../../wtcd/WTCDError":63,"./chapterControl":18,"./createWTCDErrorMessage":22}],24:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const data_1 = require("../data/data");
@@ -2013,7 +2048,7 @@ function followQuery() {
 }
 exports.followQuery = followQuery;
 
-},{"../data/data":32,"../data/state":34,"./chapterControl":17,"./contentControl":20,"./history":25}],24:[function(require,module,exports){
+},{"../data/data":33,"../data/state":35,"./chapterControl":18,"./contentControl":21,"./history":26}],25:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -2044,7 +2079,7 @@ function createHint(text, timeMs = 2000) {
 }
 exports.createHint = createHint;
 
-},{"../hs":35}],25:[function(require,module,exports){
+},{"../hs":36}],26:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const state_1 = require("../data/state");
@@ -2071,7 +2106,7 @@ function updateHistory(push) {
 }
 exports.updateHistory = updateHistory;
 
-},{"../data/state":34}],26:[function(require,module,exports){
+},{"../data/state":35}],27:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const DebugLogger_1 = require("../DebugLogger");
@@ -2134,7 +2169,7 @@ function setLayout(newLayout) {
 }
 exports.setLayout = setLayout;
 
-},{"../DebugLogger":6,"../Event":7}],27:[function(require,module,exports){
+},{"../DebugLogger":6,"../Event":7}],28:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const settings_1 = require("../data/settings");
@@ -2224,7 +2259,7 @@ function isAnyModalOpened() {
 }
 exports.isAnyModalOpened = isAnyModalOpened;
 
-},{"../data/settings":33,"../hs":35,"../input/keyboard":38,"../util/DOM":49}],28:[function(require,module,exports){
+},{"../data/settings":34,"../hs":36,"../input/keyboard":39,"../util/DOM":50}],29:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const DOM_1 = require("../util/DOM");
@@ -2253,7 +2288,7 @@ function processElements($parent) {
 }
 exports.processElements = processElements;
 
-},{"../util/DOM":49}],29:[function(require,module,exports){
+},{"../util/DOM":50}],30:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const state_1 = require("../data/state");
@@ -2306,7 +2341,7 @@ function updateSelection() {
 }
 exports.updateSelection = updateSelection;
 
-},{"../data/state":34,"./history":25}],30:[function(require,module,exports){
+},{"../data/state":35,"./history":26}],31:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const hs_1 = require("../hs");
@@ -2510,7 +2545,7 @@ class UserControl {
 }
 exports.UserControl = UserControl;
 
-},{"../constant/messages":11,"../data/state":34,"../hs":35,"./MakaiControl":14,"./commentsControl":19,"./contentControl":20,"./modalControl":27}],31:[function(require,module,exports){
+},{"../constant/messages":11,"../data/state":35,"../hs":36,"./MakaiControl":14,"./commentsControl":20,"./contentControl":21,"./modalControl":28}],32:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class AutoCache {
@@ -2541,7 +2576,7 @@ class AutoCache {
 }
 exports.AutoCache = AutoCache;
 
-},{}],32:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.data = window.DATA;
@@ -2560,7 +2595,7 @@ function iterateFolder(folder) {
 }
 iterateFolder(exports.data.chapterTree);
 
-},{}],33:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const noop = () => { };
@@ -2662,7 +2697,7 @@ exports.charCount = new BooleanSetting('charCount', true, value => {
 });
 exports.wtcdGameQuickLoadConfirm = new BooleanSetting('wtcdGameQuickLoadConfirm', true);
 
-},{}],34:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.state = {
@@ -2671,13 +2706,13 @@ exports.state = {
     chapterTextNodes: null,
 };
 
-},{}],35:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const hs = require("hyperscript");
 exports.h = hs;
 
-},{"hyperscript":4}],36:[function(require,module,exports){
+},{"hyperscript":4}],37:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const followQuery_1 = require("./control/followQuery");
@@ -2711,7 +2746,7 @@ window.addEventListener('popstate', () => {
 });
 followQuery_1.followQuery();
 
-},{"./control/followQuery":23,"./control/updateSelection":29,"./data/data":32,"./data/settings":33,"./menu/MainMenu":42,"./util/DOM":49}],37:[function(require,module,exports){
+},{"./control/followQuery":24,"./control/updateSelection":30,"./data/data":33,"./data/settings":34,"./menu/MainMenu":43,"./util/DOM":50}],38:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const DebugLogger_1 = require("../DebugLogger");
@@ -2795,7 +2830,7 @@ exports.swipeEvent.on(direction => {
     swipeEventDebugLogger.log(SwipeDirection[direction]);
 });
 
-},{"../DebugLogger":6,"../Event":7,"../util/DOM":49}],38:[function(require,module,exports){
+},{"../DebugLogger":6,"../Event":7,"../util/DOM":50}],39:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const DebugLogger_1 = require("../DebugLogger");
@@ -2836,7 +2871,7 @@ exports.arrowKeyPressEvent.on(arrowKey => {
     arrowEventDebugLogger.log(ArrowKey[arrowKey]);
 });
 
-},{"../DebugLogger":6,"../Event":7}],39:[function(require,module,exports){
+},{"../DebugLogger":6,"../Event":7}],40:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const messages_1 = require("../constant/messages");
@@ -2867,7 +2902,7 @@ class BlockMenu extends Menu_1.Menu {
 }
 exports.BlockMenu = BlockMenu;
 
-},{"../Menu":8,"../constant/messages":11,"../control/commentBlockControl":18}],40:[function(require,module,exports){
+},{"../Menu":8,"../constant/messages":11,"../control/commentBlockControl":19}],41:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const chapterControl_1 = require("../control/chapterControl");
@@ -2933,7 +2968,7 @@ class ChaptersMenu extends Menu_1.Menu {
 }
 exports.ChaptersMenu = ChaptersMenu;
 
-},{"../Menu":8,"../control/chapterControl":17,"../control/history":25,"../data/data":32,"../util/shortNumber":52}],41:[function(require,module,exports){
+},{"../Menu":8,"../control/chapterControl":18,"../control/history":26,"../data/data":33,"../util/shortNumber":55}],42:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const Menu_1 = require("../Menu");
@@ -2968,7 +3003,7 @@ class ContactMenu extends Menu_1.Menu {
 }
 exports.ContactMenu = ContactMenu;
 
-},{"../Menu":8}],42:[function(require,module,exports){
+},{"../Menu":8}],43:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const Menu_1 = require("../Menu");
@@ -2992,7 +3027,7 @@ class MainMenu extends Menu_1.Menu {
 }
 exports.MainMenu = MainMenu;
 
-},{"../Menu":8,"./ChaptersMenu":40,"./ContactMenu":41,"./SettingsMenu":44,"./StatsMenu":46,"./StyleMenu":47,"./ThanksMenu":48}],43:[function(require,module,exports){
+},{"../Menu":8,"./ChaptersMenu":41,"./ContactMenu":42,"./SettingsMenu":45,"./StatsMenu":47,"./StyleMenu":48,"./ThanksMenu":49}],44:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const Menu_1 = require("../Menu");
@@ -3029,7 +3064,7 @@ class MakaiMenu extends Menu_1.Menu {
 }
 exports.MakaiMenu = MakaiMenu;
 
-},{"../Menu":8,"../control/userControl":30,"./SettingsMenu":44}],44:[function(require,module,exports){
+},{"../Menu":8,"../control/userControl":31,"./SettingsMenu":45}],45:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const stylePreviewArticle_1 = require("../constant/stylePreviewArticle");
@@ -3101,7 +3136,7 @@ class SettingsMenu extends Menu_1.Menu {
 }
 exports.SettingsMenu = SettingsMenu;
 
-},{"../Menu":8,"../constant/stylePreviewArticle":12,"../control/contentControl":20,"../control/layoutControl":26,"../data/settings":33,"./BlockMenu":39,"./MakaiMenu":43}],45:[function(require,module,exports){
+},{"../Menu":8,"../constant/stylePreviewArticle":12,"../control/contentControl":21,"../control/layoutControl":27,"../data/settings":34,"./BlockMenu":40,"./MakaiMenu":44}],46:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const data_1 = require("../data/data");
@@ -3122,7 +3157,7 @@ class StatsKeywordsCountMenu extends Menu_1.Menu {
 }
 exports.StatsKeywordsCountMenu = StatsKeywordsCountMenu;
 
-},{"../Menu":8,"../data/data":32}],46:[function(require,module,exports){
+},{"../Menu":8,"../data/data":33}],47:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const data_1 = require("../data/data");
@@ -3139,7 +3174,7 @@ class StatsMenu extends Menu_1.Menu {
 }
 exports.StatsMenu = StatsMenu;
 
-},{"../Menu":8,"../data/data":32,"./StatsKeywordsCountMenu":45}],47:[function(require,module,exports){
+},{"../Menu":8,"../data/data":33,"./StatsKeywordsCountMenu":46}],48:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const stylePreviewArticle_1 = require("../constant/stylePreviewArticle");
@@ -3276,7 +3311,7 @@ class StyleMenu extends Menu_1.Menu {
 }
 exports.StyleMenu = StyleMenu;
 
-},{"../DebugLogger":6,"../Menu":8,"../constant/stylePreviewArticle":12,"../control/contentControl":20,"../control/layoutControl":26,"../hs":35}],48:[function(require,module,exports){
+},{"../DebugLogger":6,"../Menu":8,"../constant/stylePreviewArticle":12,"../control/contentControl":21,"../control/layoutControl":27,"../hs":36}],49:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const thanks_1 = require("../constant/thanks");
@@ -3293,7 +3328,7 @@ class ThanksMenu extends Menu_1.Menu {
 }
 exports.ThanksMenu = ThanksMenu;
 
-},{"../Menu":8,"../constant/thanks":13}],49:[function(require,module,exports){
+},{"../Menu":8,"../constant/thanks":13}],50:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const DebugLogger_1 = require("../DebugLogger");
@@ -3345,7 +3380,7 @@ function insertAfter($newElement, $referencingElement) {
 }
 exports.insertAfter = insertAfter;
 
-},{"../DebugLogger":6}],50:[function(require,module,exports){
+},{"../DebugLogger":6}],51:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const SECOND = 1000;
@@ -3376,7 +3411,57 @@ function formatTimeSimple(time) {
 }
 exports.formatTimeSimple = formatTimeSimple;
 
-},{}],51:[function(require,module,exports){
+},{}],52:[function(require,module,exports){
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const DebugLogger_1 = require("../DebugLogger");
+const matchAll_1 = require("./matchAll");
+const debugLogger = new DebugLogger_1.DebugLogger('Load Google Fonts');
+const parseRegex = /@font-face {[^}]*?font-family:\s*['"]?([^;'"]+?)['"]?;[^}]*?font-style:\s*([^;]+);[^}]*?font-weight:\s*([^;]+);[^}]*?src:\s*([^;]+);[^}]*?(?:unicode-range:\s*([^;]+))?;/g;
+function loadGoogleFonts(fontName) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const cssLink = `https://fonts.googleapis.com/css2?family=${fontName.replace(/ /g, '+')}`;
+        debugLogger.log(`Loading font: "${fontName}" from "${cssLink}".`);
+        const response = yield fetch(cssLink);
+        const text = yield response.text();
+        const matches = matchAll_1.matchAll(text, parseRegex);
+        return Promise.all(matches.map(match => new FontFace(match[1], match[4], {
+            style: match[2],
+            weight: match[3],
+            unicodeRange: match[5],
+        }).load()))
+            .then(fontFaces => fontFaces.map(fontFace => document.fonts.add(fontFace)))
+            .then(() => fontName);
+    });
+}
+exports.loadGoogleFonts = loadGoogleFonts;
+
+},{"../DebugLogger":6,"./matchAll":53}],53:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+function matchAll(str, regex) {
+    if (regex.global !== true) {
+        throw new Error('Global flag is required.');
+    }
+    const results = [];
+    let array;
+    while ((array = regex.exec(str)) !== null) {
+        results.push(array);
+    }
+    return results;
+}
+exports.matchAll = matchAll;
+
+},{}],54:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 /**
@@ -3409,7 +3494,7 @@ function resolvePath(...paths) {
 }
 exports.resolvePath = resolvePath;
 
-},{}],52:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 function shortNumber(input) {
@@ -3423,7 +3508,7 @@ function shortNumber(input) {
 }
 exports.shortNumber = shortNumber;
 
-},{}],53:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 // https://stackoverflow.com/a/7616484
@@ -3440,7 +3525,7 @@ function stringHash(str) {
 }
 exports.stringHash = stringHash;
 
-},{}],54:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class ChainedCanvas {
@@ -3466,12 +3551,41 @@ class ChainedCanvas {
 }
 exports.ChainedCanvas = ChainedCanvas;
 
-},{}],55:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+/**
+ * Implement methods to provide additional feature support.
+ */
+class FeatureProvider {
+    /**
+     * When using the canvas functionality of WTCD, user may choose to put an
+     * external image to the canvas. Whenever that happens, this method is called.
+     */
+    loadImage(path) {
+        return Promise.reject('Loading images is not allowed.');
+    }
+    /**
+     * When using the canvas functionality of WTCD, user may choose to use a
+     * custom font in the canvas. Whenever that happens, this method is called.
+     *
+     * Please make sure the font is loaded in DOM via document.fonts#add
+     *
+     * Returns the name of the font
+     */
+    loadFont(identifier) {
+        return Promise.reject('Loading fonts is not allowed.');
+    }
+}
+exports.FeatureProvider = FeatureProvider;
+exports.defaultFeatureProvider = new FeatureProvider();
+
+},{}],59:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const Interpreter_1 = require("./Interpreter");
 const Random_1 = require("./Random");
-const NetworkController_1 = require("./NetworkController");
+const FeatureProvider_1 = require("./FeatureProvider");
 /**
  * This is one of the possible implementations of a WTCD reader.
  *
@@ -3489,11 +3603,11 @@ const NetworkController_1 = require("./NetworkController");
  * will potentially lag user's interface every time the user undoes a decision.
  */
 class FlowReader {
-    constructor(docIdentifier, wtcdRoot, errorMessageCreator, elementPreprocessor, networkController = NetworkController_1.disabled) {
+    constructor(docIdentifier, wtcdRoot, errorMessageCreator, elementPreprocessor, featureProvider = FeatureProvider_1.defaultFeatureProvider) {
         this.wtcdRoot = wtcdRoot;
         this.errorMessageCreator = errorMessageCreator;
         this.elementPreprocessor = elementPreprocessor;
-        this.networkController = networkController;
+        this.featureProvider = featureProvider;
         /** Which decision the current buttons are for */
         this.currentDecisionIndex = 0;
         /** Buttons for each group of output */
@@ -3559,7 +3673,7 @@ class FlowReader {
     }
     /** Restart the interpreter and reset the interpreterIterator */
     resetInterpreter() {
-        this.interpreter = new Interpreter_1.Interpreter(this.wtcdRoot, new Random_1.Random(this.data.random), this.networkController);
+        this.interpreter = new Interpreter_1.Interpreter(this.wtcdRoot, new Random_1.Random(this.data.random), this.featureProvider);
         this.interpreterIterator = this.interpreter.start();
     }
     /**
@@ -3678,12 +3792,12 @@ class FlowReader {
 }
 exports.FlowReader = FlowReader;
 
-},{"./Interpreter":57,"./NetworkController":58,"./Random":59}],56:[function(require,module,exports){
+},{"./FeatureProvider":58,"./Interpreter":61,"./Random":62}],60:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const Interpreter_1 = require("./Interpreter");
 const Random_1 = require("./Random");
-const NetworkController_1 = require("./NetworkController");
+const FeatureProvider_1 = require("./FeatureProvider");
 function isGameData(data) {
     if (typeof data !== 'object' || data === null) {
         return false;
@@ -3736,11 +3850,11 @@ function isData(data) {
  * all decisions too.
  */
 class GameReader {
-    constructor(docIdentifier, wtcdRoot, onOutput, onError, networkController = NetworkController_1.disabled) {
+    constructor(docIdentifier, wtcdRoot, onOutput, onError, featureProvider = FeatureProvider_1.defaultFeatureProvider) {
         this.wtcdRoot = wtcdRoot;
         this.onOutput = onOutput;
         this.onError = onError;
-        this.networkController = networkController;
+        this.featureProvider = featureProvider;
         this.started = false;
         this.storageKey = `wtcd.gr.${docIdentifier}`;
         this.data = this.parseData(window.localStorage.getItem(this.storageKey)) || {
@@ -3829,7 +3943,7 @@ class GameReader {
         }
     }
     restoreGameState() {
-        this.interpreter = new Interpreter_1.Interpreter(this.wtcdRoot, new Random_1.Random(this.data.current.random), this.networkController);
+        this.interpreter = new Interpreter_1.Interpreter(this.wtcdRoot, new Random_1.Random(this.data.current.random), this.featureProvider);
         this.interpreterIterator = this.interpreter.start();
         let lastOutput = this.next();
         this.data.current.decisions.forEach(decision => lastOutput = this.next(decision));
@@ -3882,7 +3996,7 @@ class GameReader {
 }
 exports.GameReader = GameReader;
 
-},{"./Interpreter":57,"./NetworkController":58,"./Random":59}],57:[function(require,module,exports){
+},{"./FeatureProvider":58,"./Interpreter":61,"./Random":62}],61:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const constantsPool_1 = require("./constantsPool");
@@ -4099,10 +4213,10 @@ class InvalidChoiceError extends Error {
 }
 exports.InvalidChoiceError = InvalidChoiceError;
 class Interpreter {
-    constructor(wtcdRoot, random, networkController) {
+    constructor(wtcdRoot, random, featureProvider) {
         this.wtcdRoot = wtcdRoot;
         this.random = random;
-        this.networkController = networkController;
+        this.featureProvider = featureProvider;
         this.timers = new Map();
         this.interpreterHandle = {
             evaluator: this.evaluator.bind(this),
@@ -4114,7 +4228,7 @@ class Interpreter {
             timers: this.timers,
             setPinnedFunction: this.setPinnedFunction.bind(this),
             setStateDesc: this.setStateDesc.bind(this),
-            networkController: this.networkController,
+            featureProvider: this.featureProvider,
             canvases: new Map(),
         };
         this.pinnedFunction = null;
@@ -4715,16 +4829,7 @@ class Interpreter {
 }
 exports.Interpreter = Interpreter;
 
-},{"./WTCDError":60,"./constantsPool":62,"./invokeFunction":63,"./operators":64,"./std":68,"./utils":75}],58:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.disabled = {
-    redirect(path) {
-        return null;
-    }
-};
-
-},{}],59:[function(require,module,exports){
+},{"./WTCDError":63,"./constantsPool":65,"./invokeFunction":66,"./operators":67,"./std":71,"./utils":78}],62:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 /**
@@ -4787,7 +4892,7 @@ class Random {
 }
 exports.Random = Random;
 
-},{}],60:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const empty = {};
@@ -4833,7 +4938,7 @@ class WTCDError extends Error {
 }
 exports.WTCDError = WTCDError;
 
-},{}],61:[function(require,module,exports){
+},{}],64:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 function autoEvaluated(fn) {
@@ -4845,7 +4950,7 @@ function autoEvaluated(fn) {
 }
 exports.autoEvaluated = autoEvaluated;
 
-},{}],62:[function(require,module,exports){
+},{}],65:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 // Your typical immature optimization
@@ -4881,7 +4986,7 @@ function getMaybePooled(type, value) {
 }
 exports.getMaybePooled = getMaybePooled;
 
-},{}],63:[function(require,module,exports){
+},{}],66:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const autoEvaluated_1 = require("./autoEvaluated");
@@ -5029,7 +5134,7 @@ exports.regularInvocationRaw = (arg0, arg1, expr, interpreterHandle) => {
 exports.regularInvocation = autoEvaluated_1.autoEvaluated(exports.regularInvocationRaw);
 exports.pipelineInvocation = autoEvaluated_1.autoEvaluated((arg0, arg1, expr, interpreterHandle) => {
     if (arg1.type !== 'function') {
-        throw WTCDError_1.WTCDError.atLocation(expr, `Left side of pipeline invocation "|>" ` +
+        throw WTCDError_1.WTCDError.atLocation(expr, `Right side of pipeline invocation "|>" ` +
             `is expected to be a function, received: ${Interpreter_1.describe(arg1)}`);
     }
     try {
@@ -5056,7 +5161,7 @@ exports.reverseInvocation = autoEvaluated_1.autoEvaluated((arg0, arg1, expr, int
     }
 });
 
-},{"./Interpreter":57,"./WTCDError":60,"./autoEvaluated":61,"./constantsPool":62,"./std/utils":74}],64:[function(require,module,exports){
+},{"./Interpreter":61,"./WTCDError":63,"./autoEvaluated":64,"./constantsPool":65,"./std/utils":77}],67:[function(require,module,exports){
 "use strict";
 // This file defines all infix and prefix operators in WTCD.
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -5471,7 +5576,7 @@ exports.binaryOperators = new Map([
 exports.conditionalOperatorPrecedence = 4;
 exports.operators = new Set([...exports.unaryOperators.keys(), ...exports.binaryOperators.keys(), '?', ':', '...']);
 
-},{"./Interpreter":57,"./WTCDError":60,"./autoEvaluated":61,"./constantsPool":62,"./invokeFunction":63}],65:[function(require,module,exports){
+},{"./Interpreter":61,"./WTCDError":63,"./autoEvaluated":64,"./constantsPool":65,"./invokeFunction":66}],68:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -5486,34 +5591,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const constantsPool_1 = require("../constantsPool");
 const utils_1 = require("./utils");
 const ChainedCanvas_1 = require("../ChainedCanvas");
-class ImageCache {
-    constructor() {
-        this.map = new Map();
+function obtainCanvas(interpreterHandle, id) {
+    const canvas = interpreterHandle.canvases.get(id);
+    if (canvas === undefined) {
+        throw new utils_1.NativeFunctionError(`Canvas with id="${id}" does not exist.`);
     }
-    loader(url) {
-        return new Promise((resolve, reject) => {
-            const image = document.createElement('img');
-            image.onload = () => resolve(image);
-            image.onerror = () => reject(new Error(`Failed to load ${url}.`));
-            image.src = url;
-        });
-    }
-    delete(key) {
-        this.map.delete(key);
-    }
-    get(key) {
-        let value = this.map.get(key);
-        if (value === undefined) {
-            value = this.loader(key);
-            this.map.set(key, value);
-            value.catch(() => {
-                this.map.delete(key);
-            });
-        }
-        return value;
-    }
+    return canvas;
 }
-const imageCache = new ImageCache();
 exports.canvasStdFunctions = [
     function canvasCreate(args, interpreterHandle) {
         utils_1.assertArgsLength(args, 3);
@@ -5540,10 +5624,7 @@ exports.canvasStdFunctions = [
     },
     function canvasOutput(args, interpreterHandle) {
         const id = utils_1.assertArgType(args, 0, 'string');
-        const canvas = interpreterHandle.canvases.get(id);
-        if (canvas === undefined) {
-            throw new utils_1.NativeFunctionError(`Canvas with id="${id}" does not exist.`);
-        }
+        const canvas = obtainCanvas(interpreterHandle, id);
         const $newCanvas = document.createElement('canvas');
         $newCanvas.width = canvas.getWidth();
         $newCanvas.height = canvas.getHeight();
@@ -5557,10 +5638,7 @@ exports.canvasStdFunctions = [
     },
     function canvasClear(args, interpreterHandle) {
         const id = utils_1.assertArgType(args, 0, 'string');
-        const canvas = interpreterHandle.canvases.get(id);
-        if (canvas === undefined) {
-            throw new utils_1.NativeFunctionError(`Canvas with id="${id}" does not exist.`);
-        }
+        const canvas = obtainCanvas(interpreterHandle, id);
         canvas.updatePromise(() => __awaiter(this, void 0, void 0, function* () {
             canvas.ctx.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
         }));
@@ -5572,24 +5650,88 @@ exports.canvasStdFunctions = [
         const path = utils_1.assertArgType(args, 1, 'string');
         const x = utils_1.assertArgType(args, 2, 'number');
         const y = utils_1.assertArgType(args, 3, 'number');
-        const canvas = interpreterHandle.canvases.get(id);
-        if (canvas === undefined) {
-            throw new utils_1.NativeFunctionError(`Canvas with id="${id}" does not exist.`);
-        }
-        const url = interpreterHandle.networkController.redirect(path);
-        if (url === null) {
-            throw new utils_1.NativeFunctionError(`Path (${path}) is not allowed.`);
-        }
-        const imagePromise = imageCache.get(url);
+        const canvas = obtainCanvas(interpreterHandle, id);
         canvas.updatePromise(() => __awaiter(this, void 0, void 0, function* () {
-            const image = yield imagePromise;
-            canvas.ctx.drawImage(image, x, y);
+            try {
+                const image = yield interpreterHandle.featureProvider.loadImage(path);
+                canvas.ctx.drawImage(image, x, y);
+            }
+            catch (error) {
+                console.error(`WTCD failed to load image with path="${path}".`, error);
+            }
+        }));
+        return constantsPool_1.getMaybePooled('null', null);
+    },
+    function canvasSetFont(args, interpreterHandle) {
+        utils_1.assertArgsLength(args, 3);
+        const id = utils_1.assertArgType(args, 0, 'string');
+        const size = utils_1.assertArgType(args, 1, 'number');
+        const fontIdentifier = utils_1.assertArgType(args, 2, 'string');
+        const canvas = obtainCanvas(interpreterHandle, id);
+        canvas.updatePromise(() => __awaiter(this, void 0, void 0, function* () {
+            try {
+                const fontName = yield interpreterHandle.featureProvider
+                    .loadFont(fontIdentifier);
+                canvas.ctx.font = `${size}px ${fontName}`;
+            }
+            catch (error) {
+                console.error(`WTCD failed to load font with ` +
+                    `identifier="${fontIdentifier}".`, error);
+            }
+        }));
+        return constantsPool_1.getMaybePooled('null', null);
+    },
+    function canvasSetFillStyle(args, interpreterHandle) {
+        utils_1.assertArgsLength(args, 2);
+        const id = utils_1.assertArgType(args, 0, 'string');
+        const color = utils_1.assertArgType(args, 1, 'string');
+        const canvas = obtainCanvas(interpreterHandle, id);
+        canvas.updatePromise(() => __awaiter(this, void 0, void 0, function* () {
+            canvas.ctx.fillStyle = color;
+        }));
+        return constantsPool_1.getMaybePooled('null', null);
+    },
+    function canvasFillText(args, interpreterHandle) {
+        utils_1.assertArgsLength(args, 4, 6);
+        const id = utils_1.assertArgType(args, 0, 'string');
+        const text = utils_1.assertArgType(args, 1, 'string');
+        const x = utils_1.assertArgType(args, 2, 'number');
+        const y = utils_1.assertArgType(args, 3, 'number');
+        const hAlign = utils_1.assertArgType(args, 4, 'string', 'start');
+        const vAlign = utils_1.assertArgType(args, 5, 'string', 'alphabetic');
+        const canvas = obtainCanvas(interpreterHandle, id);
+        switch (hAlign) {
+            case 'left':
+            case 'center':
+            case 'right':
+            case 'start':
+            case 'end':
+                break;
+            default:
+                throw new utils_1.NativeFunctionError(`Unknown text hAlign: ${hAlign}`);
+        }
+        switch (vAlign) {
+            case 'top':
+            case 'hanging':
+            case 'middle':
+            case 'alphabetic':
+            case 'ideographic':
+            case 'bottom':
+                break;
+            default:
+                throw new utils_1.NativeFunctionError(`Unknown text vAlign: ${vAlign}`);
+        }
+        canvas.updatePromise(() => __awaiter(this, void 0, void 0, function* () {
+            const ctx = canvas.ctx;
+            ctx.textAlign = hAlign;
+            ctx.textBaseline = vAlign;
+            ctx.fillText(text, x, y);
         }));
         return constantsPool_1.getMaybePooled('null', null);
     },
 ];
 
-},{"../ChainedCanvas":54,"../constantsPool":62,"./utils":74}],66:[function(require,module,exports){
+},{"../ChainedCanvas":57,"../constantsPool":65,"./utils":77}],69:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const constantsPool_1 = require("../constantsPool");
@@ -5693,7 +5835,7 @@ exports.contentStdFunctions = [
     },
 ];
 
-},{"../Interpreter":57,"../constantsPool":62,"./utils":74}],67:[function(require,module,exports){
+},{"../Interpreter":61,"../constantsPool":65,"./utils":77}],70:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const constantsPool_1 = require("../constantsPool");
@@ -5759,7 +5901,7 @@ exports.debugStdFunctions = [
     },
 ];
 
-},{"../Interpreter":57,"../WTCDError":60,"../constantsPool":62,"../invokeFunction":63,"./utils":74}],68:[function(require,module,exports){
+},{"../Interpreter":61,"../WTCDError":63,"../constantsPool":65,"../invokeFunction":66,"./utils":77}],71:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const content_1 = require("./content");
@@ -5781,7 +5923,7 @@ exports.stdFunctions = [
     ...canvas_1.canvasStdFunctions,
 ];
 
-},{"./canvas":65,"./content":66,"./debug":67,"./list":69,"./math":70,"./random":71,"./reader":72,"./string":73}],69:[function(require,module,exports){
+},{"./canvas":68,"./content":69,"./debug":70,"./list":72,"./math":73,"./random":74,"./reader":75,"./string":76}],72:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const constantsPool_1 = require("../constantsPool");
@@ -6047,7 +6189,7 @@ exports.listStdFunctions = [
     },
 ];
 
-},{"../Interpreter":57,"../WTCDError":60,"../constantsPool":62,"../invokeFunction":63,"./utils":74}],70:[function(require,module,exports){
+},{"../Interpreter":61,"../WTCDError":63,"../constantsPool":65,"../invokeFunction":66,"./utils":77}],73:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const constantsPool_1 = require("../constantsPool");
@@ -6085,7 +6227,7 @@ exports.mathStdFunctions = [
     },
 ];
 
-},{"../constantsPool":62,"./utils":74}],71:[function(require,module,exports){
+},{"../constantsPool":65,"./utils":77}],74:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const constantsPool_1 = require("../constantsPool");
@@ -6138,7 +6280,7 @@ exports.randomStdFunctions = [
     },
 ];
 
-},{"../constantsPool":62,"./utils":74}],72:[function(require,module,exports){
+},{"../constantsPool":65,"./utils":77}],75:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const constantsPool_1 = require("../constantsPool");
@@ -6168,7 +6310,7 @@ exports.readerStdFunctions = [
     },
 ];
 
-},{"../constantsPool":62,"./utils":74}],73:[function(require,module,exports){
+},{"../constantsPool":65,"./utils":77}],76:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const constantsPool_1 = require("../constantsPool");
@@ -6199,9 +6341,15 @@ exports.stringStdFunctions = [
         }
         return constantsPool_1.getMaybePooled('string', num.toPrecision(digits));
     },
+    function stringSplit(args) {
+        utils_1.assertArgsLength(args, 2);
+        const str = utils_1.assertArgType(args, 0, 'string');
+        const separator = utils_1.assertArgType(args, 1, 'string');
+        return constantsPool_1.getMaybePooled('list', str.split(separator).map(str => constantsPool_1.getMaybePooled('string', str)));
+    },
 ];
 
-},{"../constantsPool":62,"./utils":74}],74:[function(require,module,exports){
+},{"../constantsPool":65,"./utils":77}],77:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const constantsPool_1 = require("../constantsPool");
@@ -6247,7 +6395,7 @@ function assertArgType(args, index, type, defaultValue) {
 }
 exports.assertArgType = assertArgType;
 
-},{"../Interpreter":57,"../constantsPool":62}],75:[function(require,module,exports){
+},{"../Interpreter":61,"../constantsPool":65}],78:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 function flat(arr) {
@@ -6268,4 +6416,4 @@ function arrayEquals(arr0, arr1, comparator = (e0, e1) => e0 === e1) {
 }
 exports.arrayEquals = arrayEquals;
 
-},{}]},{},[36]);
+},{}]},{},[37]);

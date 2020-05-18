@@ -107,6 +107,10 @@ mathFloor::[-11.8] == -11
 <pre><code class="language-wtcd">stringFormatNumberPrecision::[1.235 2] == &quot;1.2&quot;
 stringFormatNumberPrecision::[1234 2] == &quot;1.2e+3&quot;
 </code></pre>
+<h3>6.3.4 <code>stringSplit</code></h3>
+<p>接受 2 个参数：<code>string str</code>，<code>string separator</code>。返回用 <code>separator</code> 分割 <code>str</code> 产生的列表。</p>
+<pre><code class="language-wtcd">stringSplit::[&quot;a,b&quot; &quot;,&quot;] == [&quot;a&quot; &quot;b&quot;]
+</code></pre>
 <h2>6.4 <code>random*</code></h2>
 <h3>6.4.1 <code>random</code></h3>
 <p>接受 0 - 2 个参数：<code>number low = 0</code>，<code>number high = 1</code>。</p>
@@ -187,3 +191,15 @@ stringFormatNumberPrecision::[1234 2] == &quot;1.2e+3&quot;
 <h3>6.8.4 <code>canvasPutImage</code></h3>
 <p>接受 4 个参数：<code>string id</code>，<code>string path</code>，<code>number x</code>，<code>number y</code>。</p>
 <p>将位于 <code>path</code> 的图片绘制到 ID 为 <code>id</code> 的画布上。使用 <code>x</code> 和 <code>y</code> 可以控制绘制的位置（左上角）。</p>
+<h3>6.8.5 <code>canvasSetFont</code></h3>
+<p>接受 3 个参数：<code>string id</code>，<code>number size</code>，<code>string fontIdentifier</code>。</p>
+<p>设置 ID 为 <code>id</code> 的画布的字体为尺寸是 <code>size</code>px，类型是 <code>fontIdentifier</code> 的字体。</p>
+<p><code>fontIdentifier</code> 的解释方法由使用的 WTCD 阅读器指定。在《可穿戴科技》中，这个 <code>fontIdentifier</code> 的值为 <code>googleFonts:&lt;在 Google Fonts 上的字体名&gt;</code>。例如：<code>googleFonts:ZCOOL KuaiLe</code>。</p>
+<h3>6.8.6 <code>canvasSetFillStyle</code></h3>
+<p>接受 2 个参数：<code>string id</code>，<code>string fillStyle</code>。</p>
+<p>设置 ID 为 <code>id</code> 的画布的填充方式为 <code>fillStyle</code>。</p>
+<h3>6.8.7 <code>canvasFillText</code></h3>
+<p>接受 4-6 个参数：<code>string id</code>，<code>string text</code>，<code>number x</code>，<code>number y</code>，<code>string hAlign = &quot;start&quot;</code>，<code>string vAlign = &quot;alphabetic&quot;</code>。</p>
+<p>在 ID 为 <code>id</code> 的画布的位于（<code>x</code>, <code>y</code>）的位置，绘制以 <code>hAlign</code> 横向对齐，以 <code>vAlign</code> 纵向对齐的文本 <code>text</code>。</p>
+<p><code>hAlign</code> 可采取的值可以在<a href="https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/textAlign">这里</a>找到。</p>
+<p><code>vAlign</code> 可采取的值可以在<a href="https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/textBaseline">这里</a>找到。</p>

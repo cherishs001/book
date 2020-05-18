@@ -774,7 +774,7 @@ window.DATA={
                 "hidden": false,
                 "type": "Markdown",
                 "htmlRelativePath": "META/WTCD/6.-标准库.html",
-                "chapterCharCount": 5511
+                "chapterCharCount": 6391
               },
               {
                 "displayName": "7. 流程控制",
@@ -807,7 +807,7 @@ window.DATA={
                 "hidden": false,
                 "type": "Markdown",
                 "htmlRelativePath": "META/WTCD/变化日志.html",
-                "chapterCharCount": 697
+                "chapterCharCount": 765
               },
               {
                 "displayName": "计划功能",
@@ -984,16 +984,28 @@ window.DATA={
                     "type": "WTCD",
                     "htmlRelativePath": "META/WTCD/例子/Game-模式-Canvas.html",
                     "chapterCharCount": 0
+                  },
+                  {
+                    "displayName": "Canvas 文字",
+                    "displayIndex": 14,
+                    "name": "14 - Canvas 文字",
+                    "sourceRelativePath": "5 - META/1 - WTCD/1 - 例子/14 - Canvas 文字.wtcd",
+                    "isEarlyAccess": false,
+                    "hidden": false,
+                    "preferredReader": "flow",
+                    "type": "WTCD",
+                    "htmlRelativePath": "META/WTCD/例子/Canvas-文字.html",
+                    "chapterCharCount": 0
                   }
                 ],
                 "subFolders": [],
                 "folderCharCount": 3489
               }
             ],
-            "folderCharCount": 31627
+            "folderCharCount": 32575
           }
         ],
-        "folderCharCount": 36204
+        "folderCharCount": 37152
       },
       {
         "displayName": "人设卡",
@@ -1106,10 +1118,10 @@ window.DATA={
         "folderCharCount": 220
       }
     ],
-    "folderCharCount": 268105
+    "folderCharCount": 269053
   },
-  "charsCount": 268105,
-  "paragraphsCount": 5342,
+  "charsCount": 269053,
+  "paragraphsCount": 5352,
   "keywordsCount": [
     [
       "高潮",
@@ -1125,7 +1137,7 @@ window.DATA={
     ],
     [
       "WTCD",
-      102
+      103
     ],
     [
       "陈志鹏",
@@ -1184,5 +1196,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "499"
+  "buildNumber": "502"
 };
