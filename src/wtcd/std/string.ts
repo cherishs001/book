@@ -37,4 +37,53 @@ export const stringStdFunctions: Array<NativeFunction> = [
       str.split(separator).map(str => getMaybePooled('string', str)),
     );
   },
+  function stringSubByLength(args) {
+    assertArgsLength(args, 2, 3);
+    const str = assertArgType(args, 0, 'string');
+    const startIndex = assertArgType(args, 1, 'number');
+    const length = assertArgType(args, 2, 'number', str.length - startIndex);
+    if (startIndex < 0 || startIndex % 1 !== 0) {
+      throw new NativeFunctionError(`Start index must be an nonnegative ` +
+        `integer, received: ${startIndex}`);
+    }
+    if (startIndex > str.length) {
+      throw new NativeFunctionError(`Start cannot be larger than str length. ` +
+        `startIndex=${startIndex}, str length=${str.length}`);
+    }
+    if (length < 0 || length % 1 !== 0) {
+      throw new NativeFunctionError(`Length must be an nonnegative integer ` +
+        `, received: ${length}`);
+    }
+    if (startIndex + length > str.length) {
+      throw new NativeFunctionError(`Index out of bounds. ` +
+        `startIndex=${startIndex}, length=${length}, ` +
+        `str length=${str.length}.`);
+    }
+    return getMaybePooled('string', str.substr(startIndex, length));
+  },
+  function stringSubByIndex(args) {
+    assertArgsLength(args, 2, 3);
+    const str = assertArgType(args, 0, 'string');
+    const startIndex = assertArgType(args, 1, 'number');
+    const endIndexExclusive = assertArgType(args, 2, 'number', str.length);
+    if (startIndex < 0 || startIndex % 1 !== 0) {
+      throw new NativeFunctionError(`Start index must be an nonnegative ` +
+        `integer, received: ${startIndex}`);
+    }
+    if (startIndex > str.length) {
+      throw new NativeFunctionError(`Start cannot be larger than str length. ` +
+        `startIndex=${startIndex}, str length=${str.length}`);
+    }
+    if (endIndexExclusive < 0 || endIndexExclusive % 1 !== 0) {
+      throw new NativeFunctionError(`End index must be an nonnegative ` +
+        `integer, received: ${endIndexExclusive}`);
+    }
+    if (endIndexExclusive < startIndex || endIndexExclusive > str.length) {
+      throw new NativeFunctionError(`End index cannot be smaller than start ` +
+        `index nor larger than the length of str. ` +
+        `endIndex=${endIndexExclusive}, startIndex=${startIndex}, ` +
+        `str length=${str.length}`);
+    }
+    return getMaybePooled('string', str.substring(startIndex, endIndexExclusive));
+  },
 ];

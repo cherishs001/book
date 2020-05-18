@@ -141,4 +141,17 @@ export const canvasStdFunctions: Array<NativeFunction> = [
     });
     return getMaybePooled('null', null);
   },
+  function canvasFillRect(args, interpreterHandle) {
+    assertArgsLength(args, 5);
+    const id = assertArgType(args, 0, 'string');
+    const x = assertArgType(args, 1, 'number');
+    const y = assertArgType(args, 2, 'number');
+    const width = assertArgType(args, 3, 'number');
+    const height = assertArgType(args, 4, 'number');
+    const canvas = obtainCanvas(interpreterHandle, id);
+    canvas.updatePromise(async () => {
+      canvas.ctx.fillRect(x, y, width, height);
+    });
+    return getMaybePooled('null', null);
+  },
 ];

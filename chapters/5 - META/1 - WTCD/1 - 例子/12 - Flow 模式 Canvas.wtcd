@@ -2,11 +2,12 @@ WTCD 1.3
 declare number x = 0
 declare number y = 0
 section init {
-  canvasCreate::["a" 200 200]
+  canvasCreate::["a" 400 200]
+  canvasSetFillStyle::["a" "rgba(255,0,0,0.5)"]
 } then goto main
 section main {
   canvasClear::["a"]
-  canvasPutImage::["a" "./image.png" x y]
+  canvasFillRect::["a" x y 20 20]
   canvasOutput::["a"]
 } then selection [
   choice "x += 50" $ { x += 50 return goto main }
