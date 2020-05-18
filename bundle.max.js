@@ -6425,7 +6425,7 @@ class NativeFunctionError extends Error {
 exports.NativeFunctionError = NativeFunctionError;
 function assertArgsLength(args, min, max = min) {
     if (args.length < min) {
-        throw new NativeFunctionError(`Too many arguments are provided. ` +
+        throw new NativeFunctionError(`Too few arguments are provided. ` +
             `Minimum number of arguments: ${min}, received: ${args.length}`);
     }
     if (args.length > max) {
