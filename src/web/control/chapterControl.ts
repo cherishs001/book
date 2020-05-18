@@ -21,9 +21,8 @@ import { updateHistory } from './history';
 import { Layout, setLayout } from './layoutControl';
 import { isAnyModalOpened } from './modalControl';
 import { processElements } from './processElements';
+import { WTCDFeatureProvider } from './WTCDFeatureProvider';
 import { WTCDGameReaderUI } from './WTCDGameReaderUI';
-import { NetworkController } from '../../wtcd/NetworkController';
-import { resolvePath } from '../util/resolvePath';
 
 const debugLogger = new DebugLogger('Chapter Control');
 
@@ -266,7 +265,6 @@ export enum ErrorType {
   INTERNAL,
 }
 
-const networkControllerLogger = new DebugLogger('WTCD Network Controller');
 function insertContent(content: Content, text: string, chapter: Chapter) {
   switch (chapter.type) {
     case 'Markdown':
@@ -286,29 +284,7 @@ function insertContent(content: Content, text: string, chapter: Chapter) {
         });
         break;
       }
-      const networkController: NetworkController = {
-        redirect(path) {
-          if (!path.startsWith('./')) {
-            networkControllerLogger.warn('Path has to be relative and start ' +
-              'with "./". Received:', path);
-            return null;
-          }
-          let resolved = resolvePath(
-            'chapters',
-            chapter.htmlRelativePath,
-            '..',
-            path.substr(2),
-          );
-          if (resolved === null) {
-            networkControllerLogger.warn('Failed to resolve path.' +
-              'Received:', path);
-            return null;
-          }
-          resolved = '/' + resolved;
-          networkControllerLogger.log('Resolved from:', path, 'to:', resolved);
-          return resolved;
-        }
-      };
+      const featureProvider = new WTCDFeatureProvider(chapter);
       switch (chapter.preferredReader) {
         case 'flow': {
           const flowReader = new FlowReader(
@@ -316,7 +292,7 @@ function insertContent(content: Content, text: string, chapter: Chapter) {
             wtcdParseResult.wtcdRoot,
             createWTCDErrorMessageFromError,
             processElements,
-            networkController,
+            featureProvider,
           );
           const $wtcdContainer = content.addBlock().element;
           flowReader.renderTo($wtcdContainer);
@@ -327,7 +303,7 @@ function insertContent(content: Content, text: string, chapter: Chapter) {
             content,
             chapter.htmlRelativePath,
             wtcdParseResult.wtcdRoot,
-            networkController,
+            featureProvider,
           ).start();
           break;
         }

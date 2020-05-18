@@ -3,35 +3,6 @@ import { getMaybePooled } from '../constantsPool';
 import { assertArgsLength, assertArgType, NativeFunctionError } from './utils';
 import { ChainedCanvas } from '../ChainedCanvas';
 
-class ImageCache {
-  private map = new Map<string, Promise<HTMLImageElement>>();
-  private loader(url: string): Promise<HTMLImageElement> {
-    return new Promise((resolve, reject) => {
-      const image = document.createElement('img');
-      image.onload = () => resolve(image);
-      image.onerror = () => reject(new Error(`Failed to load ${url}.`));
-      image.src = url;
-    });
-
-  }
-  public delete(key: string) {
-    this.map.delete(key);
-  }
-  public get(key: string): Promise<HTMLImageElement> {
-    let value = this.map.get(key);
-    if (value === undefined) {
-      value = this.loader(key);
-      this.map.set(key, value);
-      value.catch(() => {
-        this.map.delete(key);
-      });
-    }
-    return value;
-  }
-}
-
-const imageCache = new ImageCache();
-
 export const canvasStdFunctions: Array<NativeFunction> = [
   function canvasCreate(args, interpreterHandle) {
     assertArgsLength(args, 3);
@@ -94,14 +65,13 @@ export const canvasStdFunctions: Array<NativeFunction> = [
     if (canvas === undefined) {
       throw new NativeFunctionError(`Canvas with id="${id}" does not exist.`);
     }
-    const url = interpreterHandle.networkController.redirect(path);
-    if (url === null) {
-      throw new NativeFunctionError(`Path (${path}) is not allowed.`);
-    }
-    const imagePromise = imageCache.get(url);
     canvas.updatePromise(async () => {
-      const image = await imagePromise;
-      canvas.ctx.drawImage(image, x, y);
+      try {
+        const image = await interpreterHandle.featureProvider.loadImage(path);
+        canvas.ctx.drawImage(image, x, y);
+      } catch (error) {
+        console.error(`WTCD failed to load image with path="${path}".`, error);
+      }
     });
     return getMaybePooled('null', null);
   },

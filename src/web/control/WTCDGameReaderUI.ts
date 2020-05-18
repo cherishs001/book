@@ -42,7 +42,7 @@ import { Content, ContentBlock } from './contentControl';
 import { createWTCDErrorMessageFromError } from './createWTCDErrorMessageFromError';
 import { createHint } from './hintControl';
 import { confirm, Modal } from './modalControl';
-import { NetworkController, disabled } from '../../wtcd/NetworkController';
+import { FeatureProvider, defaultFeatureProvider } from '../../wtcd/FeatureProvider';
 
 const debugLogger = new DebugLogger('WTCD Game Reader UI');
 
@@ -54,14 +54,14 @@ export class WTCDGameReaderUI {
     private content: Content,
     docIdentifier: string,
     wtcdRoot: WTCDRoot,
-    networkController: NetworkController = disabled,
+    featureProvider: FeatureProvider = defaultFeatureProvider,
   ) {
     this.reader = new GameReader(
       docIdentifier,
       wtcdRoot,
       this.onOutput,
       this.onError,
-      networkController,
+      featureProvider,
     );
   }
   private started = false;

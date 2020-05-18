@@ -1,7 +1,7 @@
 import { ContentOutput, Interpreter } from './Interpreter';
 import { Random } from './Random';
 import { WTCDRoot } from './types';
-import { NetworkController, disabled } from './NetworkController';
+import { FeatureProvider, defaultFeatureProvider } from './FeatureProvider';
 
 interface GameData {
   random: string;
@@ -79,7 +79,7 @@ export class GameReader {
     private wtcdRoot: WTCDRoot,
     private onOutput: (content: HTMLDivElement) => void,
     private onError: (error: Error) => void,
-    private networkController: NetworkController = disabled,
+    private featureProvider: FeatureProvider = defaultFeatureProvider,
   ) {
     this.storageKey = `wtcd.gr.${docIdentifier}`;
     this.data = this.parseData(
@@ -174,7 +174,7 @@ export class GameReader {
     this.interpreter = new Interpreter(
       this.wtcdRoot,
       new Random(this.data.current.random),
-      this.networkController,
+      this.featureProvider,
     );
     this.interpreterIterator = this.interpreter.start();
     let lastOutput = this.next();
