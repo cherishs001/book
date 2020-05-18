@@ -1196,5 +1196,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "505"
+  "buildNumber": "506"
 };

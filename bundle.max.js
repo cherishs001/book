@@ -2930,6 +2930,13 @@ function getDecorationForChapterType(chapterType) {
         case 'WTCD': return Menu_1.ItemDecoration.ICON_GAME;
     }
 }
+function isEmptyFolder(folder) {
+    if (folder.chapters.length !== 0) {
+        return false;
+    }
+    return folder.subFolders.every(isEmptyFolder);
+}
+exports.isEmptyFolder = isEmptyFolder;
 class ChaptersMenu extends Menu_1.Menu {
     constructor(parent, folder) {
         if (folder === undefined) {
@@ -2937,6 +2944,9 @@ class ChaptersMenu extends Menu_1.Menu {
         }
         super(folder.isRoot ? '章节选择' : folder.displayName, parent);
         for (const subfolder of folder.subFolders) {
+            if (isEmptyFolder(subfolder)) {
+                continue;
+            }
             const handle = this.addLink(new ChaptersMenu(this, subfolder), true, Menu_1.ItemDecoration.ICON_FOLDER);
             handle.append(`[${shortNumber_1.shortNumber(subfolder.folderCharCount)}]`, 'char-count');
         }
