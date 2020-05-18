@@ -5729,6 +5729,19 @@ exports.canvasStdFunctions = [
         }));
         return constantsPool_1.getMaybePooled('null', null);
     },
+    function canvasFillRect(args, interpreterHandle) {
+        utils_1.assertArgsLength(args, 5);
+        const id = utils_1.assertArgType(args, 0, 'string');
+        const x = utils_1.assertArgType(args, 1, 'number');
+        const y = utils_1.assertArgType(args, 2, 'number');
+        const width = utils_1.assertArgType(args, 3, 'number');
+        const height = utils_1.assertArgType(args, 4, 'number');
+        const canvas = obtainCanvas(interpreterHandle, id);
+        canvas.updatePromise(() => __awaiter(this, void 0, void 0, function* () {
+            canvas.ctx.fillRect(x, y, width, height);
+        }));
+        return constantsPool_1.getMaybePooled('null', null);
+    },
 ];
 
 },{"../ChainedCanvas":57,"../constantsPool":65,"./utils":77}],69:[function(require,module,exports){
@@ -6346,6 +6359,55 @@ exports.stringStdFunctions = [
         const str = utils_1.assertArgType(args, 0, 'string');
         const separator = utils_1.assertArgType(args, 1, 'string');
         return constantsPool_1.getMaybePooled('list', str.split(separator).map(str => constantsPool_1.getMaybePooled('string', str)));
+    },
+    function stringSubByLength(args) {
+        utils_1.assertArgsLength(args, 2, 3);
+        const str = utils_1.assertArgType(args, 0, 'string');
+        const startIndex = utils_1.assertArgType(args, 1, 'number');
+        const length = utils_1.assertArgType(args, 2, 'number', str.length - startIndex);
+        if (startIndex < 0 || startIndex % 1 !== 0) {
+            throw new utils_1.NativeFunctionError(`Start index must be an nonnegative ` +
+                `integer, received: ${startIndex}`);
+        }
+        if (startIndex > str.length) {
+            throw new utils_1.NativeFunctionError(`Start cannot be larger than str length. ` +
+                `startIndex=${startIndex}, str length=${str.length}`);
+        }
+        if (length < 0 || length % 1 !== 0) {
+            throw new utils_1.NativeFunctionError(`Length must be an nonnegative integer ` +
+                `, received: ${length}`);
+        }
+        if (startIndex + length > str.length) {
+            throw new utils_1.NativeFunctionError(`Index out of bounds. ` +
+                `startIndex=${startIndex}, length=${length}, ` +
+                `str length=${str.length}.`);
+        }
+        return constantsPool_1.getMaybePooled('string', str.substr(startIndex, length));
+    },
+    function stringSubByIndex(args) {
+        utils_1.assertArgsLength(args, 2, 3);
+        const str = utils_1.assertArgType(args, 0, 'string');
+        const startIndex = utils_1.assertArgType(args, 1, 'number');
+        const endIndexExclusive = utils_1.assertArgType(args, 2, 'number', str.length);
+        if (startIndex < 0 || startIndex % 1 !== 0) {
+            throw new utils_1.NativeFunctionError(`Start index must be an nonnegative ` +
+                `integer, received: ${startIndex}`);
+        }
+        if (startIndex > str.length) {
+            throw new utils_1.NativeFunctionError(`Start cannot be larger than str length. ` +
+                `startIndex=${startIndex}, str length=${str.length}`);
+        }
+        if (endIndexExclusive < 0 || endIndexExclusive % 1 !== 0) {
+            throw new utils_1.NativeFunctionError(`End index must be an nonnegative ` +
+                `integer, received: ${endIndexExclusive}`);
+        }
+        if (endIndexExclusive < startIndex || endIndexExclusive > str.length) {
+            throw new utils_1.NativeFunctionError(`End index cannot be smaller than start ` +
+                `index nor larger than the length of str. ` +
+                `endIndex=${endIndexExclusive}, startIndex=${startIndex}, ` +
+                `str length=${str.length}`);
+        }
+        return constantsPool_1.getMaybePooled('string', str.substring(startIndex, endIndexExclusive));
     },
 ];
 

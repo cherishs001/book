@@ -774,7 +774,7 @@ window.DATA={
                 "hidden": false,
                 "type": "Markdown",
                 "htmlRelativePath": "META/WTCD/6.-标准库.html",
-                "chapterCharCount": 6391
+                "chapterCharCount": 6792
               },
               {
                 "displayName": "7. 流程控制",
@@ -807,7 +807,7 @@ window.DATA={
                 "hidden": false,
                 "type": "Markdown",
                 "htmlRelativePath": "META/WTCD/变化日志.html",
-                "chapterCharCount": 765
+                "chapterCharCount": 821
               },
               {
                 "displayName": "计划功能",
@@ -1002,10 +1002,10 @@ window.DATA={
                 "folderCharCount": 3489
               }
             ],
-            "folderCharCount": 32575
+            "folderCharCount": 33032
           }
         ],
-        "folderCharCount": 37152
+        "folderCharCount": 37609
       },
       {
         "displayName": "人设卡",
@@ -1118,10 +1118,10 @@ window.DATA={
         "folderCharCount": 220
       }
     ],
-    "folderCharCount": 269053
+    "folderCharCount": 269510
   },
-  "charsCount": 269053,
-  "paragraphsCount": 5352,
+  "charsCount": 269510,
+  "paragraphsCount": 5358,
   "keywordsCount": [
     [
       "高潮",
@@ -1196,5 +1196,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "502"
+  "buildNumber": "503"
 };

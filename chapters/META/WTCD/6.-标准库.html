@@ -111,6 +111,12 @@ stringFormatNumberPrecision::[1234 2] == &quot;1.2e+3&quot;
 <p>接受 2 个参数：<code>string str</code>，<code>string separator</code>。返回用 <code>separator</code> 分割 <code>str</code> 产生的列表。</p>
 <pre><code class="language-wtcd">stringSplit::[&quot;a,b&quot; &quot;,&quot;] == [&quot;a&quot; &quot;b&quot;]
 </code></pre>
+<h3>6.3.5 <code>stringSubByLength</code></h3>
+<p>接受 2 - 3 个参数：<code>string str</code>，<code>number startIndex</code>，<code>number length = 剩余长度</code>。</p>
+<p>返回 <code>str</code> 从 <code>startIndex</code>（含）开始 <code>length</code>（含）个字符的子串。</p>
+<h3>6.3.6 <code>stringSubByIndex</code></h3>
+<p>接受 2 - 3 个参数：<code>string str</code>，<code>number startIndex</code>，<code>number endIndex = 字符串长度</code>。</p>
+<p>返回 <code>str</code> 从 <code>startIndex</code>（含）开始直到 <code>endIndex</code>（不含）的子串。</p>
 <h2>6.4 <code>random*</code></h2>
 <h3>6.4.1 <code>random</code></h3>
 <p>接受 0 - 2 个参数：<code>number low = 0</code>，<code>number high = 1</code>。</p>
@@ -199,7 +205,10 @@ stringFormatNumberPrecision::[1234 2] == &quot;1.2e+3&quot;
 <p>接受 2 个参数：<code>string id</code>，<code>string fillStyle</code>。</p>
 <p>设置 ID 为 <code>id</code> 的画布的填充方式为 <code>fillStyle</code>。</p>
 <h3>6.8.7 <code>canvasFillText</code></h3>
-<p>接受 4-6 个参数：<code>string id</code>，<code>string text</code>，<code>number x</code>，<code>number y</code>，<code>string hAlign = &quot;start&quot;</code>，<code>string vAlign = &quot;alphabetic&quot;</code>。</p>
+<p>接受 4 - 6 个参数：<code>string id</code>，<code>string text</code>，<code>number x</code>，<code>number y</code>，<code>string hAlign = &quot;start&quot;</code>，<code>string vAlign = &quot;alphabetic&quot;</code>。</p>
 <p>在 ID 为 <code>id</code> 的画布的位于（<code>x</code>, <code>y</code>）的位置，绘制以 <code>hAlign</code> 横向对齐，以 <code>vAlign</code> 纵向对齐的文本 <code>text</code>。</p>
 <p><code>hAlign</code> 可采取的值可以在<a href="https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/textAlign">这里</a>找到。</p>
 <p><code>vAlign</code> 可采取的值可以在<a href="https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/textBaseline">这里</a>找到。</p>
+<h3>6.8.8 <code>canvasFillRect</code></h3>
+<p>接受 5 个参数：<code>string id</code>，<code>number x</code>，<code>number y</code>，<code>number width</code>，<code>number height</code>。</p>
+<p>在 ID 为 <code>id</code> 的画布的位于（<code>x</code>, <code>y</code>）的位置绘制一个 <code>width</code>px x <code>height</code>px 的长方形。</p>
