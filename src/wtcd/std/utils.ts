@@ -14,7 +14,7 @@ export function assertArgsLength(
   max: number = min,
 ) {
   if (args.length < min) {
-    throw new NativeFunctionError(`Too many arguments are provided. ` +
+    throw new NativeFunctionError(`Too few arguments are provided. ` +
     `Minimum number of arguments: ${min}, received: ${args.length}`);
   }
   if (args.length > max) {
