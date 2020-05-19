@@ -1,8 +1,11 @@
 WTCD 1.3
 section init {
-  canvasCreate::["id" 400 100]
-  canvasSetFont::["id" 20 "googleFonts:ZCOOL KuaiLe"]
-  canvasSetFillStyle::["id" "black"]
-  canvasFillText::["id" "小朋友们大家好，还记得...（wow）" 0 0]
+  canvasCreate::["id" 800 100]
+  canvasSetFont::["id" 32 "googleFonts:ZCOOL KuaiLe"]
+  canvasSetStrokeStyle::["id" "rgba(0,0,0,0.8)"]
+  canvasSetLineWidth::["id" 6]
+  canvasStrokeText::["id" "小朋友们大家好，还记得...（wow）" 10 10 "left" "top"]
+  canvasSetFillStyle::["id" "white"]
+  canvasFillText::["id" "小朋友们大家好，还记得...（wow）" 10 10 "left" "top"]
   canvasOutput::["id"]
 } then exit
