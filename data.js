@@ -774,7 +774,7 @@ window.DATA={
                 "hidden": false,
                 "type": "Markdown",
                 "htmlRelativePath": "META/WTCD/6.-标准库.html",
-                "chapterCharCount": 6792
+                "chapterCharCount": 7810
               },
               {
                 "displayName": "7. 流程控制",
@@ -807,7 +807,7 @@ window.DATA={
                 "hidden": false,
                 "type": "Markdown",
                 "htmlRelativePath": "META/WTCD/变化日志.html",
-                "chapterCharCount": 821
+                "chapterCharCount": 905
               },
               {
                 "displayName": "计划功能",
@@ -996,16 +996,28 @@ window.DATA={
                     "type": "WTCD",
                     "htmlRelativePath": "META/WTCD/例子/Canvas-文字.html",
                     "chapterCharCount": 0
+                  },
+                  {
+                    "displayName": "canvasPutImage",
+                    "displayIndex": 15,
+                    "name": "15 - canvasPutImage",
+                    "sourceRelativePath": "5 - META/1 - WTCD/1 - 例子/15 - canvasPutImage.wtcd",
+                    "isEarlyAccess": false,
+                    "hidden": false,
+                    "preferredReader": "flow",
+                    "type": "WTCD",
+                    "htmlRelativePath": "META/WTCD/例子/canvasPutImage.html",
+                    "chapterCharCount": 0
                   }
                 ],
                 "subFolders": [],
                 "folderCharCount": 3489
               }
             ],
-            "folderCharCount": 33032
+            "folderCharCount": 34134
           }
         ],
-        "folderCharCount": 37609
+        "folderCharCount": 38711
       },
       {
         "displayName": "人设卡",
@@ -1118,10 +1130,10 @@ window.DATA={
         "folderCharCount": 220
       }
     ],
-    "folderCharCount": 269510
+    "folderCharCount": 270612
   },
-  "charsCount": 269510,
-  "paragraphsCount": 5358,
+  "charsCount": 270612,
+  "paragraphsCount": 5369,
   "keywordsCount": [
     [
       "高潮",
@@ -1196,5 +1208,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "506"
+  "buildNumber": "507"
 };

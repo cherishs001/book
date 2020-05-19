@@ -5608,6 +5608,31 @@ function obtainCanvas(interpreterHandle, id) {
     }
     return canvas;
 }
+function assertIsHAlign(hAlign) {
+    switch (hAlign) {
+        case 'left':
+        case 'center':
+        case 'right':
+        case 'start':
+        case 'end':
+            break;
+        default:
+            throw new utils_1.NativeFunctionError(`Unknown text hAlign: ${hAlign}`);
+    }
+}
+function assertIsVAlign(vAlign) {
+    switch (vAlign) {
+        case 'top':
+        case 'hanging':
+        case 'middle':
+        case 'alphabetic':
+        case 'ideographic':
+        case 'bottom':
+            break;
+        default:
+            throw new utils_1.NativeFunctionError(`Unknown text vAlign: ${vAlign}`);
+    }
+}
 exports.canvasStdFunctions = [
     function canvasCreate(args, interpreterHandle) {
         utils_1.assertArgsLength(args, 3);
@@ -5656,16 +5681,60 @@ exports.canvasStdFunctions = [
         return constantsPool_1.getMaybePooled('null', null);
     },
     function canvasPutImage(args, interpreterHandle) {
-        utils_1.assertArgsLength(args, 4);
+        utils_1.assertArgsLength(args, 4, 6);
         const id = utils_1.assertArgType(args, 0, 'string');
         const path = utils_1.assertArgType(args, 1, 'string');
         const x = utils_1.assertArgType(args, 2, 'number');
         const y = utils_1.assertArgType(args, 3, 'number');
+        const width = utils_1.assertArgType(args, 4, 'number', -1);
+        const height = utils_1.assertArgType(args, 5, 'number', -1);
+        if ((width < 0) !== (height < 0)) {
+            throw new utils_1.NativeFunctionError('Width and height must be provided at ' +
+                'the same time.');
+        }
         const canvas = obtainCanvas(interpreterHandle, id);
         canvas.updatePromise(() => __awaiter(this, void 0, void 0, function* () {
             try {
                 const image = yield interpreterHandle.featureProvider.loadImage(path);
-                canvas.ctx.drawImage(image, x, y);
+                if (width < 0) {
+                    canvas.ctx.drawImage(image, x, y);
+                }
+                else {
+                    canvas.ctx.drawImage(image, x, y, width, height);
+                }
+            }
+            catch (error) {
+                console.error(`WTCD failed to load image with path="${path}".`, error);
+            }
+        }));
+        return constantsPool_1.getMaybePooled('null', null);
+    },
+    function canvasPutImagePart(args, interpreterHandle) {
+        utils_1.assertArgsLength(args, 8, 10);
+        const id = utils_1.assertArgType(args, 0, 'string');
+        const path = utils_1.assertArgType(args, 1, 'string');
+        const sourceX = utils_1.assertArgType(args, 2, 'number');
+        const sourceY = utils_1.assertArgType(args, 3, 'number');
+        const sourceWidth = utils_1.assertArgType(args, 4, 'number');
+        const sourceHeight = utils_1.assertArgType(args, 5, 'number');
+        const destX = utils_1.assertArgType(args, 6, 'number');
+        const destY = utils_1.assertArgType(args, 7, 'number');
+        const destWidth = utils_1.assertArgType(args, 8, 'number', -1);
+        const destHeight = utils_1.assertArgType(args, 9, 'number', -1);
+        if ((destWidth < 0) !== (destHeight < 0)) {
+            throw new utils_1.NativeFunctionError('destWidth and destHeight must be ' +
+                'provided at the same time.');
+        }
+        const canvas = obtainCanvas(interpreterHandle, id);
+        canvas.updatePromise(() => __awaiter(this, void 0, void 0, function* () {
+            try {
+                const image = yield interpreterHandle.featureProvider.loadImage(path);
+                if (destWidth < 0) {
+                    canvas.ctx.drawImage(image, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, sourceWidth, sourceHeight);
+                }
+                else {
+                    canvas.ctx.drawImage(image, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight);
+                }
             }
             catch (error) {
                 console.error(`WTCD failed to load image with path="${path}".`, error);
@@ -5711,27 +5780,8 @@ exports.canvasStdFunctions = [
         const hAlign = utils_1.assertArgType(args, 4, 'string', 'start');
         const vAlign = utils_1.assertArgType(args, 5, 'string', 'alphabetic');
         const canvas = obtainCanvas(interpreterHandle, id);
-        switch (hAlign) {
-            case 'left':
-            case 'center':
-            case 'right':
-            case 'start':
-            case 'end':
-                break;
-            default:
-                throw new utils_1.NativeFunctionError(`Unknown text hAlign: ${hAlign}`);
-        }
-        switch (vAlign) {
-            case 'top':
-            case 'hanging':
-            case 'middle':
-            case 'alphabetic':
-            case 'ideographic':
-            case 'bottom':
-                break;
-            default:
-                throw new utils_1.NativeFunctionError(`Unknown text vAlign: ${vAlign}`);
-        }
+        assertIsHAlign(hAlign);
+        assertIsVAlign(vAlign);
         canvas.updatePromise(() => __awaiter(this, void 0, void 0, function* () {
             const ctx = canvas.ctx;
             ctx.textAlign = hAlign;
@@ -5750,6 +5800,45 @@ exports.canvasStdFunctions = [
         const canvas = obtainCanvas(interpreterHandle, id);
         canvas.updatePromise(() => __awaiter(this, void 0, void 0, function* () {
             canvas.ctx.fillRect(x, y, width, height);
+        }));
+        return constantsPool_1.getMaybePooled('null', null);
+    },
+    function canvasSetStrokeStyle(args, interpreterHandle) {
+        utils_1.assertArgsLength(args, 2);
+        const id = utils_1.assertArgType(args, 0, 'string');
+        const color = utils_1.assertArgType(args, 1, 'string');
+        const canvas = obtainCanvas(interpreterHandle, id);
+        canvas.updatePromise(() => __awaiter(this, void 0, void 0, function* () {
+            canvas.ctx.strokeStyle = color;
+        }));
+        return constantsPool_1.getMaybePooled('null', null);
+    },
+    function canvasSetLineWidth(args, interpreterHandle) {
+        utils_1.assertArgsLength(args, 2);
+        const id = utils_1.assertArgType(args, 0, 'string');
+        const lineWidth = utils_1.assertArgType(args, 1, 'number');
+        const canvas = obtainCanvas(interpreterHandle, id);
+        canvas.updatePromise(() => __awaiter(this, void 0, void 0, function* () {
+            canvas.ctx.lineWidth = lineWidth;
+        }));
+        return constantsPool_1.getMaybePooled('null', null);
+    },
+    function canvasStrokeText(args, interpreterHandle) {
+        utils_1.assertArgsLength(args, 4, 6);
+        const id = utils_1.assertArgType(args, 0, 'string');
+        const text = utils_1.assertArgType(args, 1, 'string');
+        const x = utils_1.assertArgType(args, 2, 'number');
+        const y = utils_1.assertArgType(args, 3, 'number');
+        const hAlign = utils_1.assertArgType(args, 4, 'string', 'start');
+        const vAlign = utils_1.assertArgType(args, 5, 'string', 'alphabetic');
+        const canvas = obtainCanvas(interpreterHandle, id);
+        assertIsHAlign(hAlign);
+        assertIsVAlign(vAlign);
+        canvas.updatePromise(() => __awaiter(this, void 0, void 0, function* () {
+            const ctx = canvas.ctx;
+            ctx.textAlign = hAlign;
+            ctx.textBaseline = vAlign;
+            ctx.strokeText(text, x, y);
         }));
         return constantsPool_1.getMaybePooled('null', null);
     },

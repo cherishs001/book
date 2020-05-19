@@ -195,20 +195,35 @@ stringFormatNumberPrecision::[1234 2] == &quot;1.2e+3&quot;
 <p>接受 1 个参数：<code>string id</code>。</p>
 <p>将 ID 为 <code>id</code> 的画布清空。</p>
 <h3>6.8.4 <code>canvasPutImage</code></h3>
-<p>接受 4 个参数：<code>string id</code>，<code>string path</code>，<code>number x</code>，<code>number y</code>。</p>
-<p>将位于 <code>path</code> 的图片绘制到 ID 为 <code>id</code> 的画布上。使用 <code>x</code> 和 <code>y</code> 可以控制绘制的位置（左上角）。</p>
-<h3>6.8.5 <code>canvasSetFont</code></h3>
+<p>接受 4 - 6 个参数：<code>string id</code>，<code>string path</code>，<code>number x</code>，<code>number y</code>，<code>number width = -1</code>，<code>number height = -1</code>。</p>
+<p>将位于 <code>path</code> 的图片绘制到 ID 为 <code>id</code> 的画布上。使用 <code>x</code> 和 <code>y</code> 可以控制绘制的位置（左上角）。使用 <code>width</code> 和 <code>height</code> 可以控制绘制出来的尺寸。如果忽略，那么就会使用图片的原始尺寸。</p>
+<p>需要注意的是，<code>width</code> 和 <code>height</code> 要么同时提供，要么都不提供。不可以只提供一个。</p>
+<h3>6.8.5 <code>canvasPutImagePart</code></h3>
+<p>接受 8 - 10 个参数：<code>string id</code>，<code>string path</code>，<code>number sourceX</code>，<code>number sourceY</code>，<code>number sourceWidth</code>，<code>number sourceHeight</code>，<code>number destX</code>，<code>number destY</code>，<code>number destWidth = -1</code>，<code>number destHeight = -1</code>。</p>
+<p>将位于 <code>path</code> 的图片的一部分绘制到 ID 为 <code>id</code> 的画布上。使用 <code>sourceX</code>，<code>sourceY</code>，<code>sourceWidth</code>，<code>sourceHeight</code> 可以控制需要绘制的部分在来源图片的位置。使用 <code>destX</code> 和 <code>destY</code> 可以控制在画布的位置（左上角）。使用 <code>destWidth</code> 和 <code>destHeight</code> 可以控制绘制出来的尺寸。如果忽略，那么就会使用图片的来源部分的尺寸。</p>
+<p>需要注意的是，<code>destWidth</code> 和 <code>destHeight</code> 要么同时提供，要么都不提供。不可以只提供一个。</p>
+<h3>6.8.6 <code>canvasSetFont</code></h3>
 <p>接受 3 个参数：<code>string id</code>，<code>number size</code>，<code>string fontIdentifier</code>。</p>
 <p>设置 ID 为 <code>id</code> 的画布的字体为尺寸是 <code>size</code>px，类型是 <code>fontIdentifier</code> 的字体。</p>
 <p><code>fontIdentifier</code> 的解释方法由使用的 WTCD 阅读器指定。在《可穿戴科技》中，这个 <code>fontIdentifier</code> 的值为 <code>googleFonts:&lt;在 Google Fonts 上的字体名&gt;</code>。例如：<code>googleFonts:ZCOOL KuaiLe</code>。</p>
-<h3>6.8.6 <code>canvasSetFillStyle</code></h3>
+<h3>6.8.7 <code>canvasSetFillStyle</code></h3>
 <p>接受 2 个参数：<code>string id</code>，<code>string fillStyle</code>。</p>
 <p>设置 ID 为 <code>id</code> 的画布的填充方式为 <code>fillStyle</code>。</p>
-<h3>6.8.7 <code>canvasFillText</code></h3>
+<h3>6.8.8 <code>canvasFillText</code></h3>
 <p>接受 4 - 6 个参数：<code>string id</code>，<code>string text</code>，<code>number x</code>，<code>number y</code>，<code>string hAlign = &quot;start&quot;</code>，<code>string vAlign = &quot;alphabetic&quot;</code>。</p>
 <p>在 ID 为 <code>id</code> 的画布的位于（<code>x</code>, <code>y</code>）的位置，绘制以 <code>hAlign</code> 横向对齐，以 <code>vAlign</code> 纵向对齐的文本 <code>text</code>。</p>
+<p>请使用 <code>canvasSetFont</code> 来选择字体，使用 <code>canvasSetFillStyle</code> 来选择填充方式。</p>
 <p><code>hAlign</code> 可采取的值可以在<a href="https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/textAlign">这里</a>找到。</p>
 <p><code>vAlign</code> 可采取的值可以在<a href="https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/textBaseline">这里</a>找到。</p>
-<h3>6.8.8 <code>canvasFillRect</code></h3>
+<h3>6.8.9 <code>canvasFillRect</code></h3>
 <p>接受 5 个参数：<code>string id</code>，<code>number x</code>，<code>number y</code>，<code>number width</code>，<code>number height</code>。</p>
 <p>在 ID 为 <code>id</code> 的画布的位于（<code>x</code>, <code>y</code>）的位置绘制一个 <code>width</code>px x <code>height</code>px 的长方形。</p>
+<h3>6.8.10 <code>canvasSetStrokeStyle</code></h3>
+<p>接受 2 个参数：<code>string id</code>，<code>string strokeStyle</code>。</p>
+<p>设置 ID 为 <code>id</code> 的画布的描线方式为 <code>strokeStyle</code>。</p>
+<h3>6.8.11 <code>canvasSetLineWidth</code></h3>
+<p>接受 2 个参数：<code>string id</code>，<code>number lineWidth</code>。</p>
+<p>设置 ID 为 <code>id</code> 的画布的描线粗细为 <code>lineWidth</code>px。</p>
+<h3>6.8.12 <code>canvasStrokeText</code></h3>
+<p>接受 4 - 6 个参数：<code>string id</code>，<code>string text</code>，<code>number x</code>，<code>number y</code>，<code>string hAlign = &quot;start&quot;</code>，<code>string vAlign = &quot;alphabetic&quot;</code>。</p>
+<p>类似 <code>canvasFillText</code>，但是只是描边。所以请使用 <code>canvasSetStrokeStyle</code> 来选择描边方式。</p>
