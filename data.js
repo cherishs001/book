@@ -222,10 +222,21 @@ window.DATA={
             "type": "Markdown",
             "htmlRelativePath": "主线/第-18-章.html",
             "chapterCharCount": 8608
+          },
+          {
+            "displayName": "第 19 章",
+            "displayIndex": 19,
+            "name": "19",
+            "sourceRelativePath": "1 - 主线/19.md",
+            "isEarlyAccess": false,
+            "hidden": false,
+            "type": "Markdown",
+            "htmlRelativePath": "主线/第-19-章.html",
+            "chapterCharCount": 4615
           }
         ],
         "subFolders": [],
-        "folderCharCount": 104585
+        "folderCharCount": 109200
       },
       {
         "displayName": "支线",
@@ -1130,22 +1141,22 @@ window.DATA={
         "folderCharCount": 220
       }
     ],
-    "folderCharCount": 270674
+    "folderCharCount": 275289
   },
-  "charsCount": 270674,
-  "paragraphsCount": 5369,
+  "charsCount": 275289,
+  "paragraphsCount": 5500,
   "keywordsCount": [
     [
       "高潮",
-      482
+      484
     ],
     [
       "贞操带",
-      244
+      253
     ],
     [
       "按摩棒",
-      215
+      216
     ],
     [
       "WTCD",
@@ -1208,5 +1219,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "517"
+  "buildNumber": "520"
 };
