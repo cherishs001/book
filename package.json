@@ -27,7 +27,7 @@
     "dependencies": {
         "@types/fs-extra": "^9.0.1",
         "@types/markdown-it": "10.0.1",
-        "@types/node": "^13.1.4",
+        "@types/node": "^14.0.5",
         "browserify": "^16.2.3",
         "fs-extra": "^9.0.0",
         "hyperscript": "^2.0.2",
