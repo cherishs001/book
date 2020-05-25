@@ -399,6 +399,17 @@ window.DATA={
                 "type": "Markdown",
                 "htmlRelativePath": "支线/为霜和克西拉的日常/人设.html",
                 "chapterCharCount": 2199
+              },
+              {
+                "displayName": "海洋公园的约会",
+                "displayIndex": 2,
+                "name": "2 - 海洋公园的约会",
+                "sourceRelativePath": "2 - 支线/2 - 为霜和克西拉的日常/2 - 海洋公园的约会.md",
+                "isEarlyAccess": false,
+                "hidden": false,
+                "type": "Markdown",
+                "htmlRelativePath": "支线/为霜和克西拉的日常/海洋公园的约会.html",
+                "chapterCharCount": 2608
               }
             ],
             "subFolders": [
@@ -469,10 +480,10 @@ window.DATA={
                 "folderCharCount": 18647
               }
             ],
-            "folderCharCount": 20846
+            "folderCharCount": 23454
           }
         ],
-        "folderCharCount": 53019
+        "folderCharCount": 55627
       },
       {
         "displayName": "小作品",
@@ -1141,10 +1152,10 @@ window.DATA={
         "folderCharCount": 220
       }
     ],
-    "folderCharCount": 275289
+    "folderCharCount": 277897
   },
-  "charsCount": 275289,
-  "paragraphsCount": 5500,
+  "charsCount": 277897,
+  "paragraphsCount": 5525,
   "keywordsCount": [
     [
       "高潮",
@@ -1219,5 +1230,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "523"
+  "buildNumber": "526"
 };
