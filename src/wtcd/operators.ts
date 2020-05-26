@@ -211,9 +211,9 @@ export const binaryOperators = new Map<string, BinaryOperatorDefinition>([
       }
       const arg1 = evaluator(expr.arg1);
       if (arg1.type === 'null') {
-        throw WTCDError.atLocation(expr, `Right side of binary operator "??" ` +
+        throw WTCDError.atLocation(expr, `Right side of binary operator "?!" ` +
           `cannot be null. If returning null is desired in this case, please ` +
-          `use "???" instead`);
+          `use "??" instead`);
       }
       return arg1;
     },
