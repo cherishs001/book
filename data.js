@@ -355,10 +355,22 @@ window.DATA={
                 "type": "WTCD",
                 "htmlRelativePath": "支线/可穿戴科技-·-Alter/第二章·幕间.html",
                 "chapterCharCount": 2242
+              },
+              {
+                "displayName": "第三章",
+                "displayIndex": 5,
+                "name": "5 - 第三章",
+                "sourceRelativePath": "2 - 支线/0 - 可穿戴科技 · Alter/5 - 第三章.wtcd",
+                "isEarlyAccess": false,
+                "hidden": false,
+                "preferredReader": "flow",
+                "type": "WTCD",
+                "htmlRelativePath": "支线/可穿戴科技-·-Alter/第三章.html",
+                "chapterCharCount": 4815
               }
             ],
             "subFolders": [],
-            "folderCharCount": 9167
+            "folderCharCount": 13982
           },
           {
             "displayName": "水晶永耀线",
@@ -483,7 +495,7 @@ window.DATA={
             "folderCharCount": 23454
           }
         ],
-        "folderCharCount": 55627
+        "folderCharCount": 60442
       },
       {
         "displayName": "小作品",
@@ -578,7 +590,7 @@ window.DATA={
             "hidden": false,
             "type": "Markdown",
             "htmlRelativePath": "道具集/充电宝少女捕获器.html",
-            "chapterCharCount": 3766
+            "chapterCharCount": 3887
           },
           {
             "displayName": "现代女仆管理系统",
@@ -692,7 +704,7 @@ window.DATA={
           }
         ],
         "subFolders": [],
-        "folderCharCount": 70190
+        "folderCharCount": 70311
       },
       {
         "displayName": "META",
@@ -1152,10 +1164,10 @@ window.DATA={
         "folderCharCount": 220
       }
     ],
-    "folderCharCount": 277897
+    "folderCharCount": 282833
   },
-  "charsCount": 277897,
-  "paragraphsCount": 5525,
+  "charsCount": 282833,
+  "paragraphsCount": 5700,
   "keywordsCount": [
     [
       "高潮",
@@ -1230,5 +1242,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "528"
+  "buildNumber": "533"
 };
