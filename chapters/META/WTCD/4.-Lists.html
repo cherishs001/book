@@ -35,7 +35,7 @@
 </code></pre>
 <h3>4.3.2 越界即空成员访问</h3>
 <p>当然，有时候，确实会希望当下标不存在时返回 <code>null</code>。这时候可以使用 <code>.?</code> 来访问成员。</p>
-<pre><code class="language-wtcd">[ &quot;a0&quot; &quot;a1&quot; ].(2) == null
+<pre><code class="language-wtcd">[ &quot;a0&quot; &quot;a1&quot; ] .? (2) == null
 </code></pre>
 <p>需要注意的是，只有下标越界的时候（<code>index &lt; 0</code> 或者 <code>index &gt;= listLength::[list]</code>），<code>.?</code> 才会返回 <code>null</code>。如果提供的下标不是整数依然会报错。（无论如何，你都不应该在下标中使用涉及浮点数运算的操作。）</p>
 <h3>4.3.3 可选成员访问</h3>

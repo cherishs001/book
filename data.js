@@ -786,7 +786,7 @@ window.DATA={
                 "hidden": false,
                 "type": "Markdown",
                 "htmlRelativePath": "META/WTCD/4.-Lists.html",
-                "chapterCharCount": 2120
+                "chapterCharCount": 2121
               },
               {
                 "displayName": "5. Functions",
@@ -1048,10 +1048,10 @@ window.DATA={
                 "folderCharCount": 3489
               }
             ],
-            "folderCharCount": 34134
+            "folderCharCount": 34135
           }
         ],
-        "folderCharCount": 38773
+        "folderCharCount": 38774
       },
       {
         "displayName": "人设卡",
@@ -1164,9 +1164,9 @@ window.DATA={
         "folderCharCount": 220
       }
     ],
-    "folderCharCount": 282833
+    "folderCharCount": 282834
   },
-  "charsCount": 282833,
+  "charsCount": 282834,
   "paragraphsCount": 5700,
   "keywordsCount": [
     [
@@ -1242,5 +1242,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "533"
+  "buildNumber": "535"
 };
