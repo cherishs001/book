@@ -30,10 +30,21 @@ export type WTCDReader =
   | 'flow'
   | 'game';
 
-export interface WTCDChapter extends ChapterBase {
+export interface WTCDChapterBase extends ChapterBase {
   type: 'WTCD';
   preferredReader: WTCDReader;
 }
+
+export interface WTCDChapterFlow extends WTCDChapterBase {
+  preferredReader: 'flow';
+}
+
+export interface WTCDChapterGame extends WTCDChapterBase {
+  preferredReader: 'game';
+  slideAnimation: boolean;
+}
+
+export type WTCDChapter = WTCDChapterFlow | WTCDChapterGame;
 
 export type Chapter = MarkdownChapter | WTCDChapter;
 

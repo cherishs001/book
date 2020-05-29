@@ -1,3 +1,4 @@
 {
-  "preferredReader": "game"
+  "preferredReader": "game",
+  "slideAnimation": false
 }

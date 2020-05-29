@@ -53,6 +53,7 @@ export class WTCDGameReaderUI {
   public constructor(
     private content: Content,
     docIdentifier: string,
+    private slideAnimation: boolean,
     wtcdRoot: WTCDRoot,
     featureProvider: FeatureProvider = defaultFeatureProvider,
   ) {
@@ -231,7 +232,11 @@ export class WTCDGameReaderUI {
     } else {
       debugLogger.log('Updating main block.');
       this.content.scrollTo(this.controlsBlock.element.offsetTop);
-      this.mainBlock.slideReplace(content);
+      if (this.slideAnimation) {
+        this.mainBlock.slideReplace(content);
+      } else {
+        this.mainBlock.directReplace(content);
+      }
     }
   }
   private onError = (error: Error) => {

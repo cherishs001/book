@@ -2,7 +2,7 @@ import { copy, copyFile, ensureDir, mkdirp, pathExists, readdir, readFile, stat,
 import * as MDI from 'markdown-it';
 import * as mdiReplaceLinkPlugin from 'markdown-it-replace-link';
 import { basename, dirname, parse as parsePath, posix, relative, resolve } from 'path';
-import { Chapter, ChapterFlagsMapped, Data, Folder, Node, WTCDReader } from '../Data';
+import { Chapter, ChapterFlagsMapped, Data, Folder, Node } from '../Data';
 import { parse } from '../wtcd/parse';
 import { countCertainWord } from './countCertainWord';
 import { countChars } from './countChars';
@@ -136,11 +136,7 @@ const argv = yargs.options({
   async function loadWTCDChapter(path: string, parentHtmlRelativePath: string): Promise<Chapter> {
     const parsedPath = parsePath(path);
     const metaPath = resolve(parsedPath.dir, parsedPath.name + '.meta.json');
-    const meta: {
-      isEarlyAccess: boolean,
-      hidden: boolean,
-      preferredReader: WTCDReader,
-    } = {
+    const meta: any = {
       isEarlyAccess: false,
       hidden: false,
       preferredReader: 'flow',
@@ -154,10 +150,13 @@ const argv = yargs.options({
         meta.hidden = content.hidden;
       }
       if (typeof content.preferredReader === 'string') {
-        if (
-          content.preferredReader !== 'flow' &&
-          content.preferredReader !== 'game'
-        ) {
+        if (content.preferredReader === 'game') {
+          if (typeof content.slideAnimation === 'boolean') {
+            meta.slideAnimation = content.slideAnimation;
+          } else {
+            meta.slideAnimation = true;
+          }
+        } else if (content.preferredReader !== 'flow') {
           throw new Error(`Unknown reader type: ${content.preferredReader}.`);
         }
         meta.preferredReader = content.preferredReader;
