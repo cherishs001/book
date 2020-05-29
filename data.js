@@ -329,6 +329,7 @@ window.DATA={
                 "isEarlyAccess": false,
                 "hidden": false,
                 "preferredReader": "game",
+                "slideAnimation": true,
                 "type": "WTCD",
                 "htmlRelativePath": "支线/可穿戴科技-·-Alter/第一章·幕间.html",
                 "chapterCharCount": 477
@@ -352,6 +353,7 @@ window.DATA={
                 "isEarlyAccess": false,
                 "hidden": false,
                 "preferredReader": "game",
+                "slideAnimation": true,
                 "type": "WTCD",
                 "htmlRelativePath": "支线/可穿戴科技-·-Alter/第二章·幕间.html",
                 "chapterCharCount": 2242
@@ -1015,6 +1017,7 @@ window.DATA={
                     "isEarlyAccess": false,
                     "hidden": false,
                     "preferredReader": "game",
+                    "slideAnimation": false,
                     "type": "WTCD",
                     "htmlRelativePath": "META/WTCD/例子/Game-模式-Canvas.html",
                     "chapterCharCount": 0
@@ -1242,5 +1245,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "536"
+  "buildNumber": "537"
 };
