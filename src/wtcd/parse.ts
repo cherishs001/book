@@ -827,7 +827,7 @@ class LogicParser {
       ) &&
       (type !== null) &&
       (type.length === 1) &&
-      (type[0] = 'function')
+      (type[0] === 'function')
     ) {
       // Simplified function declaration (declare function test[ ... ] ...)
       initialValue = this.attachLocationInfo<FunctionExpression>(
