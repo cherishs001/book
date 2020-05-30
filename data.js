@@ -724,7 +724,7 @@ window.DATA={
             "hidden": false,
             "type": "Markdown",
             "htmlRelativePath": "META/人名请求.html",
-            "chapterCharCount": 477
+            "chapterCharCount": 471
           },
           {
             "displayName": "投稿须知及简易 Markdown 教程",
@@ -1054,7 +1054,7 @@ window.DATA={
             "folderCharCount": 34135
           }
         ],
-        "folderCharCount": 38774
+        "folderCharCount": 38768
       },
       {
         "displayName": "人设卡",
@@ -1167,9 +1167,9 @@ window.DATA={
         "folderCharCount": 220
       }
     ],
-    "folderCharCount": 284565
+    "folderCharCount": 284559
   },
-  "charsCount": 284565,
+  "charsCount": 284559,
   "paragraphsCount": 5768,
   "keywordsCount": [
     [
@@ -1245,5 +1245,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "539"
+  "buildNumber": "540"
 };
