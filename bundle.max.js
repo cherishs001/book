@@ -703,7 +703,7 @@ class Menu {
 }
 exports.Menu = Menu;
 
-},{"./DebugLogger":6,"./Event":7,"./control/layoutControl":27}],9:[function(require,module,exports){
+},{"./DebugLogger":6,"./Event":7,"./control/layoutControl":26}],9:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.loadingText = '加载中...';
@@ -814,8 +814,8 @@ exports.MAKAI_ERROR_UNKNOWN = 'Oops！发生了一些不该发生的问题！快
 exports.MAKAI_INFO_SET_TOKKEN_SUCCESS = '你的 Makai 令牌已经设置完毕啦！';
 exports.MAKAI_INFO_CONFIRM_TOKEN = '正在确认你的 Makai 令牌……';
 exports.MAKAI_INFO_OBTAIN_TOKEN = '正在获取 Makai 令牌……';
-exports.MAKAI_SUBMIT_0 = '以';
-exports.MAKAI_SUBMIT_1 = '的身份评论';
+exports.MAKAI_SUBMIT_0 = '将以';
+exports.MAKAI_SUBMIT_1 = '的身份发表评论。';
 exports.MAKAI_SUBMITTED_0 = '由';
 exports.MAKAI_SUBMITTED_1 = '发表于';
 exports.MAKAI_GENERIC_LAST_MODIFIED = '（最后修改于 ';
@@ -829,11 +829,14 @@ exports.MAKAI_MODAL_TITLE_TOKEN = 'Makai 令牌';
 exports.MAKAI_MODAL_TITLE_COMMENT = 'Makai - 添加评论';
 exports.MAKAI_MODAL_OK = '好的';
 exports.MAKAI_MODAL_CONFIRM = '是的';
-exports.MAKAI_MODAL_CANCEL = '算了';
+exports.MAKAI_MODAL_CANCEL = '取消';
 exports.MAKAI_MODAL_SAVE = '保存';
 exports.MAKAI_MODAL_SUBMIT = '发表';
+exports.MAKAI_MODAL_CONFIRM_LOSS_EDITED = '是否放弃编写的内容？';
+exports.MAKAI_MODAL_CONFIRM_LOSS_EDITED_YES = '放弃编写的内容';
+exports.MAKAI_MODAL_CONFIRM_LOSS_EDITED_NO = '继续编辑';
 exports.MAKAI_MODAL_CONTENT_COMMENT_HINT = '想说些什么？直接写下来吧！';
-exports.MAKAI_MODAL_CONTENT_NAME_INPUT_PREFIX = '署名（必填）';
+exports.MAKAI_MODAL_CONTENT_NAME_INPUT_PREFIX = '署名（必填）：';
 exports.MAKAI_MODAL_CONTENT_EMAIL_INPUT_PREFIX = '邮箱（可选）：';
 exports.MAKAI_MODAL_CONTENT_TOKEN_INPUT_PREFIX = '令牌：';
 exports.MAKAI_MODAL_CONTENT_DELETION_CONFIRMATION = '你确定要删除这条评论吗？';
@@ -913,36 +916,6 @@ exports.thanks = [
 ].sort(() => Math.random() - 0.5);
 
 },{}],14:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-class MakaiControl {
-    static tokenToUsername(token) {
-        const res = fetch(MakaiControl.url + '/username/' + token);
-        return null;
-    }
-    static validToken(token) {
-        return !(MakaiControl.tokenToUsername(token) == null);
-    }
-    static saveToken(token) {
-        window.localStorage.setItem('token', token);
-    }
-    static saveUsername(username) {
-        window.localStorage.setItem('username', username);
-    }
-    static getToken() {
-        return window.localStorage.getItem('token');
-    }
-    static getUsername() {
-        return window.localStorage.getItem('username');
-    }
-    static hasToken() {
-        return window.localStorage.getItem('token') != null;
-    }
-}
-exports.MakaiControl = MakaiControl;
-MakaiControl.url = 'https://c.makai.city';
-
-},{}],15:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 function sign(x) {
@@ -1026,7 +999,7 @@ class MonoDimensionTransitionControl {
 }
 exports.MonoDimensionTransitionControl = MonoDimensionTransitionControl;
 
-},{}],16:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const FeatureProvider_1 = require("../../wtcd/FeatureProvider");
@@ -1079,7 +1052,7 @@ class WTCDFeatureProvider extends FeatureProvider_1.FeatureProvider {
 }
 exports.WTCDFeatureProvider = WTCDFeatureProvider;
 
-},{"../../wtcd/FeatureProvider":59,"../DebugLogger":6,"../data/AutoCache":32,"../util/loadGooleFonts":52,"../util/resolvePath":55}],17:[function(require,module,exports){
+},{"../../wtcd/FeatureProvider":59,"../DebugLogger":6,"../data/AutoCache":32,"../util/loadGooleFonts":52,"../util/resolvePath":55}],16:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const GameReader_1 = require("../../wtcd/GameReader");
@@ -1271,7 +1244,7 @@ class WTCDGameReaderUI {
 }
 exports.WTCDGameReaderUI = WTCDGameReaderUI;
 
-},{"../../wtcd/FeatureProvider":59,"../../wtcd/GameReader":61,"../DebugLogger":6,"../constant/messages":11,"../data/settings":34,"../hs":36,"../util/formatTime":51,"./createWTCDErrorMessageFromError":23,"./hintControl":25,"./modalControl":28}],18:[function(require,module,exports){
+},{"../../wtcd/FeatureProvider":59,"../../wtcd/GameReader":61,"../DebugLogger":6,"../constant/messages":11,"../data/settings":34,"../hs":36,"../util/formatTime":51,"./createWTCDErrorMessageFromError":22,"./hintControl":24,"./modalControl":28}],17:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const FlowReader_1 = require("../../wtcd/FlowReader");
@@ -1532,7 +1505,7 @@ function insertContent(content, text, chapter) {
     }
 }
 
-},{"../../wtcd/FlowReader":60,"../DebugLogger":6,"../Event":7,"../constant/loadingText":9,"../constant/messages":11,"../data/AutoCache":32,"../data/data":33,"../data/settings":34,"../data/state":35,"../hs":36,"../input/gestures":38,"../input/keyboard":39,"../util/DOM":50,"./WTCDFeatureProvider":16,"./WTCDGameReaderUI":17,"./commentsControl":20,"./contentControl":21,"./createWTCDErrorMessage":22,"./createWTCDErrorMessageFromError":23,"./history":26,"./layoutControl":27,"./modalControl":28,"./processElements":29}],19:[function(require,module,exports){
+},{"../../wtcd/FlowReader":60,"../DebugLogger":6,"../Event":7,"../constant/loadingText":9,"../constant/messages":11,"../data/AutoCache":32,"../data/data":33,"../data/settings":34,"../data/state":35,"../hs":36,"../input/gestures":38,"../input/keyboard":39,"../util/DOM":50,"./WTCDFeatureProvider":15,"./WTCDGameReaderUI":16,"./commentsControl":19,"./contentControl":20,"./createWTCDErrorMessage":21,"./createWTCDErrorMessageFromError":22,"./history":25,"./layoutControl":26,"./modalControl":28,"./processElements":29}],18:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const Event_1 = require("../Event");
@@ -1561,7 +1534,7 @@ function getBlockedUsers() {
 }
 exports.getBlockedUsers = getBlockedUsers;
 
-},{"../Event":7}],20:[function(require,module,exports){
+},{"../Event":7}],19:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const messages_1 = require("../constant/messages");
@@ -1574,7 +1547,7 @@ const formatTime_1 = require("../util/formatTime");
 const padName_1 = require("../util/padName");
 const commentBlockControl_1 = require("./commentBlockControl");
 const contentControl_1 = require("./contentControl");
-const MakaiControl_1 = require("./MakaiControl");
+const makaiControl_1 = require("./makaiControl");
 const modalControl_1 = require("./modalControl");
 const userControl_1 = require("./userControl");
 const debugLogger = new DebugLogger_1.DebugLogger('Comments Control');
@@ -1583,17 +1556,17 @@ const debugLogger = new DebugLogger_1.DebugLogger('Comments Control');
 // Output sample: https://api.github.com/repos/SCLeoX/Wearable-Technology/issues/1/comments
 function getApiUrl() {
     var _a;
-    return MakaiControl_1.MakaiControl.url + '/comment/github/' + ((_a = state_1.state.currentChapter) === null || _a === void 0 ? void 0 : _a.chapter.htmlRelativePath.replace(/\//g, '.')) + '/';
+    return makaiControl_1.makaiUrl + '/comment/github/' + ((_a = state_1.state.currentChapter) === null || _a === void 0 ? void 0 : _a.chapter.htmlRelativePath.replace(/\//g, '.')) + '/';
 }
 exports.getApiUrl = getApiUrl;
 function createCommentElement(userAvatarUrl, userName, userUrl, createTime, updateTime, content, id, block, display) {
     var _a;
-    const deleteButton = userName === ((_a = MakaiControl_1.MakaiControl.getUsername()) === null || _a === void 0 ? void 0 : _a.toLowerCase()) ? hs_1.h('a.block-user', {
+    const deleteButton = userName === ((_a = makaiControl_1.getUsername()) === null || _a === void 0 ? void 0 : _a.toLowerCase()) ? hs_1.h('a.block-user', {
         onclick: () => {
             modalControl_1.confirm(messages_1.MAKAI_MODAL_TITLE_WARNING, messages_1.MAKAI_MODAL_CONTENT_DELETION_CONFIRMATION, messages_1.MAKAI_MODAL_CONFIRM, messages_1.MAKAI_MODAL_CANCEL).then((result) => {
                 if (result) {
-                    const m = userControl_1.UserControl.showLoading(messages_1.MAKAI_INFO_CONFIRM_TOKEN);
-                    fetch(MakaiControl_1.MakaiControl.url + `/comment/` + id + `/` + MakaiControl_1.MakaiControl.getToken(), {
+                    const m = userControl_1.showLoading(messages_1.MAKAI_INFO_CONFIRM_TOKEN);
+                    fetch(makaiControl_1.makaiUrl + `/comment/` + id + `/` + makaiControl_1.getToken(), {
                         cache: 'no-cache',
                         credentials: 'same-origin',
                         headers: new Headers({
@@ -1609,14 +1582,14 @@ function createCommentElement(userAvatarUrl, userName, userUrl, createTime, upda
                         .then((json) => {
                         m.close();
                         if (!json.success) {
-                            userControl_1.UserControl.showMessage(messages_1.MAKAI_ERROR_DELETE_COMMENT_INVALID_TOKEN);
+                            userControl_1.showMessage(messages_1.MAKAI_ERROR_DELETE_COMMENT_INVALID_TOKEN);
                         }
                         else {
                             $comment.remove();
                         }
                     }).catch((err) => {
                         m.close();
-                        userControl_1.UserControl.showMessage(messages_1.MAKAI_ERROR_INTERNET);
+                        userControl_1.showMessage(messages_1.MAKAI_ERROR_INTERNET);
                     });
                 }
             });
@@ -1670,6 +1643,13 @@ function loadComments(content) {
             }
             debugLogger.log('Comments loaded.');
             $commentsStatus.innerText = messages_1.COMMENTS_LOADED;
+            if (data.length >= 6) {
+                $comments.appendChild(hs_1.h('.create-comment', {
+                    onclick: () => {
+                        userControl_1.showComment(block);
+                    },
+                }, messages_1.COMMENTS_CREATE));
+            }
             data.forEach((comment) => {
                 if (commentBlockControl_1.isUserBlocked(comment.user.login)) {
                     return;
@@ -1678,7 +1658,7 @@ function loadComments(content) {
             });
             $comments.appendChild(hs_1.h('.create-comment', {
                 onclick: () => {
-                    userControl_1.UserControl.showComment(block);
+                    userControl_1.showComment(block);
                 },
             }, messages_1.COMMENTS_CREATE));
         })
@@ -1689,7 +1669,7 @@ function loadComments(content) {
 }
 exports.loadComments = loadComments;
 
-},{"../DebugLogger":6,"../constant/messages":11,"../data/AutoCache":32,"../data/settings":34,"../data/state":35,"../hs":36,"../util/formatTime":51,"../util/padName":54,"./MakaiControl":14,"./commentBlockControl":19,"./contentControl":21,"./modalControl":28,"./userControl":31}],21:[function(require,module,exports){
+},{"../DebugLogger":6,"../constant/messages":11,"../data/AutoCache":32,"../data/settings":34,"../data/state":35,"../hs":36,"../util/formatTime":51,"../util/padName":54,"./commentBlockControl":18,"./contentControl":20,"./makaiControl":27,"./modalControl":28,"./userControl":31}],20:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const settings_1 = require("../data/settings");
@@ -1936,7 +1916,7 @@ class ContentBlock {
 }
 exports.ContentBlock = ContentBlock;
 
-},{"../DebugLogger":6,"../data/settings":34,"../hs":36,"../input/keyboard":39,"../util/DOM":50,"./MonoDimensionTransitionControl":15,"./layoutControl":27}],22:[function(require,module,exports){
+},{"../DebugLogger":6,"../data/settings":34,"../hs":36,"../input/keyboard":39,"../util/DOM":50,"./MonoDimensionTransitionControl":14,"./layoutControl":26}],21:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const messages_1 = require("../constant/messages");
@@ -1994,7 +1974,7 @@ function createWTCDErrorMessage({ errorType, message, internalStack, wtcdStack, 
 }
 exports.createWTCDErrorMessage = createWTCDErrorMessage;
 
-},{"../constant/messages":11,"./chapterControl":18}],23:[function(require,module,exports){
+},{"../constant/messages":11,"./chapterControl":17}],22:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const WTCDError_1 = require("../../wtcd/WTCDError");
@@ -2014,7 +1994,7 @@ function createWTCDErrorMessageFromError(error) {
 }
 exports.createWTCDErrorMessageFromError = createWTCDErrorMessageFromError;
 
-},{"../../wtcd/WTCDError":64,"./chapterControl":18,"./createWTCDErrorMessage":22}],24:[function(require,module,exports){
+},{"../../wtcd/WTCDError":64,"./chapterControl":17,"./createWTCDErrorMessage":21}],23:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const data_1 = require("../data/data");
@@ -2056,7 +2036,7 @@ function followQuery() {
 }
 exports.followQuery = followQuery;
 
-},{"../data/data":33,"../data/state":35,"./chapterControl":18,"./contentControl":21,"./history":26}],25:[function(require,module,exports){
+},{"../data/data":33,"../data/state":35,"./chapterControl":17,"./contentControl":20,"./history":25}],24:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -2087,7 +2067,7 @@ function createHint(text, timeMs = 2000) {
 }
 exports.createHint = createHint;
 
-},{"../hs":36}],26:[function(require,module,exports){
+},{"../hs":36}],25:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const state_1 = require("../data/state");
@@ -2114,7 +2094,7 @@ function updateHistory(push) {
 }
 exports.updateHistory = updateHistory;
 
-},{"../data/state":35}],27:[function(require,module,exports){
+},{"../data/state":35}],26:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const DebugLogger_1 = require("../DebugLogger");
@@ -2177,7 +2157,41 @@ function setLayout(newLayout) {
 }
 exports.setLayout = setLayout;
 
-},{"../DebugLogger":6,"../Event":7}],28:[function(require,module,exports){
+},{"../DebugLogger":6,"../Event":7}],27:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.makaiUrl = 'https://c.makai.city';
+function tokenToUsername(token) {
+    // const res = fetch(makaiUrl + '/username/' + token);
+    return null;
+}
+exports.tokenToUsername = tokenToUsername;
+function validToken(token) {
+    return !(tokenToUsername(token) == null);
+}
+exports.validToken = validToken;
+function saveToken(token) {
+    window.localStorage.setItem('token', token);
+}
+exports.saveToken = saveToken;
+function saveUsername(username) {
+    window.localStorage.setItem('username', username);
+}
+exports.saveUsername = saveUsername;
+function getToken() {
+    return window.localStorage.getItem('token');
+}
+exports.getToken = getToken;
+function getUsername() {
+    return window.localStorage.getItem('username');
+}
+exports.getUsername = getUsername;
+function hasToken() {
+    return window.localStorage.getItem('token') != null;
+}
+exports.hasToken = hasToken;
+
+},{}],28:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const settings_1 = require("../data/settings");
@@ -2349,7 +2363,7 @@ function updateSelection() {
 }
 exports.updateSelection = updateSelection;
 
-},{"../data/state":35,"./history":26}],31:[function(require,module,exports){
+},{"../data/state":35,"./history":25}],31:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const messages_1 = require("../constant/messages");
@@ -2358,207 +2372,225 @@ const hs_1 = require("../hs");
 const padName_1 = require("../util/padName");
 const commentsControl_1 = require("./commentsControl");
 const contentControl_1 = require("./contentControl");
-const MakaiControl_1 = require("./MakaiControl");
+const makaiControl_1 = require("./makaiControl");
 const modalControl_1 = require("./modalControl");
-class UserControl {
-    static showMessage(message) {
-        const modal = new modalControl_1.Modal(hs_1.h('div', [
-            hs_1.h('h1', messages_1.MAKAI_MODAL_TITLE_INFO),
-            hs_1.h('p', message),
-            hs_1.h('.button-container', [
-                hs_1.h('div', {
-                    onclick: () => {
-                        modal.close();
+function showMessage(message) {
+    const modal = new modalControl_1.Modal(hs_1.h('div', [
+        hs_1.h('h1', messages_1.MAKAI_MODAL_TITLE_INFO),
+        hs_1.h('p', message),
+        hs_1.h('.button-container', [
+            hs_1.h('div', {
+                onclick: () => {
+                    modal.close();
+                }
+            }, messages_1.MAKAI_MODAL_OK),
+        ]),
+    ]));
+    modal.setDismissible();
+    modal.open();
+}
+exports.showMessage = showMessage;
+function showLoading(message) {
+    const m = new modalControl_1.Modal(hs_1.h('div', [
+        hs_1.h('h1', messages_1.MAKAI_MODAL_TITLE_WAITING),
+        hs_1.h('p', message),
+    ]));
+    m.open();
+    return m;
+}
+exports.showLoading = showLoading;
+function showLogin() {
+    let token;
+    const modal = new modalControl_1.Modal(hs_1.h('div', [
+        hs_1.h('h1', messages_1.MAKAI_MODAL_TITLE_TOKEN),
+        hs_1.h('p', messages_1.MAKAI_MODAL_CONTENT_THIS_IS_YOUR_MAKAI_TOKEN),
+        hs_1.h('p', messages_1.MAKAI_MODAL_CONTENT_MAKAI_TOKEN_IS_USED_TO_SUBMIT_COMMENTS),
+        hs_1.h('p', messages_1.MAKAI_MODAL_CONTENT_YOU_WILL_GET_MAKAI_TOKEN_ONCE_YOU_SUBMIT_FIRST_COMMENT),
+        hs_1.h('i', messages_1.MAKAI_MODAL_CONTENT_DEVELOPMENT_HINT),
+        hs_1.h('ul', [
+            messages_1.MAKAI_MODAL_CONTENT_TOKEN_INPUT_PREFIX,
+            token = hs_1.h('input.makai-token', { value: makaiControl_1.getToken() === undefined ? '' : makaiControl_1.getToken() }),
+        ]),
+        hs_1.h('.button-container', [
+            hs_1.h('div', {
+                onclick: () => {
+                    modal.close();
+                }
+            }, messages_1.MAKAI_MODAL_CANCEL),
+            hs_1.h('div', {
+                onclick: () => {
+                    if (token.value === '') {
+                        showMessage(messages_1.MAKAI_ERROR_EMPTY_TOKEN);
+                        return;
                     }
-                }, messages_1.MAKAI_MODAL_OK),
-            ]),
-        ]));
-        modal.setDismissible();
-        modal.open();
-    }
-    static showLoading(message) {
-        const m = new modalControl_1.Modal(hs_1.h('div', [
-            hs_1.h('h1', messages_1.MAKAI_MODAL_TITLE_WAITING),
-            hs_1.h('p', message),
-        ]));
-        m.open();
-        return m;
-    }
-    static showLogin() {
-        let token;
-        const modal = new modalControl_1.Modal(hs_1.h('div', [
-            hs_1.h('h1', messages_1.MAKAI_MODAL_TITLE_TOKEN),
-            hs_1.h('p', messages_1.MAKAI_MODAL_CONTENT_THIS_IS_YOUR_MAKAI_TOKEN),
-            hs_1.h('p', messages_1.MAKAI_MODAL_CONTENT_MAKAI_TOKEN_IS_USED_TO_SUBMIT_COMMENTS),
-            hs_1.h('p', messages_1.MAKAI_MODAL_CONTENT_YOU_WILL_GET_MAKAI_TOKEN_ONCE_YOU_SUBMIT_FIRST_COMMENT),
-            hs_1.h('i', messages_1.MAKAI_MODAL_CONTENT_DEVELOPMENT_HINT),
-            hs_1.h('ul', [
-                messages_1.MAKAI_MODAL_CONTENT_TOKEN_INPUT_PREFIX,
-                token = hs_1.h('input.makai-token', { value: MakaiControl_1.MakaiControl.getToken() === undefined ? '' : MakaiControl_1.MakaiControl.getToken() }),
-            ]),
-            hs_1.h('.button-container', [
-                hs_1.h('div', {
-                    onclick: () => {
-                        modal.close();
-                    }
-                }, messages_1.MAKAI_MODAL_CANCEL),
-                hs_1.h('div', {
-                    onclick: () => {
-                        if (token.value === '') {
-                            UserControl.showMessage(messages_1.MAKAI_ERROR_EMPTY_TOKEN);
-                            return;
-                        }
-                        const m = UserControl.showLoading(messages_1.MAKAI_INFO_CONFIRM_TOKEN);
-                        fetch(MakaiControl_1.MakaiControl.url + '/username/' + token.value).then((response) => {
-                            return response.json();
-                        })
-                            .then((json) => {
-                            m.close();
-                            if (json.username == null) {
-                                UserControl.showMessage(messages_1.MAKAI_ERROR_INVALID_TOKEN);
-                            }
-                            else {
-                                MakaiControl_1.MakaiControl.saveToken(token.value);
-                                MakaiControl_1.MakaiControl.saveUsername(json.username);
-                                modal.close();
-                                UserControl.showMessage(messages_1.MAKAI_INFO_SET_TOKKEN_SUCCESS);
-                            }
-                        }).catch((err) => {
-                            m.close();
-                            UserControl.showMessage(messages_1.MAKAI_ERROR_INTERNET);
-                        });
-                    }
-                }, messages_1.MAKAI_MODAL_SAVE),
-            ]),
-        ]));
-        modal.setDismissible();
-        modal.open();
-    }
-    static sendComment(textarea, block, modal) {
-        var _a;
-        if (!MakaiControl_1.MakaiControl.hasToken()) {
-            UserControl.showMessage(messages_1.MAKAI_ERROR_INVALID_TOKEN);
-            return;
-        }
-        const m = UserControl.showLoading(messages_1.MAKAI_INFO_CONFIRM_TOKEN);
-        fetch(MakaiControl_1.MakaiControl.url + '/comment/' + MakaiControl_1.MakaiControl.getToken(), {
-            body: JSON.stringify({ pageName: (_a = state_1.state.currentChapter) === null || _a === void 0 ? void 0 : _a.chapter.htmlRelativePath.replace(/\//g, '.'), content: textarea }),
-            cache: 'no-cache',
-            credentials: 'same-origin',
-            headers: new Headers({
-                'Content-Type': 'application/json'
-            }),
-            method: 'POST',
-            mode: 'cors',
-            redirect: 'follow',
-            referrer: 'no-referrer',
-        }).then((response) => {
-            return response.json();
-        })
-            .then((json) => {
-            m.close();
-            if (!json.success) {
-                UserControl.showMessage(messages_1.MAKAI_ERROR_SUBMIT_COMMENT_INVALID_TOKEN);
-            }
-            else {
-                block.directRemove();
-                commentsControl_1.commentsCache.delete(commentsControl_1.getApiUrl());
-                commentsControl_1.loadComments(contentControl_1.getCurrentContent());
-                modal.close();
-            }
-        }).catch((err) => {
-            m.close();
-            UserControl.showMessage(messages_1.MAKAI_ERROR_INTERNET);
-        });
-    }
-    static showComment(block) {
-        const nameInput = hs_1.h('input.makai-input');
-        const emailInput = hs_1.h('input.makai-input');
-        const name = MakaiControl_1.MakaiControl.hasToken()
-            ? hs_1.h('ul', [messages_1.MAKAI_SUBMIT_0 + padName_1.padName(MakaiControl_1.MakaiControl.getUsername()) + messages_1.MAKAI_SUBMIT_1])
-            : hs_1.h('ul', [
-                messages_1.MAKAI_MODAL_CONTENT_NAME_INPUT_PREFIX,
-                nameInput,
-                hs_1.h('br'),
-                messages_1.MAKAI_MODAL_CONTENT_EMAIL_INPUT_PREFIX,
-                emailInput,
-            ]);
-        const textarea = hs_1.h('textarea.makai-comment');
-        const modal = new modalControl_1.Modal(hs_1.h('div', [
-            hs_1.h('h1', messages_1.MAKAI_MODAL_TITLE_COMMENT),
-            hs_1.h('p', messages_1.MAKAI_MODAL_CONTENT_COMMENT_HINT),
-            textarea,
-            name,
-            hs_1.h('.button-container', [
-                hs_1.h('div', {
-                    onclick: () => {
-                        modal.close();
-                    }
-                }, messages_1.MAKAI_MODAL_CANCEL),
-                hs_1.h('div', {
-                    onclick: () => {
-                        if (!MakaiControl_1.MakaiControl.hasToken()) {
-                            const m = UserControl.showLoading(messages_1.MAKAI_INFO_OBTAIN_TOKEN);
-                            const alpha = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-                            fetch(MakaiControl_1.MakaiControl.url + '/register/', {
-                                body: JSON.stringify({
-                                    username: nameInput.value,
-                                    email: emailInput.value,
-                                    encodedPassword: new Array(20).fill(undefined).map(() => alpha[Math.floor(Math.random() * alpha.length)]).join('')
-                                }),
-                                cache: 'no-cache',
-                                headers: new Headers({
-                                    'Content-Type': 'application/json'
-                                }),
-                                credentials: 'same-origin',
-                                method: 'POST',
-                                mode: 'cors',
-                                redirect: 'follow',
-                                referrer: 'no-referrer',
-                            }).then((response) => {
-                                return response.json();
-                            }).then((json) => {
-                                m.close();
-                                if (!json.success) {
-                                    switch (json.errorMessage) {
-                                        case 'Illegal email format.':
-                                            UserControl.showMessage(messages_1.MAKAI_ERROR_INVALID_EMAIL);
-                                            break;
-                                        case 'User exist.':
-                                            UserControl.showMessage(messages_1.MAKAI_ERROR_USER_EXIST);
-                                            break;
-                                        default:
-                                            UserControl.showMessage(messages_1.MAKAI_ERROR_UNKNOWN);
-                                            break;
-                                    }
-                                }
-                                else if (json.accessToken == null) {
-                                    UserControl.showMessage(messages_1.MAKAI_ERROR_UNKNOWN);
-                                }
-                                else {
-                                    MakaiControl_1.MakaiControl.saveToken(json.accessToken);
-                                    MakaiControl_1.MakaiControl.saveUsername(nameInput.value);
-                                    UserControl.sendComment(textarea.value, block, modal);
-                                }
-                            }).catch((_) => {
-                                m.close();
-                                UserControl.showMessage(messages_1.MAKAI_ERROR_INTERNET);
-                            });
+                    const m = showLoading(messages_1.MAKAI_INFO_CONFIRM_TOKEN);
+                    fetch(makaiControl_1.makaiUrl + '/username/' + token.value).then((response) => {
+                        return response.json();
+                    })
+                        .then((json) => {
+                        m.close();
+                        if (json.username == null) {
+                            showMessage(messages_1.MAKAI_ERROR_INVALID_TOKEN);
                         }
                         else {
-                            this.sendComment(textarea.value, block, modal);
+                            makaiControl_1.saveToken(token.value);
+                            makaiControl_1.saveUsername(json.username);
+                            modal.close();
+                            showMessage(messages_1.MAKAI_INFO_SET_TOKKEN_SUCCESS);
                         }
-                    }
-                }, messages_1.MAKAI_MODAL_SUBMIT),
-            ]),
-        ]));
-        modal.setDismissible();
-        modal.open();
-    }
+                    }).catch((err) => {
+                        m.close();
+                        showMessage(messages_1.MAKAI_ERROR_INTERNET);
+                    });
+                }
+            }, messages_1.MAKAI_MODAL_SAVE),
+        ]),
+    ]));
+    modal.setDismissible();
+    modal.open();
 }
-exports.UserControl = UserControl;
+exports.showLogin = showLogin;
+function sendComment(textarea, block, modal) {
+    var _a;
+    if (!makaiControl_1.hasToken()) {
+        showMessage(messages_1.MAKAI_ERROR_INVALID_TOKEN);
+        return;
+    }
+    const m = showLoading(messages_1.MAKAI_INFO_CONFIRM_TOKEN);
+    fetch(makaiControl_1.makaiUrl + '/comment/' + makaiControl_1.getToken(), {
+        body: JSON.stringify({ pageName: (_a = state_1.state.currentChapter) === null || _a === void 0 ? void 0 : _a.chapter.htmlRelativePath.replace(/\//g, '.'), content: textarea }),
+        cache: 'no-cache',
+        credentials: 'same-origin',
+        headers: new Headers({
+            'Content-Type': 'application/json'
+        }),
+        method: 'POST',
+        mode: 'cors',
+        redirect: 'follow',
+        referrer: 'no-referrer',
+    }).then((response) => {
+        return response.json();
+    })
+        .then((json) => {
+        m.close();
+        if (!json.success) {
+            showMessage(messages_1.MAKAI_ERROR_SUBMIT_COMMENT_INVALID_TOKEN);
+        }
+        else {
+            block.directRemove();
+            commentsControl_1.commentsCache.delete(commentsControl_1.getApiUrl());
+            commentsControl_1.loadComments(contentControl_1.getCurrentContent());
+            modal.close();
+        }
+    }).catch((err) => {
+        m.close();
+        showMessage(messages_1.MAKAI_ERROR_INTERNET);
+    });
+}
+exports.sendComment = sendComment;
+function showComment(block) {
+    const $nameInput = hs_1.h('input.makai-input');
+    const $emailInput = hs_1.h('input.makai-input');
+    const name = makaiControl_1.hasToken()
+        ? hs_1.h('p', [messages_1.MAKAI_SUBMIT_0 + padName_1.padName(makaiControl_1.getUsername()) + messages_1.MAKAI_SUBMIT_1])
+        : [
+            hs_1.h('.input-group', [
+                hs_1.h('span', messages_1.MAKAI_MODAL_CONTENT_NAME_INPUT_PREFIX),
+                $nameInput,
+            ]),
+            hs_1.h('.input-group', [
+                hs_1.h('span', messages_1.MAKAI_MODAL_CONTENT_EMAIL_INPUT_PREFIX),
+                $emailInput,
+            ]),
+        ];
+    const $textarea = hs_1.h('textarea.makai-comment');
+    const modal = new modalControl_1.Modal(hs_1.h('div', [
+        hs_1.h('h1', messages_1.MAKAI_MODAL_TITLE_COMMENT),
+        hs_1.h('p', messages_1.MAKAI_MODAL_CONTENT_COMMENT_HINT),
+        $textarea,
+        name,
+        hs_1.h('.button-container', [
+            hs_1.h('div', {
+                onclick: () => {
+                    if (!makaiControl_1.hasToken()) {
+                        const m = showLoading(messages_1.MAKAI_INFO_OBTAIN_TOKEN);
+                        const alpha = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+                        fetch(makaiControl_1.makaiUrl + '/register/', {
+                            body: JSON.stringify({
+                                username: $nameInput.value,
+                                email: $emailInput.value,
+                                encodedPassword: new Array(20).fill(undefined).map(() => alpha[Math.floor(Math.random() * alpha.length)]).join('')
+                            }),
+                            cache: 'no-cache',
+                            headers: new Headers({
+                                'Content-Type': 'application/json'
+                            }),
+                            credentials: 'same-origin',
+                            method: 'POST',
+                            mode: 'cors',
+                            redirect: 'follow',
+                            referrer: 'no-referrer',
+                        }).then((response) => {
+                            return response.json();
+                        }).then((json) => {
+                            m.close();
+                            if (!json.success) {
+                                switch (json.errorMessage) {
+                                    case 'Illegal email format.':
+                                        showMessage(messages_1.MAKAI_ERROR_INVALID_EMAIL);
+                                        break;
+                                    case 'User exist.':
+                                        showMessage(messages_1.MAKAI_ERROR_USER_EXIST);
+                                        break;
+                                    default:
+                                        showMessage(messages_1.MAKAI_ERROR_UNKNOWN);
+                                        break;
+                                }
+                            }
+                            else if (json.accessToken == null) {
+                                showMessage(messages_1.MAKAI_ERROR_UNKNOWN);
+                            }
+                            else {
+                                makaiControl_1.saveToken(json.accessToken);
+                                makaiControl_1.saveUsername($nameInput.value);
+                                sendComment($textarea.value, block, modal);
+                            }
+                        }).catch((_) => {
+                            m.close();
+                            showMessage(messages_1.MAKAI_ERROR_INTERNET);
+                        });
+                    }
+                    else {
+                        sendComment($textarea.value, block, modal);
+                    }
+                }
+            }, messages_1.MAKAI_MODAL_SUBMIT),
+            hs_1.h('div', {
+                onclick: () => {
+                    if ($textarea.value === '') {
+                        modal.close();
+                    }
+                    else {
+                        modalControl_1.confirm(messages_1.MAKAI_MODAL_CONFIRM_LOSS_EDITED, '', messages_1.MAKAI_MODAL_CONFIRM_LOSS_EDITED_YES, messages_1.MAKAI_MODAL_CONFIRM_LOSS_EDITED_NO).then(confirmed => {
+                            if (confirmed) {
+                                modal.close();
+                            }
+                        });
+                    }
+                }
+            }, messages_1.MAKAI_MODAL_CANCEL),
+        ]),
+    ]));
+    modal.open();
+    $textarea.focus();
+    $textarea.addEventListener('input', () => {
+        $textarea.style.height = `auto`;
+        $textarea.style.height = `${Math.max(120, $textarea.scrollHeight)}px`;
+    }, false);
+}
+exports.showComment = showComment;
 
-},{"../constant/messages":11,"../data/state":35,"../hs":36,"../util/padName":54,"./MakaiControl":14,"./commentsControl":20,"./contentControl":21,"./modalControl":28}],32:[function(require,module,exports){
+},{"../constant/messages":11,"../data/state":35,"../hs":36,"../util/padName":54,"./commentsControl":19,"./contentControl":20,"./makaiControl":27,"./modalControl":28}],32:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class AutoCache {
@@ -2759,7 +2791,7 @@ window.addEventListener('popstate', () => {
 });
 followQuery_1.followQuery();
 
-},{"./control/followQuery":24,"./control/updateSelection":30,"./data/data":33,"./data/settings":34,"./menu/MainMenu":43,"./util/DOM":50}],38:[function(require,module,exports){
+},{"./control/followQuery":23,"./control/updateSelection":30,"./data/data":33,"./data/settings":34,"./menu/MainMenu":43,"./util/DOM":50}],38:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const DebugLogger_1 = require("../DebugLogger");
@@ -2915,7 +2947,7 @@ class BlockMenu extends Menu_1.Menu {
 }
 exports.BlockMenu = BlockMenu;
 
-},{"../Menu":8,"../constant/messages":11,"../control/commentBlockControl":19}],41:[function(require,module,exports){
+},{"../Menu":8,"../constant/messages":11,"../control/commentBlockControl":18}],41:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const chapterControl_1 = require("../control/chapterControl");
@@ -2991,7 +3023,7 @@ class ChaptersMenu extends Menu_1.Menu {
 }
 exports.ChaptersMenu = ChaptersMenu;
 
-},{"../Menu":8,"../control/chapterControl":18,"../control/history":26,"../data/data":33,"../util/shortNumber":56}],42:[function(require,module,exports){
+},{"../Menu":8,"../control/chapterControl":17,"../control/history":25,"../data/data":33,"../util/shortNumber":56}],42:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const Menu_1 = require("../Menu");
@@ -3053,8 +3085,8 @@ exports.MainMenu = MainMenu;
 },{"../Menu":8,"./ChaptersMenu":41,"./ContactMenu":42,"./SettingsMenu":45,"./StatsMenu":47,"./StyleMenu":48,"./ThanksMenu":49}],44:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const Menu_1 = require("../Menu");
 const userControl_1 = require("../control/userControl");
+const Menu_1 = require("../Menu");
 const SettingsMenu_1 = require("./SettingsMenu");
 class MakaiMenu extends Menu_1.Menu {
     constructor(parent) {
@@ -3063,7 +3095,7 @@ class MakaiMenu extends Menu_1.Menu {
             small: true,
             button: true,
         }).onClick(() => {
-            userControl_1.UserControl.showLogin();
+            userControl_1.showLogin();
         });
     }
     addBooleanSetting(label, setting) {
@@ -3159,7 +3191,7 @@ class SettingsMenu extends Menu_1.Menu {
 }
 exports.SettingsMenu = SettingsMenu;
 
-},{"../Menu":8,"../constant/stylePreviewArticle":12,"../control/contentControl":21,"../control/layoutControl":27,"../data/settings":34,"./BlockMenu":40,"./MakaiMenu":44}],46:[function(require,module,exports){
+},{"../Menu":8,"../constant/stylePreviewArticle":12,"../control/contentControl":20,"../control/layoutControl":26,"../data/settings":34,"./BlockMenu":40,"./MakaiMenu":44}],46:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const data_1 = require("../data/data");
@@ -3334,7 +3366,7 @@ class StyleMenu extends Menu_1.Menu {
 }
 exports.StyleMenu = StyleMenu;
 
-},{"../DebugLogger":6,"../Menu":8,"../constant/stylePreviewArticle":12,"../control/contentControl":21,"../control/layoutControl":27,"../hs":36}],49:[function(require,module,exports){
+},{"../DebugLogger":6,"../Menu":8,"../constant/stylePreviewArticle":12,"../control/contentControl":20,"../control/layoutControl":26,"../hs":36}],49:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const thanks_1 = require("../constant/thanks");
