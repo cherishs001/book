@@ -817,7 +817,7 @@ exports.MAKAI_INFO_OBTAIN_TOKEN = '正在获取 Makai 令牌……';
 exports.MAKAI_SUBMIT_0 = '将以';
 exports.MAKAI_SUBMIT_1 = '的身份发表评论。';
 exports.MAKAI_SUBMITTED_0 = '由';
-exports.MAKAI_SUBMITTED_1 = '发表于';
+exports.MAKAI_SUBMITTED_1 = '发表于 ';
 exports.MAKAI_GENERIC_LAST_MODIFIED = '（最后修改于 ';
 exports.MAKAI_GENERIC_LAST_MODIFIED_SUFFIX = ' ）';
 exports.MAKAI_BUTTON_BLOCK = '屏蔽此人';
@@ -3519,8 +3519,8 @@ exports.matchAll = matchAll;
 },{}],54:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const cjkBeginRegex = /^[\u4E00-\u9FCC\u3400-\u4DB5\uFA0E\uFA0F\uFA11\uFA13\uFA14\uFA1F\uFA21\uFA23\uFA24\uFA27-\uFA29]|[\ud840-\ud868][\udc00-\udfff]|\ud869[\udc00-\uded6\udf00-\udfff]|[\ud86a-\ud86c][\udc00-\udfff]|\ud86d[\udc00-\udf34\udf40-\udfff]|\ud86e[\udc00-\udc1d]/;
-const cjkEndRegex = /[\u4E00-\u9FCC\u3400-\u4DB5\uFA0E\uFA0F\uFA11\uFA13\uFA14\uFA1F\uFA21\uFA23\uFA24\uFA27-\uFA29]|[\ud840-\ud868][\udc00-\udfff]|\ud869[\udc00-\uded6\udf00-\udfff]|[\ud86a-\ud86c][\udc00-\udfff]|\ud86d[\udc00-\udf34\udf40-\udfff]|\ud86e[\udc00-\udc1d]$/;
+const cjkBeginRegex = /^(?:[\u4E00-\u9FCC\u3400-\u4DB5\uFA0E\uFA0F\uFA11\uFA13\uFA14\uFA1F\uFA21\uFA23\uFA24\uFA27-\uFA29]|[\ud840-\ud868][\udc00-\udfff]|\ud869[\udc00-\uded6\udf00-\udfff]|[\ud86a-\ud86c][\udc00-\udfff]|\ud86d[\udc00-\udf34\udf40-\udfff]|\ud86e[\udc00-\udc1d])/;
+const cjkEndRegex = /(?:[\u4E00-\u9FCC\u3400-\u4DB5\uFA0E\uFA0F\uFA11\uFA13\uFA14\uFA1F\uFA21\uFA23\uFA24\uFA27-\uFA29]|[\ud840-\ud868][\udc00-\udfff]|\ud869[\udc00-\uded6\udf00-\udfff]|[\ud86a-\ud86c][\udc00-\udfff]|\ud86d[\udc00-\udf34\udf40-\udfff]|\ud86e[\udc00-\udc1d])$/;
 function padName(name) {
     if (!cjkBeginRegex.test(name)) {
         name = ' ' + name;
