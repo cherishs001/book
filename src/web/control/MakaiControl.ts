@@ -1,6 +1,6 @@
 export const makaiUrl = 'https://c.makai.city';
 export function tokenToUsername(token: String) {
-    const res = fetch(makaiUrl + '/username/' + token);
+    // const res = fetch(makaiUrl + '/username/' + token);
     return null;
 }
 export function validToken(token: String) {

@@ -137,6 +137,15 @@ export function loadComments(content: Content) {
       }
       debugLogger.log('Comments loaded.');
       $commentsStatus.innerText = COMMENTS_LOADED;
+      if (data.length >= 6) {
+        $comments.appendChild(
+          h('.create-comment', {
+            onclick: () => {
+              showComment(block);
+            },
+          }, COMMENTS_CREATE),
+        );
+      }
       data.forEach((comment: any) => {
         if (isUserBlocked(comment.user.login)) {
           return;
