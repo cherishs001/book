@@ -1,10 +1,6 @@
-import { stylePreviewArticle } from '../constant/stylePreviewArticle';
-import { newContent, Side } from '../control/contentControl';
-import { Layout } from '../control/layoutControl';
-import { animation, BooleanSetting, charCount, developerMode, earlyAccess, EnumSetting, fontFamily, gestureSwitchChapter, useComments, warning, wtcdGameQuickLoadConfirm } from '../data/settings';
-import { ItemDecoration, ItemHandle, Menu } from '../Menu';
-import { BlockMenu } from './BlockMenu';
-import { UserControl } from '../control/userControl';
+import { showLogin } from '../control/userControl';
+import { BooleanSetting, EnumSetting } from '../data/settings';
+import { Menu } from '../Menu';
 import { EnumSettingMenu } from './SettingsMenu';
 
 export class MakaiMenu extends Menu {
@@ -15,7 +11,7 @@ export class MakaiMenu extends Menu {
       small: true,
       button: true,
     }).onClick(() => {
-      UserControl.showLogin();
+      showLogin();
     });
   }
 

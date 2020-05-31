@@ -1,29 +1,23 @@
-
-export class MakaiControl {
-
-    static url: String = 'https://c.makai.city';
-
-    public static tokenToUsername(token: String) {
-        const res = fetch(MakaiControl.url + '/username/' + token);
-        return null;
-    }
-    public static validToken(token: String) {
-        return !(MakaiControl.tokenToUsername(token) == null);
-    }
-    public static saveToken(token: string) {
-        window.localStorage.setItem('token', token);
-    }
-    public static saveUsername(username: string) {
-        window.localStorage.setItem('username', username);
-    }
-    public static getToken() {
-        return window.localStorage.getItem('token');
-    }
-    public static getUsername() {
-        return window.localStorage.getItem('username');
-    }
-    public static hasToken() {
-        return window.localStorage.getItem('token') != null;
-    }
-
+export const makaiUrl = 'https://c.makai.city';
+export function tokenToUsername(token: String) {
+    const res = fetch(makaiUrl + '/username/' + token);
+    return null;
+}
+export function validToken(token: String) {
+    return !(tokenToUsername(token) == null);
+}
+export function saveToken(token: string) {
+    window.localStorage.setItem('token', token);
+}
+export function saveUsername(username: string) {
+    window.localStorage.setItem('username', username);
+}
+export function getToken() {
+    return window.localStorage.getItem('token');
+}
+export function getUsername() {
+    return window.localStorage.getItem('username');
+}
+export function hasToken() {
+    return window.localStorage.getItem('token') != null;
 }
