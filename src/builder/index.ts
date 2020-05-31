@@ -1,6 +1,7 @@
 import { copy, copyFile, ensureDir, mkdirp, pathExists, readdir, readFile, stat, writeFile } from 'fs-extra';
 import * as MDI from 'markdown-it';
 import * as mdiReplaceLinkPlugin from 'markdown-it-replace-link';
+import * as mdiRubyPlugin from 'markdown-it-ruby';
 import { basename, dirname, parse as parsePath, posix, relative, resolve } from 'path';
 import { Chapter, ChapterFlagsMapped, Data, Folder, Node } from '../Data';
 import { parse } from '../wtcd/parse';
@@ -92,7 +93,9 @@ const argv = yargs.options({
           return '#' + join(dirname(htmlRelativePath), link);
         }
       },
-    } as MDI.Options).use(mdiReplaceLinkPlugin);
+    } as MDI.Options)
+      .use(mdiReplaceLinkPlugin)
+      .use(mdiRubyPlugin);
   }
 
   async function loadMarkdownChapter(path: string, parentHtmlRelativePath: string): Promise<Chapter> {
