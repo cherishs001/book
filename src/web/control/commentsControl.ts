@@ -4,32 +4,32 @@ import {
   COMMENTS_LOADED,
   COMMENTS_LOADING,
   COMMENTS_SECTION,
-  COMMENTS_UNAVAILABLE,
-  MAKAI_ERROR_INTERNET,
-  MAKAI_ERROR_DELETE_COMMENT_INVALID_TOKEN,
-  MAKAI_MODAL_CONTENT_DELETION_CONFIRMATION,
-  MAKAI_INFO_CONFIRM_TOKEN,
-  MAKAI_MODAL_TITLE_WARNING,
-  MAKAI_MODAL_CONFIRM,
-  MAKAI_MODAL_CANCEL,
-  MAKAI_GENERIC_AS,
-  MAKAI_GENERIC_SUBMITED_AT,
-  MAKAI_GENERIC_LAST_MODIFIED,
-  MAKAI_BUTTON_DELETE,
   MAKAI_BUTTON_BLOCK,
+  MAKAI_BUTTON_DELETE,
+  MAKAI_ERROR_DELETE_COMMENT_INVALID_TOKEN,
+  MAKAI_ERROR_INTERNET,
+  MAKAI_GENERIC_LAST_MODIFIED,
   MAKAI_GENERIC_LAST_MODIFIED_SUFFIX,
+  MAKAI_INFO_CONFIRM_TOKEN,
+  MAKAI_MODAL_CANCEL,
+  MAKAI_MODAL_CONFIRM,
+  MAKAI_MODAL_CONTENT_DELETION_CONFIRMATION,
+  MAKAI_MODAL_TITLE_WARNING,
+  MAKAI_SUBMITTED_0,
+  MAKAI_SUBMITTED_1
 } from '../constant/messages';
 import { AutoCache } from '../data/AutoCache';
 import { useComments } from '../data/settings';
+import { state } from '../data/state';
 import { DebugLogger } from '../DebugLogger';
 import { h } from '../hs';
 import { formatTimeRelative } from '../util/formatTime';
+import { padName } from '../util/padName';
 import { blockUser, isUserBlocked } from './commentBlockControl';
-import { Content, getCurrentContent, ContentBlock } from './contentControl';
-import { UserControl } from './userControl';
-import { state } from '../data/state';
+import { Content, ContentBlock, getCurrentContent } from './contentControl';
 import { MakaiControl } from './MakaiControl';
 import { confirm } from './modalControl';
+import { UserControl } from './userControl';
 
 const debugLogger = new DebugLogger('Comments Control');
 // const getApiUrlRegExp = /^https:\/\/github\.com\/([a-zA-Z0-9-_]+)\/([a-zA-Z0-9-_]+)\/issues\/([1-9][0-9]*)$/;
@@ -91,7 +91,7 @@ function createCommentElement(
       href: userUrl,
       rel: 'noopener noreferrer',
     }, display),
-    h('.time', MAKAI_GENERIC_AS + userName + MAKAI_GENERIC_SUBMITED_AT + ((createTime === updateTime)
+    h('.time', MAKAI_SUBMITTED_0 + padName(userName) + MAKAI_SUBMITTED_1 + ((createTime === updateTime)
       ? formatTimeRelative(new Date(createTime))
       : `${formatTimeRelative(new Date(createTime))}` +
       MAKAI_GENERIC_LAST_MODIFIED + `${formatTimeRelative(new Date(updateTime))}` + MAKAI_GENERIC_LAST_MODIFIED_SUFFIX)), deleteButton === null ?

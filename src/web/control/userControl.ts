@@ -1,16 +1,41 @@
 
-import { DebugLogger } from '../DebugLogger';
-import { h } from '../hs';
-import { formatTimeSimple } from '../util/formatTime';
-import { Content, ContentBlock, getCurrentContent } from './contentControl';
-import { createWTCDErrorMessageFromError } from './createWTCDErrorMessageFromError';
-import { createHint } from './hintControl';
-import { confirm, Modal } from './modalControl';
-import { MakaiControl } from './MakaiControl';
+import {
+  MAKAI_ERROR_EMPTY_TOKEN,
+  MAKAI_ERROR_INTERNET,
+  MAKAI_ERROR_INVALID_EMAIL,
+  MAKAI_ERROR_INVALID_TOKEN,
+  MAKAI_ERROR_SUBMIT_COMMENT_INVALID_TOKEN,
+  MAKAI_ERROR_UNKNOWN,
+  MAKAI_ERROR_USER_EXIST,
+  MAKAI_INFO_CONFIRM_TOKEN,
+  MAKAI_INFO_OBTAIN_TOKEN,
+  MAKAI_INFO_SET_TOKKEN_SUCCESS,
+  MAKAI_MODAL_CANCEL,
+  MAKAI_MODAL_CONTENT_COMMENT_HINT,
+  MAKAI_MODAL_CONTENT_DEVELOPMENT_HINT,
+  MAKAI_MODAL_CONTENT_EMAIL_INPUT_PREFIX,
+  MAKAI_MODAL_CONTENT_MAKAI_TOKEN_IS_USED_TO_SUBMIT_COMMENTS,
+  MAKAI_MODAL_CONTENT_NAME_INPUT_PREFIX,
+  MAKAI_MODAL_CONTENT_THIS_IS_YOUR_MAKAI_TOKEN,
+  MAKAI_MODAL_CONTENT_TOKEN_INPUT_PREFIX,
+  MAKAI_MODAL_CONTENT_YOU_WILL_GET_MAKAI_TOKEN_ONCE_YOU_SUBMIT_FIRST_COMMENT,
+  MAKAI_MODAL_OK,
+  MAKAI_MODAL_SAVE,
+  MAKAI_MODAL_SUBMIT,
+  MAKAI_MODAL_TITLE_COMMENT,
+  MAKAI_MODAL_TITLE_INFO,
+  MAKAI_MODAL_TITLE_TOKEN,
+  MAKAI_MODAL_TITLE_WAITING,
+  MAKAI_SUBMIT_0,
+  MAKAI_SUBMIT_1
+} from '../constant/messages';
 import { state } from '../data/state';
-import { loadComments, commentsCache, getApiUrl } from './commentsControl';
-import { AutoCache } from '../data/AutoCache';
-import { MAKAI_MODAL_TITLE_INFO, MAKAI_MODAL_OK, MAKAI_MODAL_TITLE_WAITING, MAKAI_ERROR_INTERNET, MAKAI_INFO_CONFIRM_TOKEN, MAKAI_ERROR_INVALID_TOKEN, MAKAI_ERROR_EMPTY_TOKEN, MAKAI_INFO_SET_TOKKEN_SUCCESS, MAKAI_INFO_OBTAIN_TOKEN, MAKAI_ERROR_SUBMIT_COMMENT_INVALID_TOKEN, MAKAI_MODAL_TITLE_TOKEN, MAKAI_MODAL_CONTENT_DEVELOPMENT_HINT, MAKAI_MODAL_CONTENT_THIS_IS_YOUR_MAKAI_TOKEN, MAKAI_MODAL_CONTENT_MAKAI_TOKEN_IS_USED_TO_SUBMIT_COMMENTS, MAKAI_MODAL_CONTENT_YOU_WILL_GET_MAKAI_TOKEN_ONCE_YOU_SUBMIT_FIRST_COMMENT, MAKAI_MODAL_CONTENT_TOKEN_INPUT_PREFIX, MAKAI_MODAL_CANCEL, MAKAI_MODAL_SAVE, MAKAI_MODAL_SUBMIT, MAKAI_ERROR_UNKNOWN, MAKAI_ERROR_INVALID_EMAIL, MAKAI_ERROR_USER_EXIST, MAKAI_MODAL_TITLE_COMMENT, MAKAI_MODAL_CONTENT_COMMENT_HINT, MAKAI_GENERIC_AS, MAKAI_GENERIC_SUBMIT, MAKAI_MODAL_CONTENT_NAME_INPUT_PREFIX, MAKAI_MODAL_CONTENT_EMAIL_INPUT_PREFIX } from '../constant/messages';
+import { h } from '../hs';
+import { padName } from '../util/padName';
+import { commentsCache, getApiUrl, loadComments } from './commentsControl';
+import { ContentBlock, getCurrentContent } from './contentControl';
+import { MakaiControl } from './MakaiControl';
+import { Modal } from './modalControl';
 
 
 export class UserControl {
@@ -133,7 +158,8 @@ export class UserControl {
     const nameInput = h('input.makai-input') as HTMLInputElement;
     const emailInput = h('input.makai-input') as HTMLInputElement;
     const name = MakaiControl.hasToken()
-      ? h('ul', [MAKAI_GENERIC_AS + MakaiControl.getUsername() + MAKAI_GENERIC_SUBMIT]) : h('ul', [
+      ? h('ul', [MAKAI_SUBMIT_0 + padName(MakaiControl.getUsername()!) + MAKAI_SUBMIT_1])
+      : h('ul', [
         MAKAI_MODAL_CONTENT_NAME_INPUT_PREFIX,
         nameInput,
         h('br'),
@@ -158,7 +184,11 @@ export class UserControl {
               const m = UserControl.showLoading(MAKAI_INFO_OBTAIN_TOKEN);
               const alpha = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
               fetch(MakaiControl.url + '/register/', {
-                body: JSON.stringify({ username: nameInput.value, email: emailInput.value, encodedPassword: new Array(20).fill(undefined).map(() => alpha[Math.floor(Math.random() * alpha.length)]).join('') }),
+                body: JSON.stringify({
+                  username: nameInput.value,
+                  email: emailInput.value,
+                  encodedPassword: new Array(20).fill(undefined).map(() => alpha[Math.floor(Math.random() * alpha.length)]).join('')
+                }),
                 cache: 'no-cache',
                 headers: new Headers({
                   'Content-Type': 'application/json'
@@ -170,8 +200,7 @@ export class UserControl {
                 referrer: 'no-referrer',
               }).then((response) => {
                 return response.json();
-              })
-                .then((json) => {
+              }).then((json) => {
                   m.close();
                   if (!json.success) {
                     switch (json.errorMessage) {
@@ -192,7 +221,7 @@ export class UserControl {
                     MakaiControl.saveUsername(nameInput.value);
                     UserControl.sendComment(textarea.value, block, modal);
                   }
-                }).catch((err) =>{
+                }).catch((_) =>{
                   m.close();
                   UserControl.showMessage(MAKAI_ERROR_INTERNET);
                 });
