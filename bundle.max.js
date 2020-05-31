@@ -410,7 +410,7 @@ class DebugLogger {
 }
 exports.DebugLogger = DebugLogger;
 
-},{"./constant/materialDarkColors":10,"./data/settings":34,"./util/stringHash":56}],7:[function(require,module,exports){
+},{"./constant/materialDarkColors":10,"./data/settings":34,"./util/stringHash":57}],7:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class Event {
@@ -814,9 +814,10 @@ exports.MAKAI_ERROR_UNKNOWN = 'Oops！发生了一些不该发生的问题！快
 exports.MAKAI_INFO_SET_TOKKEN_SUCCESS = '你的 Makai 令牌已经设置完毕啦！';
 exports.MAKAI_INFO_CONFIRM_TOKEN = '正在确认你的 Makai 令牌……';
 exports.MAKAI_INFO_OBTAIN_TOKEN = '正在获取 Makai 令牌……';
-exports.MAKAI_GENERIC_AS = '以 ';
-exports.MAKAI_GENERIC_SUBMIT = ' 的身份评论';
-exports.MAKAI_GENERIC_SUBMITED_AT = ' 的身份发表于 ';
+exports.MAKAI_SUBMIT_0 = '以';
+exports.MAKAI_SUBMIT_1 = '的身份评论';
+exports.MAKAI_SUBMITTED_0 = '由';
+exports.MAKAI_SUBMITTED_1 = '发表于';
 exports.MAKAI_GENERIC_LAST_MODIFIED = '（最后修改于 ';
 exports.MAKAI_GENERIC_LAST_MODIFIED_SUFFIX = ' ）';
 exports.MAKAI_BUTTON_BLOCK = '屏蔽此人';
@@ -1078,7 +1079,7 @@ class WTCDFeatureProvider extends FeatureProvider_1.FeatureProvider {
 }
 exports.WTCDFeatureProvider = WTCDFeatureProvider;
 
-},{"../../wtcd/FeatureProvider":58,"../DebugLogger":6,"../data/AutoCache":32,"../util/loadGooleFonts":52,"../util/resolvePath":54}],17:[function(require,module,exports){
+},{"../../wtcd/FeatureProvider":59,"../DebugLogger":6,"../data/AutoCache":32,"../util/loadGooleFonts":52,"../util/resolvePath":55}],17:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const GameReader_1 = require("../../wtcd/GameReader");
@@ -1270,7 +1271,7 @@ class WTCDGameReaderUI {
 }
 exports.WTCDGameReaderUI = WTCDGameReaderUI;
 
-},{"../../wtcd/FeatureProvider":58,"../../wtcd/GameReader":60,"../DebugLogger":6,"../constant/messages":11,"../data/settings":34,"../hs":36,"../util/formatTime":51,"./createWTCDErrorMessageFromError":23,"./hintControl":25,"./modalControl":28}],18:[function(require,module,exports){
+},{"../../wtcd/FeatureProvider":59,"../../wtcd/GameReader":61,"../DebugLogger":6,"../constant/messages":11,"../data/settings":34,"../hs":36,"../util/formatTime":51,"./createWTCDErrorMessageFromError":23,"./hintControl":25,"./modalControl":28}],18:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const FlowReader_1 = require("../../wtcd/FlowReader");
@@ -1531,7 +1532,7 @@ function insertContent(content, text, chapter) {
     }
 }
 
-},{"../../wtcd/FlowReader":59,"../DebugLogger":6,"../Event":7,"../constant/loadingText":9,"../constant/messages":11,"../data/AutoCache":32,"../data/data":33,"../data/settings":34,"../data/state":35,"../hs":36,"../input/gestures":38,"../input/keyboard":39,"../util/DOM":50,"./WTCDFeatureProvider":16,"./WTCDGameReaderUI":17,"./commentsControl":20,"./contentControl":21,"./createWTCDErrorMessage":22,"./createWTCDErrorMessageFromError":23,"./history":26,"./layoutControl":27,"./modalControl":28,"./processElements":29}],19:[function(require,module,exports){
+},{"../../wtcd/FlowReader":60,"../DebugLogger":6,"../Event":7,"../constant/loadingText":9,"../constant/messages":11,"../data/AutoCache":32,"../data/data":33,"../data/settings":34,"../data/state":35,"../hs":36,"../input/gestures":38,"../input/keyboard":39,"../util/DOM":50,"./WTCDFeatureProvider":16,"./WTCDGameReaderUI":17,"./commentsControl":20,"./contentControl":21,"./createWTCDErrorMessage":22,"./createWTCDErrorMessageFromError":23,"./history":26,"./layoutControl":27,"./modalControl":28,"./processElements":29}],19:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const Event_1 = require("../Event");
@@ -1566,15 +1567,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const messages_1 = require("../constant/messages");
 const AutoCache_1 = require("../data/AutoCache");
 const settings_1 = require("../data/settings");
+const state_1 = require("../data/state");
 const DebugLogger_1 = require("../DebugLogger");
 const hs_1 = require("../hs");
 const formatTime_1 = require("../util/formatTime");
+const padName_1 = require("../util/padName");
 const commentBlockControl_1 = require("./commentBlockControl");
 const contentControl_1 = require("./contentControl");
-const userControl_1 = require("./userControl");
-const state_1 = require("../data/state");
 const MakaiControl_1 = require("./MakaiControl");
 const modalControl_1 = require("./modalControl");
+const userControl_1 = require("./userControl");
 const debugLogger = new DebugLogger_1.DebugLogger('Comments Control');
 // const getApiUrlRegExp = /^https:\/\/github\.com\/([a-zA-Z0-9-_]+)\/([a-zA-Z0-9-_]+)\/issues\/([1-9][0-9]*)$/;
 // Input sample: https://github.com/SCLeoX/Wearable-Technology/issues/1
@@ -1627,7 +1629,7 @@ function createCommentElement(userAvatarUrl, userName, userUrl, createTime, upda
             href: userUrl,
             rel: 'noopener noreferrer',
         }, display),
-        hs_1.h('.time', messages_1.MAKAI_GENERIC_AS + userName + messages_1.MAKAI_GENERIC_SUBMITED_AT + ((createTime === updateTime)
+        hs_1.h('.time', messages_1.MAKAI_SUBMITTED_0 + padName_1.padName(userName) + messages_1.MAKAI_SUBMITTED_1 + ((createTime === updateTime)
             ? formatTime_1.formatTimeRelative(new Date(createTime))
             : `${formatTime_1.formatTimeRelative(new Date(createTime))}` +
                 messages_1.MAKAI_GENERIC_LAST_MODIFIED + `${formatTime_1.formatTimeRelative(new Date(updateTime))}` + messages_1.MAKAI_GENERIC_LAST_MODIFIED_SUFFIX)), deleteButton === null ?
@@ -1687,7 +1689,7 @@ function loadComments(content) {
 }
 exports.loadComments = loadComments;
 
-},{"../DebugLogger":6,"../constant/messages":11,"../data/AutoCache":32,"../data/settings":34,"../data/state":35,"../hs":36,"../util/formatTime":51,"./MakaiControl":14,"./commentBlockControl":19,"./contentControl":21,"./modalControl":28,"./userControl":31}],21:[function(require,module,exports){
+},{"../DebugLogger":6,"../constant/messages":11,"../data/AutoCache":32,"../data/settings":34,"../data/state":35,"../hs":36,"../util/formatTime":51,"../util/padName":54,"./MakaiControl":14,"./commentBlockControl":19,"./contentControl":21,"./modalControl":28,"./userControl":31}],21:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const settings_1 = require("../data/settings");
@@ -2012,7 +2014,7 @@ function createWTCDErrorMessageFromError(error) {
 }
 exports.createWTCDErrorMessageFromError = createWTCDErrorMessageFromError;
 
-},{"../../wtcd/WTCDError":63,"./chapterControl":18,"./createWTCDErrorMessage":22}],24:[function(require,module,exports){
+},{"../../wtcd/WTCDError":64,"./chapterControl":18,"./createWTCDErrorMessage":22}],24:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const data_1 = require("../data/data");
@@ -2350,13 +2352,14 @@ exports.updateSelection = updateSelection;
 },{"../data/state":35,"./history":26}],31:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const hs_1 = require("../hs");
-const contentControl_1 = require("./contentControl");
-const modalControl_1 = require("./modalControl");
-const MakaiControl_1 = require("./MakaiControl");
-const state_1 = require("../data/state");
-const commentsControl_1 = require("./commentsControl");
 const messages_1 = require("../constant/messages");
+const state_1 = require("../data/state");
+const hs_1 = require("../hs");
+const padName_1 = require("../util/padName");
+const commentsControl_1 = require("./commentsControl");
+const contentControl_1 = require("./contentControl");
+const MakaiControl_1 = require("./MakaiControl");
+const modalControl_1 = require("./modalControl");
 class UserControl {
     static showMessage(message) {
         const modal = new modalControl_1.Modal(hs_1.h('div', [
@@ -2472,13 +2475,14 @@ class UserControl {
         const nameInput = hs_1.h('input.makai-input');
         const emailInput = hs_1.h('input.makai-input');
         const name = MakaiControl_1.MakaiControl.hasToken()
-            ? hs_1.h('ul', [messages_1.MAKAI_GENERIC_AS + MakaiControl_1.MakaiControl.getUsername() + messages_1.MAKAI_GENERIC_SUBMIT]) : hs_1.h('ul', [
-            messages_1.MAKAI_MODAL_CONTENT_NAME_INPUT_PREFIX,
-            nameInput,
-            hs_1.h('br'),
-            messages_1.MAKAI_MODAL_CONTENT_EMAIL_INPUT_PREFIX,
-            emailInput,
-        ]);
+            ? hs_1.h('ul', [messages_1.MAKAI_SUBMIT_0 + padName_1.padName(MakaiControl_1.MakaiControl.getUsername()) + messages_1.MAKAI_SUBMIT_1])
+            : hs_1.h('ul', [
+                messages_1.MAKAI_MODAL_CONTENT_NAME_INPUT_PREFIX,
+                nameInput,
+                hs_1.h('br'),
+                messages_1.MAKAI_MODAL_CONTENT_EMAIL_INPUT_PREFIX,
+                emailInput,
+            ]);
         const textarea = hs_1.h('textarea.makai-comment');
         const modal = new modalControl_1.Modal(hs_1.h('div', [
             hs_1.h('h1', messages_1.MAKAI_MODAL_TITLE_COMMENT),
@@ -2497,7 +2501,11 @@ class UserControl {
                             const m = UserControl.showLoading(messages_1.MAKAI_INFO_OBTAIN_TOKEN);
                             const alpha = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
                             fetch(MakaiControl_1.MakaiControl.url + '/register/', {
-                                body: JSON.stringify({ username: nameInput.value, email: emailInput.value, encodedPassword: new Array(20).fill(undefined).map(() => alpha[Math.floor(Math.random() * alpha.length)]).join('') }),
+                                body: JSON.stringify({
+                                    username: nameInput.value,
+                                    email: emailInput.value,
+                                    encodedPassword: new Array(20).fill(undefined).map(() => alpha[Math.floor(Math.random() * alpha.length)]).join('')
+                                }),
                                 cache: 'no-cache',
                                 headers: new Headers({
                                     'Content-Type': 'application/json'
@@ -2509,8 +2517,7 @@ class UserControl {
                                 referrer: 'no-referrer',
                             }).then((response) => {
                                 return response.json();
-                            })
-                                .then((json) => {
+                            }).then((json) => {
                                 m.close();
                                 if (!json.success) {
                                     switch (json.errorMessage) {
@@ -2533,7 +2540,7 @@ class UserControl {
                                     MakaiControl_1.MakaiControl.saveUsername(nameInput.value);
                                     UserControl.sendComment(textarea.value, block, modal);
                                 }
-                            }).catch((err) => {
+                            }).catch((_) => {
                                 m.close();
                                 UserControl.showMessage(messages_1.MAKAI_ERROR_INTERNET);
                             });
@@ -2551,7 +2558,7 @@ class UserControl {
 }
 exports.UserControl = UserControl;
 
-},{"../constant/messages":11,"../data/state":35,"../hs":36,"./MakaiControl":14,"./commentsControl":20,"./contentControl":21,"./modalControl":28}],32:[function(require,module,exports){
+},{"../constant/messages":11,"../data/state":35,"../hs":36,"../util/padName":54,"./MakaiControl":14,"./commentsControl":20,"./contentControl":21,"./modalControl":28}],32:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class AutoCache {
@@ -2984,7 +2991,7 @@ class ChaptersMenu extends Menu_1.Menu {
 }
 exports.ChaptersMenu = ChaptersMenu;
 
-},{"../Menu":8,"../control/chapterControl":18,"../control/history":26,"../data/data":33,"../util/shortNumber":55}],42:[function(require,module,exports){
+},{"../Menu":8,"../control/chapterControl":18,"../control/history":26,"../data/data":33,"../util/shortNumber":56}],42:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const Menu_1 = require("../Menu");
@@ -3480,6 +3487,22 @@ exports.matchAll = matchAll;
 },{}],54:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const cjkBeginRegex = /^[\u4E00-\u9FCC\u3400-\u4DB5\uFA0E\uFA0F\uFA11\uFA13\uFA14\uFA1F\uFA21\uFA23\uFA24\uFA27-\uFA29]|[\ud840-\ud868][\udc00-\udfff]|\ud869[\udc00-\uded6\udf00-\udfff]|[\ud86a-\ud86c][\udc00-\udfff]|\ud86d[\udc00-\udf34\udf40-\udfff]|\ud86e[\udc00-\udc1d]/;
+const cjkEndRegex = /[\u4E00-\u9FCC\u3400-\u4DB5\uFA0E\uFA0F\uFA11\uFA13\uFA14\uFA1F\uFA21\uFA23\uFA24\uFA27-\uFA29]|[\ud840-\ud868][\udc00-\udfff]|\ud869[\udc00-\uded6\udf00-\udfff]|[\ud86a-\ud86c][\udc00-\udfff]|\ud86d[\udc00-\udf34\udf40-\udfff]|\ud86e[\udc00-\udc1d]$/;
+function padName(name) {
+    if (!cjkBeginRegex.test(name)) {
+        name = ' ' + name;
+    }
+    if (!cjkEndRegex.test(name)) {
+        name = name + ' ';
+    }
+    return name;
+}
+exports.padName = padName;
+
+},{}],55:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * Input: ['a/b', '..', 'c/../e', 'f']
  * Output: 'a/e/f'
@@ -3510,7 +3533,7 @@ function resolvePath(...paths) {
 }
 exports.resolvePath = resolvePath;
 
-},{}],55:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 function shortNumber(input) {
@@ -3524,7 +3547,7 @@ function shortNumber(input) {
 }
 exports.shortNumber = shortNumber;
 
-},{}],56:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 // https://stackoverflow.com/a/7616484
@@ -3541,7 +3564,7 @@ function stringHash(str) {
 }
 exports.stringHash = stringHash;
 
-},{}],57:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class ChainedCanvas {
@@ -3567,7 +3590,7 @@ class ChainedCanvas {
 }
 exports.ChainedCanvas = ChainedCanvas;
 
-},{}],58:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 /**
@@ -3596,7 +3619,7 @@ class FeatureProvider {
 exports.FeatureProvider = FeatureProvider;
 exports.defaultFeatureProvider = new FeatureProvider();
 
-},{}],59:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const Interpreter_1 = require("./Interpreter");
@@ -3808,7 +3831,7 @@ class FlowReader {
 }
 exports.FlowReader = FlowReader;
 
-},{"./FeatureProvider":58,"./Interpreter":61,"./Random":62}],60:[function(require,module,exports){
+},{"./FeatureProvider":59,"./Interpreter":62,"./Random":63}],61:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const Interpreter_1 = require("./Interpreter");
@@ -4012,7 +4035,7 @@ class GameReader {
 }
 exports.GameReader = GameReader;
 
-},{"./FeatureProvider":58,"./Interpreter":61,"./Random":62}],61:[function(require,module,exports){
+},{"./FeatureProvider":59,"./Interpreter":62,"./Random":63}],62:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const constantsPool_1 = require("./constantsPool");
@@ -4845,7 +4868,7 @@ class Interpreter {
 }
 exports.Interpreter = Interpreter;
 
-},{"./WTCDError":63,"./constantsPool":65,"./invokeFunction":66,"./operators":67,"./std":71,"./utils":78}],62:[function(require,module,exports){
+},{"./WTCDError":64,"./constantsPool":66,"./invokeFunction":67,"./operators":68,"./std":72,"./utils":79}],63:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 /**
@@ -4908,7 +4931,7 @@ class Random {
 }
 exports.Random = Random;
 
-},{}],63:[function(require,module,exports){
+},{}],64:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const empty = {};
@@ -4954,7 +4977,7 @@ class WTCDError extends Error {
 }
 exports.WTCDError = WTCDError;
 
-},{}],64:[function(require,module,exports){
+},{}],65:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 function autoEvaluated(fn) {
@@ -4966,7 +4989,7 @@ function autoEvaluated(fn) {
 }
 exports.autoEvaluated = autoEvaluated;
 
-},{}],65:[function(require,module,exports){
+},{}],66:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 // Your typical immature optimization
@@ -5002,7 +5025,7 @@ function getMaybePooled(type, value) {
 }
 exports.getMaybePooled = getMaybePooled;
 
-},{}],66:[function(require,module,exports){
+},{}],67:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const autoEvaluated_1 = require("./autoEvaluated");
@@ -5177,7 +5200,7 @@ exports.reverseInvocation = autoEvaluated_1.autoEvaluated((arg0, arg1, expr, int
     }
 });
 
-},{"./Interpreter":61,"./WTCDError":63,"./autoEvaluated":64,"./constantsPool":65,"./std/utils":77}],67:[function(require,module,exports){
+},{"./Interpreter":62,"./WTCDError":64,"./autoEvaluated":65,"./constantsPool":66,"./std/utils":78}],68:[function(require,module,exports){
 "use strict";
 // This file defines all infix and prefix operators in WTCD.
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -5592,7 +5615,7 @@ exports.binaryOperators = new Map([
 exports.conditionalOperatorPrecedence = 4;
 exports.operators = new Set([...exports.unaryOperators.keys(), ...exports.binaryOperators.keys(), '?', ':', '...']);
 
-},{"./Interpreter":61,"./WTCDError":63,"./autoEvaluated":64,"./constantsPool":65,"./invokeFunction":66}],68:[function(require,module,exports){
+},{"./Interpreter":62,"./WTCDError":64,"./autoEvaluated":65,"./constantsPool":66,"./invokeFunction":67}],69:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -5850,7 +5873,7 @@ exports.canvasStdFunctions = [
     },
 ];
 
-},{"../ChainedCanvas":57,"../constantsPool":65,"./utils":77}],69:[function(require,module,exports){
+},{"../ChainedCanvas":58,"../constantsPool":66,"./utils":78}],70:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const constantsPool_1 = require("../constantsPool");
@@ -5954,7 +5977,7 @@ exports.contentStdFunctions = [
     },
 ];
 
-},{"../Interpreter":61,"../constantsPool":65,"./utils":77}],70:[function(require,module,exports){
+},{"../Interpreter":62,"../constantsPool":66,"./utils":78}],71:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const constantsPool_1 = require("../constantsPool");
@@ -6020,7 +6043,7 @@ exports.debugStdFunctions = [
     },
 ];
 
-},{"../Interpreter":61,"../WTCDError":63,"../constantsPool":65,"../invokeFunction":66,"./utils":77}],71:[function(require,module,exports){
+},{"../Interpreter":62,"../WTCDError":64,"../constantsPool":66,"../invokeFunction":67,"./utils":78}],72:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const content_1 = require("./content");
@@ -6042,7 +6065,7 @@ exports.stdFunctions = [
     ...canvas_1.canvasStdFunctions,
 ];
 
-},{"./canvas":68,"./content":69,"./debug":70,"./list":72,"./math":73,"./random":74,"./reader":75,"./string":76}],72:[function(require,module,exports){
+},{"./canvas":69,"./content":70,"./debug":71,"./list":73,"./math":74,"./random":75,"./reader":76,"./string":77}],73:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const constantsPool_1 = require("../constantsPool");
@@ -6308,7 +6331,7 @@ exports.listStdFunctions = [
     },
 ];
 
-},{"../Interpreter":61,"../WTCDError":63,"../constantsPool":65,"../invokeFunction":66,"./utils":77}],73:[function(require,module,exports){
+},{"../Interpreter":62,"../WTCDError":64,"../constantsPool":66,"../invokeFunction":67,"./utils":78}],74:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const constantsPool_1 = require("../constantsPool");
@@ -6346,7 +6369,7 @@ exports.mathStdFunctions = [
     },
 ];
 
-},{"../constantsPool":65,"./utils":77}],74:[function(require,module,exports){
+},{"../constantsPool":66,"./utils":78}],75:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const constantsPool_1 = require("../constantsPool");
@@ -6399,7 +6422,7 @@ exports.randomStdFunctions = [
     },
 ];
 
-},{"../constantsPool":65,"./utils":77}],75:[function(require,module,exports){
+},{"../constantsPool":66,"./utils":78}],76:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const constantsPool_1 = require("../constantsPool");
@@ -6429,7 +6452,7 @@ exports.readerStdFunctions = [
     },
 ];
 
-},{"../constantsPool":65,"./utils":77}],76:[function(require,module,exports){
+},{"../constantsPool":66,"./utils":78}],77:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const constantsPool_1 = require("../constantsPool");
@@ -6517,7 +6540,7 @@ exports.stringStdFunctions = [
     },
 ];
 
-},{"../constantsPool":65,"./utils":77}],77:[function(require,module,exports){
+},{"../constantsPool":66,"./utils":78}],78:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const constantsPool_1 = require("../constantsPool");
@@ -6563,7 +6586,7 @@ function assertArgType(args, index, type, defaultValue) {
 }
 exports.assertArgType = assertArgType;
 
-},{"../Interpreter":61,"../constantsPool":65}],78:[function(require,module,exports){
+},{"../Interpreter":62,"../constantsPool":66}],79:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 function flat(arr) {
