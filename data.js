@@ -323,9 +323,9 @@ window.DATA={
               },
               {
                 "displayName": "第一章·幕间",
-                "displayIndex": 2,
-                "name": "2 - 第一章·幕间",
-                "sourceRelativePath": "2 - 支线/0 - 可穿戴科技 · Alter/2 - 第一章·幕间.wtcd",
+                "displayIndex": 1.5,
+                "name": "1.5 - 第一章·幕间",
+                "sourceRelativePath": "2 - 支线/0 - 可穿戴科技 · Alter/1.5 - 第一章·幕间.wtcd",
                 "isEarlyAccess": false,
                 "hidden": false,
                 "preferredReader": "game",
@@ -336,9 +336,9 @@ window.DATA={
               },
               {
                 "displayName": "第二章",
-                "displayIndex": 3,
-                "name": "3 - 第二章",
-                "sourceRelativePath": "2 - 支线/0 - 可穿戴科技 · Alter/3 - 第二章.md",
+                "displayIndex": 2,
+                "name": "2 - 第二章",
+                "sourceRelativePath": "2 - 支线/0 - 可穿戴科技 · Alter/2 - 第二章.md",
                 "isEarlyAccess": false,
                 "hidden": false,
                 "type": "Markdown",
@@ -347,9 +347,9 @@ window.DATA={
               },
               {
                 "displayName": "第二章·幕间",
-                "displayIndex": 4,
-                "name": "4 - 第二章·幕间",
-                "sourceRelativePath": "2 - 支线/0 - 可穿戴科技 · Alter/4 - 第二章·幕间.wtcd",
+                "displayIndex": 2.5,
+                "name": "2.5 - 第二章·幕间",
+                "sourceRelativePath": "2 - 支线/0 - 可穿戴科技 · Alter/2.5 - 第二章·幕间.wtcd",
                 "isEarlyAccess": false,
                 "hidden": false,
                 "preferredReader": "game",
@@ -360,19 +360,43 @@ window.DATA={
               },
               {
                 "displayName": "第三章",
-                "displayIndex": 5,
-                "name": "5 - 第三章",
-                "sourceRelativePath": "2 - 支线/0 - 可穿戴科技 · Alter/5 - 第三章.wtcd",
+                "displayIndex": 3,
+                "name": "3 - 第三章",
+                "sourceRelativePath": "2 - 支线/0 - 可穿戴科技 · Alter/3 - 第三章.wtcd",
                 "isEarlyAccess": false,
                 "hidden": false,
                 "preferredReader": "flow",
                 "type": "WTCD",
                 "htmlRelativePath": "支线/可穿戴科技-·-Alter/第三章.html",
-                "chapterCharCount": 4815
+                "chapterCharCount": 4839
+              },
+              {
+                "displayName": "第三章·幕间·A",
+                "displayIndex": 3.1,
+                "name": "3.1 - 第三章·幕间·A",
+                "sourceRelativePath": "2 - 支线/0 - 可穿戴科技 · Alter/3.1 - 第三章·幕间·A.wtcd",
+                "isEarlyAccess": true,
+                "hidden": true,
+                "preferredReader": "game",
+                "slideAnimation": false,
+                "type": "WTCD",
+                "htmlRelativePath": "支线/可穿戴科技-·-Alter/第三章·幕间·A.html",
+                "chapterCharCount": 60
               }
             ],
-            "subFolders": [],
-            "folderCharCount": 13982
+            "subFolders": [
+              {
+                "displayName": "AlterResources",
+                "displayIndex": 0,
+                "name": "0 - AlterResources",
+                "sourceRelativePath": "2 - 支线/0 - 可穿戴科技 · Alter/0 - AlterResources",
+                "isRoot": false,
+                "chapters": [],
+                "subFolders": [],
+                "folderCharCount": 0
+              }
+            ],
+            "folderCharCount": 14066
           },
           {
             "displayName": "水晶永耀线",
@@ -497,7 +521,7 @@ window.DATA={
             "folderCharCount": 23454
           }
         ],
-        "folderCharCount": 60442
+        "folderCharCount": 60526
       },
       {
         "displayName": "小作品",
@@ -1167,10 +1191,10 @@ window.DATA={
         "folderCharCount": 220
       }
     ],
-    "folderCharCount": 284559
+    "folderCharCount": 284643
   },
-  "charsCount": 284559,
-  "paragraphsCount": 5768,
+  "charsCount": 284643,
+  "paragraphsCount": 5771,
   "keywordsCount": [
     [
       "高潮",
@@ -1245,5 +1269,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "547"
+  "buildNumber": "549"
 };
