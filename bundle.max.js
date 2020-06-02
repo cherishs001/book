@@ -2400,16 +2400,18 @@ function showLoading(message) {
 }
 exports.showLoading = showLoading;
 function showLogin() {
-    let token;
+    const $token = hs_1.h('input', {
+        value: makaiControl_1.getToken() === undefined ? '' : makaiControl_1.getToken()
+    });
     const modal = new modalControl_1.Modal(hs_1.h('div', [
         hs_1.h('h1', messages_1.MAKAI_MODAL_TITLE_TOKEN),
         hs_1.h('p', messages_1.MAKAI_MODAL_CONTENT_THIS_IS_YOUR_MAKAI_TOKEN),
         hs_1.h('p', messages_1.MAKAI_MODAL_CONTENT_MAKAI_TOKEN_IS_USED_TO_SUBMIT_COMMENTS),
         hs_1.h('p', messages_1.MAKAI_MODAL_CONTENT_YOU_WILL_GET_MAKAI_TOKEN_ONCE_YOU_SUBMIT_FIRST_COMMENT),
         hs_1.h('i', messages_1.MAKAI_MODAL_CONTENT_DEVELOPMENT_HINT),
-        hs_1.h('ul', [
-            messages_1.MAKAI_MODAL_CONTENT_TOKEN_INPUT_PREFIX,
-            token = hs_1.h('input.makai-token', { value: makaiControl_1.getToken() === undefined ? '' : makaiControl_1.getToken() }),
+        hs_1.h('.input-group', [
+            hs_1.h('span', messages_1.MAKAI_MODAL_CONTENT_TOKEN_INPUT_PREFIX),
+            $token,
         ]),
         hs_1.h('.button-container', [
             hs_1.h('div', {
@@ -2419,12 +2421,12 @@ function showLogin() {
             }, messages_1.MAKAI_MODAL_CANCEL),
             hs_1.h('div', {
                 onclick: () => {
-                    if (token.value === '') {
+                    if ($token.value === '') {
                         showMessage(messages_1.MAKAI_ERROR_EMPTY_TOKEN);
                         return;
                     }
                     const m = showLoading(messages_1.MAKAI_INFO_CONFIRM_TOKEN);
-                    fetch(makaiControl_1.makaiUrl + '/username/' + token.value).then((response) => {
+                    fetch(makaiControl_1.makaiUrl + '/username/' + $token.value).then((response) => {
                         return response.json();
                     })
                         .then((json) => {
@@ -2433,7 +2435,7 @@ function showLogin() {
                             showMessage(messages_1.MAKAI_ERROR_INVALID_TOKEN);
                         }
                         else {
-                            makaiControl_1.saveToken(token.value);
+                            makaiControl_1.saveToken($token.value);
                             makaiControl_1.saveUsername(json.username);
                             modal.close();
                             showMessage(messages_1.MAKAI_INFO_SET_TOKKEN_SUCCESS);
@@ -2489,8 +2491,8 @@ function sendComment(textarea, block, modal) {
 }
 exports.sendComment = sendComment;
 function showComment(block) {
-    const $nameInput = hs_1.h('input.makai-input');
-    const $emailInput = hs_1.h('input.makai-input');
+    const $nameInput = hs_1.h('input');
+    const $emailInput = hs_1.h('input');
     const name = makaiControl_1.hasToken()
         ? hs_1.h('p', [messages_1.MAKAI_SUBMIT_0 + padName_1.padName(makaiControl_1.getUsername()) + messages_1.MAKAI_SUBMIT_1])
         : [
@@ -3087,7 +3089,6 @@ exports.MainMenu = MainMenu;
 Object.defineProperty(exports, "__esModule", { value: true });
 const userControl_1 = require("../control/userControl");
 const Menu_1 = require("../Menu");
-const SettingsMenu_1 = require("./SettingsMenu");
 class MakaiMenu extends Menu_1.Menu {
     constructor(parent) {
         super('Makai 评论系统管理', parent);
@@ -3098,28 +3099,10 @@ class MakaiMenu extends Menu_1.Menu {
             userControl_1.showLogin();
         });
     }
-    addBooleanSetting(label, setting) {
-        const getText = () => `${label}：${setting.getValue() ? '开' : '关'}`;
-        const handle = this.addItem(getText(), { small: true, button: true })
-            .onClick(() => {
-            setting.toggle();
-            handle.setInnerText(getText());
-        });
-    }
-    addEnumSetting(label, setting, usePreview) {
-        const getText = () => `${label}：${setting.getValueName()}`;
-        const handle = this.addItem(getText(), { small: true, button: true });
-        const enumSettingMenu = new SettingsMenu_1.EnumSettingMenu(this, label, setting, usePreview === true);
-        handle.linkTo(enumSettingMenu).onClick(() => {
-            this.activateEvent.once(() => {
-                handle.setInnerText(getText());
-            });
-        });
-    }
 }
 exports.MakaiMenu = MakaiMenu;
 
-},{"../Menu":8,"../control/userControl":31,"./SettingsMenu":45}],45:[function(require,module,exports){
+},{"../Menu":8,"../control/userControl":31}],45:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const stylePreviewArticle_1 = require("../constant/stylePreviewArticle");
