@@ -1,12 +1,44 @@
 
-import {MAKAI_ERROR_EMPTY_TOKEN, MAKAI_ERROR_INTERNET, MAKAI_ERROR_INVALID_EMAIL, MAKAI_ERROR_INVALID_TOKEN, MAKAI_ERROR_SUBMIT_COMMENT_INVALID_TOKEN, MAKAI_ERROR_UNKNOWN, MAKAI_ERROR_USER_EXIST, MAKAI_INFO_CONFIRM_TOKEN, MAKAI_INFO_OBTAIN_TOKEN, MAKAI_INFO_SET_TOKKEN_SUCCESS, MAKAI_MODAL_CANCEL, MAKAI_MODAL_CONTENT_COMMENT_HINT, MAKAI_MODAL_CONTENT_DEVELOPMENT_HINT, MAKAI_MODAL_CONTENT_EMAIL_INPUT_PREFIX, MAKAI_MODAL_CONTENT_MAKAI_TOKEN_IS_USED_TO_SUBMIT_COMMENTS, MAKAI_MODAL_CONTENT_NAME_INPUT_PREFIX, MAKAI_MODAL_CONTENT_THIS_IS_YOUR_MAKAI_TOKEN, MAKAI_MODAL_CONTENT_TOKEN_INPUT_PREFIX, MAKAI_MODAL_CONTENT_YOU_WILL_GET_MAKAI_TOKEN_ONCE_YOU_SUBMIT_FIRST_COMMENT, MAKAI_MODAL_OK, MAKAI_MODAL_SAVE, MAKAI_MODAL_SUBMIT, MAKAI_MODAL_TITLE_COMMENT, MAKAI_MODAL_TITLE_INFO, MAKAI_MODAL_TITLE_TOKEN, MAKAI_MODAL_TITLE_WAITING, MAKAI_SUBMIT_0, MAKAI_SUBMIT_1, MAKAI_MODAL_CONFIRM_LOSS_EDITED, MAKAI_MODAL_CONFIRM_LOSS_EDITED_YES, MAKAI_MODAL_CONFIRM_LOSS_EDITED_NO} from '../constant/messages';
+import {
+  MAKAI_ERROR_EMPTY_TOKEN,
+  MAKAI_ERROR_INTERNET,
+  MAKAI_ERROR_INVALID_EMAIL,
+  MAKAI_ERROR_INVALID_TOKEN,
+  MAKAI_ERROR_SUBMIT_COMMENT_INVALID_TOKEN,
+  MAKAI_ERROR_UNKNOWN,
+  MAKAI_ERROR_USER_EXIST,
+  MAKAI_INFO_CONFIRM_TOKEN,
+  MAKAI_INFO_OBTAIN_TOKEN,
+  MAKAI_INFO_SET_TOKKEN_SUCCESS,
+  MAKAI_MODAL_CANCEL,
+  MAKAI_MODAL_CONFIRM_LOSS_EDITED,
+  MAKAI_MODAL_CONFIRM_LOSS_EDITED_NO,
+  MAKAI_MODAL_CONFIRM_LOSS_EDITED_YES,
+  MAKAI_MODAL_CONTENT_COMMENT_HINT,
+  MAKAI_MODAL_CONTENT_DEVELOPMENT_HINT,
+  MAKAI_MODAL_CONTENT_EMAIL_INPUT_PREFIX,
+  MAKAI_MODAL_CONTENT_MAKAI_TOKEN_IS_USED_TO_SUBMIT_COMMENTS,
+  MAKAI_MODAL_CONTENT_NAME_INPUT_PREFIX,
+  MAKAI_MODAL_CONTENT_THIS_IS_YOUR_MAKAI_TOKEN,
+  MAKAI_MODAL_CONTENT_TOKEN_INPUT_PREFIX,
+  MAKAI_MODAL_CONTENT_YOU_WILL_GET_MAKAI_TOKEN_ONCE_YOU_SUBMIT_FIRST_COMMENT,
+  MAKAI_MODAL_OK,
+  MAKAI_MODAL_SAVE,
+  MAKAI_MODAL_SUBMIT,
+  MAKAI_MODAL_TITLE_COMMENT,
+  MAKAI_MODAL_TITLE_INFO,
+  MAKAI_MODAL_TITLE_TOKEN,
+  MAKAI_MODAL_TITLE_WAITING,
+  MAKAI_SUBMIT_0,
+  MAKAI_SUBMIT_1
+} from '../constant/messages';
 import { state } from '../data/state';
 import { h } from '../hs';
 import { padName } from '../util/padName';
 import { commentsCache, getApiUrl, loadComments } from './commentsControl';
 import { ContentBlock, getCurrentContent } from './contentControl';
 import { getToken, getUsername, hasToken, makaiUrl, saveToken, saveUsername } from './makaiControl';
-import {Modal, confirm} from './modalControl';
+import { confirm, Modal } from './modalControl';
 
 export function showMessage(message: string) {
   const modal = new Modal(h('div', [
@@ -36,17 +68,18 @@ export function showLoading(message: string): Modal {
 
 
 export function showLogin() {
-
-  let token: HTMLInputElement;
+  const $token: HTMLInputElement = h('input', {
+    value: getToken() === undefined ? '' : getToken()
+  }) as HTMLInputElement;
   const modal = new Modal(h('div', [
     h('h1', MAKAI_MODAL_TITLE_TOKEN),
     h('p', MAKAI_MODAL_CONTENT_THIS_IS_YOUR_MAKAI_TOKEN),
     h('p', MAKAI_MODAL_CONTENT_MAKAI_TOKEN_IS_USED_TO_SUBMIT_COMMENTS),
     h('p', MAKAI_MODAL_CONTENT_YOU_WILL_GET_MAKAI_TOKEN_ONCE_YOU_SUBMIT_FIRST_COMMENT),
     h('i', MAKAI_MODAL_CONTENT_DEVELOPMENT_HINT),
-    h('ul', [
-      MAKAI_MODAL_CONTENT_TOKEN_INPUT_PREFIX,
-      token = h('input.makai-token', { value: getToken() === undefined ? '' : getToken() }) as HTMLInputElement,
+    h('.input-group', [
+      h('span', MAKAI_MODAL_CONTENT_TOKEN_INPUT_PREFIX),
+      $token,
     ]),
     h('.button-container', [
       h('div', {
@@ -56,12 +89,12 @@ export function showLogin() {
       }, MAKAI_MODAL_CANCEL),
       h('div', {
         onclick: () => {
-          if (token.value === '') {
+          if ($token.value === '') {
             showMessage(MAKAI_ERROR_EMPTY_TOKEN);
             return;
           }
           const m = showLoading(MAKAI_INFO_CONFIRM_TOKEN);
-          fetch(makaiUrl + '/username/' + token.value).then((response) => {
+          fetch(makaiUrl + '/username/' + $token.value).then((response) => {
             return response.json();
           })
             .then((json) => {
@@ -69,7 +102,7 @@ export function showLogin() {
               if (json.username == null) {
                 showMessage(MAKAI_ERROR_INVALID_TOKEN);
               } else {
-                saveToken(token.value);
+                saveToken($token.value);
                 saveUsername(json.username);
                 modal.close();
                 showMessage(MAKAI_INFO_SET_TOKKEN_SUCCESS);
@@ -124,8 +157,8 @@ export function sendComment(textarea: string, block: ContentBlock, modal: Modal)
 }
 
 export function showComment(block: ContentBlock) {
-  const $nameInput = h('input.makai-input') as HTMLInputElement;
-  const $emailInput = h('input.makai-input') as HTMLInputElement;
+  const $nameInput = h('input') as HTMLInputElement;
+  const $emailInput = h('input') as HTMLInputElement;
   const name = hasToken()
     ? h('p', [MAKAI_SUBMIT_0 + padName(getUsername()!) + MAKAI_SUBMIT_1])
     : [
