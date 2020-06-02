@@ -4,39 +4,39 @@ import {
   COMMENTS_LOADED,
   COMMENTS_LOADING,
   COMMENTS_SECTION,
-  COMMENTS_UNAVAILABLE,
-  MAKAI_ERROR_INTERNET,
-  MAKAI_ERROR_DELETE_COMMENT_INVALID_TOKEN,
-  MAKAI_MODAL_CONTENT_DELETION_CONFIRMATION,
-  MAKAI_INFO_CONFIRM_TOKEN,
-  MAKAI_MODAL_TITLE_WARNING,
-  MAKAI_MODAL_CONFIRM,
-  MAKAI_MODAL_CANCEL,
-  MAKAI_GENERIC_AS,
-  MAKAI_GENERIC_SUBMITED_AT,
-  MAKAI_GENERIC_LAST_MODIFIED,
-  MAKAI_BUTTON_DELETE,
   MAKAI_BUTTON_BLOCK,
+  MAKAI_BUTTON_DELETE,
+  MAKAI_ERROR_DELETE_COMMENT_INVALID_TOKEN,
+  MAKAI_ERROR_INTERNET,
+  MAKAI_GENERIC_LAST_MODIFIED,
   MAKAI_GENERIC_LAST_MODIFIED_SUFFIX,
+  MAKAI_INFO_CONFIRM_TOKEN,
+  MAKAI_MODAL_CANCEL,
+  MAKAI_MODAL_CONFIRM,
+  MAKAI_MODAL_CONTENT_DELETION_CONFIRMATION,
+  MAKAI_MODAL_TITLE_WARNING,
+  MAKAI_SUBMITTED_0,
+  MAKAI_SUBMITTED_1
 } from '../constant/messages';
 import { AutoCache } from '../data/AutoCache';
 import { useComments } from '../data/settings';
+import { state } from '../data/state';
 import { DebugLogger } from '../DebugLogger';
 import { h } from '../hs';
 import { formatTimeRelative } from '../util/formatTime';
+import { padName } from '../util/padName';
 import { blockUser, isUserBlocked } from './commentBlockControl';
-import { Content, getCurrentContent, ContentBlock } from './contentControl';
-import { UserControl } from './userControl';
-import { state } from '../data/state';
-import { MakaiControl } from './MakaiControl';
+import { Content, ContentBlock, getCurrentContent } from './contentControl';
+import { getToken, getUsername, makaiUrl } from './makaiControl';
 import { confirm } from './modalControl';
+import { showComment, showLoading, showMessage } from './userControl';
 
 const debugLogger = new DebugLogger('Comments Control');
 // const getApiUrlRegExp = /^https:\/\/github\.com\/([a-zA-Z0-9-_]+)\/([a-zA-Z0-9-_]+)\/issues\/([1-9][0-9]*)$/;
 // Input sample: https://github.com/SCLeoX/Wearable-Technology/issues/1
 // Output sample: https://api.github.com/repos/SCLeoX/Wearable-Technology/issues/1/comments
 export function getApiUrl() {
-  return MakaiControl.url + '/comment/github/' + state.currentChapter?.chapter.htmlRelativePath.replace(/\//g, '.') + '/';
+  return makaiUrl + '/comment/github/' + state.currentChapter?.chapter.htmlRelativePath.replace(/\//g, '.') + '/';
 }
 
 function createCommentElement(
@@ -50,12 +50,12 @@ function createCommentElement(
   block: ContentBlock,
   display: string,
 ) {
-  const deleteButton = userName === MakaiControl.getUsername()?.toLowerCase() ? h('a.block-user', {
+  const deleteButton = userName === getUsername()?.toLowerCase() ? h('a.block-user', {
     onclick: () => {
       confirm(MAKAI_MODAL_TITLE_WARNING, MAKAI_MODAL_CONTENT_DELETION_CONFIRMATION, MAKAI_MODAL_CONFIRM, MAKAI_MODAL_CANCEL).then((result) => {
         if (result) {
-          const m = UserControl.showLoading(MAKAI_INFO_CONFIRM_TOKEN);
-          fetch(MakaiControl.url + `/comment/` + id + `/` + MakaiControl.getToken(), {
+          const m = showLoading(MAKAI_INFO_CONFIRM_TOKEN);
+          fetch(makaiUrl + `/comment/` + id + `/` + getToken(), {
             cache: 'no-cache',
             credentials: 'same-origin',
             headers: new Headers({
@@ -71,13 +71,13 @@ function createCommentElement(
             .then((json) => {
               m.close();
               if (!json.success) {
-                UserControl.showMessage(MAKAI_ERROR_DELETE_COMMENT_INVALID_TOKEN);
+                showMessage(MAKAI_ERROR_DELETE_COMMENT_INVALID_TOKEN);
               } else {
                 $comment.remove();
               }
             }).catch((err) => {
               m.close();
-              UserControl.showMessage(MAKAI_ERROR_INTERNET);
+              showMessage(MAKAI_ERROR_INTERNET);
             });
         }
       });
@@ -91,7 +91,7 @@ function createCommentElement(
       href: userUrl,
       rel: 'noopener noreferrer',
     }, display),
-    h('.time', MAKAI_GENERIC_AS + userName + MAKAI_GENERIC_SUBMITED_AT + ((createTime === updateTime)
+    h('.time', MAKAI_SUBMITTED_0 + padName(userName) + MAKAI_SUBMITTED_1 + ((createTime === updateTime)
       ? formatTimeRelative(new Date(createTime))
       : `${formatTimeRelative(new Date(createTime))}` +
       MAKAI_GENERIC_LAST_MODIFIED + `${formatTimeRelative(new Date(updateTime))}` + MAKAI_GENERIC_LAST_MODIFIED_SUFFIX)), deleteButton === null ?
@@ -137,6 +137,15 @@ export function loadComments(content: Content) {
       }
       debugLogger.log('Comments loaded.');
       $commentsStatus.innerText = COMMENTS_LOADED;
+      if (data.length >= 6) {
+        $comments.appendChild(
+          h('.create-comment', {
+            onclick: () => {
+              showComment(block);
+            },
+          }, COMMENTS_CREATE),
+        );
+      }
       data.forEach((comment: any) => {
         if (isUserBlocked(comment.user.login)) {
           return;
@@ -156,7 +165,7 @@ export function loadComments(content: Content) {
       $comments.appendChild(
         h('.create-comment', {
           onclick: () => {
-            UserControl.showComment(block);
+            showComment(block);
           },
         }, COMMENTS_CREATE),
       );
