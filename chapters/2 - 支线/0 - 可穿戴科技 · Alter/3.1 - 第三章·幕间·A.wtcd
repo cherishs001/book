@@ -1,0 +1,218 @@
+WTCD 1.3
+declare function newMap[] {
+    declare list keySet
+    declare list valueSet
+    declare null function it
+    it = function switch [
+        #indexOf $[key] {
+            return listIndexOf::[keySet key]
+        }
+        #remove $[key] {
+            declare number index = it::#indexOf::[key]
+            declare number end = listLength::[keySet]
+            if index < 0 {
+                return
+            } else if index == 0 {
+                keySet = [...listSlice::[keySet 1 end]]
+                valueSet = [...listSlice::[valueSet 1 end]]
+            } else if index >= ( end - 1 ) {
+                keySet = [...listSlice::[keySet 0 (end - 1)]]
+                valueSet = [...listSlice::[valueSet 0 (end - 1)]]
+            } else {
+                keySet = [...listSlice::[keySet 0 index] ...listSlice::[keySet (index + 1) end]]
+                valueSet = [...listSlice::[valueSet 0 index] ...listSlice::[valueSet (index + 1) end]]
+            }
+        }
+        #get $[key] {
+            return valueSet ?.? (it::#indexOf::[key])
+        }
+        #put $[key value] {
+            if value == null {
+                it::#remove::[key]
+                return
+            }
+            keySet = [...keySet key]
+            valueSet = [...valueSet value]
+        }
+        #contains $[key] {
+            return listIncludes::[keySet key]
+        }
+        null
+    ]
+    return it
+}
+
+declare function newMapOf[list key list value]{
+    declare function map = newMap::[]
+    declare number i = 0
+    while i < listLength::[key] {
+      map::#put::[key.(i) value.(i)]
+      i+=1
+    }
+    return map
+}
+
+
+declare number stage = 0
+declare number backgroundStage = 0
+declare number imageId = 0
+declare action next = goto first
+
+declare string path = "AlterResources"
+declare boolean canvasCreated = false
+declare string canvas = "makai:auto_gal_play_canvas"
+declare function nameMap = newMapOf::[
+    [   "秋镜悬"           "李随物"]         // Name
+    [   "kyogen_stage"     "suiwu_stage"]   // Path
+]
+
+declare function play = function[string dialogs function endAction] {
+    if !canvasCreated {
+        canvasCreate::[canvas 1280 720]
+        canvasCreated = true
+    }
+    canvasClear::[canvas]
+    canvasSetFillStyle::[canvas "#FFFFFF"]
+    canvasSetFont::[canvas 32 "googleFonts:ZCOOL KuaiLe"]
+
+    declare string a = stringSplit::[dialogs "\n\n"].(imageId)
+    if a == "stage：1" {
+        stage = 1
+        imageId = imageId + 1
+        a = stringSplit::[dialogs "\n\n"].(imageId)
+    }
+    print::[stage]
+    if a == "backgroundStage：1" {
+        backgroundStage = 1
+        imageId = imageId + 1
+        a = stringSplit::[dialogs "\n\n"].(imageId)
+    }
+    if a == "backgroundStage：2" {
+        backgroundStage = 2
+        imageId = imageId + 1
+        a = stringSplit::[dialogs "\n\n"].(imageId)
+    }
+    declare string name = stringSplit::[a "："].(0)
+    declare string content = ""
+    if name == a {
+        name = ""
+        content = a
+    } else {
+        content = stringSubByLength::[a stringLength::[name] + 1]
+        if content == "" {
+            name = ""
+            content = a
+        }
+    }
+    readerSetStateDesc::[a]
+    canvasPutImage::[canvas "./" + path + "/bg_stage" + 
+    stringFormatNumberFixed::[backgroundStage]
+    + ".png" 0 0]
+    declare string content_second = ""
+    (stringLength::[content] > 36) ? {
+        content = "　　" + content
+        content_second = stringSubByLength::[content 37]
+        content = stringSubByLength::[content 0 37]
+    } : {}
+
+    if nameMap::#contains::[name] {
+        canvasPutImage::[canvas "./" + path + "/" + nameMap::#get::[name] +
+        stringFormatNumberFixed::[stage]
+        +".png" 540 260]
+    }
+
+    canvasPutImage::[canvas "./" + path + "/dialog.png" 0 0]
+
+    canvasSetFillStyle::[canvas "#FFFFFF"]
+    canvasSetStrokeStyle::[canvas "rgba(0,0,0,0.8)"]
+    canvasSetLineWidth::[canvas 5.5]
+
+    canvasStrokeText::[canvas name 100 550]
+    canvasFillText::[canvas name 100 550]
+    
+    canvasStrokeText::[canvas content 120 600]
+    canvasFillText::[canvas content 120 600]
+
+    canvasStrokeText::[canvas content_second 120 640]
+    canvasFillText::[canvas content_second 120 640]
+
+    canvasOutput::[canvas]
+    (imageId >= listLength::[stringSplit::[dialogs "\n\n"]] - 1) ? {
+        imageId = 0
+        next = endAction::[]
+        return endAction::[]
+    } : {
+        imageId = imageId + 1
+    }
+}
+
+declare string sectionHome = 
+"秋镜悬：呜……冰箱里什么也不剩了……就连面包和泡面都没有……
+
+忘记掉自己应该购入面包的秋镜悬，现在剩下唯一的选择，只能是让被自己关在地下室的妹妹来做晚饭了。
+
+感到一丝尴尬的秋镜悬，只得走进地下室。
+
+backgroundStage：1
+
+李随物：呜呜……
+
+我知道没有立绘，但是请脑补一下眼罩和口球，以及因为被高潮边缘放置了好几个小时而满脸潮红的李随物。
+
+秋镜悬：……
+
+李随物显然是察觉到了有人走到了边上：
+
+李随物：（挣扎）呜呜……呜！
+
+秋镜悬：那个……
+
+李随物：呜……？呜呜……！！
+
+秋镜悬：我说出来你别生气……？
+
+李随物：呜呜！！呜呜呜！！！
+
+秋镜悬走到了李随物的身后，将口球上的锁打了开来。
+
+只见随着口球的取出，残存在随物口腔中的唾液也一并涌出，她喊道：
+
+李随物：镜……镜悬姐！
+
+秋镜悬：那个……
+
+李随物：先……先让我高潮一次啦！！
+
+秋镜悬：Emmmm，好……系统指令：模式切换，强制高潮，次数限定：一……
+
+AI：权限验证中……验证通过。指令已接收。
+
+随着 AI 那和随物如出一辙的声音出现，随物身体里的几根按摩棒同时调整到了最高强度——
+
+李随物：呜——呜啊——"
+
+
+section start then selection [ 
+    choice "好的，我知道了" goto first
+    choice "好的，我知道了" goto first
+    choice "好的，我知道了" goto first
+    choice "好的，我知道了" goto first
+]
+section first play::[sectionHome $ {
+    return goto end
+}] then selection [
+    choice "继续" next
+]
+section end then exit
+
+---<<< start >>>---
+
+# 第三章·幕间 —— 结局 A
+
+友人♪B
+
+其实还没有写完，只是想发出来给大家看一看效果呐(
+
+---<<< end >>>---
+
+后续编写中，我真的在写了呜呜呜 —— 友人♪B
