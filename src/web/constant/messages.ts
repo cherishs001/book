@@ -63,6 +63,8 @@ export const WTCD_ERROR_WTCD_STACK_DESC = 'WTCD 调用栈记录了在错误发�
 export const WTCD_ERROR_INTERNAL_STACK_TITLE = '内部调用栈';
 export const WTCD_ERROR_INTERNAL_STACK_DESC = '内部调用栈记录了出现该错误时编译器或是解释器的状态。请注意内部调用栈通常只在调试 WTCD 编译器或是解释器时有用。内部调用栈通常对调试 WTCD 文档没有作用。';
 
+export const WTCD_CANVAS_LOADING = '资源加载中... 取决于网络情况，这可能需要 1 秒 ~ 10 分钟。';
+
 export const MAKAI_ERROR_INTERNET = '和 Makai 主机通讯时出现错误 OxO, 或许是你的网络环境出现了问题？';
 export const MAKAI_ERROR_SUBMIT_COMMENT_INVALID_TOKEN = 'Oops！评论失败啦，或许是你的令牌过期啦？';
 export const MAKAI_ERROR_DELETE_COMMENT_INVALID_TOKEN = 'Oops！删除失败啦，或许是你的令牌过期啦？';

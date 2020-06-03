@@ -70,10 +70,13 @@ export const canvasStdFunctions: Array<NativeFunction> = [
     $newCanvas.width = canvas.getWidth();
     $newCanvas.height = canvas.getHeight();
     $newCanvas.style.maxWidth = '100%';
+    interpreterHandle.featureProvider.drawLoadingCanvas($newCanvas);
     interpreterHandle.pushContent($newCanvas);
     canvas.onResolve(() => {
       if (document.body.contains($newCanvas)) {
-        $newCanvas.getContext('2d')!.drawImage(canvas.canvas, 0, 0);
+        const ctx = $newCanvas.getContext('2d')!;
+        ctx.clearRect(0, 0, $newCanvas.width, $newCanvas.height);
+        ctx.drawImage(canvas.canvas, 0, 0);
       }
     });
     return getMaybePooled('null', null);
@@ -251,6 +254,8 @@ export const canvasStdFunctions: Array<NativeFunction> = [
       const ctx = canvas.ctx;
       ctx.textAlign = hAlign;
       ctx.textBaseline = vAlign;
+      ctx.lineJoin = 'round';
+      ctx.lineCap = 'round';
       ctx.strokeText(text, x, y);
     });
     return getMaybePooled('null', null);
