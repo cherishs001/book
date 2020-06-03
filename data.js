@@ -512,16 +512,27 @@ window.DATA={
                     "type": "Markdown",
                     "htmlRelativePath": "支线/为霜和克西拉的日常/为霜线/第五章.html",
                     "chapterCharCount": 2866
+                  },
+                  {
+                    "displayName": "日常",
+                    "displayIndex": 5.1,
+                    "name": "5.1 - 日常",
+                    "sourceRelativePath": "2 - 支线/2 - 为霜和克西拉的日常/1 - 为霜线/5.1 - 日常.md",
+                    "isEarlyAccess": false,
+                    "hidden": false,
+                    "type": "Markdown",
+                    "htmlRelativePath": "支线/为霜和克西拉的日常/为霜线/日常.html",
+                    "chapterCharCount": 6515
                   }
                 ],
                 "subFolders": [],
-                "folderCharCount": 18647
+                "folderCharCount": 25162
               }
             ],
-            "folderCharCount": 23454
+            "folderCharCount": 29969
           }
         ],
-        "folderCharCount": 60526
+        "folderCharCount": 67041
       },
       {
         "displayName": "小作品",
@@ -1215,18 +1226,18 @@ window.DATA={
         "folderCharCount": 220
       }
     ],
-    "folderCharCount": 284720
+    "folderCharCount": 291235
   },
-  "charsCount": 284720,
-  "paragraphsCount": 5775,
+  "charsCount": 291235,
+  "paragraphsCount": 5965,
   "keywordsCount": [
     [
       "高潮",
-      484
+      498
     ],
     [
       "贞操带",
-      253
+      256
     ],
     [
       "按摩棒",
@@ -1293,5 +1304,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "556"
+  "buildNumber": "559"
 };
