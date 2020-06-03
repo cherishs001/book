@@ -20,6 +20,12 @@ export class FeatureProvider {
   loadFont(identifier: string): Promise<string> {
     return Promise.reject('Loading fonts is not allowed.');
   }
+  /**
+   * Draw loading screen on the provided canvas.
+   */
+  drawLoadingCanvas($canvas: HTMLCanvasElement): void {
+    return undefined;
+  }
 }
 
 export const defaultFeatureProvider = new FeatureProvider();

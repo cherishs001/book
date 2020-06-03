@@ -4,6 +4,7 @@ import { DebugLogger } from '../DebugLogger';
 import { Chapter } from '../../Data';
 import { AutoCache } from '../data/AutoCache';
 import { loadGoogleFonts } from '../util/loadGooleFonts';
+import { WTCD_CANVAS_LOADING } from '../constant/messages';
 
 const debugLogger = new DebugLogger('WTCD Feature Provider');
 const imageCache = new AutoCache<string, HTMLImageElement>(url => {
@@ -52,5 +53,18 @@ export class WTCDFeatureProvider extends FeatureProvider {
   }
   public loadFont(identifier: string): Promise<string> {
     return fontsCache.get(identifier);
+  }
+  public drawLoadingCanvas($canvas: HTMLCanvasElement) {
+    const ctx = $canvas.getContext('2d')!;
+    ctx.font = `${$canvas.width / 40}px sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.strokeStyle = 'rgba(0,0,0,0.8)';
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    ctx.lineWidth = $canvas.width / 200;
+    ctx.strokeText(WTCD_CANVAS_LOADING, $canvas.width / 2, $canvas.height / 2);
+    ctx.fillStyle = 'white';
+    ctx.fillText(WTCD_CANVAS_LOADING, $canvas.width / 2, $canvas.height / 2);
   }
 }
