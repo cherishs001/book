@@ -560,7 +560,7 @@ window.DATA={
             "isEarlyAccess": false,
             "hidden": false,
             "preferredReader": "game",
-            "slideAnimation": true,
+            "slideAnimation": false,
             "type": "WTCD",
             "htmlRelativePath": "小作品/关于催更-WTCD-特性的真相.html",
             "chapterCharCount": 77
@@ -1293,5 +1293,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "552"
+  "buildNumber": "554"
 };
