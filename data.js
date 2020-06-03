@@ -551,10 +551,34 @@ window.DATA={
             "type": "Markdown",
             "htmlRelativePath": "小作品/戴着可穿戴科技参加-AP-考试.html",
             "chapterCharCount": 820
+          },
+          {
+            "displayName": "关于催更 WTCD 特性的真相",
+            "displayIndex": 3,
+            "name": "3 - 关于催更 WTCD 特性的真相",
+            "sourceRelativePath": "3 - 小作品/3 - 关于催更 WTCD 特性的真相.wtcd",
+            "isEarlyAccess": false,
+            "hidden": false,
+            "preferredReader": "game",
+            "slideAnimation": true,
+            "type": "WTCD",
+            "htmlRelativePath": "小作品/关于催更-WTCD-特性的真相.html",
+            "chapterCharCount": 77
           }
         ],
-        "subFolders": [],
-        "folderCharCount": 979
+        "subFolders": [
+          {
+            "displayName": "Resources",
+            "displayIndex": 0,
+            "name": "0 - Resources",
+            "sourceRelativePath": "3 - 小作品/0 - Resources",
+            "isRoot": false,
+            "chapters": [],
+            "subFolders": [],
+            "folderCharCount": 0
+          }
+        ],
+        "folderCharCount": 1056
       },
       {
         "displayName": "道具集",
@@ -1191,10 +1215,10 @@ window.DATA={
         "folderCharCount": 220
       }
     ],
-    "folderCharCount": 284643
+    "folderCharCount": 284720
   },
-  "charsCount": 284643,
-  "paragraphsCount": 5771,
+  "charsCount": 284720,
+  "paragraphsCount": 5775,
   "keywordsCount": [
     [
       "高潮",
@@ -1210,7 +1234,7 @@ window.DATA={
     ],
     [
       "WTCD",
-      103
+      104
     ],
     [
       "陈志鹏",
@@ -1269,5 +1293,5 @@ window.DATA={
       1
     ]
   ],
-  "buildNumber": "550"
+  "buildNumber": "552"
 };
