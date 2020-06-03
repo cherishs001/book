@@ -803,6 +803,7 @@ exports.WTCD_ERROR_WTCD_STACK_TITLE = 'WTCD 调用栈';
 exports.WTCD_ERROR_WTCD_STACK_DESC = 'WTCD 调用栈记录了在错误发生时 WTCD 的解释器状态。这可以帮助理解错误发生的上下文。';
 exports.WTCD_ERROR_INTERNAL_STACK_TITLE = '内部调用栈';
 exports.WTCD_ERROR_INTERNAL_STACK_DESC = '内部调用栈记录了出现该错误时编译器或是解释器的状态。请注意内部调用栈通常只在调试 WTCD 编译器或是解释器时有用。内部调用栈通常对调试 WTCD 文档没有作用。';
+exports.WTCD_CANVAS_LOADING = '资源加载中... 取决于网络情况，这可能需要 1 秒 ~ 10 分钟。';
 exports.MAKAI_ERROR_INTERNET = '和 Makai 主机通讯时出现错误 OxO, 或许是你的网络环境出现了问题？';
 exports.MAKAI_ERROR_SUBMIT_COMMENT_INVALID_TOKEN = 'Oops！评论失败啦，或许是你的令牌过期啦？';
 exports.MAKAI_ERROR_DELETE_COMMENT_INVALID_TOKEN = 'Oops！删除失败啦，或许是你的令牌过期啦？';
@@ -1007,6 +1008,7 @@ const resolvePath_1 = require("../util/resolvePath");
 const DebugLogger_1 = require("../DebugLogger");
 const AutoCache_1 = require("../data/AutoCache");
 const loadGooleFonts_1 = require("../util/loadGooleFonts");
+const messages_1 = require("../constant/messages");
 const debugLogger = new DebugLogger_1.DebugLogger('WTCD Feature Provider');
 const imageCache = new AutoCache_1.AutoCache(url => {
     return new Promise((resolve, reject) => {
@@ -1049,10 +1051,23 @@ class WTCDFeatureProvider extends FeatureProvider_1.FeatureProvider {
     loadFont(identifier) {
         return fontsCache.get(identifier);
     }
+    drawLoadingCanvas($canvas) {
+        const ctx = $canvas.getContext('2d');
+        ctx.font = `${$canvas.width / 40}px sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.strokeStyle = 'rgba(0,0,0,0.8)';
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
+        ctx.lineWidth = $canvas.width / 200;
+        ctx.strokeText(messages_1.WTCD_CANVAS_LOADING, $canvas.width / 2, $canvas.height / 2);
+        ctx.fillStyle = 'white';
+        ctx.fillText(messages_1.WTCD_CANVAS_LOADING, $canvas.width / 2, $canvas.height / 2);
+    }
 }
 exports.WTCDFeatureProvider = WTCDFeatureProvider;
 
-},{"../../wtcd/FeatureProvider":59,"../DebugLogger":6,"../data/AutoCache":32,"../util/loadGooleFonts":52,"../util/resolvePath":55}],16:[function(require,module,exports){
+},{"../../wtcd/FeatureProvider":59,"../DebugLogger":6,"../constant/messages":11,"../data/AutoCache":32,"../util/loadGooleFonts":52,"../util/resolvePath":55}],16:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const GameReader_1 = require("../../wtcd/GameReader");
@@ -3630,6 +3645,12 @@ class FeatureProvider {
     loadFont(identifier) {
         return Promise.reject('Loading fonts is not allowed.');
     }
+    /**
+     * Draw loading screen on the provided canvas.
+     */
+    drawLoadingCanvas($canvas) {
+        return undefined;
+    }
 }
 exports.FeatureProvider = FeatureProvider;
 exports.defaultFeatureProvider = new FeatureProvider();
@@ -5708,10 +5729,13 @@ exports.canvasStdFunctions = [
         $newCanvas.width = canvas.getWidth();
         $newCanvas.height = canvas.getHeight();
         $newCanvas.style.maxWidth = '100%';
+        interpreterHandle.featureProvider.drawLoadingCanvas($newCanvas);
         interpreterHandle.pushContent($newCanvas);
         canvas.onResolve(() => {
             if (document.body.contains($newCanvas)) {
-                $newCanvas.getContext('2d').drawImage(canvas.canvas, 0, 0);
+                const ctx = $newCanvas.getContext('2d');
+                ctx.clearRect(0, 0, $newCanvas.width, $newCanvas.height);
+                ctx.drawImage(canvas.canvas, 0, 0);
             }
         });
         return constantsPool_1.getMaybePooled('null', null);
@@ -5882,6 +5906,8 @@ exports.canvasStdFunctions = [
             const ctx = canvas.ctx;
             ctx.textAlign = hAlign;
             ctx.textBaseline = vAlign;
+            ctx.lineJoin = 'round';
+            ctx.lineCap = 'round';
             ctx.strokeText(text, x, y);
         }));
         return constantsPool_1.getMaybePooled('null', null);
