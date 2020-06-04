@@ -1,4 +1,138 @@
 WTCD 1.3
+declare string path = "AlterResources"
+declare action next = goto first
+declare string canvas = "makai:auto_gal_play_canvas"
+
+// 0 墙壁
+// 1 地板
+// 2 出口
+// 3 事件
+// 4 楼梯
+// 5 桌子A
+// 6 桌子B
+// 7 凳子
+// 9 出生点&路
+declare list basementMap = [
+    [0 0 0 0 0 0 0 0 0 0 0 0 0]
+    [0 0 0 0 0 0 1 1 1 0 0 0 0]
+    [0 5 6 0 1 0 1 7 1 1 1 2 4]
+    [0 1 1 1 1 0 1 1 0 1 0 0 0]
+    [0 9 7 1 1 1 1 0 1 1 1 0 0]
+    [0 0 0 0 0 0 0 0 0 0 0 0 0]
+]
+//--- 2D Map Module
+
+declare list tempMap = basementMap
+
+declare action up = goto first
+declare action down = goto first
+declare action right = goto first
+declare action left = goto first
+
+declare number currentX = 0
+declare number currentY = 0
+
+declare function modifyMap = function[list map number x number y number value]{
+    declare list xList = map.(y)
+    return listSet::[map y listSet::[xList x value]]
+}
+declare function getMap = function[list map number x number y]{
+    declare list xList = map.(y)
+    return xList.(x)
+}
+declare function getCurrentPosition = function[list map]{
+    declare number resultX = -1
+    declare number resultY = -1
+    listForEach::[map function[list l number index]{
+        declare number result = listIndexOf::[l 9]
+        (result > -1) ? {
+            resultX = result
+            resultY = index
+        } : {}
+    }]
+    return [resultX resultY]
+}
+
+declare function drawMap = function[string canvas list map]{
+    canvasClear::[canvas]
+    listForEach::[map function[list yList number y]{
+        listForEach::[yList function[number value number x]{
+            if(value==9){
+                currentX = x
+                currentY = y
+                canvasPutImage::[canvas "./" + path + "/ground_icon.png" x * 72 y * 72]
+                canvasPutImage::[canvas "./" + path + "/kyogen_icon.png" x * 72 y * 72]
+            } else if(value==0){
+                canvasPutImage::[canvas "./" + path + "/brick_icon.png" x * 72 y * 72]
+            } else if(value==4){
+                canvasPutImage::[canvas "./" + path + "/stair_icon.png" x * 72 y * 72]
+            } else if(value==5){
+                canvasPutImage::[canvas "./" + path + "/desk_a_icon.png" x * 72 y * 72]
+            } else if(value==6){
+                canvasPutImage::[canvas "./" + path + "/desk_b_icon.png" x * 72 y * 72]
+            } else if(value==7){
+                canvasPutImage::[canvas "./" + path + "/chair_icon.png" x * 72 y * 72]
+            } else {
+                canvasPutImage::[canvas "./" + path + "/ground_icon.png" x * 72 y * 72]
+            }
+        }]
+    }]
+    canvasOutput::[canvas]
+}
+
+declare function move = function[list map number x number y action nextAction action finishAction action trickAction = goto end] {
+    declare number nextX = x + currentX
+    declare number nextY = y + currentY
+    declare number nextMap = getMap::[map nextX nextY]
+
+    if nextMap == 0 {
+        return nextAction
+    } else if nextMap == 3{
+        next = trickAction
+        return trickAction
+    } else if nextMap == 2{
+        next = finishAction
+        return finishAction
+    } else if nextMap == 1{
+        map = modifyMap::[map currentX currentY 1]
+        map = modifyMap::[map nextX nextY 9]
+        tempMap = map
+        return nextAction
+    } else {
+        return nextAction
+    }
+}
+
+declare function canMove = function[list map number x number y]{
+    declare number nextX = x + currentX
+    declare number nextY = y + currentY
+    if nextX < 0 || nextY < 0 {
+        return false
+    }
+    
+    declare number nextMap = getMap::[map nextX nextY]
+    if nextMap == 7 {
+        return false
+    }
+    if nextMap == 6 {
+        return false
+    }
+    if nextMap == 5 {
+        return false
+    }
+    if nextMap == 4 {
+        return false
+    }
+    if nextMap == 0 {
+        return false
+    } else {
+        return true
+    }
+}
+//--- End of 2D Map Module
+
+//--- Galgame Module
+
 declare function newMap[] {
     declare list keySet
     declare list valueSet
@@ -56,11 +190,8 @@ declare function newMapOf[list key list value]{
 declare number stage = 0
 declare number backgroundStage = 0
 declare number imageId = 0
-declare action next = goto first
 
-declare string path = "AlterResources"
 declare boolean canvasCreated = false
-declare string canvas = "makai:auto_gal_play_canvas"
 declare function nameMap = newMapOf::[
     [   "秋镜悬"           "李随物"]         // Name
     [   "kyogen_stage"     "suiwu_stage"]   // Path
@@ -82,6 +213,11 @@ declare function play = function[string dialogs function endAction] {
         a = stringSplit::[dialogs "\n\n"].(imageId)
     }
     print::[stage]
+    if a == "backgroundStage：0" {
+        backgroundStage = 0
+        imageId = imageId + 1
+        a = stringSplit::[dialogs "\n\n"].(imageId)
+    }
     if a == "backgroundStage：1" {
         backgroundStage = 1
         imageId = imageId + 1
@@ -145,6 +281,7 @@ declare function play = function[string dialogs function endAction] {
         imageId = imageId + 1
     }
 }
+//--- End of Galgame Module
 
 declare string sectionHome = 
 "秋镜悬：呜……冰箱里什么也不剩了……就连面包和泡面都没有……
@@ -177,11 +314,11 @@ backgroundStage：1
 
 只见随着口球的取出，残存在随物口腔中的唾液也一并涌出，她喊道：
 
-李随物：镜……镜悬姐！
+李随物：（努力的试图用有些脱臼的下巴说）镜……镜悬姐！
 
 秋镜悬：那个……
 
-李随物：先……先让我高潮一次啦！！
+李随物：（努力的试图用有些脱臼的下巴说）先……先让我高潮一次啦！！
 
 秋镜悬：Emmmm，好……系统指令：模式切换，强制高潮，次数限定：一……
 
@@ -189,8 +326,103 @@ AI：权限验证中……验证通过。指令已接收。
 
 随着 AI 那和随物如出一辙的声音出现，随物身体里的几根按摩棒同时调整到了最高强度——
 
-李随物：呜——呜啊——"
+李随物：呜——呜啊——
 
+下体传来的快感，击垮了随物那本就因为长时间的边缘控制而有些恍惚的精神——
+
+我知道还是没有立绘，所以请再脑补一下因为高潮而爽到坏掉的李随物……
+
+李随物：（眼神上飘）呜————哈…………
+
+伴随着身体的些许震颤，AI 也停下了操作。
+
+AI：指令已完成。
+
+秋镜悬：那个……随物？
+
+李随物：（眼神上飘）呼哈……呼呜……
+
+过于强烈的快感，似乎是打断了李随物的思考回路，现在她怕是还沉浸在高潮的余韵之中。
+
+秋镜悬：……这题我做过，之前被这破 AI 做过一样的事情……怕是要等个十多分钟了……
+
+AI：……您说的很对 Dr. Aki。
+
+秋镜悬：好了现在你确实可以闭嘴了，系统指令：halt（关机）。
+
+AI：指令已接收。
+
+李随物：（眼神上飘）……
+
+秋镜悬：（小声）一会儿要被狠狠地玩一次了的样子……
+
+很有自知之明的秋镜悬，已经预料到一会儿央求李随物做晚饭之后，自己身上会发生些什么了。
+
+于是她还很有自觉地关掉了随物身上那个“原型机试做机”的 AI……
+
+秋镜悬：（一脸尴尬）
+
+于是过去了大概十分钟的样子。
+
+李随物：呜……好像，经历了不得了的事情……
+
+秋镜悬：啊，恢复了，好的……那个（逐渐小声）……晚饭……？
+
+李随物：……嗯，镜悬姐，我现在超级生气的。
+
+秋镜悬：（把头别向一边）嗯……我知道……
+
+李随物：（怒）所以，你是不是应该把我的手铐和这个贞操带给拆下来？
+
+好，因为没得晚饭吃显然是一个更恐怖的问题，所以秋镜悬非常听话的帮妹妹解开了手铐以及“原型机试做机”。
+
+李随物：（起身拍了拍裙摆）衣服都被弄皱了啦镜悬姐，我还挺中意这身的呢……
+
+秋镜悬：……
+
+李随物：（满脸“和善”的微笑）所以，我没弄错的话，镜悬姐你把我关在这里之后，都没考虑晚饭的吗？
+
+秋镜悬：……（点头）
+
+李随物：（满脸“和善”的微笑）那你是要我在这个快累死的状态下给你做晚饭吗？
+
+秋镜悬：……（从身后拿了几捆绳子出来交给了李随物）
+
+李随物：你这是想萌混过关吗？
+
+秋镜悬：……（开始脱衣服）
+
+对，还是没有立绘……好的，我一定去找个画师把立绘补上……
+
+李随物：（怒）好啊，那看上去镜悬姐你完全知道我想做些什么了呢。
+
+说着，李随物捡起了刚从自己嘴里卸下来，还沾着自己唾液的口球，说到：
+
+李随物：张嘴啦！
+
+秋镜悬：欸………………好吧…………啊——
+
+给秋镜悬戴上了口球之后，李随物将刚才拿到的那几捆绳子全都展了开来，
+
+先是给秋镜悬捆上了一层菱缚——在下体还特别打上了几个大号的绳结，
+
+又现场做了个收紧环，当作项圈一样套在了秋镜悬的脖子上，一手拉着“项圈”的绳子，一手指着地板：
+
+李随物：（怒）给我躺下去！
+
+秋镜悬：呜……
+
+待秋镜悬仰面朝天乖乖躺在了地板上后，李随物便将她的四肢折叠起来分别捆上——
+
+李随物：（拍了拍手）好了，镜悬姐你就当会儿我的坐骑吧，我可是累到完全爬不动楼梯了呢。
+
+说完，李随物便将秋镜悬翻了个身，让她的手肘和膝盖着了地。
+
+李随物：（坐在了秋镜悬的背上）那，镜悬姐你慢慢爬吧~
+
+秋镜悬：呜呜……
+
+接下来请移动到楼梯口吧。"
 
 section start then selection [ 
     choice "好的，我知道了" goto first
@@ -199,10 +431,21 @@ section start then selection [
     choice "好的，我知道了" goto first
 ]
 section first play::[sectionHome $ {
-    return goto end
+    return goto moveToFloor
 }] then selection [
     choice "继续" next
 ]
+
+section moveToFloor{
+    next = goto moveToFloor
+    drawMap::[canvas tempMap]
+} then selection [
+    choice "↑" canMove::[tempMap 0 (-1)] ? ($ move::[tempMap 0 (-1) goto moveToFloor goto end null]) : null
+    choice "←" canMove::[tempMap (-1) 0] ? ($ move::[tempMap (-1) 0 goto moveToFloor goto end null]) : null
+    choice "→" canMove::[tempMap 1 0] ? ($ move::[tempMap 1 0 goto moveToFloor goto end null]) : null
+    choice "↓" canMove::[tempMap 0 1] ? ($ move::[tempMap 0 1 goto moveToFloor goto end null]) : null
+]
+
 section end then exit
 
 ---<<< start >>>---

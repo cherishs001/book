@@ -1,0 +1,214 @@
+WTCD 1.3
+declare function newMap[] {
+    declare list keySet
+    declare list valueSet
+    declare null function it
+    it = function switch [
+        #indexOf $[key] {
+            return listIndexOf::[keySet key]
+        }
+        #remove $[key] {
+            declare number index = it::#indexOf::[key]
+            declare number end = listLength::[keySet]
+            if index < 0 {
+                return
+            } else if index == 0 {
+                keySet = [...listSlice::[keySet 1 end]]
+                valueSet = [...listSlice::[valueSet 1 end]]
+            } else if index >= ( end - 1 ) {
+                keySet = [...listSlice::[keySet 0 (end - 1)]]
+                valueSet = [...listSlice::[valueSet 0 (end - 1)]]
+            } else {
+                keySet = [...listSlice::[keySet 0 index] ...listSlice::[keySet (index + 1) end]]
+                valueSet = [...listSlice::[valueSet 0 index] ...listSlice::[valueSet (index + 1) end]]
+            }
+        }
+        #get $[key] {
+            return valueSet ?.? (it::#indexOf::[key])
+        }
+        #put $[key value] {
+            if value == null {
+                it::#remove::[key]
+                return
+            }
+            keySet = [...keySet key]
+            valueSet = [...valueSet value]
+        }
+        #contains $[key] {
+            return listIncludes::[keySet key]
+        }
+        null
+    ]
+    return it
+}
+
+declare function newMapOf[list key list value]{
+    declare function map = newMap::[]
+    declare number i = 0
+    while i < listLength::[key] {
+      map::#put::[key.(i) value.(i)]
+      i+=1
+    }
+    return map
+}
+
+
+declare number stage = 0
+declare number backgroundStage = 0
+declare number imageId = 0
+declare action next = goto first
+
+declare string path = "Resources"
+declare boolean canvasCreated = false
+declare string canvas = "makai:auto_gal_play_canvas"
+declare function nameMap = newMapOf::[
+    [   "秋镜悬"           "琳"]         // Name
+    [   "kyogen_stage"     "rin_stage"]   // Path
+]
+
+declare function play = function[string dialogs function endAction] {
+    if !canvasCreated {
+        canvasCreate::[canvas 1280 720]
+        canvasCreated = true
+    }
+    canvasClear::[canvas]
+    canvasSetFillStyle::[canvas "#FFFFFF"]
+    canvasSetFont::[canvas 32 "googleFonts:ZCOOL KuaiLe"]
+
+    declare string a = stringSplit::[dialogs "\n\n"].(imageId)
+    if a == "stage：1" {
+        stage = 1
+        imageId = imageId + 1
+        a = stringSplit::[dialogs "\n\n"].(imageId)
+    }
+    print::[stage]
+    if a == "backgroundStage：1" {
+        backgroundStage = 1
+        imageId = imageId + 1
+        a = stringSplit::[dialogs "\n\n"].(imageId)
+    }
+    if a == "backgroundStage：2" {
+        backgroundStage = 2
+        imageId = imageId + 1
+        a = stringSplit::[dialogs "\n\n"].(imageId)
+    }
+    declare string name = stringSplit::[a "："].(0)
+    declare string content = ""
+    if name == a {
+        name = ""
+        content = a
+    } else {
+        content = stringSubByLength::[a stringLength::[name] + 1]
+        if content == "" {
+            name = ""
+            content = a
+        }
+    }
+    readerSetStateDesc::[a]
+    canvasPutImage::[canvas "./" + path + "/bg_stage" + 
+    stringFormatNumberFixed::[backgroundStage]
+    + ".jpg" 0 0]
+    declare string content_second = ""
+    (stringLength::[content] > 36) ? {
+        content = "　　" + content
+        content_second = stringSubByLength::[content 37]
+        content = stringSubByLength::[content 0 37]
+    } : {}
+
+    if nameMap::#contains::[name] {
+        canvasPutImage::[canvas "./" + path + "/" + nameMap::#get::[name] +
+        stringFormatNumberFixed::[stage]
+        +".png" 540 260]
+    }
+
+    canvasPutImage::[canvas "./" + path + "/dialog.png" 0 0]
+
+    canvasSetFillStyle::[canvas "#FFFFFF"]
+    canvasSetStrokeStyle::[canvas "rgba(0,0,0,0.8)"]
+    canvasSetLineWidth::[canvas 5.5]
+
+    canvasStrokeText::[canvas name 100 550]
+    canvasFillText::[canvas name 100 550]
+    
+    canvasStrokeText::[canvas content 120 600]
+    canvasFillText::[canvas content 120 600]
+
+    canvasStrokeText::[canvas content_second 120 640]
+    canvasFillText::[canvas content_second 120 640]
+
+    canvasOutput::[canvas]
+    (imageId >= listLength::[stringSplit::[dialogs "\n\n"]] - 1) ? {
+        imageId = 0
+        next = endAction::[]
+        return endAction::[]
+    } : {
+        imageId = imageId + 1
+    }
+}
+
+section start then selection[
+    choice "继续" goto first
+]
+
+declare string sectionTruth = 
+"秋镜悬：琳！
+
+普通的一天，普通的秋镜悬正在给她的支线加工 WTCD 文档。
+
+似乎是发现了什么问题，完全不懂 WTCD 底层原理的秋镜悬，只能把琳叫过来了。
+
+琳：怎么啦？
+
+秋镜悬：你看这个（指着什么也没加载出来的屏幕），为什么没加载出来啦！
+
+琳： Hmmmm
+
+琳看了看屏幕，然后按下了 F12，屏幕上出现了十万个秋镜悬完全看不懂的窗口，里面写满了各种天书。
+
+琳： Hmmmm
+
+琳：我也不知道
+
+秋镜悬：你不知道个鬼……
+
+琳：我们先去 ghs 再管代码问题吧
+
+秋镜悬：……
+
+琳转身拿出了贞操带……
+
+秋镜悬：呜，起码，起码加一个跳蛋……？
+
+琳：不行。
+
+那之后，琳往 WTCD 的 Canvas 系统里增加了一句加载提示。
+
+秋镜悬：好，起码问题解决了（哭
+
+事后（
+
+琳：为什么我觉得还是咕咕喵写的更有意思一点……？
+
+秋镜悬：好，那这个是你说的。
+
+嘻嘻。"
+
+section first play::[sectionTruth $ {
+    return goto end
+}] then selection [
+    choice "继续" next
+]
+section end then exit
+
+---<<< end >>>---
+
+没了。 —— 友人♪B
+
+---<<< start >>>---
+# 关于催更 WTCD 特性的真相
+友人♪B
+
+!["真相"](./Resources/thetruth.jpg)
+
+把事实的真相艺术加工一下的话就是……
+
