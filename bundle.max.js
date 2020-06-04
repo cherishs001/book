@@ -752,6 +752,9 @@ exports.GO_TO_MENU = '返回';
 exports.NEXT_CHAPTER = '下一章';
 exports.CHAPTER_LOADING = '章节加载中...';
 exports.CHAPTER_FAILED = '章节加载失败，请检查网络连接。';
+exports.BUILD_FAILED_TITLE = '构建失败';
+exports.BUILD_FAILED_DESC = '《可穿戴科技》的网页构建脚本在构建过程中发生了可以恢复的异常。详细内容请参见控制台输出。';
+exports.BUILD_FAILED_OK = '我知道了';
 exports.COMMENTS_SECTION = '评论区';
 exports.COMMENTS_LOADING = '评论加载中...';
 exports.COMMENTS_UNAVAILABLE = '本文评论不可用。';
@@ -1312,22 +1315,22 @@ const select = ([anchorNodeIndex, anchorOffset, focusNodeIndex, focusOffset,]) =
 const canChapterShown = (chapter) => (settings_1.earlyAccess.getValue() || !chapter.isEarlyAccess) && (!chapter.hidden);
 function findNextChapter(chapterCtx) {
     const index = chapterCtx.inFolderIndex;
-    const folderChapters = chapterCtx.folder.chapters;
+    const folderChapters = chapterCtx.folder.children;
     for (let i = index + 1; i < folderChapters.length; i++) {
-        const chapter = folderChapters[i];
-        if (canChapterShown(chapter)) {
-            return chapter;
+        const child = folderChapters[i];
+        if (child.type !== 'folder' && canChapterShown(child)) {
+            return child;
         }
     }
     return null;
 }
 function findPreviousChapter(chapterCtx) {
     const index = chapterCtx.inFolderIndex;
-    const folderChapters = chapterCtx.folder.chapters;
+    const folderChapters = chapterCtx.folder.children;
     for (let i = index - 1; i >= 0; i--) {
-        const chapter = folderChapters[i];
-        if (canChapterShown(chapter)) {
-            return chapter;
+        const child = folderChapters[i];
+        if (child.type !== 'folder' && canChapterShown(child)) {
+            return child;
         }
     }
     return null;
@@ -2182,7 +2185,7 @@ function tokenToUsername(token) {
 }
 exports.tokenToUsername = tokenToUsername;
 function validToken(token) {
-    return !(tokenToUsername(token) == null);
+    return !(tokenToUsername(token) === null);
 }
 exports.validToken = validToken;
 function saveToken(token) {
@@ -2202,7 +2205,7 @@ function getUsername() {
 }
 exports.getUsername = getUsername;
 function hasToken() {
-    return window.localStorage.getItem('token') != null;
+    return window.localStorage.getItem('token') !== null;
 }
 exports.hasToken = hasToken;
 
@@ -2291,6 +2294,29 @@ function confirm(title, desc, yes, no) {
     });
 }
 exports.confirm = confirm;
+function notify(title, desc, yes) {
+    let resolved = false;
+    return new Promise(resolve => {
+        const modal = new Modal(hs_1.h('div', [
+            hs_1.h('h1', title),
+            desc === '' ? null : hs_1.h('p', desc),
+            hs_1.h('.button-container', [
+                hs_1.h('div', {
+                    onclick: () => {
+                        if (resolved) {
+                            return;
+                        }
+                        resolved = true;
+                        modal.close();
+                        resolve();
+                    },
+                }, yes),
+            ]),
+        ]));
+        modal.open();
+    });
+}
+exports.notify = notify;
 function isAnyModalOpened() {
     return $modalHolder.childElementCount > 0;
 }
@@ -2446,7 +2472,7 @@ function showLogin() {
                     })
                         .then((json) => {
                         m.close();
-                        if (json.username == null) {
+                        if (json.username === null) {
                             showMessage(messages_1.MAKAI_ERROR_INVALID_TOKEN);
                         }
                         else {
@@ -2564,7 +2590,7 @@ function showComment(block) {
                                         break;
                                 }
                             }
-                            else if (json.accessToken == null) {
+                            else if (json.accessToken === null) {
                                 showMessage(messages_1.MAKAI_ERROR_UNKNOWN);
                             }
                             else {
@@ -2644,15 +2670,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.data = window.DATA;
 exports.relativePathLookUpMap = new Map();
 function iterateFolder(folder) {
-    folder.subFolders.forEach(subFolder => {
-        iterateFolder(subFolder);
-    });
-    folder.chapters.forEach((chapter, index) => {
-        exports.relativePathLookUpMap.set(chapter.htmlRelativePath, {
-            folder,
-            chapter,
-            inFolderIndex: index,
-        });
+    folder.children.forEach((child, index) => {
+        if (child.type === 'folder') {
+            iterateFolder(child);
+        }
+        else {
+            exports.relativePathLookUpMap.set(child.htmlRelativePath, {
+                folder,
+                chapter: child,
+                inFolderIndex: index,
+            });
+        }
     });
 }
 iterateFolder(exports.data.chapterTree);
@@ -2777,7 +2805,9 @@ exports.h = hs;
 },{"hyperscript":4}],37:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const messages_1 = require("./constant/messages");
 const followQuery_1 = require("./control/followQuery");
+const modalControl_1 = require("./control/modalControl");
 const updateSelection_1 = require("./control/updateSelection");
 const data_1 = require("./data/data");
 const settings_1 = require("./data/settings");
@@ -2800,6 +2830,9 @@ if ($warning !== null) {
 const $buildNumber = DOM_1.id('build-number');
 $buildNumber.innerText = `Build ${data_1.data.buildNumber}`;
 new MainMenu_1.MainMenu().setActive(true);
+if (data_1.data.buildError) {
+    modalControl_1.notify(messages_1.BUILD_FAILED_TITLE, messages_1.BUILD_FAILED_DESC, messages_1.BUILD_FAILED_OK);
+}
 document.addEventListener('selectionchange', () => {
     updateSelection_1.updateSelection();
 });
@@ -2808,7 +2841,7 @@ window.addEventListener('popstate', () => {
 });
 followQuery_1.followQuery();
 
-},{"./control/followQuery":23,"./control/updateSelection":30,"./data/data":33,"./data/settings":34,"./menu/MainMenu":43,"./util/DOM":50}],38:[function(require,module,exports){
+},{"./constant/messages":11,"./control/followQuery":23,"./control/modalControl":28,"./control/updateSelection":30,"./data/data":33,"./data/settings":34,"./menu/MainMenu":43,"./util/DOM":50}],38:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const DebugLogger_1 = require("../DebugLogger");
@@ -2993,10 +3026,7 @@ function getDecorationForChapterType(chapterType) {
     }
 }
 function isEmptyFolder(folder) {
-    if (folder.chapters.length !== 0) {
-        return false;
-    }
-    return folder.subFolders.every(isEmptyFolder);
+    return folder.children.every(child => child.type === 'folder' && isEmptyFolder(child));
 }
 exports.isEmptyFolder = isEmptyFolder;
 class ChaptersMenu extends Menu_1.Menu {
@@ -3004,37 +3034,39 @@ class ChaptersMenu extends Menu_1.Menu {
         if (folder === undefined) {
             folder = data_1.data.chapterTree;
         }
-        super(folder.isRoot ? '章节选择' : folder.displayName, parent);
-        for (const subfolder of folder.subFolders) {
-            if (isEmptyFolder(subfolder)) {
-                continue;
+        super(folder.sourceRelativePath === '' ? '章节选择' : folder.displayName, parent);
+        for (const child of folder.children) {
+            if (child.type === 'folder') {
+                if (isEmptyFolder(child)) {
+                    continue;
+                }
+                const handle = this.addLink(new ChaptersMenu(this, child), true, Menu_1.ItemDecoration.ICON_FOLDER);
+                handle.append(`[${shortNumber_1.shortNumber(child.charsCount)}]`, 'char-count');
             }
-            const handle = this.addLink(new ChaptersMenu(this, subfolder), true, Menu_1.ItemDecoration.ICON_FOLDER);
-            handle.append(`[${shortNumber_1.shortNumber(subfolder.folderCharCount)}]`, 'char-count');
-        }
-        for (const chapter of folder.chapters) {
-            if (chapter.hidden) {
-                continue;
+            else {
+                if (child.hidden) {
+                    continue;
+                }
+                const handle = this.addItem(child.displayName, {
+                    small: true,
+                    button: true,
+                    decoration: getDecorationForChapterType(child.type),
+                })
+                    .onClick(() => {
+                    chapterControl_1.loadChapter(child.htmlRelativePath);
+                    history_1.updateHistory(true);
+                });
+                if (child.isEarlyAccess) {
+                    handle.prepend('[编写中]');
+                    handle.addClass('early-access');
+                }
+                handle.append(`[${shortNumber_1.shortNumber(child.charsCount)}]`, 'char-count');
+                const lastRead = window.localStorage.getItem('lastRead');
+                if (lastRead === child.htmlRelativePath) {
+                    attachLastReadLabelTo(handle);
+                }
+                chapterSelectionButtonsMap.set(child.htmlRelativePath, handle);
             }
-            const handle = this.addItem(chapter.displayName, {
-                small: true,
-                button: true,
-                decoration: getDecorationForChapterType(chapter.type),
-            })
-                .onClick(() => {
-                chapterControl_1.loadChapter(chapter.htmlRelativePath);
-                history_1.updateHistory(true);
-            });
-            if (chapter.isEarlyAccess) {
-                handle.prepend('[编写中]');
-                handle.addClass('early-access');
-            }
-            handle.append(`[${shortNumber_1.shortNumber(chapter.chapterCharCount)}]`, 'char-count');
-            const lastRead = window.localStorage.getItem('lastRead');
-            if (lastRead === chapter.htmlRelativePath) {
-                attachLastReadLabelTo(handle);
-            }
-            chapterSelectionButtonsMap.set(chapter.htmlRelativePath, handle);
         }
     }
 }
