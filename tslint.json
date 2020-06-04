@@ -21,7 +21,8 @@
     "no-shadowed-variable": false,
     "no-conditional-assignment": false,
     "max-line-length": false,
-    "no-bitwise": false
+    "no-bitwise": false,
+    "triple-equals": true
   },
   "rulesDirectory": []
 }

@@ -4,7 +4,7 @@ export function tokenToUsername(token: String) {
     return null;
 }
 export function validToken(token: String) {
-    return !(tokenToUsername(token) == null);
+    return !(tokenToUsername(token) === null);
 }
 export function saveToken(token: string) {
     window.localStorage.setItem('token', token);
@@ -19,5 +19,5 @@ export function getUsername() {
     return window.localStorage.getItem('username');
 }
 export function hasToken() {
-    return window.localStorage.getItem('token') != null;
+    return window.localStorage.getItem('token') !== null;
 }

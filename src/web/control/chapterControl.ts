@@ -66,11 +66,11 @@ const canChapterShown = (chapter: Chapter) =>
 
 function findNextChapter(chapterCtx: ChapterContext) {
   const index = chapterCtx.inFolderIndex;
-  const folderChapters = chapterCtx.folder.chapters;
+  const folderChapters = chapterCtx.folder.children;
   for (let i = index + 1; i < folderChapters.length; i++) {
-    const chapter = folderChapters[i];
-    if (canChapterShown(chapter)) {
-      return chapter;
+    const child = folderChapters[i];
+    if (child.type !== 'folder' && canChapterShown(child)) {
+      return child;
     }
   }
   return null;
@@ -78,11 +78,11 @@ function findNextChapter(chapterCtx: ChapterContext) {
 
 function findPreviousChapter(chapterCtx: ChapterContext) {
   const index = chapterCtx.inFolderIndex;
-  const folderChapters = chapterCtx.folder.chapters;
+  const folderChapters = chapterCtx.folder.children;
   for (let i = index - 1; i >= 0; i--) {
-    const chapter = folderChapters[i];
-    if (canChapterShown(chapter)) {
-      return chapter;
+    const child = folderChapters[i];
+    if (child.type !== 'folder' && canChapterShown(child)) {
+      return child;
     }
   }
   return null;

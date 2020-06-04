@@ -1,13 +1,15 @@
-export interface Node {
+export interface NodeBase {
+  type: NodeType;
   displayName: string;
   displayIndex: number;
-  name: string;
   sourceRelativePath: string;
+  charsCount: number;
 }
 
-export type ChapterType =
+export type NodeType =
+  | 'folder'   // Folder
   | 'Markdown' // Markdown based static chapter
-  | 'WTCD';   // WTCD based interactive chapter
+  | 'WTCD';    // WTCD based interactive chapter
 
 export interface ChapterFlagsMapped {
   isEarlyAccess: boolean;
@@ -16,10 +18,8 @@ export interface ChapterFlagsMapped {
 
 export type ChapterFlags = keyof ChapterFlagsMapped;
 
-export interface ChapterBase extends Node, ChapterFlagsMapped {
-  type: ChapterType;
+export interface ChapterBase extends NodeBase, ChapterFlagsMapped {
   htmlRelativePath: string;
-  chapterCharCount: number;
 }
 
 export interface MarkdownChapter extends ChapterBase {
@@ -48,12 +48,12 @@ export type WTCDChapter = WTCDChapterFlow | WTCDChapterGame;
 
 export type Chapter = MarkdownChapter | WTCDChapter;
 
-export interface Folder extends Node {
-  chapters: Array<Chapter>;
-  subFolders: Array<Folder>;
-  isRoot: boolean;
-  folderCharCount: number;
+export interface Folder extends NodeBase {
+  type: 'folder';
+  children: Array<Node>;
 }
+
+export type Node = Folder | Chapter;
 
 export interface Data {
   chapterTree: Folder;
@@ -61,4 +61,5 @@ export interface Data {
   paragraphsCount: number;
   keywordsCount: Array<[string, number]>;
   buildNumber: string;
+  buildError: boolean;
 }

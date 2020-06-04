@@ -1,4 +1,4 @@
-import { ChapterType, Folder } from '../../Data';
+import { NodeType, Folder } from '../../Data';
 import { loadChapter, loadChapterEvent } from '../control/chapterControl';
 import { updateHistory } from '../control/history';
 import { data } from '../data/data';
@@ -22,18 +22,15 @@ loadChapterEvent.on(newChapterHtmlRelativePath => {
   attachLastReadLabelTo(chapterSelectionButtonsMap.get(newChapterHtmlRelativePath));
 });
 
-function getDecorationForChapterType(chapterType: ChapterType) {
+function getDecorationForChapterType(chapterType: NodeType) {
   switch (chapterType) {
     case 'Markdown': return ItemDecoration.ICON_FILE;
     case 'WTCD': return ItemDecoration.ICON_GAME;
   }
 }
 
-export function isEmptyFolder(folder: Folder) {
-  if (folder.chapters.length !== 0) {
-    return false;
-  }
-  return folder.subFolders.every(isEmptyFolder);
+export function isEmptyFolder(folder: Folder): boolean {
+  return folder.children.every(child => child.type === 'folder' && isEmptyFolder(child));
 }
 
 export class ChaptersMenu extends Menu {
@@ -41,39 +38,40 @@ export class ChaptersMenu extends Menu {
     if (folder === undefined) {
       folder = data.chapterTree;
     }
-    super(folder.isRoot ? '章节选择' : folder.displayName, parent);
-    for (const subfolder of folder.subFolders) {
-      if (isEmptyFolder(subfolder)) {
-        continue;
-      }
-      const handle = this.addLink(new ChaptersMenu(this, subfolder), true, ItemDecoration.ICON_FOLDER);
-      handle.append(`[${shortNumber(subfolder.folderCharCount)}]`, 'char-count');
-    }
-    for (const chapter of folder.chapters) {
-      if (chapter.hidden) {
-        continue;
-      }
-      const handle = this.addItem(chapter.displayName, {
-        small: true,
-        button: true,
-        decoration: getDecorationForChapterType(chapter.type),
-      })
-        .onClick(() => {
-          loadChapter(chapter.htmlRelativePath);
-          updateHistory(true);
-        });
-      if (chapter.isEarlyAccess) {
-        handle.prepend('[编写中]');
-        handle.addClass('early-access');
-      }
-      handle.append(`[${shortNumber(chapter.chapterCharCount)}]`, 'char-count');
+    super(folder.sourceRelativePath === '' ? '章节选择' : folder.displayName, parent);
+    for (const child of folder.children) {
+      if (child.type === 'folder') {
+        if (isEmptyFolder(child)) {
+          continue;
+        }
+        const handle = this.addLink(new ChaptersMenu(this, child), true, ItemDecoration.ICON_FOLDER);
+        handle.append(`[${shortNumber(child.charsCount)}]`, 'char-count');
+      } else {
+        if (child.hidden) {
+          continue;
+        }
+        const handle = this.addItem(child.displayName, {
+          small: true,
+          button: true,
+          decoration: getDecorationForChapterType(child.type),
+        })
+          .onClick(() => {
+            loadChapter(child.htmlRelativePath);
+            updateHistory(true);
+          });
+        if (child.isEarlyAccess) {
+          handle.prepend('[编写中]');
+          handle.addClass('early-access');
+        }
+        handle.append(`[${shortNumber(child.charsCount)}]`, 'char-count');
 
-      const lastRead = window.localStorage.getItem('lastRead');
-      if (lastRead === chapter.htmlRelativePath) {
-        attachLastReadLabelTo(handle);
-      }
+        const lastRead = window.localStorage.getItem('lastRead');
+        if (lastRead === child.htmlRelativePath) {
+          attachLastReadLabelTo(handle);
+        }
 
-      chapterSelectionButtonsMap.set(chapter.htmlRelativePath, handle);
+        chapterSelectionButtonsMap.set(child.htmlRelativePath, handle);
+      }
     }
   }
 }

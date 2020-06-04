@@ -78,9 +78,9 @@ function backwardsCompTypeTransformer(
 }
 
 export interface SimpleLogger {
-  info(...stuff: any): void;
-  error(...stuff: any): void;
-  warn(...stuff: any): void;
+  info(msg: string): void;
+  error(msg: string): void;
+  warn(msg: string): void;
 }
 
 /**
@@ -1017,7 +1017,6 @@ export function parse({ source, mdi, sourceMap = false, logger = console, markdo
       const sectionFullName = (sectionBound === undefined)
         ? sectionName
         : `${sectionName}@${sectionBound}`;
-      logger.info(`Parsing markdown for section ${sectionFullName}.`);
       const variables: Array<{ elementClass: string, variableName: string }> = [];
 
       const sectionHTML = mdi.render(sectionMarkdown);

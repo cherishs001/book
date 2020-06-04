@@ -99,7 +99,7 @@ export function showLogin() {
           })
             .then((json) => {
               m.close();
-              if (json.username == null) {
+              if (json.username === null) {
                 showMessage(MAKAI_ERROR_INVALID_TOKEN);
               } else {
                 saveToken($token.value);
@@ -214,7 +214,7 @@ export function showComment(block: ContentBlock) {
                       showMessage(MAKAI_ERROR_UNKNOWN);
                       break;
                   }
-                } else if (json.accessToken == null) {
+                } else if (json.accessToken === null) {
                   showMessage(MAKAI_ERROR_UNKNOWN);
                 } else {
                   saveToken(json.accessToken);

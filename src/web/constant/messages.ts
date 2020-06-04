@@ -8,6 +8,10 @@ export const NEXT_CHAPTER = '下一章';
 export const CHAPTER_LOADING = '章节加载中...';
 export const CHAPTER_FAILED = '章节加载失败，请检查网络连接。';
 
+export const BUILD_FAILED_TITLE = '构建失败';
+export const BUILD_FAILED_DESC = '《可穿戴科技》的网页构建脚本在构建过程中发生了可以恢复的异常。详细内容请参见控制台输出。';
+export const BUILD_FAILED_OK = '我知道了';
+
 export const COMMENTS_SECTION = '评论区';
 export const COMMENTS_LOADING = '评论加载中...';
 export const COMMENTS_UNAVAILABLE = '本文评论不可用。';

@@ -88,6 +88,29 @@ export function confirm(title: string, desc: string, yes: string, no: string) {
   });
 }
 
+export function notify(title: string, desc: string, yes: string) {
+  let resolved = false;
+  return new Promise<void>(resolve => {
+    const modal = new Modal(h('div', [
+      h('h1', title),
+      desc === '' ? null : h('p', desc),
+      h('.button-container', [
+        h('div', {
+          onclick: () => {
+            if (resolved) {
+              return;
+            }
+            resolved = true;
+            modal.close();
+            resolve();
+          },
+        }, yes),
+      ]),
+    ]));
+    modal.open();
+  });
+}
+
 export function isAnyModalOpened() {
   return $modalHolder.childElementCount > 0;
 }
