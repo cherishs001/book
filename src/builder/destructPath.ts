@@ -1,6 +1,6 @@
 import { basename, relative } from 'path';
+import { DisplayIndex } from '../Data';
 import { chaptersDir } from './dirs';
-import {DisplayIndex} from '../Data';
 
 function removeExtension(name: string) {
   if (name.includes('.')) {
