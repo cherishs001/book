@@ -385,6 +385,7 @@ module.exports = function(arr, obj){
 },{}],6:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.DebugLogger = void 0;
 const materialDarkColors_1 = require("./constant/materialDarkColors");
 const settings_1 = require("./data/settings");
 const stringHash_1 = require("./util/stringHash");
@@ -413,6 +414,7 @@ exports.DebugLogger = DebugLogger;
 },{"./constant/materialDarkColors":10,"./data/settings":34,"./util/stringHash":57}],7:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.Event = void 0;
 class Event {
     constructor() {
         this.listeners = null;
@@ -504,6 +506,7 @@ exports.Event = Event;
 },{}],8:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.Menu = exports.ItemHandle = exports.ItemDecoration = void 0;
 const layoutControl_1 = require("./control/layoutControl");
 const DebugLogger_1 = require("./DebugLogger");
 const Event_1 = require("./Event");
@@ -706,11 +709,13 @@ exports.Menu = Menu;
 },{"./DebugLogger":6,"./Event":7,"./control/layoutControl":26}],9:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.loadingText = void 0;
 exports.loadingText = '加载中...';
 
 },{}],10:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.materialDarkColors = void 0;
 // https://material.io/resources/color/
 exports.materialDarkColors = [
     'b71c1c',
@@ -745,6 +750,7 @@ exports.materialDarkColors = [
 },{}],11:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.MAKAI_MODAL_CONTENT_DEVELOPMENT_HINT = exports.MAKAI_MODAL_CONTENT_YOU_WILL_GET_MAKAI_TOKEN_ONCE_YOU_SUBMIT_FIRST_COMMENT = exports.MAKAI_MODAL_CONTENT_MAKAI_TOKEN_IS_USED_TO_SUBMIT_COMMENTS = exports.MAKAI_MODAL_CONTENT_THIS_IS_YOUR_MAKAI_TOKEN = exports.MAKAI_MODAL_CONTENT_DELETION_CONFIRMATION = exports.MAKAI_MODAL_CONTENT_TOKEN_INPUT_PREFIX = exports.MAKAI_MODAL_CONTENT_EMAIL_INPUT_PREFIX = exports.MAKAI_MODAL_CONTENT_NAME_INPUT_PREFIX = exports.MAKAI_MODAL_CONTENT_COMMENT_HINT = exports.MAKAI_MODAL_CONFIRM_LOSS_EDITED_NO = exports.MAKAI_MODAL_CONFIRM_LOSS_EDITED_YES = exports.MAKAI_MODAL_CONFIRM_LOSS_EDITED = exports.MAKAI_MODAL_SUBMIT = exports.MAKAI_MODAL_SAVE = exports.MAKAI_MODAL_CANCEL = exports.MAKAI_MODAL_CONFIRM = exports.MAKAI_MODAL_OK = exports.MAKAI_MODAL_TITLE_COMMENT = exports.MAKAI_MODAL_TITLE_TOKEN = exports.MAKAI_MODAL_TITLE_WAITING = exports.MAKAI_MODAL_TITLE_INFO = exports.MAKAI_MODAL_TITLE_WARNING = exports.MAKAI_BUTTON_DELETE = exports.MAKAI_BUTTON_BLOCK = exports.MAKAI_GENERIC_LAST_MODIFIED_SUFFIX = exports.MAKAI_GENERIC_LAST_MODIFIED = exports.MAKAI_SUBMITTED_1 = exports.MAKAI_SUBMITTED_0 = exports.MAKAI_SUBMIT_1 = exports.MAKAI_SUBMIT_0 = exports.MAKAI_INFO_OBTAIN_TOKEN = exports.MAKAI_INFO_CONFIRM_TOKEN = exports.MAKAI_INFO_SET_TOKKEN_SUCCESS = exports.MAKAI_ERROR_UNKNOWN = exports.MAKAI_ERROR_USER_EXIST = exports.MAKAI_ERROR_INVALID_EMAIL = exports.MAKAI_ERROR_INVALID_TOKEN = exports.MAKAI_ERROR_EMPTY_TOKEN = exports.MAKAI_ERROR_DELETE_COMMENT_INVALID_TOKEN = exports.MAKAI_ERROR_SUBMIT_COMMENT_INVALID_TOKEN = exports.MAKAI_ERROR_INTERNET = exports.WTCD_CANVAS_LOADING = exports.WTCD_ERROR_INTERNAL_STACK_DESC = exports.WTCD_ERROR_INTERNAL_STACK_TITLE = exports.WTCD_ERROR_WTCD_STACK_DESC = exports.WTCD_ERROR_WTCD_STACK_TITLE = exports.WTCD_ERROR_MESSAGE = exports.WTCD_ERROR_INTERNAL_DESC = exports.WTCD_ERROR_INTERNAL_TITLE = exports.WTCD_ERROR_RUNTIME_DESC = exports.WTCD_ERROR_RUNTIME_TITLE = exports.WTCD_ERROR_COMPILE_DESC = exports.WTCD_ERROR_COMPILE_TITLE = exports.WTCD_GAME_NO_DESC = exports.WTCD_GAME_QUICK_LOAD_CONFIRM_CANCEL = exports.WTCD_GAME_QUICK_LOAD_CONFIRM_CONFIRM = exports.WTCD_GAME_QUICK_LOAD_CONFIRM_DESC = exports.WTCD_GAME_QUICK_LOAD_CONFIRM_TITLE = exports.WTCD_GAME_QUICK_LOAD_NOT_EXIST = exports.WTCD_GAME_QUICK_LOAD_OK = exports.WTCD_GAME_QUICK_LOAD = exports.WTCD_GAME_QUICK_SAVE_OK = exports.WTCD_GAME_QUICK_SAVE = exports.WTCD_GAME_LOAD_OK = exports.WTCD_GAME_LOAD_QUICK = exports.WTCD_GAME_LOAD_CANCEL = exports.WTCD_GAME_LOAD_TITLE = exports.WTCD_GAME_LOAD = exports.WTCD_GAME_SAVE_OK = exports.WTCD_GAME_SAVE_OVERWRITE_CANCEL = exports.WTCD_GAME_SAVE_OVERWRITE_CONFIRM = exports.WTCD_GAME_SAVE_OVERWRITE_TITLE = exports.WTCD_GAME_SAVE_NEW = exports.WTCD_GAME_SAVE_CANCEL = exports.WTCD_GAME_SAVE_TITLE = exports.WTCD_GAME_SAVE = exports.WTCD_GAME_RESTART_OK = exports.WTCD_GAME_RESTART_CANCEL = exports.WTCD_GAME_RESTART_DECISION_ONLY = exports.WTCD_GAME_RESTART_ALL = exports.WTCD_GAME_RESTART_DECISION_ONLY_DESC = exports.WTCD_GAME_RESTART_ALL_DESC = exports.WTCD_GAME_RESTART_DESC = exports.WTCD_GAME_RESTART_TITLE = exports.WTCD_GAME_RESTART = exports.CLICK_TO_UNBLOCK = exports.NO_BLOCKED_USERS = exports.COMMENTS_FAILED = exports.COMMENTS_LOADED = exports.COMMENTS_CREATE = exports.COMMENTS_UNAVAILABLE = exports.COMMENTS_LOADING = exports.COMMENTS_SECTION = exports.BUILD_FAILED_OK = exports.BUILD_FAILED_DESC = exports.BUILD_FAILED_TITLE = exports.CHAPTER_FAILED = exports.CHAPTER_LOADING = exports.NEXT_CHAPTER = exports.GO_TO_MENU = exports.PREVIOUS_CHAPTER = exports.EARLY_ACCESS_DESC = exports.EARLY_ACCESS_TITLE = void 0;
 exports.EARLY_ACCESS_TITLE = '编写中章节';
 exports.EARLY_ACCESS_DESC = '请注意，本文正在编写中，因此可能会含有未完成的句子或是尚未更新的信息。';
 exports.PREVIOUS_CHAPTER = '上一章';
@@ -852,6 +858,7 @@ exports.MAKAI_MODAL_CONTENT_DEVELOPMENT_HINT = 'WTCD 存档同步正在开发中
 },{}],12:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.stylePreviewArticle = void 0;
 exports.stylePreviewArticle = `<h1>午饭</h1>
 <p><em>作者：友人♪B</em></p>
 <p>“午饭，午饭♪”</p>
@@ -885,6 +892,7 @@ exports.stylePreviewArticle = `<h1>午饭</h1>
 },{}],13:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.thanks = void 0;
 exports.thanks = [
     { name: '神楽坂 立音' },
     { name: 'lgd_小翅膀' },
@@ -922,6 +930,7 @@ exports.thanks = [
 },{}],14:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.MonoDimensionTransitionControl = void 0;
 function sign(x) {
     return x > 0 ? 1 : x < 0 ? -1 : 0;
 }
@@ -1006,6 +1015,7 @@ exports.MonoDimensionTransitionControl = MonoDimensionTransitionControl;
 },{}],15:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.WTCDFeatureProvider = void 0;
 const FeatureProvider_1 = require("../../wtcd/FeatureProvider");
 const resolvePath_1 = require("../util/resolvePath");
 const DebugLogger_1 = require("../DebugLogger");
@@ -1073,6 +1083,7 @@ exports.WTCDFeatureProvider = WTCDFeatureProvider;
 },{"../../wtcd/FeatureProvider":59,"../DebugLogger":6,"../constant/messages":11,"../data/AutoCache":32,"../util/loadGooleFonts":52,"../util/resolvePath":55}],16:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.WTCDGameReaderUI = void 0;
 const GameReader_1 = require("../../wtcd/GameReader");
 const messages_1 = require("../constant/messages");
 const settings_1 = require("../data/settings");
@@ -1265,6 +1276,7 @@ exports.WTCDGameReaderUI = WTCDGameReaderUI;
 },{"../../wtcd/FeatureProvider":59,"../../wtcd/GameReader":61,"../DebugLogger":6,"../constant/messages":11,"../data/settings":34,"../hs":36,"../util/formatTime":51,"./createWTCDErrorMessageFromError":22,"./hintControl":24,"./modalControl":28}],17:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.ErrorType = exports.loadChapter = exports.loadNextChapter = exports.loadPrevChapter = exports.closeChapter = exports.loadChapterEvent = void 0;
 const FlowReader_1 = require("../../wtcd/FlowReader");
 const loadingText_1 = require("../constant/loadingText");
 const messages_1 = require("../constant/messages");
@@ -1526,6 +1538,7 @@ function insertContent(content, text, chapter) {
 },{"../../wtcd/FlowReader":60,"../DebugLogger":6,"../Event":7,"../constant/loadingText":9,"../constant/messages":11,"../data/AutoCache":32,"../data/data":33,"../data/settings":34,"../data/state":35,"../hs":36,"../input/gestures":38,"../input/keyboard":39,"../util/DOM":50,"./WTCDFeatureProvider":15,"./WTCDGameReaderUI":16,"./commentsControl":19,"./contentControl":20,"./createWTCDErrorMessage":21,"./createWTCDErrorMessageFromError":22,"./history":25,"./layoutControl":26,"./modalControl":28,"./processElements":29}],18:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.getBlockedUsers = exports.isUserBlocked = exports.unblockUser = exports.blockUser = exports.blockedUserUpdateEvent = void 0;
 const Event_1 = require("../Event");
 const blockedUsers = new Set(JSON.parse(window.localStorage.getItem('blockedUsers') || '[]'));
 exports.blockedUserUpdateEvent = new Event_1.Event();
@@ -1555,6 +1568,7 @@ exports.getBlockedUsers = getBlockedUsers;
 },{"../Event":7}],19:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.loadComments = exports.commentsCache = exports.getApiUrl = void 0;
 const messages_1 = require("../constant/messages");
 const AutoCache_1 = require("../data/AutoCache");
 const settings_1 = require("../data/settings");
@@ -1623,7 +1637,8 @@ function createCommentElement(userAvatarUrl, userName, userUrl, createTime, upda
         hs_1.h('.time', messages_1.MAKAI_SUBMITTED_0 + padName_1.padName(userName) + messages_1.MAKAI_SUBMITTED_1 + ((createTime === updateTime)
             ? formatTime_1.formatTimeRelative(new Date(createTime))
             : `${formatTime_1.formatTimeRelative(new Date(createTime))}` +
-                messages_1.MAKAI_GENERIC_LAST_MODIFIED + `${formatTime_1.formatTimeRelative(new Date(updateTime))}` + messages_1.MAKAI_GENERIC_LAST_MODIFIED_SUFFIX)), deleteButton === null ?
+                messages_1.MAKAI_GENERIC_LAST_MODIFIED + `${formatTime_1.formatTimeRelative(new Date(updateTime))}` + messages_1.MAKAI_GENERIC_LAST_MODIFIED_SUFFIX)),
+        deleteButton === null ?
             hs_1.h('a.block-user', {
                 onclick: () => {
                     commentBlockControl_1.blockUser(userName);
@@ -1690,6 +1705,7 @@ exports.loadComments = loadComments;
 },{"../DebugLogger":6,"../constant/messages":11,"../data/AutoCache":32,"../data/settings":34,"../data/state":35,"../hs":36,"../util/formatTime":51,"../util/padName":54,"./commentBlockControl":18,"./contentControl":20,"./makaiControl":27,"./modalControl":28,"./userControl":31}],20:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.ContentBlock = exports.Content = exports.ContentBlockStyle = exports.newContent = exports.focus = exports.getCurrentContent = exports.Side = void 0;
 const settings_1 = require("../data/settings");
 const DebugLogger_1 = require("../DebugLogger");
 const hs_1 = require("../hs");
@@ -1937,6 +1953,7 @@ exports.ContentBlock = ContentBlock;
 },{"../DebugLogger":6,"../data/settings":34,"../hs":36,"../input/keyboard":39,"../util/DOM":50,"./MonoDimensionTransitionControl":14,"./layoutControl":26}],21:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.createWTCDErrorMessage = void 0;
 const messages_1 = require("../constant/messages");
 const chapterControl_1 = require("./chapterControl");
 function createWTCDErrorMessage({ errorType, message, internalStack, wtcdStack, }) {
@@ -1995,6 +2012,7 @@ exports.createWTCDErrorMessage = createWTCDErrorMessage;
 },{"../constant/messages":11,"./chapterControl":17}],22:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.createWTCDErrorMessageFromError = void 0;
 const WTCDError_1 = require("../../wtcd/WTCDError");
 const chapterControl_1 = require("./chapterControl");
 const createWTCDErrorMessage_1 = require("./createWTCDErrorMessage");
@@ -2015,6 +2033,7 @@ exports.createWTCDErrorMessageFromError = createWTCDErrorMessageFromError;
 },{"../../wtcd/WTCDError":64,"./chapterControl":17,"./createWTCDErrorMessage":21}],23:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.followQuery = void 0;
 const data_1 = require("../data/data");
 const state_1 = require("../data/state");
 const chapterControl_1 = require("./chapterControl");
@@ -2066,6 +2085,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.createHint = void 0;
 const hs_1 = require("../hs");
 // Promise queue
 let current = Promise.resolve();
@@ -2088,6 +2108,7 @@ exports.createHint = createHint;
 },{"../hs":36}],25:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.updateHistory = exports.getTitle = void 0;
 const state_1 = require("../data/state");
 function getTitle() {
     let title = '可穿戴科技';
@@ -2115,6 +2136,7 @@ exports.updateHistory = updateHistory;
 },{"../data/state":35}],26:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.setLayout = exports.getCurrentLayout = exports.layoutChangeEvent = exports.Layout = void 0;
 const DebugLogger_1 = require("../DebugLogger");
 const Event_1 = require("../Event");
 var Layout;
@@ -2178,6 +2200,7 @@ exports.setLayout = setLayout;
 },{"../DebugLogger":6,"../Event":7}],27:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.hasToken = exports.getUsername = exports.getToken = exports.saveUsername = exports.saveToken = exports.validToken = exports.tokenToUsername = exports.makaiUrl = void 0;
 exports.makaiUrl = 'https://c.makai.city';
 function tokenToUsername(token) {
     // const res = fetch(makaiUrl + '/username/' + token);
@@ -2212,6 +2235,7 @@ exports.hasToken = hasToken;
 },{}],28:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.isAnyModalOpened = exports.notify = exports.confirm = exports.Modal = void 0;
 const settings_1 = require("../data/settings");
 const hs_1 = require("../hs");
 const keyboard_1 = require("../input/keyboard");
@@ -2325,6 +2349,7 @@ exports.isAnyModalOpened = isAnyModalOpened;
 },{"../data/settings":34,"../hs":36,"../input/keyboard":39,"../util/DOM":50}],29:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.processElements = void 0;
 const DOM_1 = require("../util/DOM");
 function processElements($parent) {
     Array.from($parent.getElementsByTagName('a')).forEach(($anchor) => {
@@ -2354,6 +2379,7 @@ exports.processElements = processElements;
 },{"../util/DOM":50}],30:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.updateSelection = void 0;
 const state_1 = require("../data/state");
 const history_1 = require("./history");
 function updateSelection() {
@@ -2407,6 +2433,7 @@ exports.updateSelection = updateSelection;
 },{"../data/state":35,"./history":25}],31:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.showComment = exports.sendComment = exports.showLogin = exports.showLoading = exports.showMessage = void 0;
 const messages_1 = require("../constant/messages");
 const state_1 = require("../data/state");
 const hs_1 = require("../hs");
@@ -2636,6 +2663,7 @@ exports.showComment = showComment;
 },{"../constant/messages":11,"../data/state":35,"../hs":36,"../util/padName":54,"./commentsControl":19,"./contentControl":20,"./makaiControl":27,"./modalControl":28}],32:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.AutoCache = void 0;
 class AutoCache {
     constructor(loader, logger) {
         this.loader = loader;
@@ -2667,6 +2695,7 @@ exports.AutoCache = AutoCache;
 },{}],33:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.relativePathLookUpMap = exports.data = void 0;
 exports.data = window.DATA;
 exports.relativePathLookUpMap = new Map();
 function iterateFolder(folder) {
@@ -2688,6 +2717,7 @@ iterateFolder(exports.data.chapterTree);
 },{}],34:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.wtcdGameQuickLoadConfirm = exports.charCount = exports.developerMode = exports.fontFamily = exports.gestureSwitchChapter = exports.useComments = exports.earlyAccess = exports.warning = exports.animation = exports.EnumSetting = exports.BooleanSetting = void 0;
 const noop = () => { };
 class BooleanSetting {
     constructor(key, defaultValue, onUpdate = noop) {
@@ -2790,6 +2820,7 @@ exports.wtcdGameQuickLoadConfirm = new BooleanSetting('wtcdGameQuickLoadConfirm'
 },{}],35:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.state = void 0;
 exports.state = {
     currentChapter: null,
     chapterSelection: null,
@@ -2799,6 +2830,7 @@ exports.state = {
 },{}],36:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.h = void 0;
 const hs = require("hyperscript");
 exports.h = hs;
 
@@ -2844,6 +2876,7 @@ followQuery_1.followQuery();
 },{"./constant/messages":11,"./control/followQuery":23,"./control/modalControl":28,"./control/updateSelection":30,"./data/data":33,"./data/settings":34,"./menu/MainMenu":43,"./util/DOM":50}],38:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.swipeEvent = exports.SwipeDirection = void 0;
 const DebugLogger_1 = require("../DebugLogger");
 const Event_1 = require("../Event");
 const DOM_1 = require("../util/DOM");
@@ -2928,6 +2961,7 @@ exports.swipeEvent.on(direction => {
 },{"../DebugLogger":6,"../Event":7,"../util/DOM":50}],39:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.escapeKeyPressEvent = exports.arrowKeyPressEvent = exports.ArrowKey = void 0;
 const DebugLogger_1 = require("../DebugLogger");
 const Event_1 = require("../Event");
 var ArrowKey;
@@ -2969,6 +3003,7 @@ exports.arrowKeyPressEvent.on(arrowKey => {
 },{"../DebugLogger":6,"../Event":7}],40:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.BlockMenu = void 0;
 const messages_1 = require("../constant/messages");
 const commentBlockControl_1 = require("../control/commentBlockControl");
 const Menu_1 = require("../Menu");
@@ -3000,6 +3035,7 @@ exports.BlockMenu = BlockMenu;
 },{"../Menu":8,"../constant/messages":11,"../control/commentBlockControl":18}],41:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.ChaptersMenu = exports.isEmptyFolder = void 0;
 const chapterControl_1 = require("../control/chapterControl");
 const history_1 = require("../control/history");
 const data_1 = require("../data/data");
@@ -3075,6 +3111,7 @@ exports.ChaptersMenu = ChaptersMenu;
 },{"../Menu":8,"../control/chapterControl":17,"../control/history":25,"../data/data":33,"../util/shortNumber":56}],42:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.ContactMenu = void 0;
 const Menu_1 = require("../Menu");
 class ContactMenu extends Menu_1.Menu {
     constructor(parent) {
@@ -3110,6 +3147,7 @@ exports.ContactMenu = ContactMenu;
 },{"../Menu":8}],43:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.MainMenu = void 0;
 const Menu_1 = require("../Menu");
 const ChaptersMenu_1 = require("./ChaptersMenu");
 const ContactMenu_1 = require("./ContactMenu");
@@ -3134,6 +3172,7 @@ exports.MainMenu = MainMenu;
 },{"../Menu":8,"./ChaptersMenu":41,"./ContactMenu":42,"./SettingsMenu":45,"./StatsMenu":47,"./StyleMenu":48,"./ThanksMenu":49}],44:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.MakaiMenu = void 0;
 const userControl_1 = require("../control/userControl");
 const Menu_1 = require("../Menu");
 class MakaiMenu extends Menu_1.Menu {
@@ -3152,6 +3191,7 @@ exports.MakaiMenu = MakaiMenu;
 },{"../Menu":8,"../control/userControl":31}],45:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.SettingsMenu = exports.EnumSettingMenu = void 0;
 const stylePreviewArticle_1 = require("../constant/stylePreviewArticle");
 const contentControl_1 = require("../control/contentControl");
 const layoutControl_1 = require("../control/layoutControl");
@@ -3224,6 +3264,7 @@ exports.SettingsMenu = SettingsMenu;
 },{"../Menu":8,"../constant/stylePreviewArticle":12,"../control/contentControl":20,"../control/layoutControl":26,"../data/settings":34,"./BlockMenu":40,"./MakaiMenu":44}],46:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.StatsKeywordsCountMenu = void 0;
 const data_1 = require("../data/data");
 const Menu_1 = require("../Menu");
 class StatsKeywordsCountMenu extends Menu_1.Menu {
@@ -3245,6 +3286,7 @@ exports.StatsKeywordsCountMenu = StatsKeywordsCountMenu;
 },{"../Menu":8,"../data/data":33}],47:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.StatsMenu = void 0;
 const data_1 = require("../data/data");
 const Menu_1 = require("../Menu");
 const StatsKeywordsCountMenu_1 = require("./StatsKeywordsCountMenu");
@@ -3262,6 +3304,7 @@ exports.StatsMenu = StatsMenu;
 },{"../Menu":8,"../data/data":33,"./StatsKeywordsCountMenu":46}],48:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.StyleMenu = void 0;
 const stylePreviewArticle_1 = require("../constant/stylePreviewArticle");
 const contentControl_1 = require("../control/contentControl");
 const layoutControl_1 = require("../control/layoutControl");
@@ -3399,6 +3442,7 @@ exports.StyleMenu = StyleMenu;
 },{"../DebugLogger":6,"../Menu":8,"../constant/stylePreviewArticle":12,"../control/contentControl":20,"../control/layoutControl":26,"../hs":36}],49:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.ThanksMenu = void 0;
 const thanks_1 = require("../constant/thanks");
 const Menu_1 = require("../Menu");
 class ThanksMenu extends Menu_1.Menu {
@@ -3416,6 +3460,7 @@ exports.ThanksMenu = ThanksMenu;
 },{"../Menu":8,"../constant/thanks":13}],50:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.insertAfter = exports.isAnyParent = exports.selectNode = exports.getTextNodes = exports.id = void 0;
 const DebugLogger_1 = require("../DebugLogger");
 function id(id) {
     return document.getElementById(id);
@@ -3468,6 +3513,7 @@ exports.insertAfter = insertAfter;
 },{"../DebugLogger":6}],51:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.formatTimeSimple = exports.formatTimeRelative = void 0;
 const SECOND = 1000;
 const MINUTE = 60 * SECOND;
 const HOUR = 60 * MINUTE;
@@ -3508,6 +3554,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.loadGoogleFonts = void 0;
 const DebugLogger_1 = require("../DebugLogger");
 const matchAll_1 = require("./matchAll");
 const debugLogger = new DebugLogger_1.DebugLogger('Load Google Fonts');
@@ -3533,6 +3580,7 @@ exports.loadGoogleFonts = loadGoogleFonts;
 },{"../DebugLogger":6,"./matchAll":53}],53:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.matchAll = void 0;
 function matchAll(str, regex) {
     if (regex.global !== true) {
         throw new Error('Global flag is required.');
@@ -3549,6 +3597,7 @@ exports.matchAll = matchAll;
 },{}],54:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.padName = void 0;
 const cjkBeginRegex = /^(?:[\u4E00-\u9FCC\u3400-\u4DB5\uFA0E\uFA0F\uFA11\uFA13\uFA14\uFA1F\uFA21\uFA23\uFA24\uFA27-\uFA29]|[\ud840-\ud868][\udc00-\udfff]|\ud869[\udc00-\uded6\udf00-\udfff]|[\ud86a-\ud86c][\udc00-\udfff]|\ud86d[\udc00-\udf34\udf40-\udfff]|\ud86e[\udc00-\udc1d])/;
 const cjkEndRegex = /(?:[\u4E00-\u9FCC\u3400-\u4DB5\uFA0E\uFA0F\uFA11\uFA13\uFA14\uFA1F\uFA21\uFA23\uFA24\uFA27-\uFA29]|[\ud840-\ud868][\udc00-\udfff]|\ud869[\udc00-\uded6\udf00-\udfff]|[\ud86a-\ud86c][\udc00-\udfff]|\ud86d[\udc00-\udf34\udf40-\udfff]|\ud86e[\udc00-\udc1d])$/;
 function padName(name) {
@@ -3565,6 +3614,7 @@ exports.padName = padName;
 },{}],55:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.resolvePath = void 0;
 /**
  * Input: ['a/b', '..', 'c/../e', 'f']
  * Output: 'a/e/f'
@@ -3598,6 +3648,7 @@ exports.resolvePath = resolvePath;
 },{}],56:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.shortNumber = void 0;
 function shortNumber(input) {
     if (input < 1000) {
         return String(input);
@@ -3612,6 +3663,7 @@ exports.shortNumber = shortNumber;
 },{}],57:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.stringHash = void 0;
 // https://stackoverflow.com/a/7616484
 function stringHash(str) {
     let hash = 0;
@@ -3629,6 +3681,7 @@ exports.stringHash = stringHash;
 },{}],58:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.ChainedCanvas = void 0;
 class ChainedCanvas {
     constructor(width, height) {
         this.promise = Promise.resolve();
@@ -3655,6 +3708,7 @@ exports.ChainedCanvas = ChainedCanvas;
 },{}],59:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.defaultFeatureProvider = exports.FeatureProvider = void 0;
 /**
  * Implement methods to provide additional feature support.
  */
@@ -3690,6 +3744,7 @@ exports.defaultFeatureProvider = new FeatureProvider();
 },{}],60:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.FlowReader = void 0;
 const Interpreter_1 = require("./Interpreter");
 const Random_1 = require("./Random");
 const FeatureProvider_1 = require("./FeatureProvider");
@@ -3902,6 +3957,7 @@ exports.FlowReader = FlowReader;
 },{"./FeatureProvider":59,"./Interpreter":62,"./Random":63}],61:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.GameReader = void 0;
 const Interpreter_1 = require("./Interpreter");
 const Random_1 = require("./Random");
 const FeatureProvider_1 = require("./FeatureProvider");
@@ -4106,6 +4162,7 @@ exports.GameReader = GameReader;
 },{"./FeatureProvider":59,"./Interpreter":62,"./Random":63}],62:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.Interpreter = exports.InvalidChoiceError = exports.assignValueToVariable = exports.isTypeAssignableTo = exports.describe = exports.BubbleSignal = exports.BubbleSignalType = exports.isEqual = void 0;
 const constantsPool_1 = require("./constantsPool");
 const invokeFunction_1 = require("./invokeFunction");
 const operators_1 = require("./operators");
@@ -4939,6 +4996,7 @@ exports.Interpreter = Interpreter;
 },{"./WTCDError":64,"./constantsPool":66,"./invokeFunction":67,"./operators":68,"./std":72,"./utils":79}],63:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.Random = void 0;
 /**
  * Convert a string to 32 bit hash
  * https://stackoverflow.com/a/47593316
@@ -5002,6 +5060,7 @@ exports.Random = Random;
 },{}],64:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.WTCDError = void 0;
 const empty = {};
 class WTCDError extends Error {
     constructor(message, line, column) {
@@ -5048,6 +5107,7 @@ exports.WTCDError = WTCDError;
 },{}],65:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.autoEvaluated = void 0;
 function autoEvaluated(fn) {
     return (expr, interpreterHandle) => {
         const arg0 = interpreterHandle.evaluator(expr.arg0);
@@ -5060,6 +5120,7 @@ exports.autoEvaluated = autoEvaluated;
 },{}],66:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.getMaybePooled = exports.booleanValue = exports.smallIntegers = exports.falseValue = exports.trueValue = exports.nullValue = void 0;
 // Your typical immature optimization
 // Caches null values, boolean values, and small integers to somewhat reduce GC
 exports.nullValue = { type: 'null', value: null };
@@ -5096,6 +5157,7 @@ exports.getMaybePooled = getMaybePooled;
 },{}],67:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.reverseInvocation = exports.pipelineInvocation = exports.regularInvocation = exports.regularInvocationRaw = exports.invokeFunctionRaw = exports.FunctionInvocationError = void 0;
 const autoEvaluated_1 = require("./autoEvaluated");
 const constantsPool_1 = require("./constantsPool");
 const Interpreter_1 = require("./Interpreter");
@@ -5272,6 +5334,7 @@ exports.reverseInvocation = autoEvaluated_1.autoEvaluated((arg0, arg1, expr, int
 "use strict";
 // This file defines all infix and prefix operators in WTCD.
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.operators = exports.conditionalOperatorPrecedence = exports.binaryOperators = exports.unaryOperators = void 0;
 const autoEvaluated_1 = require("./autoEvaluated");
 const constantsPool_1 = require("./constantsPool");
 const Interpreter_1 = require("./Interpreter");
@@ -5695,6 +5758,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.canvasStdFunctions = void 0;
 const constantsPool_1 = require("../constantsPool");
 const utils_1 = require("./utils");
 const ChainedCanvas_1 = require("../ChainedCanvas");
@@ -5949,6 +6013,7 @@ exports.canvasStdFunctions = [
 },{"../ChainedCanvas":58,"../constantsPool":66,"./utils":78}],70:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.contentStdFunctions = void 0;
 const constantsPool_1 = require("../constantsPool");
 const Interpreter_1 = require("../Interpreter");
 const utils_1 = require("./utils");
@@ -6053,6 +6118,7 @@ exports.contentStdFunctions = [
 },{"../Interpreter":62,"../constantsPool":66,"./utils":78}],71:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.debugStdFunctions = void 0;
 const constantsPool_1 = require("../constantsPool");
 const Interpreter_1 = require("../Interpreter");
 const invokeFunction_1 = require("../invokeFunction");
@@ -6119,6 +6185,7 @@ exports.debugStdFunctions = [
 },{"../Interpreter":62,"../WTCDError":64,"../constantsPool":66,"../invokeFunction":67,"./utils":78}],72:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.stdFunctions = void 0;
 const content_1 = require("./content");
 const debug_1 = require("./debug");
 const list_1 = require("./list");
@@ -6141,6 +6208,7 @@ exports.stdFunctions = [
 },{"./canvas":69,"./content":70,"./debug":71,"./list":73,"./math":74,"./random":75,"./reader":76,"./string":77}],73:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.listStdFunctions = void 0;
 const constantsPool_1 = require("../constantsPool");
 const Interpreter_1 = require("../Interpreter");
 const invokeFunction_1 = require("../invokeFunction");
@@ -6407,6 +6475,7 @@ exports.listStdFunctions = [
 },{"../Interpreter":62,"../WTCDError":64,"../constantsPool":66,"../invokeFunction":67,"./utils":78}],74:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.mathStdFunctions = void 0;
 const constantsPool_1 = require("../constantsPool");
 const utils_1 = require("./utils");
 exports.mathStdFunctions = [
@@ -6445,6 +6514,7 @@ exports.mathStdFunctions = [
 },{"../constantsPool":66,"./utils":78}],75:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.randomStdFunctions = void 0;
 const constantsPool_1 = require("../constantsPool");
 const utils_1 = require("./utils");
 exports.randomStdFunctions = [
@@ -6498,6 +6568,7 @@ exports.randomStdFunctions = [
 },{"../constantsPool":66,"./utils":78}],76:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.readerStdFunctions = void 0;
 const constantsPool_1 = require("../constantsPool");
 const utils_1 = require("./utils");
 exports.readerStdFunctions = [
@@ -6528,6 +6599,7 @@ exports.readerStdFunctions = [
 },{"../constantsPool":66,"./utils":78}],77:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.stringStdFunctions = void 0;
 const constantsPool_1 = require("../constantsPool");
 const utils_1 = require("./utils");
 exports.stringStdFunctions = [
@@ -6616,6 +6688,7 @@ exports.stringStdFunctions = [
 },{"../constantsPool":66,"./utils":78}],78:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.assertArgType = exports.nullify = exports.assertArgsLength = exports.NativeFunctionError = void 0;
 const constantsPool_1 = require("../constantsPool");
 const Interpreter_1 = require("../Interpreter");
 class NativeFunctionError extends Error {
@@ -6662,6 +6735,7 @@ exports.assertArgType = assertArgType;
 },{"../Interpreter":62,"../constantsPool":66}],79:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.arrayEquals = exports.flat = void 0;
 function flat(arr) {
     const result = [];
     for (const item of arr) {
