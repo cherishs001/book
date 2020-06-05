@@ -4,11 +4,15 @@ import { Folder, Node } from '../../Data';
 import { LoaderContext } from '../LoaderContext';
 import { load, Loader } from './Loader';
 
-interface HasDisplayIndex {
-  displayIndex: number;
-}
-function byDisplayIndex(a: HasDisplayIndex, b: HasDisplayIndex) {
-  return a.displayIndex - b.displayIndex;
+function byDisplayIndex(a: Node, b: Node) {
+  const largestCommonIndex = Math.min(a.displayIndex.length, b.displayIndex.length);
+  for (let i = 0; i < largestCommonIndex; i++) {
+    const diff = a.displayIndex[i] - b.displayIndex[i];
+    if (diff !== 0) {
+      return diff;
+    }
+  }
+  return a.displayIndex.length - b.displayIndex.length;
 }
 
 export const folderLoader: Loader = {

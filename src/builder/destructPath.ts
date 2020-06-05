@@ -1,5 +1,6 @@
 import { basename, relative } from 'path';
 import { chaptersDir } from './dirs';
+import {DisplayIndex} from '../Data';
 
 function removeExtension(name: string) {
   if (name.includes('.')) {
@@ -8,10 +9,24 @@ function removeExtension(name: string) {
   return name;
 }
 
+const displayIndexRegex = /^(?:[1-9][0-9]*|0)(?:\.(?:[1-9][0-9]*|0))*$/;
+function parseDisplayIndex(specifier: string): DisplayIndex {
+  if (!displayIndexRegex.test(specifier)) {
+    throw new Error(`Invalid display index specifier: "${specifier}".`);
+  }
+  return specifier.split('.').map(segment => {
+    const num = +segment;
+    if (num > Number.MAX_SAFE_INTEGER) {
+      throw new Error(`The segment "${segment}" is too large.`);
+    }
+    return num;
+  });
+}
+
 // Get basic displayName, displayIndex, name, relativePath from a full path
 export function destructPath(fullPath: string): {
   displayName: string,
-  displayIndex: number,
+  displayIndex: DisplayIndex,
   sourceRelativePath: string,
 } {
   const relativePath = relative(chaptersDir, fullPath);
@@ -20,7 +35,7 @@ export function destructPath(fullPath: string): {
     // Root
     return {
       displayName: '',
-      displayIndex: 0,
+      displayIndex: [0],
       sourceRelativePath: relativePath,
     };
   }
@@ -32,10 +47,10 @@ export function destructPath(fullPath: string): {
 
   const separatorIndex = name.indexOf(' - ');
   if (separatorIndex === -1) {
-    displayIndex = +removeExtension(name);
+    displayIndex = parseDisplayIndex(removeExtension(name));
     displayName = `第 ${displayIndex} 章`;
   } else {
-    displayIndex = +name.substr(0, separatorIndex);
+    displayIndex = parseDisplayIndex(name.substr(0, separatorIndex));
     displayName = removeExtension(name.substr(separatorIndex + 3));
   }
 

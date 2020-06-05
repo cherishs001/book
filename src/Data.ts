@@ -1,7 +1,9 @@
+export type DisplayIndex = Array<number>;
+
 export interface NodeBase {
   type: NodeType;
   displayName: string;
-  displayIndex: number;
+  displayIndex: DisplayIndex;
   sourceRelativePath: string;
   charsCount: number;
 }
