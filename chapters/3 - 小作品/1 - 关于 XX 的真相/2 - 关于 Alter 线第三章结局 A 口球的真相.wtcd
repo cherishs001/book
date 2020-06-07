@@ -1,0 +1,229 @@
+WTCD 1.3
+declare function newMap[] {
+    declare list keySet
+    declare list valueSet
+    declare null function it
+    it = function switch [
+        #indexOf $[key] {
+            return listIndexOf::[keySet key]
+        }
+        #remove $[key] {
+            declare number index = it::#indexOf::[key]
+            declare number end = listLength::[keySet]
+            if index < 0 {
+                return
+            } else if index == 0 {
+                keySet = [...listSlice::[keySet 1 end]]
+                valueSet = [...listSlice::[valueSet 1 end]]
+            } else if index >= ( end - 1 ) {
+                keySet = [...listSlice::[keySet 0 (end - 1)]]
+                valueSet = [...listSlice::[valueSet 0 (end - 1)]]
+            } else {
+                keySet = [...listSlice::[keySet 0 index] ...listSlice::[keySet (index + 1) end]]
+                valueSet = [...listSlice::[valueSet 0 index] ...listSlice::[valueSet (index + 1) end]]
+            }
+        }
+        #get $[key] {
+            return valueSet ?.? (it::#indexOf::[key])
+        }
+        #put $[key value] {
+            if value == null {
+                it::#remove::[key]
+                return
+            }
+            keySet = [...keySet key]
+            valueSet = [...valueSet value]
+        }
+        #contains $[key] {
+            return listIncludes::[keySet key]
+        }
+        null
+    ]
+    return it
+}
+
+declare function newMapOf[list key list value]{
+    declare function map = newMap::[]
+    declare number i = 0
+    while i < listLength::[key] {
+      map::#put::[key.(i) value.(i)]
+      i+=1
+    }
+    return map
+}
+
+
+declare number stage = 0
+declare number backgroundStage = 0
+declare number imageId = 0
+declare action next = goto first
+
+declare string path = "Resources"
+declare boolean canvasCreated = false
+declare string canvas = "makai:auto_gal_play_canvas"
+declare function nameMap = newMapOf::[
+    [   "秋镜悬"           "琳"]         // Name
+    [   "kyogen_stage"     "rin_stage"]   // Path
+]
+
+declare function play = function[string dialogs function endAction] {
+    if !canvasCreated {
+        canvasCreate::[canvas 1280 720]
+        canvasCreated = true
+    }
+    canvasClear::[canvas]
+    canvasSetFillStyle::[canvas "#FFFFFF"]
+    canvasSetFont::[canvas 32 "googleFonts:ZCOOL KuaiLe"]
+
+    declare string a = stringSplit::[dialogs "\n\n"].(imageId)
+    if a == "stage：1" {
+        stage = 1
+        imageId = imageId + 1
+        a = stringSplit::[dialogs "\n\n"].(imageId)
+    }
+    print::[stage]
+    if a == "backgroundStage：1" {
+        backgroundStage = 1
+        imageId = imageId + 1
+        a = stringSplit::[dialogs "\n\n"].(imageId)
+    }
+    if a == "backgroundStage：2" {
+        backgroundStage = 2
+        imageId = imageId + 1
+        a = stringSplit::[dialogs "\n\n"].(imageId)
+    }
+    declare string name = stringSplit::[a "："].(0)
+    declare string content = ""
+    if name == a {
+        name = ""
+        content = a
+    } else {
+        content = stringSubByLength::[a stringLength::[name] + 1]
+        if content == "" {
+            name = ""
+            content = a
+        }
+    }
+    readerSetStateDesc::[a]
+    canvasPutImage::[canvas "./" + path + "/bg_stage" + 
+    stringFormatNumberFixed::[backgroundStage]
+    + ".jpg" 0 0]
+    declare string content_second = ""
+    (stringLength::[content] > 36) ? {
+        content = "　　" + content
+        content_second = stringSubByLength::[content 37]
+        content = stringSubByLength::[content 0 37]
+    } : {}
+
+    if nameMap::#contains::[name] {
+        canvasPutImage::[canvas "./" + path + "/" + nameMap::#get::[name] +
+        stringFormatNumberFixed::[stage]
+        +".png" 540 260]
+    }
+
+    canvasPutImage::[canvas "./" + path + "/dialog.png" 0 0]
+
+    canvasSetFillStyle::[canvas "#FFFFFF"]
+    canvasSetStrokeStyle::[canvas "rgba(0,0,0,0.8)"]
+    canvasSetLineWidth::[canvas 5.5]
+
+    canvasStrokeText::[canvas name 100 550]
+    canvasFillText::[canvas name 100 550]
+    
+    canvasStrokeText::[canvas content 120 600]
+    canvasFillText::[canvas content 120 600]
+
+    canvasStrokeText::[canvas content_second 120 640]
+    canvasFillText::[canvas content_second 120 640]
+
+    canvasOutput::[canvas]
+    (imageId >= listLength::[stringSplit::[dialogs "\n\n"]] - 1) ? {
+        imageId = 0
+        next = endAction::[]
+        return endAction::[]
+    } : {
+        imageId = imageId + 1
+    }
+}
+
+section start then selection[
+    choice "继续" goto first
+]
+
+declare string sectionTruth = 
+"秋镜悬：琳！
+
+琳：这个开场有点眼熟。
+
+秋镜悬：不要在意这些细节！
+
+琳： 好吧，所以怎么了？
+
+秋镜悬：琳你最长一次带口球带了多久啊？
+
+琳：Hmmmm
+
+琳：一个晚上？
+
+秋镜悬：那你起床之后能说话吗？
+
+琳：Hmmmm，好像可以？
+
+秋镜悬：（陷入思考）
+
+然后秋镜悬翻箱倒柜，找出了一个大概很久没有用过的口球。
+
+琳：诶，你要干嘛？
+
+秋镜悬：实验！来，张嘴！
+
+总而言之，忽略了琳的反抗，秋镜悬强行把口球塞进了琳的嘴里。
+
+秋镜悬：好嘞，我开始计时了呐！
+
+琳：呜……
+
+总而言之，大概四个小时以后……
+
+琳：（拿手机打字说）我可以拿下来了吗
+
+秋镜悬：虽然我觉得你能带着口球睡着这件事情实在是太神奇了，但是你再带一会儿吧！
+
+琳：……
+
+又过了那么一会儿。
+
+秋镜悬：好了，我觉得差不多了。
+
+于是秋镜悬帮琳把口球摘了下来……
+
+一会儿要处理一下地板上的口水了。
+
+琳：嗯……啊……
+
+大概十秒，
+
+琳：就，牙齿有点痛？
+
+秋镜悬：诶？居然是牙疼吗？？"
+
+
+
+section first play::[sectionTruth $ {
+    return goto end
+}] then selection [
+    choice "继续" next
+]
+section end then exit
+
+---<<< end >>>---
+
+没了。 —— 友人♪B
+
+---<<< start >>>---
+# 关于 Alter 线第三章结局 A 口球的真相
+友人♪B
+
+因为群友表示 Alter 线第三章结局 A 里随物摘下口球可以直接说话这件事有点奇怪，于是非常好奇事实真相的友人♪B，回忆了自己的经历之后发现自己就没有带口球超过一个小时，所以——
+
+把这件事情艺术加工一下的话就是……
