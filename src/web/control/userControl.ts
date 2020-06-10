@@ -127,7 +127,7 @@ export function sendComment(textarea: string, block: ContentBlock, modal: Modal)
 
   const m = showLoading(MAKAI_INFO_CONFIRM_TOKEN);
   fetch(makaiUrl + '/comment/' + getToken(), {
-    body: JSON.stringify({ pageName: state.currentChapter?.chapter.htmlRelativePath.replace(/\//g, '.'), content: textarea }),
+    body: JSON.stringify({ pageName: state.currentChapter!.chapter.htmlRelativePath, content: textarea }),
     cache: 'no-cache',
     credentials: 'same-origin',
     headers: new Headers({

@@ -19,6 +19,9 @@ export const COMMENTS_CREATE = '+ 添加评论';
 export const COMMENTS_LOADED = '以下为本章节的评论区。';
 export const COMMENTS_FAILED = '评论加载失败，请检查网络连接。';
 
+export const COMMENTS_RECENT_SECTION = '最新评论';
+export const COMMENTS_RECENT_LOADED = '以下是最新的十条评论。';
+
 export const NO_BLOCKED_USERS = '没有用户的评论被屏蔽';
 export const CLICK_TO_UNBLOCK = '(点击用户名以解除屏蔽)';
 
