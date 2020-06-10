@@ -4,6 +4,8 @@ import {
   COMMENTS_LOADED,
   COMMENTS_LOADING,
   COMMENTS_SECTION,
+  COMMENTS_RECENT_SECTION,
+  COMMENTS_RECENT_LOADED,
   MAKAI_BUTTON_BLOCK,
   MAKAI_BUTTON_DELETE,
   MAKAI_ERROR_DELETE_COMMENT_INVALID_TOKEN,
@@ -36,7 +38,7 @@ const debugLogger = new DebugLogger('Comments Control');
 // Input sample: https://github.com/SCLeoX/Wearable-Technology/issues/1
 // Output sample: https://api.github.com/repos/SCLeoX/Wearable-Technology/issues/1/comments
 export function getApiUrl() {
-  return makaiUrl + '/comment/github/' + state.currentChapter?.chapter.htmlRelativePath.replace(/\//g, '.') + '/';
+  return makaiUrl + '/comment/github/' + encodeURIComponent(state.currentChapter!.chapter.htmlRelativePath) + '/';
 }
 
 function createCommentElement(
@@ -49,6 +51,7 @@ function createCommentElement(
   id: number,
   block: ContentBlock,
   display: string,
+  pageName?: string,
 ) {
   const deleteButton = userName === getUsername()?.toLowerCase() ? h('a.block-user', {
     onclick: () => {
@@ -103,6 +106,9 @@ function createCommentElement(
         },
       }, MAKAI_BUTTON_BLOCK) : deleteButton,
     ...content.split('\n\n').map(paragraph => h('p', paragraph)),
+    pageName === undefined ? null : h('p', h('a.pageName', {
+      href: `#${pageName}`,
+    }, `发表于${padName(pageName.replace(/\//g, ' > ').replace(/-/g, ' ').replace(/\.html$/, ''))}`)),
   ]);
   return $comment;
 }
@@ -159,7 +165,7 @@ export function loadComments(content: Content) {
           comment.body,
           comment.id,
           block,
-          comment.user.display
+          comment.user.display,
         ));
       });
       $comments.appendChild(
@@ -169,6 +175,53 @@ export function loadComments(content: Content) {
           },
         }, COMMENTS_CREATE),
       );
+    })
+      .catch(() => {
+        $commentsStatus.innerText = COMMENTS_FAILED;
+      });
+  });
+}
+
+export function loadRecentComments(content: Content) {
+  if (useComments.getValue() === false) {
+    return;
+  }
+  const $commentsStatus = h('p', COMMENTS_LOADING);
+  const $comments = h('.comments', [
+    h('h1', COMMENTS_RECENT_SECTION),
+    $commentsStatus,
+  ]) as HTMLDivElement;
+  const block = content.addBlock({
+    initElement: $comments,
+  });
+
+  block.onEnteringView(() => {
+    const apiUrl = 'https://c.makai.city/comment/recent/github/10';
+    commentsCache.get(apiUrl).then(data => {
+      if (content.isDestroyed) {
+        debugLogger.log('Comments loaded, but abandoned since the original ' +
+          'content page is already destroyed.');
+        return;
+      }
+      debugLogger.log('Comments loaded.');
+      $commentsStatus.innerText = COMMENTS_RECENT_LOADED;
+      data.forEach((comment: any) => {
+        if (isUserBlocked(comment.user.login)) {
+          return;
+        }
+        $comments.appendChild(createCommentElement(
+          comment.user.avatar_url,
+          comment.user.login,
+          comment.user.html_url,
+          comment.created_at,
+          comment.updated_at,
+          comment.body,
+          comment.id,
+          block,
+          comment.user.display,
+          comment.pageName,
+        ));
+      });
     })
       .catch(() => {
         $commentsStatus.innerText = COMMENTS_FAILED;
