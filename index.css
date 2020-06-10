@@ -545,6 +545,10 @@ body.animation-enabled .content-container > .content > .slide-container > .conte
 .content-container > .content .content-block.comments > .comment > p {
   margin-bottom: 0;
 }
+.content-container > .content .content-block.comments > .comment > p > .pageName {
+  margin-top: 2em;
+  opacity: 0.5;
+}
 .nsfw-warning {
   position: fixed;
   z-index: 5;

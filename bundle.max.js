@@ -750,7 +750,7 @@ exports.materialDarkColors = [
 },{}],11:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.MAKAI_MODAL_CONTENT_DEVELOPMENT_HINT = exports.MAKAI_MODAL_CONTENT_YOU_WILL_GET_MAKAI_TOKEN_ONCE_YOU_SUBMIT_FIRST_COMMENT = exports.MAKAI_MODAL_CONTENT_MAKAI_TOKEN_IS_USED_TO_SUBMIT_COMMENTS = exports.MAKAI_MODAL_CONTENT_THIS_IS_YOUR_MAKAI_TOKEN = exports.MAKAI_MODAL_CONTENT_DELETION_CONFIRMATION = exports.MAKAI_MODAL_CONTENT_TOKEN_INPUT_PREFIX = exports.MAKAI_MODAL_CONTENT_EMAIL_INPUT_PREFIX = exports.MAKAI_MODAL_CONTENT_NAME_INPUT_PREFIX = exports.MAKAI_MODAL_CONTENT_COMMENT_HINT = exports.MAKAI_MODAL_CONFIRM_LOSS_EDITED_NO = exports.MAKAI_MODAL_CONFIRM_LOSS_EDITED_YES = exports.MAKAI_MODAL_CONFIRM_LOSS_EDITED = exports.MAKAI_MODAL_SUBMIT = exports.MAKAI_MODAL_SAVE = exports.MAKAI_MODAL_CANCEL = exports.MAKAI_MODAL_CONFIRM = exports.MAKAI_MODAL_OK = exports.MAKAI_MODAL_TITLE_COMMENT = exports.MAKAI_MODAL_TITLE_TOKEN = exports.MAKAI_MODAL_TITLE_WAITING = exports.MAKAI_MODAL_TITLE_INFO = exports.MAKAI_MODAL_TITLE_WARNING = exports.MAKAI_BUTTON_DELETE = exports.MAKAI_BUTTON_BLOCK = exports.MAKAI_GENERIC_LAST_MODIFIED_SUFFIX = exports.MAKAI_GENERIC_LAST_MODIFIED = exports.MAKAI_SUBMITTED_1 = exports.MAKAI_SUBMITTED_0 = exports.MAKAI_SUBMIT_1 = exports.MAKAI_SUBMIT_0 = exports.MAKAI_INFO_OBTAIN_TOKEN = exports.MAKAI_INFO_CONFIRM_TOKEN = exports.MAKAI_INFO_SET_TOKKEN_SUCCESS = exports.MAKAI_ERROR_UNKNOWN = exports.MAKAI_ERROR_USER_EXIST = exports.MAKAI_ERROR_INVALID_EMAIL = exports.MAKAI_ERROR_INVALID_TOKEN = exports.MAKAI_ERROR_EMPTY_TOKEN = exports.MAKAI_ERROR_DELETE_COMMENT_INVALID_TOKEN = exports.MAKAI_ERROR_SUBMIT_COMMENT_INVALID_TOKEN = exports.MAKAI_ERROR_INTERNET = exports.WTCD_CANVAS_LOADING = exports.WTCD_ERROR_INTERNAL_STACK_DESC = exports.WTCD_ERROR_INTERNAL_STACK_TITLE = exports.WTCD_ERROR_WTCD_STACK_DESC = exports.WTCD_ERROR_WTCD_STACK_TITLE = exports.WTCD_ERROR_MESSAGE = exports.WTCD_ERROR_INTERNAL_DESC = exports.WTCD_ERROR_INTERNAL_TITLE = exports.WTCD_ERROR_RUNTIME_DESC = exports.WTCD_ERROR_RUNTIME_TITLE = exports.WTCD_ERROR_COMPILE_DESC = exports.WTCD_ERROR_COMPILE_TITLE = exports.WTCD_GAME_NO_DESC = exports.WTCD_GAME_QUICK_LOAD_CONFIRM_CANCEL = exports.WTCD_GAME_QUICK_LOAD_CONFIRM_CONFIRM = exports.WTCD_GAME_QUICK_LOAD_CONFIRM_DESC = exports.WTCD_GAME_QUICK_LOAD_CONFIRM_TITLE = exports.WTCD_GAME_QUICK_LOAD_NOT_EXIST = exports.WTCD_GAME_QUICK_LOAD_OK = exports.WTCD_GAME_QUICK_LOAD = exports.WTCD_GAME_QUICK_SAVE_OK = exports.WTCD_GAME_QUICK_SAVE = exports.WTCD_GAME_LOAD_OK = exports.WTCD_GAME_LOAD_QUICK = exports.WTCD_GAME_LOAD_CANCEL = exports.WTCD_GAME_LOAD_TITLE = exports.WTCD_GAME_LOAD = exports.WTCD_GAME_SAVE_OK = exports.WTCD_GAME_SAVE_OVERWRITE_CANCEL = exports.WTCD_GAME_SAVE_OVERWRITE_CONFIRM = exports.WTCD_GAME_SAVE_OVERWRITE_TITLE = exports.WTCD_GAME_SAVE_NEW = exports.WTCD_GAME_SAVE_CANCEL = exports.WTCD_GAME_SAVE_TITLE = exports.WTCD_GAME_SAVE = exports.WTCD_GAME_RESTART_OK = exports.WTCD_GAME_RESTART_CANCEL = exports.WTCD_GAME_RESTART_DECISION_ONLY = exports.WTCD_GAME_RESTART_ALL = exports.WTCD_GAME_RESTART_DECISION_ONLY_DESC = exports.WTCD_GAME_RESTART_ALL_DESC = exports.WTCD_GAME_RESTART_DESC = exports.WTCD_GAME_RESTART_TITLE = exports.WTCD_GAME_RESTART = exports.CLICK_TO_UNBLOCK = exports.NO_BLOCKED_USERS = exports.COMMENTS_FAILED = exports.COMMENTS_LOADED = exports.COMMENTS_CREATE = exports.COMMENTS_UNAVAILABLE = exports.COMMENTS_LOADING = exports.COMMENTS_SECTION = exports.BUILD_FAILED_OK = exports.BUILD_FAILED_DESC = exports.BUILD_FAILED_TITLE = exports.CHAPTER_FAILED = exports.CHAPTER_LOADING = exports.NEXT_CHAPTER = exports.GO_TO_MENU = exports.PREVIOUS_CHAPTER = exports.EARLY_ACCESS_DESC = exports.EARLY_ACCESS_TITLE = void 0;
+exports.MAKAI_MODAL_CONTENT_DEVELOPMENT_HINT = exports.MAKAI_MODAL_CONTENT_YOU_WILL_GET_MAKAI_TOKEN_ONCE_YOU_SUBMIT_FIRST_COMMENT = exports.MAKAI_MODAL_CONTENT_MAKAI_TOKEN_IS_USED_TO_SUBMIT_COMMENTS = exports.MAKAI_MODAL_CONTENT_THIS_IS_YOUR_MAKAI_TOKEN = exports.MAKAI_MODAL_CONTENT_DELETION_CONFIRMATION = exports.MAKAI_MODAL_CONTENT_TOKEN_INPUT_PREFIX = exports.MAKAI_MODAL_CONTENT_EMAIL_INPUT_PREFIX = exports.MAKAI_MODAL_CONTENT_NAME_INPUT_PREFIX = exports.MAKAI_MODAL_CONTENT_COMMENT_HINT = exports.MAKAI_MODAL_CONFIRM_LOSS_EDITED_NO = exports.MAKAI_MODAL_CONFIRM_LOSS_EDITED_YES = exports.MAKAI_MODAL_CONFIRM_LOSS_EDITED = exports.MAKAI_MODAL_SUBMIT = exports.MAKAI_MODAL_SAVE = exports.MAKAI_MODAL_CANCEL = exports.MAKAI_MODAL_CONFIRM = exports.MAKAI_MODAL_OK = exports.MAKAI_MODAL_TITLE_COMMENT = exports.MAKAI_MODAL_TITLE_TOKEN = exports.MAKAI_MODAL_TITLE_WAITING = exports.MAKAI_MODAL_TITLE_INFO = exports.MAKAI_MODAL_TITLE_WARNING = exports.MAKAI_BUTTON_DELETE = exports.MAKAI_BUTTON_BLOCK = exports.MAKAI_GENERIC_LAST_MODIFIED_SUFFIX = exports.MAKAI_GENERIC_LAST_MODIFIED = exports.MAKAI_SUBMITTED_1 = exports.MAKAI_SUBMITTED_0 = exports.MAKAI_SUBMIT_1 = exports.MAKAI_SUBMIT_0 = exports.MAKAI_INFO_OBTAIN_TOKEN = exports.MAKAI_INFO_CONFIRM_TOKEN = exports.MAKAI_INFO_SET_TOKKEN_SUCCESS = exports.MAKAI_ERROR_UNKNOWN = exports.MAKAI_ERROR_USER_EXIST = exports.MAKAI_ERROR_INVALID_EMAIL = exports.MAKAI_ERROR_INVALID_TOKEN = exports.MAKAI_ERROR_EMPTY_TOKEN = exports.MAKAI_ERROR_DELETE_COMMENT_INVALID_TOKEN = exports.MAKAI_ERROR_SUBMIT_COMMENT_INVALID_TOKEN = exports.MAKAI_ERROR_INTERNET = exports.WTCD_CANVAS_LOADING = exports.WTCD_ERROR_INTERNAL_STACK_DESC = exports.WTCD_ERROR_INTERNAL_STACK_TITLE = exports.WTCD_ERROR_WTCD_STACK_DESC = exports.WTCD_ERROR_WTCD_STACK_TITLE = exports.WTCD_ERROR_MESSAGE = exports.WTCD_ERROR_INTERNAL_DESC = exports.WTCD_ERROR_INTERNAL_TITLE = exports.WTCD_ERROR_RUNTIME_DESC = exports.WTCD_ERROR_RUNTIME_TITLE = exports.WTCD_ERROR_COMPILE_DESC = exports.WTCD_ERROR_COMPILE_TITLE = exports.WTCD_GAME_NO_DESC = exports.WTCD_GAME_QUICK_LOAD_CONFIRM_CANCEL = exports.WTCD_GAME_QUICK_LOAD_CONFIRM_CONFIRM = exports.WTCD_GAME_QUICK_LOAD_CONFIRM_DESC = exports.WTCD_GAME_QUICK_LOAD_CONFIRM_TITLE = exports.WTCD_GAME_QUICK_LOAD_NOT_EXIST = exports.WTCD_GAME_QUICK_LOAD_OK = exports.WTCD_GAME_QUICK_LOAD = exports.WTCD_GAME_QUICK_SAVE_OK = exports.WTCD_GAME_QUICK_SAVE = exports.WTCD_GAME_LOAD_OK = exports.WTCD_GAME_LOAD_QUICK = exports.WTCD_GAME_LOAD_CANCEL = exports.WTCD_GAME_LOAD_TITLE = exports.WTCD_GAME_LOAD = exports.WTCD_GAME_SAVE_OK = exports.WTCD_GAME_SAVE_OVERWRITE_CANCEL = exports.WTCD_GAME_SAVE_OVERWRITE_CONFIRM = exports.WTCD_GAME_SAVE_OVERWRITE_TITLE = exports.WTCD_GAME_SAVE_NEW = exports.WTCD_GAME_SAVE_CANCEL = exports.WTCD_GAME_SAVE_TITLE = exports.WTCD_GAME_SAVE = exports.WTCD_GAME_RESTART_OK = exports.WTCD_GAME_RESTART_CANCEL = exports.WTCD_GAME_RESTART_DECISION_ONLY = exports.WTCD_GAME_RESTART_ALL = exports.WTCD_GAME_RESTART_DECISION_ONLY_DESC = exports.WTCD_GAME_RESTART_ALL_DESC = exports.WTCD_GAME_RESTART_DESC = exports.WTCD_GAME_RESTART_TITLE = exports.WTCD_GAME_RESTART = exports.CLICK_TO_UNBLOCK = exports.NO_BLOCKED_USERS = exports.COMMENTS_RECENT_LOADED = exports.COMMENTS_RECENT_SECTION = exports.COMMENTS_FAILED = exports.COMMENTS_LOADED = exports.COMMENTS_CREATE = exports.COMMENTS_UNAVAILABLE = exports.COMMENTS_LOADING = exports.COMMENTS_SECTION = exports.BUILD_FAILED_OK = exports.BUILD_FAILED_DESC = exports.BUILD_FAILED_TITLE = exports.CHAPTER_FAILED = exports.CHAPTER_LOADING = exports.NEXT_CHAPTER = exports.GO_TO_MENU = exports.PREVIOUS_CHAPTER = exports.EARLY_ACCESS_DESC = exports.EARLY_ACCESS_TITLE = void 0;
 exports.EARLY_ACCESS_TITLE = '编写中章节';
 exports.EARLY_ACCESS_DESC = '请注意，本文正在编写中，因此可能会含有未完成的句子或是尚未更新的信息。';
 exports.PREVIOUS_CHAPTER = '上一章';
@@ -767,6 +767,8 @@ exports.COMMENTS_UNAVAILABLE = '本文评论不可用。';
 exports.COMMENTS_CREATE = '+ 添加评论';
 exports.COMMENTS_LOADED = '以下为本章节的评论区。';
 exports.COMMENTS_FAILED = '评论加载失败，请检查网络连接。';
+exports.COMMENTS_RECENT_SECTION = '最新评论';
+exports.COMMENTS_RECENT_LOADED = '以下是最新的十条评论。';
 exports.NO_BLOCKED_USERS = '没有用户的评论被屏蔽';
 exports.CLICK_TO_UNBLOCK = '(点击用户名以解除屏蔽)';
 exports.WTCD_GAME_RESTART = '重置游戏';
@@ -1568,7 +1570,7 @@ exports.getBlockedUsers = getBlockedUsers;
 },{"../Event":7}],19:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.loadComments = exports.commentsCache = exports.getApiUrl = void 0;
+exports.loadRecentComments = exports.loadComments = exports.commentsCache = exports.getApiUrl = void 0;
 const messages_1 = require("../constant/messages");
 const AutoCache_1 = require("../data/AutoCache");
 const settings_1 = require("../data/settings");
@@ -1587,11 +1589,10 @@ const debugLogger = new DebugLogger_1.DebugLogger('Comments Control');
 // Input sample: https://github.com/SCLeoX/Wearable-Technology/issues/1
 // Output sample: https://api.github.com/repos/SCLeoX/Wearable-Technology/issues/1/comments
 function getApiUrl() {
-    var _a;
-    return makaiControl_1.makaiUrl + '/comment/github/' + ((_a = state_1.state.currentChapter) === null || _a === void 0 ? void 0 : _a.chapter.htmlRelativePath.replace(/\//g, '.')) + '/';
+    return makaiControl_1.makaiUrl + '/comment/github/' + encodeURIComponent(state_1.state.currentChapter.chapter.htmlRelativePath) + '/';
 }
 exports.getApiUrl = getApiUrl;
-function createCommentElement(userAvatarUrl, userName, userUrl, createTime, updateTime, content, id, block, display) {
+function createCommentElement(userAvatarUrl, userName, userUrl, createTime, updateTime, content, id, block, display, pageName) {
     var _a;
     const deleteButton = userName === ((_a = makaiControl_1.getUsername()) === null || _a === void 0 ? void 0 : _a.toLowerCase()) ? hs_1.h('a.block-user', {
         onclick: () => {
@@ -1647,6 +1648,9 @@ function createCommentElement(userAvatarUrl, userName, userUrl, createTime, upda
                 },
             }, messages_1.MAKAI_BUTTON_BLOCK) : deleteButton,
         ...content.split('\n\n').map(paragraph => hs_1.h('p', paragraph)),
+        pageName === undefined ? null : hs_1.h('p', hs_1.h('a.pageName', {
+            href: `#${pageName}`,
+        }, `发表于${padName_1.padName(pageName.replace(/\//g, ' > ').replace(/-/g, ' ').replace(/\.html$/, ''))}`)),
     ]);
     return $comment;
 }
@@ -1701,6 +1705,41 @@ function loadComments(content) {
     });
 }
 exports.loadComments = loadComments;
+function loadRecentComments(content) {
+    if (settings_1.useComments.getValue() === false) {
+        return;
+    }
+    const $commentsStatus = hs_1.h('p', messages_1.COMMENTS_LOADING);
+    const $comments = hs_1.h('.comments', [
+        hs_1.h('h1', messages_1.COMMENTS_RECENT_SECTION),
+        $commentsStatus,
+    ]);
+    const block = content.addBlock({
+        initElement: $comments,
+    });
+    block.onEnteringView(() => {
+        const apiUrl = 'https://c.makai.city/comment/recent/github/10';
+        exports.commentsCache.get(apiUrl).then(data => {
+            if (content.isDestroyed) {
+                debugLogger.log('Comments loaded, but abandoned since the original ' +
+                    'content page is already destroyed.');
+                return;
+            }
+            debugLogger.log('Comments loaded.');
+            $commentsStatus.innerText = messages_1.COMMENTS_RECENT_LOADED;
+            data.forEach((comment) => {
+                if (commentBlockControl_1.isUserBlocked(comment.user.login)) {
+                    return;
+                }
+                $comments.appendChild(createCommentElement(comment.user.avatar_url, comment.user.login, comment.user.html_url, comment.created_at, comment.updated_at, comment.body, comment.id, block, comment.user.display, comment.pageName));
+            });
+        })
+            .catch(() => {
+            $commentsStatus.innerText = messages_1.COMMENTS_FAILED;
+        });
+    });
+}
+exports.loadRecentComments = loadRecentComments;
 
 },{"../DebugLogger":6,"../constant/messages":11,"../data/AutoCache":32,"../data/settings":34,"../data/state":35,"../hs":36,"../util/formatTime":51,"../util/padName":54,"./commentBlockControl":18,"./contentControl":20,"./makaiControl":27,"./modalControl":28,"./userControl":31}],20:[function(require,module,exports){
 "use strict";
@@ -2521,14 +2560,13 @@ function showLogin() {
 }
 exports.showLogin = showLogin;
 function sendComment(textarea, block, modal) {
-    var _a;
     if (!makaiControl_1.hasToken()) {
         showMessage(messages_1.MAKAI_ERROR_INVALID_TOKEN);
         return;
     }
     const m = showLoading(messages_1.MAKAI_INFO_CONFIRM_TOKEN);
     fetch(makaiControl_1.makaiUrl + '/comment/' + makaiControl_1.getToken(), {
-        body: JSON.stringify({ pageName: (_a = state_1.state.currentChapter) === null || _a === void 0 ? void 0 : _a.chapter.htmlRelativePath.replace(/\//g, '.'), content: textarea }),
+        body: JSON.stringify({ pageName: state_1.state.currentChapter.chapter.htmlRelativePath, content: textarea }),
         cache: 'no-cache',
         credentials: 'same-origin',
         headers: new Headers({
@@ -3174,6 +3212,9 @@ exports.MainMenu = MainMenu;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MakaiMenu = void 0;
 const userControl_1 = require("../control/userControl");
+const contentControl_1 = require("../control/contentControl");
+const commentsControl_1 = require("../control/commentsControl");
+const layoutControl_1 = require("../control/layoutControl");
 const Menu_1 = require("../Menu");
 class MakaiMenu extends Menu_1.Menu {
     constructor(parent) {
@@ -3184,11 +3225,19 @@ class MakaiMenu extends Menu_1.Menu {
         }).onClick(() => {
             userControl_1.showLogin();
         });
+        this.addItem('最新评论', {
+            small: true,
+            button: true,
+        }).onClick(() => {
+            const content = contentControl_1.newContent(contentControl_1.Side.RIGHT);
+            layoutControl_1.setLayout(layoutControl_1.Layout.MAIN);
+            commentsControl_1.loadRecentComments(content);
+        });
     }
 }
 exports.MakaiMenu = MakaiMenu;
 
-},{"../Menu":8,"../control/userControl":31}],45:[function(require,module,exports){
+},{"../Menu":8,"../control/commentsControl":19,"../control/contentControl":20,"../control/layoutControl":26,"../control/userControl":31}],45:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SettingsMenu = exports.EnumSettingMenu = void 0;
