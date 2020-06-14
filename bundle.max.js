@@ -1725,7 +1725,7 @@ function loadComments(content) {
                     },
                 }, messages_1.COMMENTS_CREATE));
             }
-            data.forEach((comment) => {
+            data.reverse().forEach((comment) => {
                 if (commentBlockControl_1.isUserBlocked(comment.user.login)) {
                     return;
                 }
