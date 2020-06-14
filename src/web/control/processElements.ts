@@ -2,7 +2,8 @@ import { selectNode } from '../util/DOM';
 
 export function processElements($parent: HTMLElement) {
   Array.from($parent.getElementsByTagName('a')).forEach(($anchor: HTMLAnchorElement) => {
-    if (!$anchor.href.startsWith('#')) {
+    const hrefAttribute = $anchor.attributes.getNamedItem('href');
+    if (hrefAttribute !== null && !hrefAttribute.value.startsWith('#')) {
       $anchor.target = '_blank';
     }
     $anchor.rel = 'noopener noreferrer';
