@@ -2,7 +2,7 @@ body.animation-enabled {
   transition: background-color 0.3s;
 }
 .display-none {
-  display: none;
+  display: none !important;
 }
 @keyframes moving-strips {
   0% {
@@ -320,7 +320,7 @@ body.animation-enabled .wtcd-button {
 }
 .wtcd-button.selected {
   cursor: pointer;
-  border: white 0.2em sold;
+  border: white 0.2em;
   background-color: var(--button-color);
   box-shadow: rgba(0, 0, 0, 0) 0 0 0, 0 0 0 2px var(--key) inset;
 }
@@ -661,6 +661,19 @@ body.animation-enabled .modal-holder > .modal-container > .modal {
   margin: 0.4em !important;
   word-break: keep-all;
 }
+body.animation-enabled .button-container div.rich {
+  transition: background-color 0.3s, box-shadow 0.3s, color 0.3s;
+}
+.button-container div.rich.disabled {
+  color: var(--key-opacity-05);
+  background-color: var(--key-opacity-004);
+  box-shadow: none;
+}
+.button-container div.rich.selected {
+  border: white 0.2em;
+  background-color: var(--button-color);
+  box-shadow: rgba(0, 0, 0, 0) 0 0 0, 0 0 0 2px var(--key) inset;
+}
 .wtcd-save-button-list > div {
   margin-top: 2vh;
 }
@@ -813,6 +826,29 @@ h5 {
 h6 {
   font-size: 1.1em;
 }
+.visit-count-holder > a {
+  display: block;
+  overflow-x: visible;
+  margin: 0.2em 0;
+  padding: 0.15em 0.3em;
+  cursor: pointer;
+  white-space: nowrap;
+  border-top-right-radius: 0.4em;
+  border-bottom-right-radius: 0.4em;
+  background-color: var(--key-opacity-01);
+}
+body.animation-enabled .visit-count-holder > a {
+  transition: background-color 0.12s;
+}
+.visit-count-holder > a:hover {
+  background-color: var(--key-opacity-015) !important;
+}
+.visit-count-holder > a:active {
+  background-color: var(--key-opacity-01) !important;
+}
+.visit-count-holder:hover > a {
+  background-color: var(--key-opacity-007);
+}
 #common.button,
 .content-container > .content .content-block .page-switcher > a,
 .content-container > .content .content-block.comments > .create-comment,
@@ -858,6 +894,14 @@ body.animation-enabled .wtcd-save-button-list > div::before {
 .button-container div:active::before,
 .wtcd-save-button-list > div:active::before {
   opacity: 0.04;
+}
+#common.button.disabled::before,
+.content-container > .content .content-block .page-switcher > a.disabled::before,
+.content-container > .content .content-block.comments > .create-comment.disabled::before,
+.button-container div.disabled::before,
+.wtcd-save-button-list > div.disabled::before {
+  cursor: default;
+  opacity: 0;
 }
 #common.layer-card,
 .content-container > .content .content-block.comments > .comment,

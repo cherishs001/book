@@ -411,7 +411,7 @@ class DebugLogger {
 }
 exports.DebugLogger = DebugLogger;
 
-},{"./constant/materialDarkColors":10,"./data/settings":35,"./util/stringHash":60}],7:[function(require,module,exports){
+},{"./constant/materialDarkColors":10,"./data/settings":35,"./util/stringHash":61}],7:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Event = void 0;
@@ -752,7 +752,7 @@ exports.materialDarkColors = [
 },{}],11:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.MAKAI_MODAL_CONTENT_DEVELOPMENT_HINT = exports.MAKAI_MODAL_CONTENT_YOU_WILL_GET_MAKAI_TOKEN_ONCE_YOU_SUBMIT_FIRST_COMMENT = exports.MAKAI_MODAL_CONTENT_MAKAI_TOKEN_IS_USED_TO_SUBMIT_COMMENTS = exports.MAKAI_MODAL_CONTENT_THIS_IS_YOUR_MAKAI_TOKEN = exports.MAKAI_MODAL_CONTENT_DELETION_CONFIRMATION = exports.MAKAI_MODAL_CONTENT_TOKEN_INPUT_PREFIX = exports.MAKAI_MODAL_CONTENT_EMAIL_INPUT_PREFIX = exports.MAKAI_MODAL_CONTENT_NAME_INPUT_PREFIX = exports.MAKAI_MODAL_CONTENT_COMMENT_HINT = exports.MAKAI_MODAL_CONFIRM_LOSS_EDITED_NO = exports.MAKAI_MODAL_CONFIRM_LOSS_EDITED_YES = exports.MAKAI_MODAL_CONFIRM_LOSS_EDITED = exports.MAKAI_MODAL_SUBMIT = exports.MAKAI_MODAL_SAVE = exports.MAKAI_MODAL_CANCEL = exports.MAKAI_MODAL_CONFIRM = exports.MAKAI_MODAL_OK = exports.MAKAI_MODAL_TITLE_COMMENT = exports.MAKAI_MODAL_TITLE_TOKEN = exports.MAKAI_MODAL_TITLE_WAITING = exports.MAKAI_MODAL_TITLE_INFO = exports.MAKAI_MODAL_TITLE_WARNING = exports.MAKAI_BUTTON_DELETE = exports.MAKAI_BUTTON_BLOCK = exports.MAKAI_GENERIC_LAST_MODIFIED_SUFFIX = exports.MAKAI_GENERIC_LAST_MODIFIED = exports.MAKAI_SUBMITTED_1 = exports.MAKAI_SUBMITTED_0 = exports.MAKAI_SUBMIT_1 = exports.MAKAI_SUBMIT_0 = exports.MAKAI_INFO_OBTAIN_TOKEN = exports.MAKAI_INFO_CONFIRM_TOKEN = exports.MAKAI_INFO_SET_TOKKEN_SUCCESS = exports.MAKAI_ERROR_UNKNOWN = exports.MAKAI_ERROR_USER_EXIST = exports.MAKAI_ERROR_INVALID_EMAIL = exports.MAKAI_ERROR_INVALID_TOKEN = exports.MAKAI_ERROR_EMPTY_TOKEN = exports.MAKAI_ERROR_DELETE_COMMENT_INVALID_TOKEN = exports.MAKAI_ERROR_SUBMIT_COMMENT_INVALID_TOKEN = exports.MAKAI_ERROR_INTERNET = exports.WTCD_CANVAS_LOADING = exports.WTCD_ERROR_INTERNAL_STACK_DESC = exports.WTCD_ERROR_INTERNAL_STACK_TITLE = exports.WTCD_ERROR_WTCD_STACK_DESC = exports.WTCD_ERROR_WTCD_STACK_TITLE = exports.WTCD_ERROR_MESSAGE = exports.WTCD_ERROR_INTERNAL_DESC = exports.WTCD_ERROR_INTERNAL_TITLE = exports.WTCD_ERROR_RUNTIME_DESC = exports.WTCD_ERROR_RUNTIME_TITLE = exports.WTCD_ERROR_COMPILE_DESC = exports.WTCD_ERROR_COMPILE_TITLE = exports.WTCD_GAME_NO_DESC = exports.WTCD_GAME_QUICK_LOAD_CONFIRM_CANCEL = exports.WTCD_GAME_QUICK_LOAD_CONFIRM_CONFIRM = exports.WTCD_GAME_QUICK_LOAD_CONFIRM_DESC = exports.WTCD_GAME_QUICK_LOAD_CONFIRM_TITLE = exports.WTCD_GAME_QUICK_LOAD_NOT_EXIST = exports.WTCD_GAME_QUICK_LOAD_OK = exports.WTCD_GAME_QUICK_LOAD = exports.WTCD_GAME_QUICK_SAVE_OK = exports.WTCD_GAME_QUICK_SAVE = exports.WTCD_GAME_LOAD_OK = exports.WTCD_GAME_LOAD_QUICK = exports.WTCD_GAME_LOAD_CANCEL = exports.WTCD_GAME_LOAD_TITLE = exports.WTCD_GAME_LOAD = exports.WTCD_GAME_SAVE_OK = exports.WTCD_GAME_SAVE_OVERWRITE_CANCEL = exports.WTCD_GAME_SAVE_OVERWRITE_CONFIRM = exports.WTCD_GAME_SAVE_OVERWRITE_TITLE = exports.WTCD_GAME_SAVE_NEW = exports.WTCD_GAME_SAVE_CANCEL = exports.WTCD_GAME_SAVE_TITLE = exports.WTCD_GAME_SAVE = exports.WTCD_GAME_RESTART_OK = exports.WTCD_GAME_RESTART_CANCEL = exports.WTCD_GAME_RESTART_DECISION_ONLY = exports.WTCD_GAME_RESTART_ALL = exports.WTCD_GAME_RESTART_DECISION_ONLY_DESC = exports.WTCD_GAME_RESTART_ALL_DESC = exports.WTCD_GAME_RESTART_DESC = exports.WTCD_GAME_RESTART_TITLE = exports.WTCD_GAME_RESTART = exports.CLICK_TO_UNBLOCK = exports.NO_BLOCKED_USERS = exports.COMMENTS_RECENT_LOADED = exports.COMMENTS_RECENT_SECTION = exports.COMMENTS_FAILED = exports.COMMENTS_LOADED = exports.COMMENTS_CREATE = exports.COMMENTS_UNAVAILABLE = exports.COMMENTS_LOADING = exports.COMMENTS_SECTION = exports.BROKEN_LINK_OK = exports.BROKEN_LINK_DESC = exports.BROKEN_LINK_TITLE = exports.BUILD_FAILED_OK = exports.BUILD_FAILED_DESC = exports.BUILD_FAILED_TITLE = exports.CHAPTER_FAILED = exports.CHAPTER_LOADING = exports.NEXT_CHAPTER = exports.GO_TO_MENU = exports.PREVIOUS_CHAPTER = exports.EARLY_ACCESS_DESC = exports.EARLY_ACCESS_TITLE = void 0;
+exports.MAKAI_MODAL_CONTENT_DEVELOPMENT_HINT = exports.MAKAI_MODAL_CONTENT_YOU_WILL_GET_MAKAI_TOKEN_ONCE_YOU_SUBMIT_FIRST_COMMENT = exports.MAKAI_MODAL_CONTENT_MAKAI_TOKEN_IS_USED_TO_SUBMIT_COMMENTS = exports.MAKAI_MODAL_CONTENT_THIS_IS_YOUR_MAKAI_TOKEN = exports.MAKAI_MODAL_CONTENT_DELETION_CONFIRMATION = exports.MAKAI_MODAL_CONTENT_TOKEN_INPUT_PREFIX = exports.MAKAI_MODAL_CONTENT_EMAIL_INPUT_PREFIX = exports.MAKAI_MODAL_CONTENT_NAME_INPUT_PREFIX = exports.MAKAI_MODAL_CONTENT_COMMENT_HINT = exports.MAKAI_MODAL_CONFIRM_LOSS_EDITED_NO = exports.MAKAI_MODAL_CONFIRM_LOSS_EDITED_YES = exports.MAKAI_MODAL_CONFIRM_LOSS_EDITED = exports.MAKAI_MODAL_SUBMIT = exports.MAKAI_MODAL_SAVE = exports.MAKAI_MODAL_CANCEL = exports.MAKAI_MODAL_CONFIRM = exports.MAKAI_MODAL_OK = exports.MAKAI_MODAL_TITLE_COMMENT = exports.MAKAI_MODAL_TITLE_TOKEN = exports.MAKAI_MODAL_TITLE_WAITING = exports.MAKAI_MODAL_TITLE_INFO = exports.MAKAI_MODAL_TITLE_WARNING = exports.MAKAI_BUTTON_DELETE = exports.MAKAI_BUTTON_BLOCK = exports.MAKAI_GENERIC_LAST_MODIFIED_SUFFIX = exports.MAKAI_GENERIC_LAST_MODIFIED = exports.MAKAI_SUBMITTED_1 = exports.MAKAI_SUBMITTED_0 = exports.MAKAI_SUBMIT_1 = exports.MAKAI_SUBMIT_0 = exports.MAKAI_INFO_OBTAIN_TOKEN = exports.MAKAI_INFO_CONFIRM_TOKEN = exports.MAKAI_INFO_SET_TOKKEN_SUCCESS = exports.MAKAI_ERROR_UNKNOWN = exports.MAKAI_ERROR_USER_EXIST = exports.MAKAI_ERROR_INVALID_EMAIL = exports.MAKAI_ERROR_INVALID_TOKEN = exports.MAKAI_ERROR_EMPTY_TOKEN = exports.MAKAI_ERROR_DELETE_COMMENT_INVALID_TOKEN = exports.MAKAI_ERROR_SUBMIT_COMMENT_INVALID_TOKEN = exports.MAKAI_ERROR_INTERNET = exports.WTCD_CANVAS_LOADING = exports.WTCD_ERROR_INTERNAL_STACK_DESC = exports.WTCD_ERROR_INTERNAL_STACK_TITLE = exports.WTCD_ERROR_WTCD_STACK_DESC = exports.WTCD_ERROR_WTCD_STACK_TITLE = exports.WTCD_ERROR_MESSAGE = exports.WTCD_ERROR_INTERNAL_DESC = exports.WTCD_ERROR_INTERNAL_TITLE = exports.WTCD_ERROR_RUNTIME_DESC = exports.WTCD_ERROR_RUNTIME_TITLE = exports.WTCD_ERROR_COMPILE_DESC = exports.WTCD_ERROR_COMPILE_TITLE = exports.WTCD_GAME_NO_DESC = exports.WTCD_GAME_QUICK_LOAD_CONFIRM_CANCEL = exports.WTCD_GAME_QUICK_LOAD_CONFIRM_CONFIRM = exports.WTCD_GAME_QUICK_LOAD_CONFIRM_DESC = exports.WTCD_GAME_QUICK_LOAD_CONFIRM_TITLE = exports.WTCD_GAME_QUICK_LOAD_NOT_EXIST = exports.WTCD_GAME_QUICK_LOAD_OK = exports.WTCD_GAME_QUICK_LOAD = exports.WTCD_GAME_QUICK_SAVE_OK = exports.WTCD_GAME_QUICK_SAVE = exports.WTCD_GAME_LOAD_OK = exports.WTCD_GAME_LOAD_QUICK = exports.WTCD_GAME_LOAD_CANCEL = exports.WTCD_GAME_LOAD_TITLE = exports.WTCD_GAME_LOAD = exports.WTCD_GAME_SAVE_OK = exports.WTCD_GAME_SAVE_OVERWRITE_CANCEL = exports.WTCD_GAME_SAVE_OVERWRITE_CONFIRM = exports.WTCD_GAME_SAVE_OVERWRITE_TITLE = exports.WTCD_GAME_SAVE_NEW = exports.WTCD_GAME_SAVE_CANCEL = exports.WTCD_GAME_SAVE_TITLE = exports.WTCD_GAME_SAVE = exports.WTCD_GAME_RESTART_OK = exports.WTCD_GAME_RESTART_CANCEL = exports.WTCD_GAME_RESTART_DECISION_ONLY = exports.WTCD_GAME_RESTART_ALL = exports.WTCD_GAME_RESTART_DECISION_ONLY_DESC = exports.WTCD_GAME_RESTART_ALL_DESC = exports.WTCD_GAME_RESTART_DESC = exports.WTCD_GAME_RESTART_TITLE = exports.WTCD_GAME_RESTART = exports.CLICK_TO_UNBLOCK = exports.NO_BLOCKED_USERS = exports.VISIT_COUNT_TIMES = exports.VISIT_COUNT_DISPLAYING = exports.VISIT_COUNT_TIME_FRAME_YEAR = exports.VISIT_COUNT_TIME_FRAME_MONTH = exports.VISIT_COUNT_TIME_FRAME_WEEK = exports.VISIT_COUNT_TIME_FRAME_DAY = exports.VISIT_COUNT_TIME_FRAME_HOUR = exports.VISIT_COUNT_TIME_FRAME_ALL = exports.VISIT_COUNT_LOAD_MORE_FAILED = exports.VISIT_COUNT_LOAD_MORE_LOADING = exports.VISIT_COUNT_LOAD_MORE = exports.VISIT_COUNT_FAILED = exports.VISIT_COUNT_LOADING = exports.VISIT_COUNT_DESC_2 = exports.VISIT_COUNT_DESC_1 = exports.VISIT_COUNT_DESC_0 = exports.VISIT_COUNT_TITLE = exports.COMMENTS_RECENT_LOADED = exports.COMMENTS_RECENT_SECTION = exports.COMMENTS_FAILED = exports.COMMENTS_LOADED = exports.COMMENTS_CREATE = exports.COMMENTS_UNAVAILABLE = exports.COMMENTS_LOADING = exports.COMMENTS_SECTION = exports.BROKEN_LINK_OK = exports.BROKEN_LINK_DESC = exports.BROKEN_LINK_TITLE = exports.BUILD_FAILED_OK = exports.BUILD_FAILED_DESC = exports.BUILD_FAILED_TITLE = exports.CHAPTER_FAILED = exports.CHAPTER_LOADING = exports.NEXT_CHAPTER = exports.GO_TO_MENU = exports.PREVIOUS_CHAPTER = exports.EARLY_ACCESS_DESC = exports.EARLY_ACCESS_TITLE = void 0;
 exports.EARLY_ACCESS_TITLE = '编写中章节';
 exports.EARLY_ACCESS_DESC = '请注意，本文正在编写中，因此可能会含有未完成的句子或是尚未更新的信息。';
 exports.PREVIOUS_CHAPTER = '上一章';
@@ -774,6 +774,23 @@ exports.COMMENTS_LOADED = '以下为本章节的评论区。';
 exports.COMMENTS_FAILED = '评论加载失败，请检查网络连接。';
 exports.COMMENTS_RECENT_SECTION = '最新评论';
 exports.COMMENTS_RECENT_LOADED = '以下是最新的二十条评论。';
+exports.VISIT_COUNT_TITLE = '访问量统计';
+exports.VISIT_COUNT_DESC_0 = '访问量统计信息由《可穿戴科技》访问统计系统提供。《可穿戴科技》访问统计系统是专门为本小说编写的高度重视隐私保护的，不记录任何个人信息的数据统计服务。其隐私政策可以在';
+exports.VISIT_COUNT_DESC_1 = '这里';
+exports.VISIT_COUNT_DESC_2 = '找到。';
+exports.VISIT_COUNT_LOADING = '访问量加载中...';
+exports.VISIT_COUNT_FAILED = '访问量加载失败，请检查网络连接。';
+exports.VISIT_COUNT_LOAD_MORE = '加载更多';
+exports.VISIT_COUNT_LOAD_MORE_LOADING = '加载中...';
+exports.VISIT_COUNT_LOAD_MORE_FAILED = '加载失败，点此重试';
+exports.VISIT_COUNT_TIME_FRAME_ALL = '所有';
+exports.VISIT_COUNT_TIME_FRAME_HOUR = '一个小时内';
+exports.VISIT_COUNT_TIME_FRAME_DAY = '一天内';
+exports.VISIT_COUNT_TIME_FRAME_WEEK = '一个星期内';
+exports.VISIT_COUNT_TIME_FRAME_MONTH = '一个月内';
+exports.VISIT_COUNT_TIME_FRAME_YEAR = '一年内';
+exports.VISIT_COUNT_DISPLAYING = '正在显示$的访问量：';
+exports.VISIT_COUNT_TIMES = ' 次';
 exports.NO_BLOCKED_USERS = '没有用户的评论被屏蔽';
 exports.CLICK_TO_UNBLOCK = '(点击用户名以解除屏蔽)';
 exports.WTCD_GAME_RESTART = '重置游戏';
@@ -1087,7 +1104,7 @@ class WTCDFeatureProvider extends FeatureProvider_1.FeatureProvider {
 }
 exports.WTCDFeatureProvider = WTCDFeatureProvider;
 
-},{"../../wtcd/FeatureProvider":62,"../DebugLogger":6,"../constant/messages":11,"../data/AutoCache":33,"../util/loadGooleFonts":55,"../util/resolvePath":58}],16:[function(require,module,exports){
+},{"../../wtcd/FeatureProvider":63,"../DebugLogger":6,"../constant/messages":11,"../data/AutoCache":33,"../util/loadGooleFonts":56,"../util/resolvePath":59}],16:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WTCDGameReaderUI = void 0;
@@ -1280,7 +1297,7 @@ class WTCDGameReaderUI {
 }
 exports.WTCDGameReaderUI = WTCDGameReaderUI;
 
-},{"../../wtcd/FeatureProvider":62,"../../wtcd/GameReader":64,"../DebugLogger":6,"../constant/messages":11,"../data/settings":35,"../hs":37,"../util/formatTime":54,"./createWTCDErrorMessageFromError":23,"./hintControl":25,"./modalControl":29}],17:[function(require,module,exports){
+},{"../../wtcd/FeatureProvider":63,"../../wtcd/GameReader":65,"../DebugLogger":6,"../constant/messages":11,"../data/settings":35,"../hs":37,"../util/formatTime":55,"./createWTCDErrorMessageFromError":23,"./hintControl":25,"./modalControl":29}],17:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const AutoCache_1 = require("../data/AutoCache");
@@ -1314,7 +1331,7 @@ chapterControl_1.loadChapterEvent.on(chapterRelativePath => {
 },{"../DebugLogger":6,"../data/AutoCache":33,"../data/state":36,"./chapterControl":18}],18:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ErrorType = exports.loadChapter = exports.loadNextChapter = exports.loadPrevChapter = exports.closeChapter = exports.loadChapterEvent = void 0;
+exports.ErrorType = exports.loadChapter = exports.loadNextChapter = exports.loadPrevChapter = exports.implicitCloseChapter = exports.closeChapter = exports.loadChapterEvent = void 0;
 const FlowReader_1 = require("../../wtcd/FlowReader");
 const loadingText_1 = require("../constant/loadingText");
 const messages_1 = require("../constant/messages");
@@ -1342,11 +1359,18 @@ const debugLogger = new DebugLogger_1.DebugLogger('Chapter Control');
 exports.loadChapterEvent = new Event_1.Event();
 function closeChapter() {
     layoutControl_1.setLayout(layoutControl_1.Layout.OFF);
+    implicitCloseChapter();
+}
+exports.closeChapter = closeChapter;
+/**
+ * Closes the current chapter without changing layout.
+ */
+function implicitCloseChapter() {
     state_1.state.currentChapter = null;
     state_1.state.chapterSelection = null;
     state_1.state.chapterTextNodes = null;
 }
-exports.closeChapter = closeChapter;
+exports.implicitCloseChapter = implicitCloseChapter;
 const select = ([anchorNodeIndex, anchorOffset, focusNodeIndex, focusOffset,]) => {
     if (state_1.state.chapterTextNodes === null) {
         return;
@@ -1573,7 +1597,7 @@ function insertContent(content, text, chapter) {
     }
 }
 
-},{"../../wtcd/FlowReader":63,"../DebugLogger":6,"../Event":7,"../constant/loadingText":9,"../constant/messages":11,"../data/AutoCache":33,"../data/data":34,"../data/settings":35,"../data/state":36,"../hs":37,"../input/gestures":39,"../input/keyboard":40,"../util/DOM":53,"./WTCDFeatureProvider":15,"./WTCDGameReaderUI":16,"./commentsControl":20,"./contentControl":21,"./createWTCDErrorMessage":22,"./createWTCDErrorMessageFromError":23,"./history":26,"./layoutControl":27,"./modalControl":29,"./processElements":30}],19:[function(require,module,exports){
+},{"../../wtcd/FlowReader":64,"../DebugLogger":6,"../Event":7,"../constant/loadingText":9,"../constant/messages":11,"../data/AutoCache":33,"../data/data":34,"../data/settings":35,"../data/state":36,"../hs":37,"../input/gestures":39,"../input/keyboard":40,"../util/DOM":54,"./WTCDFeatureProvider":15,"./WTCDGameReaderUI":16,"./commentsControl":20,"./contentControl":21,"./createWTCDErrorMessage":22,"./createWTCDErrorMessageFromError":23,"./history":26,"./layoutControl":27,"./modalControl":29,"./processElements":30}],19:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getBlockedUsers = exports.isUserBlocked = exports.unblockUser = exports.blockUser = exports.blockedUserUpdateEvent = void 0;
@@ -1787,7 +1811,7 @@ function loadRecentComments(content) {
 }
 exports.loadRecentComments = loadRecentComments;
 
-},{"../DebugLogger":6,"../constant/messages":11,"../data/AutoCache":33,"../data/settings":35,"../data/state":36,"../hs":37,"../util/formatTime":54,"../util/padName":57,"./chapterControl":18,"./commentBlockControl":19,"./contentControl":21,"./history":26,"./makaiControl":28,"./modalControl":29,"./userControl":32}],21:[function(require,module,exports){
+},{"../DebugLogger":6,"../constant/messages":11,"../data/AutoCache":33,"../data/settings":35,"../data/state":36,"../hs":37,"../util/formatTime":55,"../util/padName":58,"./chapterControl":18,"./commentBlockControl":19,"./contentControl":21,"./history":26,"./makaiControl":28,"./modalControl":29,"./userControl":32}],21:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ContentBlock = exports.Content = exports.ContentBlockStyle = exports.newContent = exports.focus = exports.getCurrentContent = exports.Side = void 0;
@@ -2035,7 +2059,7 @@ class ContentBlock {
 }
 exports.ContentBlock = ContentBlock;
 
-},{"../DebugLogger":6,"../data/settings":35,"../hs":37,"../input/keyboard":40,"../util/DOM":53,"./MonoDimensionTransitionControl":14,"./layoutControl":27}],22:[function(require,module,exports){
+},{"../DebugLogger":6,"../data/settings":35,"../hs":37,"../input/keyboard":40,"../util/DOM":54,"./MonoDimensionTransitionControl":14,"./layoutControl":27}],22:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createWTCDErrorMessage = void 0;
@@ -2115,7 +2139,7 @@ function createWTCDErrorMessageFromError(error) {
 }
 exports.createWTCDErrorMessageFromError = createWTCDErrorMessageFromError;
 
-},{"../../wtcd/WTCDError":67,"./chapterControl":18,"./createWTCDErrorMessage":22}],24:[function(require,module,exports){
+},{"../../wtcd/WTCDError":68,"./chapterControl":18,"./createWTCDErrorMessage":22}],24:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.followQuery = void 0;
@@ -2155,6 +2179,7 @@ function followQueryToChapter(relativePath) {
     return true;
 }
 function followQueryToPage(pageSpecifier) {
+    chapterControl_1.implicitCloseChapter();
     for (const page of pages_1.pages) {
         if (pageSpecifier.startsWith(page.name)) {
             const content = contentControl_1.newContent(contentControl_1.Side.LEFT);
@@ -2467,7 +2492,7 @@ function isAnyModalOpened() {
 }
 exports.isAnyModalOpened = isAnyModalOpened;
 
-},{"../data/settings":35,"../hs":37,"../input/keyboard":40,"../util/DOM":53}],30:[function(require,module,exports){
+},{"../data/settings":35,"../hs":37,"../input/keyboard":40,"../util/DOM":54}],30:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.processElements = void 0;
@@ -2500,7 +2525,7 @@ function processElements($parent) {
 }
 exports.processElements = processElements;
 
-},{"../util/DOM":53}],31:[function(require,module,exports){
+},{"../util/DOM":54}],31:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateSelection = void 0;
@@ -2783,7 +2808,7 @@ function showComment(block) {
 }
 exports.showComment = showComment;
 
-},{"../constant/messages":11,"../data/state":36,"../hs":37,"../util/padName":57,"./commentsControl":20,"./contentControl":21,"./makaiControl":28,"./modalControl":29}],33:[function(require,module,exports){
+},{"../constant/messages":11,"../data/state":36,"../hs":37,"../util/padName":58,"./commentsControl":20,"./contentControl":21,"./makaiControl":28,"./modalControl":29}],33:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AutoCache = void 0;
@@ -2997,7 +3022,7 @@ window.addEventListener('popstate', () => {
 });
 followQuery_1.followQuery();
 
-},{"./constant/messages":11,"./control/analyticsControl":17,"./control/followQuery":24,"./control/modalControl":29,"./control/updateSelection":31,"./data/data":34,"./data/settings":35,"./menu/MainMenu":44,"./util/DOM":53}],39:[function(require,module,exports){
+},{"./constant/messages":11,"./control/analyticsControl":17,"./control/followQuery":24,"./control/modalControl":29,"./control/updateSelection":31,"./data/data":34,"./data/settings":35,"./menu/MainMenu":44,"./util/DOM":54}],39:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.swipeEvent = exports.SwipeDirection = void 0;
@@ -3082,7 +3107,7 @@ exports.swipeEvent.on(direction => {
     swipeEventDebugLogger.log(SwipeDirection[direction]);
 });
 
-},{"../DebugLogger":6,"../Event":7,"../util/DOM":53}],40:[function(require,module,exports){
+},{"../DebugLogger":6,"../Event":7,"../util/DOM":54}],40:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.escapeKeyPressEvent = exports.arrowKeyPressEvent = exports.ArrowKey = void 0;
@@ -3232,7 +3257,7 @@ class ChaptersMenu extends Menu_1.Menu {
 }
 exports.ChaptersMenu = ChaptersMenu;
 
-},{"../Menu":8,"../control/chapterControl":18,"../control/history":26,"../data/data":34,"../util/shortNumber":59}],43:[function(require,module,exports){
+},{"../Menu":8,"../control/chapterControl":18,"../control/history":26,"../data/data":34,"../util/shortNumber":60}],43:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ContactMenu = void 0;
@@ -3418,7 +3443,7 @@ const StatsKeywordsCountMenu_1 = require("./StatsKeywordsCountMenu");
 class StatsMenu extends Menu_1.Menu {
     constructor(parent) {
         super('统计', parent);
-        this.addItem('统计数据由构建脚本自动生成', { small: true });
+        this.addItem('访问量统计', { button: true, link: '##page/visit-count', small: true, decoration: Menu_1.ItemDecoration.ICON_EQUALIZER });
         this.addLink(new StatsKeywordsCountMenu_1.StatsKeywordsCountMenu(this), true, Menu_1.ItemDecoration.ICON_EQUALIZER);
         this.addItem(`总字数：${data_1.data.charsCount}`, { small: true });
         this.addItem(`总段落数：${data_1.data.paragraphsCount}`, { small: true });
@@ -3482,6 +3507,7 @@ class Style {
         attemptInsertRule(`:root { --link-active-color: ${this.def.linkActiveColor}; }`);
         attemptInsertRule(`:root { --key: ${key}; }`);
         attemptInsertRule(`:root { --key-opacity-01: ${keyAlpha(0.1)}; }`);
+        attemptInsertRule(`:root { --key-opacity-015: ${keyAlpha(0.15)}; }`);
         attemptInsertRule(`:root { --key-opacity-05: ${keyAlpha(0.5)}; }`);
         attemptInsertRule(`:root { --key-opacity-007: ${keyAlpha(0.07)}; }`);
         attemptInsertRule(`:root { --key-opacity-004: ${keyAlpha(0.04)}; }`);
@@ -3587,11 +3613,13 @@ exports.ThanksMenu = ThanksMenu;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.pages = void 0;
 const recentComments_1 = require("./recentComments");
+const visitCount_1 = require("./visitCount");
 exports.pages = [
     recentComments_1.recentComments,
+    visitCount_1.visitCount,
 ];
 
-},{"./recentComments":52}],52:[function(require,module,exports){
+},{"./recentComments":52,"./visitCount":53}],52:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.recentComments = void 0;
@@ -3605,6 +3633,167 @@ exports.recentComments = {
 };
 
 },{"../control/commentsControl":20}],53:[function(require,module,exports){
+"use strict";
+// !!! Super spaghetti code warning !!!
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.visitCount = void 0;
+const messages_1 = require("../constant/messages");
+const chapterControl_1 = require("../control/chapterControl");
+const history_1 = require("../control/history");
+const AutoCache_1 = require("../data/AutoCache");
+const DebugLogger_1 = require("../DebugLogger");
+const hs_1 = require("../hs");
+const timeFrames = ['ALL', 'HOUR', 'DAY', 'WEEK', 'MONTH', 'YEAR'];
+function getEndpoint(timeFrame, page) {
+    if (timeFrame === 'ALL') {
+        return `https://wta.makai.city/api/chapters/all?page=${page}`;
+    }
+    else {
+        return `https://wta.makai.city/api/chapters/recent?page=${page}&time_frame=${timeFrame}`;
+    }
+}
+const debugLogger = new DebugLogger_1.DebugLogger('Visit Count Logger');
+function getTimeFrameText(timeFrame) {
+    switch (timeFrame) {
+        case 'ALL': return messages_1.VISIT_COUNT_TIME_FRAME_ALL;
+        case 'HOUR': return messages_1.VISIT_COUNT_TIME_FRAME_HOUR;
+        case 'DAY': return messages_1.VISIT_COUNT_TIME_FRAME_DAY;
+        case 'WEEK': return messages_1.VISIT_COUNT_TIME_FRAME_WEEK;
+        case 'YEAR': return messages_1.VISIT_COUNT_TIME_FRAME_YEAR;
+        case 'MONTH': return messages_1.VISIT_COUNT_TIME_FRAME_MONTH;
+    }
+}
+function formatTitle(relativePath, visitCount) {
+    if (relativePath.endsWith('.html')) {
+        relativePath = relativePath.substr(0, relativePath.length - '.html'.length);
+    }
+    relativePath = relativePath.replace(/\//g, ' > ');
+    relativePath = relativePath.replace(/-/g, ' ');
+    return relativePath + ': ' + visitCount + messages_1.VISIT_COUNT_TIMES;
+}
+const visitCountCache = new AutoCache_1.AutoCache(endpoint => fetch(endpoint).then(data => data.json()), new DebugLogger_1.DebugLogger('Visit Count Cache'));
+exports.visitCount = {
+    name: 'visit-count',
+    handler: content => {
+        const block = content.addBlock();
+        block.element.appendChild(hs_1.h('h1', messages_1.VISIT_COUNT_TITLE));
+        block.element.appendChild(hs_1.h('p', [
+            messages_1.VISIT_COUNT_DESC_0,
+            hs_1.h('a.regular', { href: '#META/隐私政策.html' }, messages_1.VISIT_COUNT_DESC_1),
+            messages_1.VISIT_COUNT_DESC_2,
+        ]));
+        const $status = hs_1.h('p');
+        const $results = hs_1.h('.visit-count-holder');
+        const $loadMoreButton = hs_1.h('div.rich');
+        const $loadMoreContainer = hs_1.h('.button-container.display-none', {
+            style: { 'margin-top': '0.5em' },
+        }, $loadMoreButton);
+        // Used to determine whether the current request is still needed.
+        let currentRequestId = 0;
+        // Time frame to be used when clicking load more.
+        let nextLoadingTimeFrame = 'ALL';
+        // Page to be load when clicking load more.
+        let nextLoadingPage = 2;
+        let maxVisits = 0;
+        const load = (timeFrame, page) => {
+            const endpoint = getEndpoint(timeFrame, page);
+            currentRequestId++;
+            const requestId = currentRequestId;
+            debugLogger.log(`Request ID ${requestId}: Loading visit count info from ${endpoint}.`);
+            visitCountCache.get(endpoint).then(data => {
+                var _a, _b;
+                if (content.isDestroyed || requestId !== currentRequestId) {
+                    debugLogger.log(`Request ID ${requestId}: Request completed, but the result is abandoned.`);
+                    return;
+                }
+                if (page === 1) {
+                    maxVisits = (_b = ((_a = data[0]) === null || _a === void 0 ? void 0 : _a.visit_count)) !== null && _b !== void 0 ? _b : 0;
+                    $loadMoreContainer.classList.remove('display-none');
+                }
+                else {
+                    $loadMoreButton.classList.remove('disabled');
+                }
+                $status.innerText = messages_1.VISIT_COUNT_DISPLAYING.replace(/\$/g, getTimeFrameText(timeFrame));
+                $loadMoreButton.innerText = messages_1.VISIT_COUNT_LOAD_MORE;
+                // If there is less than 50, stop showing load more button
+                $loadMoreContainer.classList.toggle('display-none', data.length !== 50);
+                for (const entry of data) {
+                    $results.appendChild(hs_1.h('a', {
+                        style: {
+                            'width': `${entry.visit_count / maxVisits * 100}%`,
+                        },
+                        href: '#' + entry.relative_path,
+                    }, formatTitle(entry.relative_path, entry.visit_count)));
+                }
+                nextLoadingPage = page + 1;
+            }).catch(error => {
+                if (content.isDestroyed || requestId !== currentRequestId) {
+                    debugLogger.warn(`Request ID ${requestId}: Request failed, but the result is abandoned.`, error);
+                    return;
+                }
+                if (page === 1) {
+                    $status.innerText = messages_1.VISIT_COUNT_FAILED;
+                }
+                else {
+                    $loadMoreButton.classList.remove('disabled');
+                    $loadMoreButton.innerText = messages_1.VISIT_COUNT_LOAD_MORE_FAILED;
+                }
+            });
+        };
+        $loadMoreButton.addEventListener('click', () => {
+            // Yes, I am doing it. I am using class list as my state keeper.
+            if ($loadMoreButton.classList.contains('disabled')) {
+                return;
+            }
+            $loadMoreButton.classList.add('disabled');
+            $loadMoreButton.innerText = messages_1.VISIT_COUNT_LOAD_MORE_LOADING;
+            load(nextLoadingTimeFrame, nextLoadingPage);
+        });
+        const loadTimeFrame = (timeFrame) => {
+            $results.innerHTML = '';
+            $status.innerText = messages_1.VISIT_COUNT_LOADING;
+            $loadMoreContainer.classList.add('display-none');
+            nextLoadingTimeFrame = timeFrame;
+            nextLoadingPage = 2;
+            load(timeFrame, 1);
+        };
+        const ltfButtons = [];
+        /** Load time frame button */
+        const createLtfButton = (text, timeFrame) => {
+            const $button = hs_1.h('div.rich', {
+                onclick: () => {
+                    for (const $ltfButton of ltfButtons) {
+                        $ltfButton.classList.toggle('selected', $ltfButton === $button);
+                    }
+                    loadTimeFrame(timeFrame);
+                },
+            }, text);
+            if (timeFrame === 'ALL') {
+                $button.classList.add('selected');
+            }
+            ltfButtons.push($button);
+            return $button;
+        };
+        block.element.appendChild(hs_1.h('.button-container', timeFrames.map(timeFrame => createLtfButton(getTimeFrameText(timeFrame), timeFrame)))),
+            block.element.appendChild($status);
+        block.element.appendChild($results);
+        block.element.appendChild($loadMoreContainer);
+        block.element.appendChild(hs_1.h('div.page-switcher', [
+            hs_1.h('a.to-menu', {
+                href: window.location.pathname,
+                onclick: (event) => {
+                    event.preventDefault();
+                    chapterControl_1.closeChapter();
+                    history_1.updateHistory(true);
+                },
+            }, messages_1.GO_TO_MENU),
+        ]));
+        loadTimeFrame('ALL');
+        return true;
+    },
+};
+
+},{"../DebugLogger":6,"../constant/messages":11,"../control/chapterControl":18,"../control/history":26,"../data/AutoCache":33,"../hs":37}],54:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.insertAfter = exports.isAnyParent = exports.selectNode = exports.getTextNodes = exports.id = void 0;
@@ -3657,7 +3846,7 @@ function insertAfter($newElement, $referencingElement) {
 }
 exports.insertAfter = insertAfter;
 
-},{"../DebugLogger":6}],54:[function(require,module,exports){
+},{"../DebugLogger":6}],55:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.formatTimeSimple = exports.formatTimeRelative = void 0;
@@ -3689,7 +3878,7 @@ function formatTimeSimple(time) {
 }
 exports.formatTimeSimple = formatTimeSimple;
 
-},{}],55:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -3724,7 +3913,7 @@ function loadGoogleFonts(fontName) {
 }
 exports.loadGoogleFonts = loadGoogleFonts;
 
-},{"../DebugLogger":6,"./matchAll":56}],56:[function(require,module,exports){
+},{"../DebugLogger":6,"./matchAll":57}],57:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.matchAll = void 0;
@@ -3741,7 +3930,7 @@ function matchAll(str, regex) {
 }
 exports.matchAll = matchAll;
 
-},{}],57:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.padName = void 0;
@@ -3758,7 +3947,7 @@ function padName(name) {
 }
 exports.padName = padName;
 
-},{}],58:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.resolvePath = void 0;
@@ -3792,7 +3981,7 @@ function resolvePath(...paths) {
 }
 exports.resolvePath = resolvePath;
 
-},{}],59:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.shortNumber = void 0;
@@ -3807,7 +3996,7 @@ function shortNumber(input) {
 }
 exports.shortNumber = shortNumber;
 
-},{}],60:[function(require,module,exports){
+},{}],61:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.stringHash = void 0;
@@ -3825,7 +4014,7 @@ function stringHash(str) {
 }
 exports.stringHash = stringHash;
 
-},{}],61:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChainedCanvas = void 0;
@@ -3852,7 +4041,7 @@ class ChainedCanvas {
 }
 exports.ChainedCanvas = ChainedCanvas;
 
-},{}],62:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.defaultFeatureProvider = exports.FeatureProvider = void 0;
@@ -3888,7 +4077,7 @@ class FeatureProvider {
 exports.FeatureProvider = FeatureProvider;
 exports.defaultFeatureProvider = new FeatureProvider();
 
-},{}],63:[function(require,module,exports){
+},{}],64:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FlowReader = void 0;
@@ -4101,7 +4290,7 @@ class FlowReader {
 }
 exports.FlowReader = FlowReader;
 
-},{"./FeatureProvider":62,"./Interpreter":65,"./Random":66}],64:[function(require,module,exports){
+},{"./FeatureProvider":63,"./Interpreter":66,"./Random":67}],65:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GameReader = void 0;
@@ -4306,7 +4495,7 @@ class GameReader {
 }
 exports.GameReader = GameReader;
 
-},{"./FeatureProvider":62,"./Interpreter":65,"./Random":66}],65:[function(require,module,exports){
+},{"./FeatureProvider":63,"./Interpreter":66,"./Random":67}],66:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Interpreter = exports.InvalidChoiceError = exports.assignValueToVariable = exports.isTypeAssignableTo = exports.describe = exports.BubbleSignal = exports.BubbleSignalType = exports.isEqual = void 0;
@@ -5140,7 +5329,7 @@ class Interpreter {
 }
 exports.Interpreter = Interpreter;
 
-},{"./WTCDError":67,"./constantsPool":69,"./invokeFunction":70,"./operators":71,"./std":75,"./utils":82}],66:[function(require,module,exports){
+},{"./WTCDError":68,"./constantsPool":70,"./invokeFunction":71,"./operators":72,"./std":76,"./utils":83}],67:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Random = void 0;
@@ -5204,7 +5393,7 @@ class Random {
 }
 exports.Random = Random;
 
-},{}],67:[function(require,module,exports){
+},{}],68:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WTCDError = void 0;
@@ -5251,7 +5440,7 @@ class WTCDError extends Error {
 }
 exports.WTCDError = WTCDError;
 
-},{}],68:[function(require,module,exports){
+},{}],69:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.autoEvaluated = void 0;
@@ -5264,7 +5453,7 @@ function autoEvaluated(fn) {
 }
 exports.autoEvaluated = autoEvaluated;
 
-},{}],69:[function(require,module,exports){
+},{}],70:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getMaybePooled = exports.booleanValue = exports.smallIntegers = exports.falseValue = exports.trueValue = exports.nullValue = void 0;
@@ -5301,7 +5490,7 @@ function getMaybePooled(type, value) {
 }
 exports.getMaybePooled = getMaybePooled;
 
-},{}],70:[function(require,module,exports){
+},{}],71:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.reverseInvocation = exports.pipelineInvocation = exports.regularInvocation = exports.regularInvocationRaw = exports.invokeFunctionRaw = exports.FunctionInvocationError = void 0;
@@ -5477,7 +5666,7 @@ exports.reverseInvocation = autoEvaluated_1.autoEvaluated((arg0, arg1, expr, int
     }
 });
 
-},{"./Interpreter":65,"./WTCDError":67,"./autoEvaluated":68,"./constantsPool":69,"./std/utils":81}],71:[function(require,module,exports){
+},{"./Interpreter":66,"./WTCDError":68,"./autoEvaluated":69,"./constantsPool":70,"./std/utils":82}],72:[function(require,module,exports){
 "use strict";
 // This file defines all infix and prefix operators in WTCD.
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -5893,7 +6082,7 @@ exports.binaryOperators = new Map([
 exports.conditionalOperatorPrecedence = 4;
 exports.operators = new Set([...exports.unaryOperators.keys(), ...exports.binaryOperators.keys(), '?', ':', '...']);
 
-},{"./Interpreter":65,"./WTCDError":67,"./autoEvaluated":68,"./constantsPool":69,"./invokeFunction":70}],72:[function(require,module,exports){
+},{"./Interpreter":66,"./WTCDError":68,"./autoEvaluated":69,"./constantsPool":70,"./invokeFunction":71}],73:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -6157,7 +6346,7 @@ exports.canvasStdFunctions = [
     },
 ];
 
-},{"../ChainedCanvas":61,"../constantsPool":69,"./utils":81}],73:[function(require,module,exports){
+},{"../ChainedCanvas":62,"../constantsPool":70,"./utils":82}],74:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.contentStdFunctions = void 0;
@@ -6262,7 +6451,7 @@ exports.contentStdFunctions = [
     },
 ];
 
-},{"../Interpreter":65,"../constantsPool":69,"./utils":81}],74:[function(require,module,exports){
+},{"../Interpreter":66,"../constantsPool":70,"./utils":82}],75:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.debugStdFunctions = void 0;
@@ -6329,7 +6518,7 @@ exports.debugStdFunctions = [
     },
 ];
 
-},{"../Interpreter":65,"../WTCDError":67,"../constantsPool":69,"../invokeFunction":70,"./utils":81}],75:[function(require,module,exports){
+},{"../Interpreter":66,"../WTCDError":68,"../constantsPool":70,"../invokeFunction":71,"./utils":82}],76:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.stdFunctions = void 0;
@@ -6352,7 +6541,7 @@ exports.stdFunctions = [
     ...canvas_1.canvasStdFunctions,
 ];
 
-},{"./canvas":72,"./content":73,"./debug":74,"./list":76,"./math":77,"./random":78,"./reader":79,"./string":80}],76:[function(require,module,exports){
+},{"./canvas":73,"./content":74,"./debug":75,"./list":77,"./math":78,"./random":79,"./reader":80,"./string":81}],77:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.listStdFunctions = void 0;
@@ -6619,7 +6808,7 @@ exports.listStdFunctions = [
     },
 ];
 
-},{"../Interpreter":65,"../WTCDError":67,"../constantsPool":69,"../invokeFunction":70,"./utils":81}],77:[function(require,module,exports){
+},{"../Interpreter":66,"../WTCDError":68,"../constantsPool":70,"../invokeFunction":71,"./utils":82}],78:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.mathStdFunctions = void 0;
@@ -6658,7 +6847,7 @@ exports.mathStdFunctions = [
     },
 ];
 
-},{"../constantsPool":69,"./utils":81}],78:[function(require,module,exports){
+},{"../constantsPool":70,"./utils":82}],79:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.randomStdFunctions = void 0;
@@ -6712,7 +6901,7 @@ exports.randomStdFunctions = [
     },
 ];
 
-},{"../constantsPool":69,"./utils":81}],79:[function(require,module,exports){
+},{"../constantsPool":70,"./utils":82}],80:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.readerStdFunctions = void 0;
@@ -6743,7 +6932,7 @@ exports.readerStdFunctions = [
     },
 ];
 
-},{"../constantsPool":69,"./utils":81}],80:[function(require,module,exports){
+},{"../constantsPool":70,"./utils":82}],81:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.stringStdFunctions = void 0;
@@ -6832,7 +7021,7 @@ exports.stringStdFunctions = [
     },
 ];
 
-},{"../constantsPool":69,"./utils":81}],81:[function(require,module,exports){
+},{"../constantsPool":70,"./utils":82}],82:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.assertArgType = exports.nullify = exports.assertArgsLength = exports.NativeFunctionError = void 0;
@@ -6879,7 +7068,7 @@ function assertArgType(args, index, type, defaultValue) {
 }
 exports.assertArgType = assertArgType;
 
-},{"../Interpreter":65,"../constantsPool":69}],82:[function(require,module,exports){
+},{"../Interpreter":66,"../constantsPool":70}],83:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.arrayEquals = exports.flat = void 0;
