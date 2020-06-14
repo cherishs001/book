@@ -456,6 +456,7 @@ body.animation-enabled .content-container > .content .content-block {
 }
 .content-container > .content .content-block .page-switcher {
   display: flex;
+  margin-top: 2vh;
 }
 .content-container > .content .content-block .page-switcher > a {
   flex: 1;

@@ -1620,6 +1620,8 @@ const contentControl_1 = require("./contentControl");
 const makaiControl_1 = require("./makaiControl");
 const modalControl_1 = require("./modalControl");
 const userControl_1 = require("./userControl");
+const history_1 = require("./history");
+const chapterControl_1 = require("./chapterControl");
 const debugLogger = new DebugLogger_1.DebugLogger('Comments Control');
 // const getApiUrlRegExp = /^https:\/\/github\.com\/([a-zA-Z0-9-_]+)\/([a-zA-Z0-9-_]+)\/issues\/([1-9][0-9]*)$/;
 // Input sample: https://github.com/SCLeoX/Wearable-Technology/issues/1
@@ -1753,31 +1755,39 @@ function loadRecentComments(content) {
     const block = content.addBlock({
         initElement: $comments,
     });
-    block.onEnteringView(() => {
-        const apiUrl = 'https://c.makai.city/comment/recent/github/20';
-        exports.commentsCache.get(apiUrl).then(data => {
-            if (content.isDestroyed) {
-                debugLogger.log('Comments loaded, but abandoned since the original ' +
-                    'content page is already destroyed.');
+    const apiUrl = 'https://c.makai.city/comment/recent/github/20';
+    exports.commentsCache.get(apiUrl).then(data => {
+        if (content.isDestroyed) {
+            debugLogger.log('Comments loaded, but abandoned since the original ' +
+                'content page is already destroyed.');
+            return;
+        }
+        debugLogger.log('Comments loaded.');
+        $commentsStatus.innerText = messages_1.COMMENTS_RECENT_LOADED;
+        data.forEach((comment) => {
+            if (commentBlockControl_1.isUserBlocked(comment.user.login)) {
                 return;
             }
-            debugLogger.log('Comments loaded.');
-            $commentsStatus.innerText = messages_1.COMMENTS_RECENT_LOADED;
-            data.forEach((comment) => {
-                if (commentBlockControl_1.isUserBlocked(comment.user.login)) {
-                    return;
-                }
-                $comments.appendChild(createCommentElement(comment.user.avatar_url, comment.user.login, comment.user.html_url, comment.created_at, comment.updated_at, comment.body, comment.id, block, comment.user.display, comment.pageName));
-            });
-        })
-            .catch(() => {
-            $commentsStatus.innerText = messages_1.COMMENTS_FAILED;
+            $comments.appendChild(createCommentElement(comment.user.avatar_url, comment.user.login, comment.user.html_url, comment.created_at, comment.updated_at, comment.body, comment.id, block, comment.user.display, comment.pageName));
         });
+    }).catch(() => {
+        $commentsStatus.innerText = messages_1.COMMENTS_FAILED;
+    }).then(() => {
+        $comments.appendChild(hs_1.h('div.page-switcher', [
+            hs_1.h('a.to-menu', {
+                href: window.location.pathname,
+                onclick: (event) => {
+                    event.preventDefault();
+                    chapterControl_1.closeChapter();
+                    history_1.updateHistory(true);
+                },
+            }, messages_1.GO_TO_MENU),
+        ]));
     });
 }
 exports.loadRecentComments = loadRecentComments;
 
-},{"../DebugLogger":6,"../constant/messages":11,"../data/AutoCache":33,"../data/settings":35,"../data/state":36,"../hs":37,"../util/formatTime":54,"../util/padName":57,"./commentBlockControl":19,"./contentControl":21,"./makaiControl":28,"./modalControl":29,"./userControl":32}],21:[function(require,module,exports){
+},{"../DebugLogger":6,"../constant/messages":11,"../data/AutoCache":33,"../data/settings":35,"../data/state":36,"../hs":37,"../util/formatTime":54,"../util/padName":57,"./chapterControl":18,"./commentBlockControl":19,"./contentControl":21,"./history":26,"./makaiControl":28,"./modalControl":29,"./userControl":32}],21:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ContentBlock = exports.Content = exports.ContentBlockStyle = exports.newContent = exports.focus = exports.getCurrentContent = exports.Side = void 0;
