@@ -13,6 +13,7 @@ export class MainMenu extends Menu {
     this.addLink(new ThanksMenu(this));
     this.addLink(new StyleMenu(this));
     this.addLink(new ContactMenu(this));
+    this.addItem('最新评论', { button: true, link: '##page/recent-comments' });
     this.addItem('源代码', { button: true, link: 'https://github.com/SCLeoX/Wearable-Technology' });
     this.addLink(new SettingsMenu(this));
     this.addLink(new StatsMenu(this));

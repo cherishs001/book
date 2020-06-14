@@ -2,7 +2,9 @@ import { selectNode } from '../util/DOM';
 
 export function processElements($parent: HTMLElement) {
   Array.from($parent.getElementsByTagName('a')).forEach(($anchor: HTMLAnchorElement) => {
-    $anchor.target = '_blank';
+    if (!$anchor.href.startsWith('#')) {
+      $anchor.target = '_blank';
+    }
     $anchor.rel = 'noopener noreferrer';
     $anchor.className = 'regular';
   });

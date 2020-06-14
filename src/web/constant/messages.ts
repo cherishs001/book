@@ -12,6 +12,10 @@ export const BUILD_FAILED_TITLE = '构建失败';
 export const BUILD_FAILED_DESC = '《可穿戴科技》的网页构建脚本在构建过程中发生了可以恢复的异常。详细内容请参见控制台输出。';
 export const BUILD_FAILED_OK = '我知道了';
 
+export const BROKEN_LINK_TITLE = '损坏的链接';
+export const BROKEN_LINK_DESC = '对不起，您提供的地址无法被正确解析，所以您现在回到了《可穿戴科技》的首页。';
+export const BROKEN_LINK_OK = '我知道了';
+
 export const COMMENTS_SECTION = '评论区';
 export const COMMENTS_LOADING = '评论加载中...';
 export const COMMENTS_UNAVAILABLE = '本文评论不可用。';
@@ -20,7 +24,7 @@ export const COMMENTS_LOADED = '以下为本章节的评论区。';
 export const COMMENTS_FAILED = '评论加载失败，请检查网络连接。';
 
 export const COMMENTS_RECENT_SECTION = '最新评论';
-export const COMMENTS_RECENT_LOADED = '以下是最新的十条评论。';
+export const COMMENTS_RECENT_LOADED = '以下是最新的二十条评论。';
 
 export const NO_BLOCKED_USERS = '没有用户的评论被屏蔽';
 export const CLICK_TO_UNBLOCK = '(点击用户名以解除屏蔽)';

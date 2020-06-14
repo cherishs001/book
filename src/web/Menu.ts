@@ -169,7 +169,9 @@ export class Menu {
       $element = document.createElement('a');
       $element.href = options.link;
       $element.rel = 'noopener noreferrer';
-      $element.target = '_blank';
+      if (!options.link.startsWith('#')) {
+        $element.target = '_blank';
+      }
     } else {
       $element = document.createElement('div');
     }

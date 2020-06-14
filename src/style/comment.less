@@ -38,9 +38,17 @@
     }
     >p {
       margin-bottom: 0;
-      >.pageName {
+      >.page-name {
         margin-top: 2em;
-        opacity: 0.5;
+
+        opacity: 0.45;
+
+        body.animation-enabled & {
+          transition: opacity 0.12s;
+        }
+        &:hover {
+          opacity: 0.75;
+        }
       }
     }
   }

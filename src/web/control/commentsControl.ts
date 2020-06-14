@@ -106,7 +106,7 @@ function createCommentElement(
         },
       }, MAKAI_BUTTON_BLOCK) : deleteButton,
     ...content.split('\n\n').map(paragraph => h('p', paragraph)),
-    pageName === undefined ? null : h('p', h('a.pageName', {
+    pageName === undefined ? null : h('p', h('a.page-name', {
       href: `#${pageName}`,
     }, `发表于${padName(pageName.replace(/\//g, ' > ').replace(/-/g, ' ').replace(/\.html$/, ''))}`)),
   ]);
@@ -196,7 +196,7 @@ export function loadRecentComments(content: Content) {
   });
 
   block.onEnteringView(() => {
-    const apiUrl = 'https://c.makai.city/comment/recent/github/10';
+    const apiUrl = 'https://c.makai.city/comment/recent/github/20';
     commentsCache.get(apiUrl).then(data => {
       if (content.isDestroyed) {
         debugLogger.log('Comments loaded, but abandoned since the original ' +
