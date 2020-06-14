@@ -6,6 +6,7 @@ import { data } from './data/data';
 import { animation } from './data/settings';
 import { MainMenu } from './menu/MainMenu';
 import { id } from './util/DOM';
+import './control/analyticsControl';
 
 const $warning = id('warning');
 
