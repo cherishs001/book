@@ -2464,7 +2464,8 @@ exports.processElements = void 0;
 const DOM_1 = require("../util/DOM");
 function processElements($parent) {
     Array.from($parent.getElementsByTagName('a')).forEach(($anchor) => {
-        if (!$anchor.href.startsWith('#')) {
+        const hrefAttribute = $anchor.attributes.getNamedItem('href');
+        if (hrefAttribute !== null && !hrefAttribute.value.startsWith('#')) {
             $anchor.target = '_blank';
         }
         $anchor.rel = 'noopener noreferrer';
