@@ -155,7 +155,7 @@ export function loadComments(content: Content) {
           }, COMMENTS_CREATE),
         );
       }
-      data.forEach((comment: any) => {
+      data.reverse().forEach((comment: any) => {
         if (isUserBlocked(comment.user.login)) {
           return;
         }
