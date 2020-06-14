@@ -18,7 +18,8 @@ import {
   MAKAI_MODAL_CONTENT_DELETION_CONFIRMATION,
   MAKAI_MODAL_TITLE_WARNING,
   MAKAI_SUBMITTED_0,
-  MAKAI_SUBMITTED_1
+  MAKAI_SUBMITTED_1,
+  GO_TO_MENU,
 } from '../constant/messages';
 import { AutoCache } from '../data/AutoCache';
 import { useComments } from '../data/settings';
@@ -32,6 +33,8 @@ import { Content, ContentBlock, getCurrentContent } from './contentControl';
 import { getToken, getUsername, makaiUrl } from './makaiControl';
 import { confirm } from './modalControl';
 import { showComment, showLoading, showMessage } from './userControl';
+import {updateHistory} from './history';
+import {closeChapter, loadPrevChapter, loadNextChapter} from './chapterControl';
 
 const debugLogger = new DebugLogger('Comments Control');
 // const getApiUrlRegExp = /^https:\/\/github\.com\/([a-zA-Z0-9-_]+)\/([a-zA-Z0-9-_]+)\/issues\/([1-9][0-9]*)$/;
@@ -195,36 +198,44 @@ export function loadRecentComments(content: Content) {
     initElement: $comments,
   });
 
-  block.onEnteringView(() => {
-    const apiUrl = 'https://c.makai.city/comment/recent/github/20';
-    commentsCache.get(apiUrl).then(data => {
-      if (content.isDestroyed) {
-        debugLogger.log('Comments loaded, but abandoned since the original ' +
-          'content page is already destroyed.');
+  const apiUrl = 'https://c.makai.city/comment/recent/github/20';
+  commentsCache.get(apiUrl).then(data => {
+    if (content.isDestroyed) {
+      debugLogger.log('Comments loaded, but abandoned since the original ' +
+        'content page is already destroyed.');
+      return;
+    }
+    debugLogger.log('Comments loaded.');
+    $commentsStatus.innerText = COMMENTS_RECENT_LOADED;
+    data.forEach((comment: any) => {
+      if (isUserBlocked(comment.user.login)) {
         return;
       }
-      debugLogger.log('Comments loaded.');
-      $commentsStatus.innerText = COMMENTS_RECENT_LOADED;
-      data.forEach((comment: any) => {
-        if (isUserBlocked(comment.user.login)) {
-          return;
-        }
-        $comments.appendChild(createCommentElement(
-          comment.user.avatar_url,
-          comment.user.login,
-          comment.user.html_url,
-          comment.created_at,
-          comment.updated_at,
-          comment.body,
-          comment.id,
-          block,
-          comment.user.display,
-          comment.pageName,
-        ));
-      });
-    })
-      .catch(() => {
-        $commentsStatus.innerText = COMMENTS_FAILED;
-      });
+      $comments.appendChild(createCommentElement(
+        comment.user.avatar_url,
+        comment.user.login,
+        comment.user.html_url,
+        comment.created_at,
+        comment.updated_at,
+        comment.body,
+        comment.id,
+        block,
+        comment.user.display,
+        comment.pageName,
+      ));
+    });
+  }).catch(() => {
+    $commentsStatus.innerText = COMMENTS_FAILED;
+  }).then(() => {
+    $comments.appendChild(h('div.page-switcher', [
+      h('a.to-menu', {
+        href: window.location.pathname,
+        onclick: (event: MouseEvent) => {
+          event.preventDefault();
+          closeChapter();
+          updateHistory(true);
+        },
+      }, GO_TO_MENU),
+    ]));
   });
 }
