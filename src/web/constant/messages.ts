@@ -26,6 +26,25 @@ export const COMMENTS_FAILED = '评论加载失败，请检查网络连接。';
 export const COMMENTS_RECENT_SECTION = '最新评论';
 export const COMMENTS_RECENT_LOADED = '以下是最新的二十条评论。';
 
+export const VISIT_COUNT_TITLE = '访问量统计';
+export const VISIT_COUNT_DESC_0 = '访问量统计信息由《可穿戴科技》访问统计系统提供。《可穿戴科技》访问统计系统是专门为本小说编写的高度重视隐私保护的，不记录任何个人信息的数据统计服务。其隐私政策可以在';
+export const VISIT_COUNT_DESC_1 = '这里';
+export const VISIT_COUNT_DESC_2 = '找到。';
+
+export const VISIT_COUNT_LOADING = '访问量加载中...';
+export const VISIT_COUNT_FAILED = '访问量加载失败，请检查网络连接。';
+export const VISIT_COUNT_LOAD_MORE = '加载更多';
+export const VISIT_COUNT_LOAD_MORE_LOADING = '加载中...';
+export const VISIT_COUNT_LOAD_MORE_FAILED = '加载失败，点此重试';
+export const VISIT_COUNT_TIME_FRAME_ALL = '所有';
+export const VISIT_COUNT_TIME_FRAME_HOUR = '一个小时内';
+export const VISIT_COUNT_TIME_FRAME_DAY = '一天内';
+export const VISIT_COUNT_TIME_FRAME_WEEK = '一个星期内';
+export const VISIT_COUNT_TIME_FRAME_MONTH = '一个月内';
+export const VISIT_COUNT_TIME_FRAME_YEAR = '一年内';
+export const VISIT_COUNT_DISPLAYING = '正在显示$的访问量：';
+export const VISIT_COUNT_TIMES = ' 次';
+
 export const NO_BLOCKED_USERS = '没有用户的评论被屏蔽';
 export const CLICK_TO_UNBLOCK = '(点击用户名以解除屏蔽)';
 

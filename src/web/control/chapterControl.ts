@@ -30,6 +30,13 @@ export const loadChapterEvent = new Event<string>();
 
 export function closeChapter() {
   setLayout(Layout.OFF);
+  implicitCloseChapter();
+}
+
+/**
+ * Closes the current chapter without changing layout.
+ */
+export function implicitCloseChapter() {
   state.currentChapter = null;
   state.chapterSelection = null;
   state.chapterTextNodes = null;

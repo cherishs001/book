@@ -2,7 +2,7 @@ import { BROKEN_LINK_DESC, BROKEN_LINK_OK, BROKEN_LINK_TITLE } from '../constant
 import { relativePathLookUpMap } from '../data/data';
 import { state } from '../data/state';
 import { pages } from '../pages/pages';
-import { closeChapter, loadChapter } from './chapterControl';
+import { closeChapter, loadChapter, implicitCloseChapter } from './chapterControl';
 import { newContent, Side } from './contentControl';
 import { getTitle, updateHistory } from './history';
 import { Layout, setLayout } from './layoutControl';
@@ -42,6 +42,7 @@ function followQueryToChapter(relativePath: string): boolean {
 }
 
 function followQueryToPage(pageSpecifier: string): boolean {
+  implicitCloseChapter();
   for (const page of pages) {
     if (pageSpecifier.startsWith(page.name)) {
       const content = newContent(Side.LEFT);

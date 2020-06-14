@@ -77,6 +77,7 @@ class Style {
 
     attemptInsertRule(`:root { --key: ${key}; }`);
     attemptInsertRule(`:root { --key-opacity-01: ${keyAlpha(0.1)}; }`);
+    attemptInsertRule(`:root { --key-opacity-015: ${keyAlpha(0.15)}; }`);
     attemptInsertRule(`:root { --key-opacity-05: ${keyAlpha(0.5)}; }`);
     attemptInsertRule(`:root { --key-opacity-007: ${keyAlpha(0.07)}; }`);
     attemptInsertRule(`:root { --key-opacity-004: ${keyAlpha(0.04)}; }`);

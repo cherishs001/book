@@ -32,4 +32,10 @@
   &:active::before {
     opacity: 0.04;
   }
+
+  &.disabled::before {
+    cursor: default;
+
+    opacity: 0;
+  }
 }
