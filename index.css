@@ -545,9 +545,15 @@ body.animation-enabled .content-container > .content > .slide-container > .conte
 .content-container > .content .content-block.comments > .comment > p {
   margin-bottom: 0;
 }
-.content-container > .content .content-block.comments > .comment > p > .pageName {
+.content-container > .content .content-block.comments > .comment > p > .page-name {
   margin-top: 2em;
-  opacity: 0.5;
+  opacity: 0.45;
+}
+body.animation-enabled .content-container > .content .content-block.comments > .comment > p > .page-name {
+  transition: opacity 0.12s;
+}
+.content-container > .content .content-block.comments > .comment > p > .page-name:hover {
+  opacity: 0.75;
 }
 .nsfw-warning {
   position: fixed;
