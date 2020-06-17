@@ -119,7 +119,9 @@ function createCommentElement(
 export const commentsCache = new AutoCache<string, any>(
   apiUrl => {
     debugLogger.log(`Loading comments from ${apiUrl}.`);
-    return fetch(apiUrl).then(response => response.json());
+    return fetch(apiUrl)
+      .then(response => response.json())
+      .then(data => data.reverse());
   },
   new DebugLogger('Comments Cache'),
 );
@@ -155,7 +157,7 @@ export function loadComments(content: Content) {
           }, COMMENTS_CREATE),
         );
       }
-      data.reverse().forEach((comment: any) => {
+      data.forEach((comment: any) => {
         if (isUserBlocked(comment.user.login)) {
           return;
         }
