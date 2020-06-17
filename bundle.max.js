@@ -1718,7 +1718,9 @@ function createCommentElement(userAvatarUrl, userName, userUrl, createTime, upda
 }
 exports.commentsCache = new AutoCache_1.AutoCache(apiUrl => {
     debugLogger.log(`Loading comments from ${apiUrl}.`);
-    return fetch(apiUrl).then(response => response.json());
+    return fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => data.reverse());
 }, new DebugLogger_1.DebugLogger('Comments Cache'));
 function loadComments(content) {
     if (settings_1.useComments.getValue() === false) {
@@ -1749,7 +1751,7 @@ function loadComments(content) {
                     },
                 }, messages_1.COMMENTS_CREATE));
             }
-            data.reverse().forEach((comment) => {
+            data.forEach((comment) => {
                 if (commentBlockControl_1.isUserBlocked(comment.user.login)) {
                     return;
                 }
