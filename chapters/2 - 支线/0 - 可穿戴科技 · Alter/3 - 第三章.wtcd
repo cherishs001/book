@@ -205,7 +205,7 @@ section breadIsDelicious then exit
 
 咦，她手上好像有一袋面包？
 
-*后续互动文档编写中!*
+*你达成了结局 B，但是后续互动文档还在编写中!*
 
 ---<<< preBakerySelection >>>---
 
@@ -240,7 +240,7 @@ section breadIsDelicious then exit
 
 “好吧，还是把随物放出来做晚饭吧……”
 
-[后续！](./第三章·幕间·A.html)
+[你达成了结局 A，点这里查看后续！](./第三章·幕间·A.html)
 
 ---<<< bakery >>>---
 
@@ -254,7 +254,7 @@ section breadIsDelicious then exit
 
 “好吧，还是把随物放出来做晚饭吧……”
 
-[后续！](./第三章·幕间·A.html)
+[你达成了结局 A，点这里查看后续！](./第三章·幕间·A.html)
 
 ---<<< university >>>---
 
