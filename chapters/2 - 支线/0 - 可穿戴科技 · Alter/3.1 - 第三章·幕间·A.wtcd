@@ -285,9 +285,11 @@ declare function play = function[string dialogs function endAction] {
     if name == "cg" {
         canvasClear::[canvas]
         canvasPutImage::[canvas "./" + path + "/" + content 0 0]
+        contentAddImage::[content]
+    } else {
+        canvasOutput::[canvas]
     }
     
-    canvasOutput::[canvas]
 
     (imageId >= listLength::[stringSplit::[dialogs "\n\n"]] - 1) ? {
         imageId = 0
@@ -434,7 +436,7 @@ AI：指令已接收。
 
 说完，李随物便将秋镜悬翻了个身，让她的手肘和膝盖着了地。
 
-cg：cg_1.png
+cg：./../../chapters/插图/坐骑_1_low.jpg
 
 stage：1
 
@@ -442,7 +444,7 @@ stage：1
 
 秋镜悬：呜呜……
 
-cg：cg_2.png
+cg：./../../chapters/插图/坐骑_2_low.jpg
 
 接下来请移动到楼梯口吧。"
 
@@ -495,6 +497,8 @@ declare string sectionKitchen =
 李随物：嗨呀，真没办法，给你把口球摘下来用嘴叼着蛋吧~
 
 说着，李随物便走到餐桌旁，把秋镜悬的口球给摘了下来。
+
+cg：./../../chapters/插图/坐骑_3_low.jpg
 
 stage：2
 
