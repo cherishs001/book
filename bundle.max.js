@@ -1120,9 +1120,10 @@ const modalControl_1 = require("./modalControl");
 const FeatureProvider_1 = require("../../wtcd/FeatureProvider");
 const debugLogger = new DebugLogger_1.DebugLogger('WTCD Game Reader UI');
 class WTCDGameReaderUI {
-    constructor(content, docIdentifier, slideAnimation, wtcdRoot, featureProvider = FeatureProvider_1.defaultFeatureProvider) {
+    constructor(content, docIdentifier, slideAnimation, wtcdRoot, elementPreprocessor, featureProvider = FeatureProvider_1.defaultFeatureProvider) {
         this.content = content;
         this.slideAnimation = slideAnimation;
+        this.elementPreprocessor = elementPreprocessor;
         this.mainBlock = null;
         this.started = false;
         this.onClickRestart = () => {
@@ -1250,6 +1251,7 @@ class WTCDGameReaderUI {
             }
         };
         this.onOutput = (content) => {
+            this.elementPreprocessor(content);
             if (this.mainBlock === null) {
                 debugLogger.log('Initialize main block.');
                 this.mainBlock = this.content.addBlock({
@@ -1589,7 +1591,7 @@ function insertContent(content, text, chapter) {
                     break;
                 }
                 case 'game': {
-                    new WTCDGameReaderUI_1.WTCDGameReaderUI(content, chapter.htmlRelativePath, chapter.slideAnimation, wtcdParseResult.wtcdRoot, featureProvider).start();
+                    new WTCDGameReaderUI_1.WTCDGameReaderUI(content, chapter.htmlRelativePath, chapter.slideAnimation, wtcdParseResult.wtcdRoot, processElements_1.processElements, featureProvider).start();
                     break;
                 }
             }
