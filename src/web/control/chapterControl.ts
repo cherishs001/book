@@ -311,6 +311,7 @@ function insertContent(content: Content, text: string, chapter: Chapter) {
             chapter.htmlRelativePath,
             chapter.slideAnimation,
             wtcdParseResult.wtcdRoot,
+            processElements,
             featureProvider,
           ).start();
           break;

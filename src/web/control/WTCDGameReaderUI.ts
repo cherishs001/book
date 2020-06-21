@@ -55,6 +55,7 @@ export class WTCDGameReaderUI {
     docIdentifier: string,
     private slideAnimation: boolean,
     wtcdRoot: WTCDRoot,
+    private elementPreprocessor: ($element: HTMLElement) => void,
     featureProvider: FeatureProvider = defaultFeatureProvider,
   ) {
     this.reader = new GameReader(
@@ -223,6 +224,7 @@ export class WTCDGameReaderUI {
     }
   }
   private onOutput = (content: HTMLDivElement) => {
+    this.elementPreprocessor(content);
     if (this.mainBlock === null) {
       debugLogger.log('Initialize main block.');
       this.mainBlock = this.content.addBlock({
