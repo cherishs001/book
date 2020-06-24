@@ -2,7 +2,7 @@ import { copy, ensureDir, readFile, writeFile } from 'fs-extra';
 import { resolve } from 'path';
 import { Data, Folder } from '../Data';
 import { chaptersDir, distChaptersDir, distDir, staticDir } from './dirs';
-import { log, indent, fPath } from './indentConsole';
+import { fPath, log } from './indentConsole';
 import { LoaderContext } from './LoaderContext';
 import { load } from './loaders/Loader';
 import { Stats } from './Stats';
@@ -27,7 +27,7 @@ const argv = yargs.options({
   await writeFile(indexPath, result, 'utf8');
   log('[[green|Static copied.]]');
 
-  const stats = new Stats();
+  const stats = new Stats(argv.production);
 
   const rootLoaderCtx = new LoaderContext(
     true,
@@ -39,7 +39,7 @@ const argv = yargs.options({
 
   const data: Data = {
     chapterTree: await load(rootLoaderCtx)! as Folder,
-    charsCount: stats.getCharsCount(),
+    charsCount: argv.production ? stats.getCharsCount() : null,
     paragraphsCount: stats.getParagraphCount(),
     keywordsCount: [...stats.getKeywordsCount()].sort((a, b) => b[1] - a[1]),
     buildNumber: process.env.TRAVIS_BUILD_NUMBER || 'Unoffical',

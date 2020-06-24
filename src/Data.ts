@@ -5,7 +5,7 @@ export interface NodeBase {
   displayName: string;
   displayIndex: DisplayIndex;
   sourceRelativePath: string;
-  charsCount: number;
+  charsCount: number | null;
 }
 
 export type NodeType =
@@ -59,7 +59,7 @@ export type Node = Folder | Chapter;
 
 export interface Data {
   chapterTree: Folder;
-  charsCount: number;
+  charsCount: number | null;
   paragraphsCount: number;
   keywordsCount: Array<[string, number]>;
   buildNumber: string;

@@ -1,18 +1,20 @@
-import { keywords } from './keywords';
+import { countCertainWord } from './countCertainWord';
 import { countChars } from './countChars';
 import { countParagraphs } from './countParagraphs';
-import {countCertainWord} from './countCertainWord';
+import { keywords } from './keywords';
 
 export class Stats {
   private charsCount = 0;
   private paragraphsCount = 0;
   private keywordsCount: Map<string, number> = new Map();
-  public constructor() {
+  public constructor(
+    private isProduction: boolean,
+  ) {
     keywords.forEach(keyword => {
       this.keywordsCount.set(keyword, 0);
     });
   }
-  public processMarkdown(markdown: string) {
+  public processMarkdown(markdown: string): number | null {
     keywords.forEach(keyword => {
       const count = countCertainWord(markdown, keyword);
       if (count !== 0) {
@@ -20,9 +22,13 @@ export class Stats {
       }
     });
 
-    const deltaChars = countChars(markdown);
-    this.charsCount += deltaChars;
-    return deltaChars;
+    if (this.isProduction) {
+      const deltaChars = countChars(markdown);
+      this.charsCount += deltaChars;
+      return deltaChars;
+    } else {
+      return null;
+    }
   }
   public processHtml(html: string) {
     this.paragraphsCount += countParagraphs(html);

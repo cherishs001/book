@@ -32,11 +32,19 @@ export const folderLoader: Loader = {
       }
     }
     children.sort(byDisplayIndex);
+    let charsCount: number | null = 0;
+    for (const child of children) {
+      if (child.charsCount === null) {
+        charsCount = null;
+        break;
+      }
+      charsCount += child.charsCount;
+    }
     return {
       ...node,
       type: 'folder',
       children,
-      charsCount: children.reduce((count, node) => count += node.charsCount, 0),
+      charsCount,
     };
   },
 };

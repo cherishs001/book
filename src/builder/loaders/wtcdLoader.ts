@@ -51,7 +51,7 @@ export const wtcdLoader: Loader = {
     const htmlPath = ctx.getDistFullPath();
     await mkdirp(dirname(htmlPath));
 
-    let chapterCharCount = 0;
+    let chapterCharCount: number | null = 0;
 
     log(`[[green|Start parsing WTCD for [[yellow|${fPath(ctx.path)}]].]]`);
 
@@ -71,7 +71,12 @@ export const wtcdLoader: Loader = {
     indent();
     try {
       wtcdParseResult = parse({ source, mdi, logger, sourceMap: !ctx.production, markdownPreProcessor: markdown => {
-        chapterCharCount += ctx.stats.processMarkdown(markdown);
+        const deltaChars = ctx.stats.processMarkdown(markdown);
+        if (deltaChars !== null && chapterCharCount !== null) {
+          chapterCharCount += deltaChars;
+        } else {
+          chapterCharCount = null;
+        }
         return markdown;
       }, htmlPostProcessor: html => {
         ctx.stats.processHtml(html);

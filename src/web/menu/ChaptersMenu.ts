@@ -45,7 +45,9 @@ export class ChaptersMenu extends Menu {
           continue;
         }
         const handle = this.addLink(new ChaptersMenu(this, child), true, ItemDecoration.ICON_FOLDER);
-        handle.append(`[${shortNumber(child.charsCount)}]`, 'char-count');
+        if (child.charsCount !== null) {
+          handle.append(`[${shortNumber(child.charsCount)}]`, 'char-count');
+        }
       } else {
         if (child.hidden) {
           continue;
@@ -63,7 +65,9 @@ export class ChaptersMenu extends Menu {
           handle.prepend('[编写中]');
           handle.addClass('early-access');
         }
-        handle.append(`[${shortNumber(child.charsCount)}]`, 'char-count');
+        if (child.charsCount !== null) {
+          handle.append(`[${shortNumber(child.charsCount)}]`, 'char-count');
+        }
 
         const lastRead = window.localStorage.getItem('lastRead');
         if (lastRead === child.htmlRelativePath) {
