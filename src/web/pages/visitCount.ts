@@ -24,6 +24,8 @@ import { updateHistory } from '../control/history';
 import { AutoCache } from '../data/AutoCache';
 import { DebugLogger } from '../DebugLogger';
 import { h } from '../hs';
+import { padName } from '../util/padName';
+import { shortNumber } from '../util/shortNumber';
 import { Page } from './pages';
 
 type TimeFrame = 'ALL' | 'HOUR' | 'DAY' | 'WEEK' | 'MONTH' | 'YEAR';
@@ -58,7 +60,7 @@ function formatTitle(relativePath: string, visitCount: number) {
   relativePath = relativePath.replace(/\//g, ' > ');
 
   relativePath = relativePath.replace(/-/g, ' ');
-  return relativePath + ': ' + visitCount + VISIT_COUNT_TIMES;
+  return relativePath + ': ' + shortNumber(visitCount, 2) + VISIT_COUNT_TIMES;
 }
 
 const visitCountCache = new AutoCache<string, any>(
@@ -111,7 +113,7 @@ export const visitCount: Page = {
         } else {
           $loadMoreButton.classList.remove('disabled');
         }
-        $status.innerText = VISIT_COUNT_DISPLAYING.replace(/\$/g, getTimeFrameText(timeFrame));
+        $status.innerText = VISIT_COUNT_DISPLAYING.replace(/\$/g, padName(getTimeFrameText(timeFrame)));
         $loadMoreButton.innerText = VISIT_COUNT_LOAD_MORE;
         // If there is less than 50, stop showing load more button
         $loadMoreContainer.classList.toggle('display-none', data.length !== 50);

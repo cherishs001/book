@@ -1,9 +1,9 @@
-export function shortNumber(input: number) {
-  if (input < 1000) {
+export function shortNumber(input: number, digits: number = 1) {
+  if (input < 1_000) {
     return String(input);
   }
-  if (input < 1000_000) {
-    return (input / 1000).toFixed(1) + 'k';
+  if (input < 1_000_000) {
+    return (input / 1000).toFixed(digits) + 'k';
   }
-  return (input / 1000_000).toFixed(1) + 'M';
+  return (input / 1_000_000).toFixed(digits) + 'M';
 }

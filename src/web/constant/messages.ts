@@ -37,11 +37,11 @@ export const VISIT_COUNT_LOAD_MORE = '加载更多';
 export const VISIT_COUNT_LOAD_MORE_LOADING = '加载中...';
 export const VISIT_COUNT_LOAD_MORE_FAILED = '加载失败，点此重试';
 export const VISIT_COUNT_TIME_FRAME_ALL = '所有';
-export const VISIT_COUNT_TIME_FRAME_HOUR = '一个小时内';
-export const VISIT_COUNT_TIME_FRAME_DAY = '一天内';
-export const VISIT_COUNT_TIME_FRAME_WEEK = '一个星期内';
-export const VISIT_COUNT_TIME_FRAME_MONTH = '一个月内';
-export const VISIT_COUNT_TIME_FRAME_YEAR = '一年内';
+export const VISIT_COUNT_TIME_FRAME_HOUR = '1 小时内';
+export const VISIT_COUNT_TIME_FRAME_DAY = '24 小时内';
+export const VISIT_COUNT_TIME_FRAME_WEEK = '7 天内';
+export const VISIT_COUNT_TIME_FRAME_MONTH = '30 天内';
+export const VISIT_COUNT_TIME_FRAME_YEAR = '365 天内';
 export const VISIT_COUNT_DISPLAYING = '正在显示$的访问量：';
 export const VISIT_COUNT_TIMES = ' 次';
 
