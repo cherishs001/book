@@ -784,11 +784,11 @@ exports.VISIT_COUNT_LOAD_MORE = '加载更多';
 exports.VISIT_COUNT_LOAD_MORE_LOADING = '加载中...';
 exports.VISIT_COUNT_LOAD_MORE_FAILED = '加载失败，点此重试';
 exports.VISIT_COUNT_TIME_FRAME_ALL = '所有';
-exports.VISIT_COUNT_TIME_FRAME_HOUR = '一个小时内';
-exports.VISIT_COUNT_TIME_FRAME_DAY = '一天内';
-exports.VISIT_COUNT_TIME_FRAME_WEEK = '一个星期内';
-exports.VISIT_COUNT_TIME_FRAME_MONTH = '一个月内';
-exports.VISIT_COUNT_TIME_FRAME_YEAR = '一年内';
+exports.VISIT_COUNT_TIME_FRAME_HOUR = '1 小时内';
+exports.VISIT_COUNT_TIME_FRAME_DAY = '24 小时内';
+exports.VISIT_COUNT_TIME_FRAME_WEEK = '7 天内';
+exports.VISIT_COUNT_TIME_FRAME_MONTH = '30 天内';
+exports.VISIT_COUNT_TIME_FRAME_YEAR = '365 天内';
 exports.VISIT_COUNT_DISPLAYING = '正在显示$的访问量：';
 exports.VISIT_COUNT_TIMES = ' 次';
 exports.NO_BLOCKED_USERS = '没有用户的评论被屏蔽';
@@ -3230,7 +3230,9 @@ class ChaptersMenu extends Menu_1.Menu {
                     continue;
                 }
                 const handle = this.addLink(new ChaptersMenu(this, child), true, Menu_1.ItemDecoration.ICON_FOLDER);
-                handle.append(`[${shortNumber_1.shortNumber(child.charsCount)}]`, 'char-count');
+                if (child.charsCount !== null) {
+                    handle.append(`[${shortNumber_1.shortNumber(child.charsCount)}]`, 'char-count');
+                }
             }
             else {
                 if (child.hidden) {
@@ -3249,7 +3251,9 @@ class ChaptersMenu extends Menu_1.Menu {
                     handle.prepend('[编写中]');
                     handle.addClass('early-access');
                 }
-                handle.append(`[${shortNumber_1.shortNumber(child.charsCount)}]`, 'char-count');
+                if (child.charsCount !== null) {
+                    handle.append(`[${shortNumber_1.shortNumber(child.charsCount)}]`, 'char-count');
+                }
                 const lastRead = window.localStorage.getItem('lastRead');
                 if (lastRead === child.htmlRelativePath) {
                     attachLastReadLabelTo(handle);
@@ -3421,6 +3425,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.StatsKeywordsCountMenu = void 0;
 const data_1 = require("../data/data");
 const Menu_1 = require("../Menu");
+const shortNumber_1 = require("../util/shortNumber");
 class StatsKeywordsCountMenu extends Menu_1.Menu {
     constructor(parent) {
         super('关键词统计', parent);
@@ -3431,31 +3436,32 @@ class StatsKeywordsCountMenu extends Menu_1.Menu {
             decoration: Menu_1.ItemDecoration.ICON_LINK,
         });
         data_1.data.keywordsCount.forEach(([keyword, count]) => {
-            this.addItem(`${keyword}：${count}`, { small: true });
+            this.addItem(`${keyword}：${shortNumber_1.shortNumber(count, 2)}`, { small: true });
         });
     }
 }
 exports.StatsKeywordsCountMenu = StatsKeywordsCountMenu;
 
-},{"../Menu":8,"../data/data":34}],48:[function(require,module,exports){
+},{"../Menu":8,"../data/data":34,"../util/shortNumber":60}],48:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.StatsMenu = void 0;
 const data_1 = require("../data/data");
 const Menu_1 = require("../Menu");
 const StatsKeywordsCountMenu_1 = require("./StatsKeywordsCountMenu");
+const shortNumber_1 = require("../util/shortNumber");
 class StatsMenu extends Menu_1.Menu {
     constructor(parent) {
         super('统计', parent);
         this.addItem('访问量统计', { button: true, link: '##page/visit-count', small: true, decoration: Menu_1.ItemDecoration.ICON_EQUALIZER });
         this.addLink(new StatsKeywordsCountMenu_1.StatsKeywordsCountMenu(this), true, Menu_1.ItemDecoration.ICON_EQUALIZER);
-        this.addItem(`总字数：${data_1.data.charsCount}`, { small: true });
-        this.addItem(`总段落数：${data_1.data.paragraphsCount}`, { small: true });
+        this.addItem(`总字数：${data_1.data.charsCount === null ? '不可用' : shortNumber_1.shortNumber(data_1.data.charsCount, 2)}`, { small: true });
+        this.addItem(`总段落数：${shortNumber_1.shortNumber(data_1.data.paragraphsCount, 2)}`, { small: true });
     }
 }
 exports.StatsMenu = StatsMenu;
 
-},{"../Menu":8,"../data/data":34,"./StatsKeywordsCountMenu":47}],49:[function(require,module,exports){
+},{"../Menu":8,"../data/data":34,"../util/shortNumber":60,"./StatsKeywordsCountMenu":47}],49:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.StyleMenu = void 0;
@@ -3647,6 +3653,8 @@ const history_1 = require("../control/history");
 const AutoCache_1 = require("../data/AutoCache");
 const DebugLogger_1 = require("../DebugLogger");
 const hs_1 = require("../hs");
+const padName_1 = require("../util/padName");
+const shortNumber_1 = require("../util/shortNumber");
 const timeFrames = ['ALL', 'HOUR', 'DAY', 'WEEK', 'MONTH', 'YEAR'];
 function getEndpoint(timeFrame, page) {
     if (timeFrame === 'ALL') {
@@ -3673,7 +3681,7 @@ function formatTitle(relativePath, visitCount) {
     }
     relativePath = relativePath.replace(/\//g, ' > ');
     relativePath = relativePath.replace(/-/g, ' ');
-    return relativePath + ': ' + visitCount + messages_1.VISIT_COUNT_TIMES;
+    return relativePath + ': ' + shortNumber_1.shortNumber(visitCount, 2) + messages_1.VISIT_COUNT_TIMES;
 }
 const visitCountCache = new AutoCache_1.AutoCache(endpoint => fetch(endpoint).then(data => data.json()), new DebugLogger_1.DebugLogger('Visit Count Cache'));
 exports.visitCount = {
@@ -3717,7 +3725,7 @@ exports.visitCount = {
                 else {
                     $loadMoreButton.classList.remove('disabled');
                 }
-                $status.innerText = messages_1.VISIT_COUNT_DISPLAYING.replace(/\$/g, getTimeFrameText(timeFrame));
+                $status.innerText = messages_1.VISIT_COUNT_DISPLAYING.replace(/\$/g, padName_1.padName(getTimeFrameText(timeFrame)));
                 $loadMoreButton.innerText = messages_1.VISIT_COUNT_LOAD_MORE;
                 // If there is less than 50, stop showing load more button
                 $loadMoreContainer.classList.toggle('display-none', data.length !== 50);
@@ -3797,7 +3805,7 @@ exports.visitCount = {
     },
 };
 
-},{"../DebugLogger":6,"../constant/messages":11,"../control/chapterControl":18,"../control/history":26,"../data/AutoCache":33,"../hs":37}],54:[function(require,module,exports){
+},{"../DebugLogger":6,"../constant/messages":11,"../control/chapterControl":18,"../control/history":26,"../data/AutoCache":33,"../hs":37,"../util/padName":58,"../util/shortNumber":60}],54:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.insertAfter = exports.isAnyParent = exports.selectNode = exports.getTextNodes = exports.id = void 0;
@@ -3989,14 +3997,14 @@ exports.resolvePath = resolvePath;
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.shortNumber = void 0;
-function shortNumber(input) {
+function shortNumber(input, digits = 1) {
     if (input < 1000) {
         return String(input);
     }
     if (input < 1000000) {
-        return (input / 1000).toFixed(1) + 'k';
+        return (input / 1000).toFixed(digits) + 'k';
     }
-    return (input / 1000000).toFixed(1) + 'M';
+    return (input / 1000000).toFixed(digits) + 'M';
 }
 exports.shortNumber = shortNumber;
 
