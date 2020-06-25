@@ -411,7 +411,7 @@ class DebugLogger {
 }
 exports.DebugLogger = DebugLogger;
 
-},{"./constant/materialDarkColors":10,"./data/settings":35,"./util/stringHash":61}],7:[function(require,module,exports){
+},{"./constant/materialDarkColors":10,"./data/settings":35,"./util/stringHash":62}],7:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Event = void 0;
@@ -1104,7 +1104,7 @@ class WTCDFeatureProvider extends FeatureProvider_1.FeatureProvider {
 }
 exports.WTCDFeatureProvider = WTCDFeatureProvider;
 
-},{"../../wtcd/FeatureProvider":63,"../DebugLogger":6,"../constant/messages":11,"../data/AutoCache":33,"../util/loadGooleFonts":56,"../util/resolvePath":59}],16:[function(require,module,exports){
+},{"../../wtcd/FeatureProvider":64,"../DebugLogger":6,"../constant/messages":11,"../data/AutoCache":33,"../util/loadGooleFonts":57,"../util/resolvePath":60}],16:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WTCDGameReaderUI = void 0;
@@ -1299,7 +1299,7 @@ class WTCDGameReaderUI {
 }
 exports.WTCDGameReaderUI = WTCDGameReaderUI;
 
-},{"../../wtcd/FeatureProvider":63,"../../wtcd/GameReader":65,"../DebugLogger":6,"../constant/messages":11,"../data/settings":35,"../hs":37,"../util/formatTime":55,"./createWTCDErrorMessageFromError":23,"./hintControl":25,"./modalControl":29}],17:[function(require,module,exports){
+},{"../../wtcd/FeatureProvider":64,"../../wtcd/GameReader":66,"../DebugLogger":6,"../constant/messages":11,"../data/settings":35,"../hs":37,"../util/formatTime":56,"./createWTCDErrorMessageFromError":23,"./hintControl":25,"./modalControl":29}],17:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const AutoCache_1 = require("../data/AutoCache");
@@ -1599,7 +1599,7 @@ function insertContent(content, text, chapter) {
     }
 }
 
-},{"../../wtcd/FlowReader":64,"../DebugLogger":6,"../Event":7,"../constant/loadingText":9,"../constant/messages":11,"../data/AutoCache":33,"../data/data":34,"../data/settings":35,"../data/state":36,"../hs":37,"../input/gestures":39,"../input/keyboard":40,"../util/DOM":54,"./WTCDFeatureProvider":15,"./WTCDGameReaderUI":16,"./commentsControl":20,"./contentControl":21,"./createWTCDErrorMessage":22,"./createWTCDErrorMessageFromError":23,"./history":26,"./layoutControl":27,"./modalControl":29,"./processElements":30}],19:[function(require,module,exports){
+},{"../../wtcd/FlowReader":65,"../DebugLogger":6,"../Event":7,"../constant/loadingText":9,"../constant/messages":11,"../data/AutoCache":33,"../data/data":34,"../data/settings":35,"../data/state":36,"../hs":37,"../input/gestures":39,"../input/keyboard":40,"../util/DOM":55,"./WTCDFeatureProvider":15,"./WTCDGameReaderUI":16,"./commentsControl":20,"./contentControl":21,"./createWTCDErrorMessage":22,"./createWTCDErrorMessageFromError":23,"./history":26,"./layoutControl":27,"./modalControl":29,"./processElements":30}],19:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getBlockedUsers = exports.isUserBlocked = exports.unblockUser = exports.blockUser = exports.blockedUserUpdateEvent = void 0;
@@ -1815,7 +1815,7 @@ function loadRecentComments(content) {
 }
 exports.loadRecentComments = loadRecentComments;
 
-},{"../DebugLogger":6,"../constant/messages":11,"../data/AutoCache":33,"../data/settings":35,"../data/state":36,"../hs":37,"../util/formatTime":55,"../util/padName":58,"./chapterControl":18,"./commentBlockControl":19,"./contentControl":21,"./history":26,"./makaiControl":28,"./modalControl":29,"./userControl":32}],21:[function(require,module,exports){
+},{"../DebugLogger":6,"../constant/messages":11,"../data/AutoCache":33,"../data/settings":35,"../data/state":36,"../hs":37,"../util/formatTime":56,"../util/padName":59,"./chapterControl":18,"./commentBlockControl":19,"./contentControl":21,"./history":26,"./makaiControl":28,"./modalControl":29,"./userControl":32}],21:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ContentBlock = exports.Content = exports.ContentBlockStyle = exports.newContent = exports.focus = exports.getCurrentContent = exports.Side = void 0;
@@ -2063,7 +2063,7 @@ class ContentBlock {
 }
 exports.ContentBlock = ContentBlock;
 
-},{"../DebugLogger":6,"../data/settings":35,"../hs":37,"../input/keyboard":40,"../util/DOM":54,"./MonoDimensionTransitionControl":14,"./layoutControl":27}],22:[function(require,module,exports){
+},{"../DebugLogger":6,"../data/settings":35,"../hs":37,"../input/keyboard":40,"../util/DOM":55,"./MonoDimensionTransitionControl":14,"./layoutControl":27}],22:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createWTCDErrorMessage = void 0;
@@ -2143,7 +2143,7 @@ function createWTCDErrorMessageFromError(error) {
 }
 exports.createWTCDErrorMessageFromError = createWTCDErrorMessageFromError;
 
-},{"../../wtcd/WTCDError":68,"./chapterControl":18,"./createWTCDErrorMessage":22}],24:[function(require,module,exports){
+},{"../../wtcd/WTCDError":69,"./chapterControl":18,"./createWTCDErrorMessage":22}],24:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.followQuery = void 0;
@@ -2223,7 +2223,7 @@ function followQuery() {
 }
 exports.followQuery = followQuery;
 
-},{"../constant/messages":11,"../data/data":34,"../data/state":36,"../pages/pages":51,"./chapterControl":18,"./contentControl":21,"./history":26,"./layoutControl":27,"./modalControl":29}],25:[function(require,module,exports){
+},{"../constant/messages":11,"../data/data":34,"../data/state":36,"../pages/pages":52,"./chapterControl":18,"./contentControl":21,"./history":26,"./layoutControl":27,"./modalControl":29}],25:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -2496,7 +2496,7 @@ function isAnyModalOpened() {
 }
 exports.isAnyModalOpened = isAnyModalOpened;
 
-},{"../data/settings":35,"../hs":37,"../input/keyboard":40,"../util/DOM":54}],30:[function(require,module,exports){
+},{"../data/settings":35,"../hs":37,"../input/keyboard":40,"../util/DOM":55}],30:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.processElements = void 0;
@@ -2529,7 +2529,7 @@ function processElements($parent) {
 }
 exports.processElements = processElements;
 
-},{"../util/DOM":54}],31:[function(require,module,exports){
+},{"../util/DOM":55}],31:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateSelection = void 0;
@@ -2812,7 +2812,7 @@ function showComment(block) {
 }
 exports.showComment = showComment;
 
-},{"../constant/messages":11,"../data/state":36,"../hs":37,"../util/padName":58,"./commentsControl":20,"./contentControl":21,"./makaiControl":28,"./modalControl":29}],33:[function(require,module,exports){
+},{"../constant/messages":11,"../data/state":36,"../hs":37,"../util/padName":59,"./commentsControl":20,"./contentControl":21,"./makaiControl":28,"./modalControl":29}],33:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AutoCache = void 0;
@@ -3026,7 +3026,7 @@ window.addEventListener('popstate', () => {
 });
 followQuery_1.followQuery();
 
-},{"./constant/messages":11,"./control/analyticsControl":17,"./control/followQuery":24,"./control/modalControl":29,"./control/updateSelection":31,"./data/data":34,"./data/settings":35,"./menu/MainMenu":44,"./util/DOM":54}],39:[function(require,module,exports){
+},{"./constant/messages":11,"./control/analyticsControl":17,"./control/followQuery":24,"./control/modalControl":29,"./control/updateSelection":31,"./data/data":34,"./data/settings":35,"./menu/MainMenu":45,"./util/DOM":55}],39:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.swipeEvent = exports.SwipeDirection = void 0;
@@ -3111,7 +3111,7 @@ exports.swipeEvent.on(direction => {
     swipeEventDebugLogger.log(SwipeDirection[direction]);
 });
 
-},{"../DebugLogger":6,"../Event":7,"../util/DOM":54}],40:[function(require,module,exports){
+},{"../DebugLogger":6,"../Event":7,"../util/DOM":55}],40:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.escapeKeyPressEvent = exports.arrowKeyPressEvent = exports.ArrowKey = void 0;
@@ -3265,7 +3265,7 @@ class ChaptersMenu extends Menu_1.Menu {
 }
 exports.ChaptersMenu = ChaptersMenu;
 
-},{"../Menu":8,"../control/chapterControl":18,"../control/history":26,"../data/data":34,"../util/shortNumber":60}],43:[function(require,module,exports){
+},{"../Menu":8,"../control/chapterControl":18,"../control/history":26,"../data/data":34,"../util/shortNumber":61}],43:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ContactMenu = void 0;
@@ -3304,10 +3304,29 @@ exports.ContactMenu = ContactMenu;
 },{"../Menu":8}],44:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.LinkExchangeMenu = void 0;
+const Menu_1 = require("../Menu");
+class LinkExchangeMenu extends Menu_1.Menu {
+    constructor(parent) {
+        super('友情链接', parent);
+        this.addItem('艾利浩斯学院 图书馆', {
+            small: true,
+            button: true,
+            link: 'http://ailihaosi.xyz/',
+            decoration: Menu_1.ItemDecoration.ICON_LINK,
+        });
+    }
+}
+exports.LinkExchangeMenu = LinkExchangeMenu;
+
+},{"../Menu":8}],45:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.MainMenu = void 0;
 const Menu_1 = require("../Menu");
 const ChaptersMenu_1 = require("./ChaptersMenu");
 const ContactMenu_1 = require("./ContactMenu");
+const LinkExchangeMenu_1 = require("./LinkExchangeMenu");
 const SettingsMenu_1 = require("./SettingsMenu");
 const StatsMenu_1 = require("./StatsMenu");
 const StyleMenu_1 = require("./StyleMenu");
@@ -3320,6 +3339,7 @@ class MainMenu extends Menu_1.Menu {
         this.addLink(new StyleMenu_1.StyleMenu(this));
         this.addLink(new ContactMenu_1.ContactMenu(this));
         this.addItem('最新评论', { button: true, link: '##page/recent-comments' });
+        this.addLink(new LinkExchangeMenu_1.LinkExchangeMenu(this));
         this.addItem('源代码', { button: true, link: 'https://github.com/SCLeoX/Wearable-Technology' });
         this.addLink(new SettingsMenu_1.SettingsMenu(this));
         this.addLink(new StatsMenu_1.StatsMenu(this));
@@ -3327,7 +3347,7 @@ class MainMenu extends Menu_1.Menu {
 }
 exports.MainMenu = MainMenu;
 
-},{"../Menu":8,"./ChaptersMenu":42,"./ContactMenu":43,"./SettingsMenu":46,"./StatsMenu":48,"./StyleMenu":49,"./ThanksMenu":50}],45:[function(require,module,exports){
+},{"../Menu":8,"./ChaptersMenu":42,"./ContactMenu":43,"./LinkExchangeMenu":44,"./SettingsMenu":47,"./StatsMenu":49,"./StyleMenu":50,"./ThanksMenu":51}],46:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MakaiMenu = void 0;
@@ -3346,7 +3366,7 @@ class MakaiMenu extends Menu_1.Menu {
 }
 exports.MakaiMenu = MakaiMenu;
 
-},{"../Menu":8,"../control/userControl":32}],46:[function(require,module,exports){
+},{"../Menu":8,"../control/userControl":32}],47:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SettingsMenu = exports.EnumSettingMenu = void 0;
@@ -3419,7 +3439,7 @@ class SettingsMenu extends Menu_1.Menu {
 }
 exports.SettingsMenu = SettingsMenu;
 
-},{"../Menu":8,"../constant/stylePreviewArticle":12,"../control/contentControl":21,"../control/layoutControl":27,"../data/settings":35,"./BlockMenu":41,"./MakaiMenu":45}],47:[function(require,module,exports){
+},{"../Menu":8,"../constant/stylePreviewArticle":12,"../control/contentControl":21,"../control/layoutControl":27,"../data/settings":35,"./BlockMenu":41,"./MakaiMenu":46}],48:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.StatsKeywordsCountMenu = void 0;
@@ -3442,7 +3462,7 @@ class StatsKeywordsCountMenu extends Menu_1.Menu {
 }
 exports.StatsKeywordsCountMenu = StatsKeywordsCountMenu;
 
-},{"../Menu":8,"../data/data":34,"../util/shortNumber":60}],48:[function(require,module,exports){
+},{"../Menu":8,"../data/data":34,"../util/shortNumber":61}],49:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.StatsMenu = void 0;
@@ -3461,7 +3481,7 @@ class StatsMenu extends Menu_1.Menu {
 }
 exports.StatsMenu = StatsMenu;
 
-},{"../Menu":8,"../data/data":34,"../util/shortNumber":60,"./StatsKeywordsCountMenu":47}],49:[function(require,module,exports){
+},{"../Menu":8,"../data/data":34,"../util/shortNumber":61,"./StatsKeywordsCountMenu":48}],50:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.StyleMenu = void 0;
@@ -3600,7 +3620,7 @@ class StyleMenu extends Menu_1.Menu {
 }
 exports.StyleMenu = StyleMenu;
 
-},{"../DebugLogger":6,"../Menu":8,"../constant/stylePreviewArticle":12,"../control/contentControl":21,"../control/layoutControl":27,"../hs":37}],50:[function(require,module,exports){
+},{"../DebugLogger":6,"../Menu":8,"../constant/stylePreviewArticle":12,"../control/contentControl":21,"../control/layoutControl":27,"../hs":37}],51:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ThanksMenu = void 0;
@@ -3618,7 +3638,7 @@ class ThanksMenu extends Menu_1.Menu {
 }
 exports.ThanksMenu = ThanksMenu;
 
-},{"../Menu":8,"../constant/thanks":13}],51:[function(require,module,exports){
+},{"../Menu":8,"../constant/thanks":13}],52:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.pages = void 0;
@@ -3629,7 +3649,7 @@ exports.pages = [
     visitCount_1.visitCount,
 ];
 
-},{"./recentComments":52,"./visitCount":53}],52:[function(require,module,exports){
+},{"./recentComments":53,"./visitCount":54}],53:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.recentComments = void 0;
@@ -3642,7 +3662,7 @@ exports.recentComments = {
     },
 };
 
-},{"../control/commentsControl":20}],53:[function(require,module,exports){
+},{"../control/commentsControl":20}],54:[function(require,module,exports){
 "use strict";
 // !!! Super spaghetti code warning !!!
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -3805,7 +3825,7 @@ exports.visitCount = {
     },
 };
 
-},{"../DebugLogger":6,"../constant/messages":11,"../control/chapterControl":18,"../control/history":26,"../data/AutoCache":33,"../hs":37,"../util/padName":58,"../util/shortNumber":60}],54:[function(require,module,exports){
+},{"../DebugLogger":6,"../constant/messages":11,"../control/chapterControl":18,"../control/history":26,"../data/AutoCache":33,"../hs":37,"../util/padName":59,"../util/shortNumber":61}],55:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.insertAfter = exports.isAnyParent = exports.selectNode = exports.getTextNodes = exports.id = void 0;
@@ -3858,7 +3878,7 @@ function insertAfter($newElement, $referencingElement) {
 }
 exports.insertAfter = insertAfter;
 
-},{"../DebugLogger":6}],55:[function(require,module,exports){
+},{"../DebugLogger":6}],56:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.formatTimeSimple = exports.formatTimeRelative = void 0;
@@ -3890,7 +3910,7 @@ function formatTimeSimple(time) {
 }
 exports.formatTimeSimple = formatTimeSimple;
 
-},{}],56:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -3925,7 +3945,7 @@ function loadGoogleFonts(fontName) {
 }
 exports.loadGoogleFonts = loadGoogleFonts;
 
-},{"../DebugLogger":6,"./matchAll":57}],57:[function(require,module,exports){
+},{"../DebugLogger":6,"./matchAll":58}],58:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.matchAll = void 0;
@@ -3942,7 +3962,7 @@ function matchAll(str, regex) {
 }
 exports.matchAll = matchAll;
 
-},{}],58:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.padName = void 0;
@@ -3959,7 +3979,7 @@ function padName(name) {
 }
 exports.padName = padName;
 
-},{}],59:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.resolvePath = void 0;
@@ -3993,7 +4013,7 @@ function resolvePath(...paths) {
 }
 exports.resolvePath = resolvePath;
 
-},{}],60:[function(require,module,exports){
+},{}],61:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.shortNumber = void 0;
@@ -4008,7 +4028,7 @@ function shortNumber(input, digits = 1) {
 }
 exports.shortNumber = shortNumber;
 
-},{}],61:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.stringHash = void 0;
@@ -4026,7 +4046,7 @@ function stringHash(str) {
 }
 exports.stringHash = stringHash;
 
-},{}],62:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChainedCanvas = void 0;
@@ -4053,7 +4073,7 @@ class ChainedCanvas {
 }
 exports.ChainedCanvas = ChainedCanvas;
 
-},{}],63:[function(require,module,exports){
+},{}],64:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.defaultFeatureProvider = exports.FeatureProvider = void 0;
@@ -4089,7 +4109,7 @@ class FeatureProvider {
 exports.FeatureProvider = FeatureProvider;
 exports.defaultFeatureProvider = new FeatureProvider();
 
-},{}],64:[function(require,module,exports){
+},{}],65:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FlowReader = void 0;
@@ -4302,7 +4322,7 @@ class FlowReader {
 }
 exports.FlowReader = FlowReader;
 
-},{"./FeatureProvider":63,"./Interpreter":66,"./Random":67}],65:[function(require,module,exports){
+},{"./FeatureProvider":64,"./Interpreter":67,"./Random":68}],66:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GameReader = void 0;
@@ -4507,7 +4527,7 @@ class GameReader {
 }
 exports.GameReader = GameReader;
 
-},{"./FeatureProvider":63,"./Interpreter":66,"./Random":67}],66:[function(require,module,exports){
+},{"./FeatureProvider":64,"./Interpreter":67,"./Random":68}],67:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Interpreter = exports.InvalidChoiceError = exports.assignValueToVariable = exports.isTypeAssignableTo = exports.describe = exports.BubbleSignal = exports.BubbleSignalType = exports.isEqual = void 0;
@@ -5341,7 +5361,7 @@ class Interpreter {
 }
 exports.Interpreter = Interpreter;
 
-},{"./WTCDError":68,"./constantsPool":70,"./invokeFunction":71,"./operators":72,"./std":76,"./utils":83}],67:[function(require,module,exports){
+},{"./WTCDError":69,"./constantsPool":71,"./invokeFunction":72,"./operators":73,"./std":77,"./utils":84}],68:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Random = void 0;
@@ -5405,7 +5425,7 @@ class Random {
 }
 exports.Random = Random;
 
-},{}],68:[function(require,module,exports){
+},{}],69:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WTCDError = void 0;
@@ -5452,7 +5472,7 @@ class WTCDError extends Error {
 }
 exports.WTCDError = WTCDError;
 
-},{}],69:[function(require,module,exports){
+},{}],70:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.autoEvaluated = void 0;
@@ -5465,7 +5485,7 @@ function autoEvaluated(fn) {
 }
 exports.autoEvaluated = autoEvaluated;
 
-},{}],70:[function(require,module,exports){
+},{}],71:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getMaybePooled = exports.booleanValue = exports.smallIntegers = exports.falseValue = exports.trueValue = exports.nullValue = void 0;
@@ -5502,7 +5522,7 @@ function getMaybePooled(type, value) {
 }
 exports.getMaybePooled = getMaybePooled;
 
-},{}],71:[function(require,module,exports){
+},{}],72:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.reverseInvocation = exports.pipelineInvocation = exports.regularInvocation = exports.regularInvocationRaw = exports.invokeFunctionRaw = exports.FunctionInvocationError = void 0;
@@ -5678,7 +5698,7 @@ exports.reverseInvocation = autoEvaluated_1.autoEvaluated((arg0, arg1, expr, int
     }
 });
 
-},{"./Interpreter":66,"./WTCDError":68,"./autoEvaluated":69,"./constantsPool":70,"./std/utils":82}],72:[function(require,module,exports){
+},{"./Interpreter":67,"./WTCDError":69,"./autoEvaluated":70,"./constantsPool":71,"./std/utils":83}],73:[function(require,module,exports){
 "use strict";
 // This file defines all infix and prefix operators in WTCD.
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -6094,7 +6114,7 @@ exports.binaryOperators = new Map([
 exports.conditionalOperatorPrecedence = 4;
 exports.operators = new Set([...exports.unaryOperators.keys(), ...exports.binaryOperators.keys(), '?', ':', '...']);
 
-},{"./Interpreter":66,"./WTCDError":68,"./autoEvaluated":69,"./constantsPool":70,"./invokeFunction":71}],73:[function(require,module,exports){
+},{"./Interpreter":67,"./WTCDError":69,"./autoEvaluated":70,"./constantsPool":71,"./invokeFunction":72}],74:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -6358,7 +6378,7 @@ exports.canvasStdFunctions = [
     },
 ];
 
-},{"../ChainedCanvas":62,"../constantsPool":70,"./utils":82}],74:[function(require,module,exports){
+},{"../ChainedCanvas":63,"../constantsPool":71,"./utils":83}],75:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.contentStdFunctions = void 0;
@@ -6463,7 +6483,7 @@ exports.contentStdFunctions = [
     },
 ];
 
-},{"../Interpreter":66,"../constantsPool":70,"./utils":82}],75:[function(require,module,exports){
+},{"../Interpreter":67,"../constantsPool":71,"./utils":83}],76:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.debugStdFunctions = void 0;
@@ -6530,7 +6550,7 @@ exports.debugStdFunctions = [
     },
 ];
 
-},{"../Interpreter":66,"../WTCDError":68,"../constantsPool":70,"../invokeFunction":71,"./utils":82}],76:[function(require,module,exports){
+},{"../Interpreter":67,"../WTCDError":69,"../constantsPool":71,"../invokeFunction":72,"./utils":83}],77:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.stdFunctions = void 0;
@@ -6553,7 +6573,7 @@ exports.stdFunctions = [
     ...canvas_1.canvasStdFunctions,
 ];
 
-},{"./canvas":73,"./content":74,"./debug":75,"./list":77,"./math":78,"./random":79,"./reader":80,"./string":81}],77:[function(require,module,exports){
+},{"./canvas":74,"./content":75,"./debug":76,"./list":78,"./math":79,"./random":80,"./reader":81,"./string":82}],78:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.listStdFunctions = void 0;
@@ -6820,7 +6840,7 @@ exports.listStdFunctions = [
     },
 ];
 
-},{"../Interpreter":66,"../WTCDError":68,"../constantsPool":70,"../invokeFunction":71,"./utils":82}],78:[function(require,module,exports){
+},{"../Interpreter":67,"../WTCDError":69,"../constantsPool":71,"../invokeFunction":72,"./utils":83}],79:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.mathStdFunctions = void 0;
@@ -6859,7 +6879,7 @@ exports.mathStdFunctions = [
     },
 ];
 
-},{"../constantsPool":70,"./utils":82}],79:[function(require,module,exports){
+},{"../constantsPool":71,"./utils":83}],80:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.randomStdFunctions = void 0;
@@ -6913,7 +6933,7 @@ exports.randomStdFunctions = [
     },
 ];
 
-},{"../constantsPool":70,"./utils":82}],80:[function(require,module,exports){
+},{"../constantsPool":71,"./utils":83}],81:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.readerStdFunctions = void 0;
@@ -6944,7 +6964,7 @@ exports.readerStdFunctions = [
     },
 ];
 
-},{"../constantsPool":70,"./utils":82}],81:[function(require,module,exports){
+},{"../constantsPool":71,"./utils":83}],82:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.stringStdFunctions = void 0;
@@ -7033,7 +7053,7 @@ exports.stringStdFunctions = [
     },
 ];
 
-},{"../constantsPool":70,"./utils":82}],82:[function(require,module,exports){
+},{"../constantsPool":71,"./utils":83}],83:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.assertArgType = exports.nullify = exports.assertArgsLength = exports.NativeFunctionError = void 0;
@@ -7080,7 +7100,7 @@ function assertArgType(args, index, type, defaultValue) {
 }
 exports.assertArgType = assertArgType;
 
-},{"../Interpreter":66,"../constantsPool":70}],83:[function(require,module,exports){
+},{"../Interpreter":67,"../constantsPool":71}],84:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.arrayEquals = exports.flat = void 0;
