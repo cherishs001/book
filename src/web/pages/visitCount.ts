@@ -24,6 +24,7 @@ import { updateHistory } from '../control/history';
 import { AutoCache } from '../data/AutoCache';
 import { DebugLogger } from '../DebugLogger';
 import { h } from '../hs';
+import { commaNumber } from '../util/commaNumber';
 import { padName } from '../util/padName';
 import { shortNumber } from '../util/shortNumber';
 import { Page } from './pages';
@@ -123,6 +124,7 @@ export const visitCount: Page = {
               style: {
                 'width': `${entry.visit_count / maxVisits * 100}%`,
               },
+              title: commaNumber(entry.visit_count) + VISIT_COUNT_TIMES,
               href: '#' + entry.relative_path,
             }, formatTitle(entry.relative_path, entry.visit_count),
           ));
