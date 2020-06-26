@@ -411,7 +411,7 @@ class DebugLogger {
 }
 exports.DebugLogger = DebugLogger;
 
-},{"./constant/materialDarkColors":10,"./data/settings":35,"./util/stringHash":62}],7:[function(require,module,exports){
+},{"./constant/materialDarkColors":10,"./data/settings":35,"./util/stringHash":63}],7:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Event = void 0;
@@ -1104,7 +1104,7 @@ class WTCDFeatureProvider extends FeatureProvider_1.FeatureProvider {
 }
 exports.WTCDFeatureProvider = WTCDFeatureProvider;
 
-},{"../../wtcd/FeatureProvider":64,"../DebugLogger":6,"../constant/messages":11,"../data/AutoCache":33,"../util/loadGooleFonts":57,"../util/resolvePath":60}],16:[function(require,module,exports){
+},{"../../wtcd/FeatureProvider":65,"../DebugLogger":6,"../constant/messages":11,"../data/AutoCache":33,"../util/loadGooleFonts":58,"../util/resolvePath":61}],16:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WTCDGameReaderUI = void 0;
@@ -1299,7 +1299,7 @@ class WTCDGameReaderUI {
 }
 exports.WTCDGameReaderUI = WTCDGameReaderUI;
 
-},{"../../wtcd/FeatureProvider":64,"../../wtcd/GameReader":66,"../DebugLogger":6,"../constant/messages":11,"../data/settings":35,"../hs":37,"../util/formatTime":56,"./createWTCDErrorMessageFromError":23,"./hintControl":25,"./modalControl":29}],17:[function(require,module,exports){
+},{"../../wtcd/FeatureProvider":65,"../../wtcd/GameReader":67,"../DebugLogger":6,"../constant/messages":11,"../data/settings":35,"../hs":37,"../util/formatTime":57,"./createWTCDErrorMessageFromError":23,"./hintControl":25,"./modalControl":29}],17:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const AutoCache_1 = require("../data/AutoCache");
@@ -1599,7 +1599,7 @@ function insertContent(content, text, chapter) {
     }
 }
 
-},{"../../wtcd/FlowReader":65,"../DebugLogger":6,"../Event":7,"../constant/loadingText":9,"../constant/messages":11,"../data/AutoCache":33,"../data/data":34,"../data/settings":35,"../data/state":36,"../hs":37,"../input/gestures":39,"../input/keyboard":40,"../util/DOM":55,"./WTCDFeatureProvider":15,"./WTCDGameReaderUI":16,"./commentsControl":20,"./contentControl":21,"./createWTCDErrorMessage":22,"./createWTCDErrorMessageFromError":23,"./history":26,"./layoutControl":27,"./modalControl":29,"./processElements":30}],19:[function(require,module,exports){
+},{"../../wtcd/FlowReader":66,"../DebugLogger":6,"../Event":7,"../constant/loadingText":9,"../constant/messages":11,"../data/AutoCache":33,"../data/data":34,"../data/settings":35,"../data/state":36,"../hs":37,"../input/gestures":39,"../input/keyboard":40,"../util/DOM":55,"./WTCDFeatureProvider":15,"./WTCDGameReaderUI":16,"./commentsControl":20,"./contentControl":21,"./createWTCDErrorMessage":22,"./createWTCDErrorMessageFromError":23,"./history":26,"./layoutControl":27,"./modalControl":29,"./processElements":30}],19:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getBlockedUsers = exports.isUserBlocked = exports.unblockUser = exports.blockUser = exports.blockedUserUpdateEvent = void 0;
@@ -1815,7 +1815,7 @@ function loadRecentComments(content) {
 }
 exports.loadRecentComments = loadRecentComments;
 
-},{"../DebugLogger":6,"../constant/messages":11,"../data/AutoCache":33,"../data/settings":35,"../data/state":36,"../hs":37,"../util/formatTime":56,"../util/padName":59,"./chapterControl":18,"./commentBlockControl":19,"./contentControl":21,"./history":26,"./makaiControl":28,"./modalControl":29,"./userControl":32}],21:[function(require,module,exports){
+},{"../DebugLogger":6,"../constant/messages":11,"../data/AutoCache":33,"../data/settings":35,"../data/state":36,"../hs":37,"../util/formatTime":57,"../util/padName":60,"./chapterControl":18,"./commentBlockControl":19,"./contentControl":21,"./history":26,"./makaiControl":28,"./modalControl":29,"./userControl":32}],21:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ContentBlock = exports.Content = exports.ContentBlockStyle = exports.newContent = exports.focus = exports.getCurrentContent = exports.Side = void 0;
@@ -2143,7 +2143,7 @@ function createWTCDErrorMessageFromError(error) {
 }
 exports.createWTCDErrorMessageFromError = createWTCDErrorMessageFromError;
 
-},{"../../wtcd/WTCDError":69,"./chapterControl":18,"./createWTCDErrorMessage":22}],24:[function(require,module,exports){
+},{"../../wtcd/WTCDError":70,"./chapterControl":18,"./createWTCDErrorMessage":22}],24:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.followQuery = void 0;
@@ -2812,7 +2812,7 @@ function showComment(block) {
 }
 exports.showComment = showComment;
 
-},{"../constant/messages":11,"../data/state":36,"../hs":37,"../util/padName":59,"./commentsControl":20,"./contentControl":21,"./makaiControl":28,"./modalControl":29}],33:[function(require,module,exports){
+},{"../constant/messages":11,"../data/state":36,"../hs":37,"../util/padName":60,"./commentsControl":20,"./contentControl":21,"./makaiControl":28,"./modalControl":29}],33:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AutoCache = void 0;
@@ -3265,7 +3265,7 @@ class ChaptersMenu extends Menu_1.Menu {
 }
 exports.ChaptersMenu = ChaptersMenu;
 
-},{"../Menu":8,"../control/chapterControl":18,"../control/history":26,"../data/data":34,"../util/shortNumber":61}],43:[function(require,module,exports){
+},{"../Menu":8,"../control/chapterControl":18,"../control/history":26,"../data/data":34,"../util/shortNumber":62}],43:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ContactMenu = void 0;
@@ -3462,7 +3462,7 @@ class StatsKeywordsCountMenu extends Menu_1.Menu {
 }
 exports.StatsKeywordsCountMenu = StatsKeywordsCountMenu;
 
-},{"../Menu":8,"../data/data":34,"../util/shortNumber":61}],49:[function(require,module,exports){
+},{"../Menu":8,"../data/data":34,"../util/shortNumber":62}],49:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.StatsMenu = void 0;
@@ -3481,7 +3481,7 @@ class StatsMenu extends Menu_1.Menu {
 }
 exports.StatsMenu = StatsMenu;
 
-},{"../Menu":8,"../data/data":34,"../util/shortNumber":61,"./StatsKeywordsCountMenu":48}],50:[function(require,module,exports){
+},{"../Menu":8,"../data/data":34,"../util/shortNumber":62,"./StatsKeywordsCountMenu":48}],50:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.StyleMenu = void 0;
@@ -3673,6 +3673,7 @@ const history_1 = require("../control/history");
 const AutoCache_1 = require("../data/AutoCache");
 const DebugLogger_1 = require("../DebugLogger");
 const hs_1 = require("../hs");
+const commaNumber_1 = require("../util/commaNumber");
 const padName_1 = require("../util/padName");
 const shortNumber_1 = require("../util/shortNumber");
 const timeFrames = ['ALL', 'HOUR', 'DAY', 'WEEK', 'MONTH', 'YEAR'];
@@ -3754,6 +3755,7 @@ exports.visitCount = {
                         style: {
                             'width': `${entry.visit_count / maxVisits * 100}%`,
                         },
+                        title: commaNumber_1.commaNumber(entry.visit_count) + messages_1.VISIT_COUNT_TIMES,
                         href: '#' + entry.relative_path,
                     }, formatTitle(entry.relative_path, entry.visit_count)));
                 }
@@ -3825,7 +3827,7 @@ exports.visitCount = {
     },
 };
 
-},{"../DebugLogger":6,"../constant/messages":11,"../control/chapterControl":18,"../control/history":26,"../data/AutoCache":33,"../hs":37,"../util/padName":59,"../util/shortNumber":61}],55:[function(require,module,exports){
+},{"../DebugLogger":6,"../constant/messages":11,"../control/chapterControl":18,"../control/history":26,"../data/AutoCache":33,"../hs":37,"../util/commaNumber":56,"../util/padName":60,"../util/shortNumber":62}],55:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.insertAfter = exports.isAnyParent = exports.selectNode = exports.getTextNodes = exports.id = void 0;
@@ -3881,6 +3883,22 @@ exports.insertAfter = insertAfter;
 },{"../DebugLogger":6}],56:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.commaNumber = void 0;
+function commaNumber(num) {
+    const segments = [];
+    while (num >= 1000) {
+        segments.push(String(num % 1000).padStart(3, '0'));
+        num = Math.floor(num / 1000);
+    }
+    segments.push(String(num));
+    segments.reverse();
+    return segments.join(',');
+}
+exports.commaNumber = commaNumber;
+
+},{}],57:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.formatTimeSimple = exports.formatTimeRelative = void 0;
 const SECOND = 1000;
 const MINUTE = 60 * SECOND;
@@ -3910,7 +3928,7 @@ function formatTimeSimple(time) {
 }
 exports.formatTimeSimple = formatTimeSimple;
 
-},{}],57:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -3945,7 +3963,7 @@ function loadGoogleFonts(fontName) {
 }
 exports.loadGoogleFonts = loadGoogleFonts;
 
-},{"../DebugLogger":6,"./matchAll":58}],58:[function(require,module,exports){
+},{"../DebugLogger":6,"./matchAll":59}],59:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.matchAll = void 0;
@@ -3962,7 +3980,7 @@ function matchAll(str, regex) {
 }
 exports.matchAll = matchAll;
 
-},{}],59:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.padName = void 0;
@@ -3979,7 +3997,7 @@ function padName(name) {
 }
 exports.padName = padName;
 
-},{}],60:[function(require,module,exports){
+},{}],61:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.resolvePath = void 0;
@@ -4013,7 +4031,7 @@ function resolvePath(...paths) {
 }
 exports.resolvePath = resolvePath;
 
-},{}],61:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.shortNumber = void 0;
@@ -4028,7 +4046,7 @@ function shortNumber(input, digits = 1) {
 }
 exports.shortNumber = shortNumber;
 
-},{}],62:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.stringHash = void 0;
@@ -4046,7 +4064,7 @@ function stringHash(str) {
 }
 exports.stringHash = stringHash;
 
-},{}],63:[function(require,module,exports){
+},{}],64:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChainedCanvas = void 0;
@@ -4073,7 +4091,7 @@ class ChainedCanvas {
 }
 exports.ChainedCanvas = ChainedCanvas;
 
-},{}],64:[function(require,module,exports){
+},{}],65:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.defaultFeatureProvider = exports.FeatureProvider = void 0;
@@ -4109,7 +4127,7 @@ class FeatureProvider {
 exports.FeatureProvider = FeatureProvider;
 exports.defaultFeatureProvider = new FeatureProvider();
 
-},{}],65:[function(require,module,exports){
+},{}],66:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FlowReader = void 0;
@@ -4322,7 +4340,7 @@ class FlowReader {
 }
 exports.FlowReader = FlowReader;
 
-},{"./FeatureProvider":64,"./Interpreter":67,"./Random":68}],66:[function(require,module,exports){
+},{"./FeatureProvider":65,"./Interpreter":68,"./Random":69}],67:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GameReader = void 0;
@@ -4527,7 +4545,7 @@ class GameReader {
 }
 exports.GameReader = GameReader;
 
-},{"./FeatureProvider":64,"./Interpreter":67,"./Random":68}],67:[function(require,module,exports){
+},{"./FeatureProvider":65,"./Interpreter":68,"./Random":69}],68:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Interpreter = exports.InvalidChoiceError = exports.assignValueToVariable = exports.isTypeAssignableTo = exports.describe = exports.BubbleSignal = exports.BubbleSignalType = exports.isEqual = void 0;
@@ -5361,7 +5379,7 @@ class Interpreter {
 }
 exports.Interpreter = Interpreter;
 
-},{"./WTCDError":69,"./constantsPool":71,"./invokeFunction":72,"./operators":73,"./std":77,"./utils":84}],68:[function(require,module,exports){
+},{"./WTCDError":70,"./constantsPool":72,"./invokeFunction":73,"./operators":74,"./std":78,"./utils":85}],69:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Random = void 0;
@@ -5425,7 +5443,7 @@ class Random {
 }
 exports.Random = Random;
 
-},{}],69:[function(require,module,exports){
+},{}],70:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WTCDError = void 0;
@@ -5472,7 +5490,7 @@ class WTCDError extends Error {
 }
 exports.WTCDError = WTCDError;
 
-},{}],70:[function(require,module,exports){
+},{}],71:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.autoEvaluated = void 0;
@@ -5485,7 +5503,7 @@ function autoEvaluated(fn) {
 }
 exports.autoEvaluated = autoEvaluated;
 
-},{}],71:[function(require,module,exports){
+},{}],72:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getMaybePooled = exports.booleanValue = exports.smallIntegers = exports.falseValue = exports.trueValue = exports.nullValue = void 0;
@@ -5522,7 +5540,7 @@ function getMaybePooled(type, value) {
 }
 exports.getMaybePooled = getMaybePooled;
 
-},{}],72:[function(require,module,exports){
+},{}],73:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.reverseInvocation = exports.pipelineInvocation = exports.regularInvocation = exports.regularInvocationRaw = exports.invokeFunctionRaw = exports.FunctionInvocationError = void 0;
@@ -5698,7 +5716,7 @@ exports.reverseInvocation = autoEvaluated_1.autoEvaluated((arg0, arg1, expr, int
     }
 });
 
-},{"./Interpreter":67,"./WTCDError":69,"./autoEvaluated":70,"./constantsPool":71,"./std/utils":83}],73:[function(require,module,exports){
+},{"./Interpreter":68,"./WTCDError":70,"./autoEvaluated":71,"./constantsPool":72,"./std/utils":84}],74:[function(require,module,exports){
 "use strict";
 // This file defines all infix and prefix operators in WTCD.
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -6114,7 +6132,7 @@ exports.binaryOperators = new Map([
 exports.conditionalOperatorPrecedence = 4;
 exports.operators = new Set([...exports.unaryOperators.keys(), ...exports.binaryOperators.keys(), '?', ':', '...']);
 
-},{"./Interpreter":67,"./WTCDError":69,"./autoEvaluated":70,"./constantsPool":71,"./invokeFunction":72}],74:[function(require,module,exports){
+},{"./Interpreter":68,"./WTCDError":70,"./autoEvaluated":71,"./constantsPool":72,"./invokeFunction":73}],75:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -6378,7 +6396,7 @@ exports.canvasStdFunctions = [
     },
 ];
 
-},{"../ChainedCanvas":63,"../constantsPool":71,"./utils":83}],75:[function(require,module,exports){
+},{"../ChainedCanvas":64,"../constantsPool":72,"./utils":84}],76:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.contentStdFunctions = void 0;
@@ -6483,7 +6501,7 @@ exports.contentStdFunctions = [
     },
 ];
 
-},{"../Interpreter":67,"../constantsPool":71,"./utils":83}],76:[function(require,module,exports){
+},{"../Interpreter":68,"../constantsPool":72,"./utils":84}],77:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.debugStdFunctions = void 0;
@@ -6550,7 +6568,7 @@ exports.debugStdFunctions = [
     },
 ];
 
-},{"../Interpreter":67,"../WTCDError":69,"../constantsPool":71,"../invokeFunction":72,"./utils":83}],77:[function(require,module,exports){
+},{"../Interpreter":68,"../WTCDError":70,"../constantsPool":72,"../invokeFunction":73,"./utils":84}],78:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.stdFunctions = void 0;
@@ -6573,7 +6591,7 @@ exports.stdFunctions = [
     ...canvas_1.canvasStdFunctions,
 ];
 
-},{"./canvas":74,"./content":75,"./debug":76,"./list":78,"./math":79,"./random":80,"./reader":81,"./string":82}],78:[function(require,module,exports){
+},{"./canvas":75,"./content":76,"./debug":77,"./list":79,"./math":80,"./random":81,"./reader":82,"./string":83}],79:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.listStdFunctions = void 0;
@@ -6840,7 +6858,7 @@ exports.listStdFunctions = [
     },
 ];
 
-},{"../Interpreter":67,"../WTCDError":69,"../constantsPool":71,"../invokeFunction":72,"./utils":83}],79:[function(require,module,exports){
+},{"../Interpreter":68,"../WTCDError":70,"../constantsPool":72,"../invokeFunction":73,"./utils":84}],80:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.mathStdFunctions = void 0;
@@ -6879,7 +6897,7 @@ exports.mathStdFunctions = [
     },
 ];
 
-},{"../constantsPool":71,"./utils":83}],80:[function(require,module,exports){
+},{"../constantsPool":72,"./utils":84}],81:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.randomStdFunctions = void 0;
@@ -6933,7 +6951,7 @@ exports.randomStdFunctions = [
     },
 ];
 
-},{"../constantsPool":71,"./utils":83}],81:[function(require,module,exports){
+},{"../constantsPool":72,"./utils":84}],82:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.readerStdFunctions = void 0;
@@ -6964,7 +6982,7 @@ exports.readerStdFunctions = [
     },
 ];
 
-},{"../constantsPool":71,"./utils":83}],82:[function(require,module,exports){
+},{"../constantsPool":72,"./utils":84}],83:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.stringStdFunctions = void 0;
@@ -7053,7 +7071,7 @@ exports.stringStdFunctions = [
     },
 ];
 
-},{"../constantsPool":71,"./utils":83}],83:[function(require,module,exports){
+},{"../constantsPool":72,"./utils":84}],84:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.assertArgType = exports.nullify = exports.assertArgsLength = exports.NativeFunctionError = void 0;
@@ -7100,7 +7118,7 @@ function assertArgType(args, index, type, defaultValue) {
 }
 exports.assertArgType = assertArgType;
 
-},{"../Interpreter":67,"../constantsPool":71}],84:[function(require,module,exports){
+},{"../Interpreter":68,"../constantsPool":72}],85:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.arrayEquals = exports.flat = void 0;
