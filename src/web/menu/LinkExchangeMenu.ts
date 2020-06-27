@@ -8,5 +8,11 @@ export class LinkExchangeMenu extends Menu {
       link: 'http://ailihaosi.xyz/',
       decoration: ItemDecoration.ICON_LINK,
     });
+    this.addItem('acted 咕咕喵的小说和小游戏', {
+      small: true,
+      button: true,
+      link: 'https://acted.gitlab.io/h3/',
+      decoration: ItemDecoration.ICON_LINK,
+    });
   }
 }
