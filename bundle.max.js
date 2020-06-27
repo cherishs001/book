@@ -3315,6 +3315,12 @@ class LinkExchangeMenu extends Menu_1.Menu {
             link: 'http://ailihaosi.xyz/',
             decoration: Menu_1.ItemDecoration.ICON_LINK,
         });
+        this.addItem('acted 咕咕喵的小说和小游戏', {
+            small: true,
+            button: true,
+            link: 'https://acted.gitlab.io/h3/',
+            decoration: Menu_1.ItemDecoration.ICON_LINK,
+        });
     }
 }
 exports.LinkExchangeMenu = LinkExchangeMenu;
