@@ -19,4 +19,6 @@ export const keywords: Array<string> = [
   '贞操带',
 
   'WTCD',
+
+  '微积分',
 ];
