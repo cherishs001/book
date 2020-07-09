@@ -1,5 +1,6 @@
 import { Content } from '../control/contentControl';
 import { recentComments } from './recentComments';
+import { recentMentions } from './recentMentions';
 import { visitCount } from './visitCount';
 
 export interface Page {
@@ -10,4 +11,5 @@ export interface Page {
 export const pages: Array<Page> = [
   recentComments,
   visitCount,
+  recentMentions,
 ];

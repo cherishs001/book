@@ -3,23 +3,42 @@ import {
   COMMENTS_FAILED,
   COMMENTS_LOADED,
   COMMENTS_LOADING,
-  COMMENTS_SECTION,
-  COMMENTS_RECENT_SECTION,
+  COMMENTS_MENTION_LOADED,
+  COMMENTS_MENTION_REPLIED_OK,
+  COMMENTS_MENTION_REPLIED_TITLE,
+  COMMENTS_MENTION_SECTION,
   COMMENTS_RECENT_LOADED,
-  MAKAI_BUTTON_BLOCK,
+  COMMENTS_RECENT_SECTION,
+  COMMENTS_SECTION,
+  GO_TO_MENU,
   MAKAI_BUTTON_DELETE,
+  MAKAI_BUTTON_REPLY,
   MAKAI_ERROR_DELETE_COMMENT_INVALID_TOKEN,
   MAKAI_ERROR_INTERNET,
+  MAKAI_ERROR_INVALID_EMAIL,
+  MAKAI_ERROR_SUBMIT_COMMENT_INVALID_TOKEN,
+  MAKAI_ERROR_UNKNOWN,
+  MAKAI_ERROR_USER_EXIST,
   MAKAI_GENERIC_LAST_MODIFIED,
   MAKAI_GENERIC_LAST_MODIFIED_SUFFIX,
   MAKAI_INFO_CONFIRM_TOKEN,
+  MAKAI_INFO_OBTAIN_TOKEN,
   MAKAI_MODAL_CANCEL,
   MAKAI_MODAL_CONFIRM,
+  MAKAI_MODAL_CONFIRM_LOSS_EDITED,
+  MAKAI_MODAL_CONFIRM_LOSS_EDITED_NO,
+  MAKAI_MODAL_CONFIRM_LOSS_EDITED_YES,
+  MAKAI_MODAL_CONTENT_COMMENT_HINT,
   MAKAI_MODAL_CONTENT_DELETION_CONFIRMATION,
+  MAKAI_MODAL_CONTENT_EMAIL_INPUT_PREFIX,
+  MAKAI_MODAL_CONTENT_NAME_INPUT_PREFIX,
+  MAKAI_MODAL_SUBMIT,
+  MAKAI_MODAL_TITLE_COMMENT,
   MAKAI_MODAL_TITLE_WARNING,
   MAKAI_SUBMITTED_0,
   MAKAI_SUBMITTED_1,
-  GO_TO_MENU,
+  MAKAI_SUBMIT_0,
+  MAKAI_SUBMIT_1,
 } from '../constant/messages';
 import { AutoCache } from '../data/AutoCache';
 import { useComments } from '../data/settings';
@@ -28,90 +47,106 @@ import { DebugLogger } from '../DebugLogger';
 import { h } from '../hs';
 import { formatTimeRelative } from '../util/formatTime';
 import { padName } from '../util/padName';
-import { blockUser, isUserBlocked } from './commentBlockControl';
-import { Content, ContentBlock, getCurrentContent } from './contentControl';
-import { getToken, getUsername, makaiUrl } from './makaiControl';
-import { confirm } from './modalControl';
-import { showComment, showLoading, showMessage } from './userControl';
-import {updateHistory} from './history';
-import {closeChapter, loadPrevChapter, loadNextChapter} from './chapterControl';
+import { closeChapter } from './chapterControl';
+import { Content, ContentBlock } from './contentControl';
+import { updateHistory } from './history';
+import { getToken, getUsername, hasToken, makaiUrl, saveToken, saveUsername } from './makaiControl';
+import { confirm, Modal, notify } from './modalControl';
+import { showLoading, showMessage } from './userControl';
 
 const debugLogger = new DebugLogger('Comments Control');
-// const getApiUrlRegExp = /^https:\/\/github\.com\/([a-zA-Z0-9-_]+)\/([a-zA-Z0-9-_]+)\/issues\/([1-9][0-9]*)$/;
-// Input sample: https://github.com/SCLeoX/Wearable-Technology/issues/1
-// Output sample: https://api.github.com/repos/SCLeoX/Wearable-Technology/issues/1/comments
-export function getApiUrl() {
-  return makaiUrl + '/comment/github/' + encodeURIComponent(state.currentChapter!.chapter.htmlRelativePath) + '/';
+
+interface CommentData {
+  user: {
+    avatar_url: string,
+    login: string,
+    html_url: string,
+    display: string;
+  };
+  created_at: string;
+  updated_at: string;
+  body: string;
+  id: number;
+  pageName?: string;
 }
 
-function createCommentElement(
-  userAvatarUrl: string,
-  userName: string,
-  userUrl: string,
-  createTime: string,
-  updateTime: string,
-  content: string,
-  id: number,
-  block: ContentBlock,
-  display: string,
-  pageName?: string,
-) {
-  const deleteButton = userName === getUsername()?.toLowerCase() ? h('a.block-user', {
-    onclick: () => {
-      confirm(MAKAI_MODAL_TITLE_WARNING, MAKAI_MODAL_CONTENT_DELETION_CONFIRMATION, MAKAI_MODAL_CONFIRM, MAKAI_MODAL_CANCEL).then((result) => {
-        if (result) {
-          const m = showLoading(MAKAI_INFO_CONFIRM_TOKEN);
-          fetch(makaiUrl + `/comment/` + id + `/` + getToken(), {
-            cache: 'no-cache',
-            credentials: 'same-origin',
-            headers: new Headers({
-              'Content-Type': 'application/json'
-            }),
-            method: 'DELETE',
-            mode: 'cors',
-            redirect: 'follow',
-            referrer: 'no-referrer',
-          }).then((response) => {
-            return response.json();
-          })
-            .then((json) => {
-              m.close();
-              if (!json.success) {
-                showMessage(MAKAI_ERROR_DELETE_COMMENT_INVALID_TOKEN);
-              } else {
-                $comment.remove();
-              }
-            }).catch((err) => {
-              m.close();
-              showMessage(MAKAI_ERROR_INTERNET);
-            });
-        }
-      });
-    },
-  }, MAKAI_BUTTON_DELETE) : null;
+async function promptDeleteComment(pageName: string, commentId: number) {
+  if (await confirm(MAKAI_MODAL_TITLE_WARNING, MAKAI_MODAL_CONTENT_DELETION_CONFIRMATION, MAKAI_MODAL_CONFIRM, MAKAI_MODAL_CANCEL)) {
+    const loadingModal = showLoading(MAKAI_INFO_CONFIRM_TOKEN);
+    try {
+      const json = await fetch(makaiUrl + `/comment/` + commentId + `/` + getToken(), {
+        cache: 'no-cache',
+        credentials: 'same-origin',
+        headers: new Headers({
+          'Content-Type': 'application/json'
+        }),
+        method: 'DELETE',
+        mode: 'cors',
+        redirect: 'follow',
+        referrer: 'no-referrer',
+      }).then(response => response.json());
+      loadingModal.close();
+      if (json.success) {
+        commentsCache.delete(recentCommentsUrl());
+        commentsCache.delete(chapterCommentsUrl(pageName));
+        return true;
+      } else {
+        showMessage(MAKAI_ERROR_DELETE_COMMENT_INVALID_TOKEN);
+        return false;
+      }
+    } catch (error) {
+      showMessage(MAKAI_ERROR_INTERNET);
+      debugLogger.error(error);
+      return false;
+    } finally {
+      loadingModal.close();
+    }
+  }
+  return false;
+}
+
+function createCommentElement(comment: CommentData, onComment: () => void, pageName?: string) {
+  pageName = pageName ?? comment.pageName;
+  if (pageName === undefined) {
+    debugLogger.warn('Unknown page name.');
+  }
+  const actionButton = (comment.user.login === getUsername()?.toLowerCase())
+    ? h('a.action', { // 删除按钮
+      onclick: () => {
+        promptDeleteComment(pageName!, comment.id).then(deleted => {
+          if (deleted) {
+            $comment.remove();
+          }
+        });
+      },
+    }, MAKAI_BUTTON_DELETE)
+    : pageName && h('a.action', { // 回复按钮
+      onclick: () => {
+        promptComment(pageName!, '@' + comment.user.login + ' ').then(replied => {
+          if (replied) {
+            onComment();
+          }
+        });
+      },
+    }, MAKAI_BUTTON_REPLY);
 
   const $comment = h('.comment', [
-    h('img.avatar', { src: userAvatarUrl }),
+    h('img.avatar', { src: comment.user.avatar_url }),
     h('a.author', {
       target: '_blank',
-      href: userUrl,
+      href: comment.user.html_url,
       rel: 'noopener noreferrer',
-    }, display),
-    h('.time', MAKAI_SUBMITTED_0 + padName(userName) + MAKAI_SUBMITTED_1 + ((createTime === updateTime)
-      ? formatTimeRelative(new Date(createTime))
-      : `${formatTimeRelative(new Date(createTime))}` +
-      MAKAI_GENERIC_LAST_MODIFIED + `${formatTimeRelative(new Date(updateTime))}` + MAKAI_GENERIC_LAST_MODIFIED_SUFFIX)), deleteButton === null ?
-      h('a.block-user', {
-        onclick: () => {
-          blockUser(userName);
-          block.directRemove();
-          loadComments(getCurrentContent()!);
-        },
-      }, MAKAI_BUTTON_BLOCK) : deleteButton,
-    ...content.split('\n\n').map(paragraph => h('p', paragraph)),
-    pageName === undefined ? null : h('p', h('a.page-name', {
-      href: `#${pageName}`,
-    }, `发表于${padName(pageName.replace(/\//g, ' > ').replace(/-/g, ' ').replace(/\.html$/, ''))}`)),
+    }, comment.user.display),
+    h('.time', MAKAI_SUBMITTED_0 + padName(comment.user.login) + MAKAI_SUBMITTED_1 + ((comment.created_at === comment.updated_at)
+      ? formatTimeRelative(new Date(comment.created_at))
+      : `${formatTimeRelative(new Date(comment.created_at))}` +
+      MAKAI_GENERIC_LAST_MODIFIED + `${formatTimeRelative(new Date(comment.updated_at))}` + MAKAI_GENERIC_LAST_MODIFIED_SUFFIX)
+    ),
+    actionButton,
+    ...comment.body.split('\n\n').map(paragraph => h('p', paragraph)),
+    comment.pageName === undefined ? null : h('p', h('a.page-name', {
+      href: `#${comment.pageName}`,
+    }, `发表于${padName(comment.pageName.replace(/\//g, ' > ').replace(/-/g, ' ').replace(/\.html$/, ''))}`)),
   ]);
   return $comment;
 }
@@ -120,18 +155,23 @@ export const commentsCache = new AutoCache<string, any>(
   apiUrl => {
     debugLogger.log(`Loading comments from ${apiUrl}.`);
     return fetch(apiUrl)
-      .then(response => response.json())
-      .then(data => data.reverse());
+      .then(response => response.json());
   },
   new DebugLogger('Comments Cache'),
 );
-export function loadComments(content: Content) {
-  if (useComments.getValue() === false) {
-    return;
-  }
+
+function loadComments(
+  content: Content,
+  apiUrl: string,
+  title: string,
+  desc: string,
+  onComment: () => void,
+  backButton: boolean = true,
+  commentingPageName?: string,
+) {
   const $commentsStatus = h('p', COMMENTS_LOADING);
   const $comments = h('.comments', [
-    h('h1', COMMENTS_SECTION),
+    h('h1', title),
     $commentsStatus,
   ]) as HTMLDivElement;
   const block = content.addBlock({
@@ -139,7 +179,6 @@ export function loadComments(content: Content) {
   });
 
   block.onEnteringView(() => {
-    const apiUrl = getApiUrl();
     commentsCache.get(apiUrl).then(data => {
       if (content.isDestroyed) {
         debugLogger.log('Comments loaded, but abandoned since the original ' +
@@ -147,97 +186,264 @@ export function loadComments(content: Content) {
         return;
       }
       debugLogger.log('Comments loaded.');
-      $commentsStatus.innerText = COMMENTS_LOADED;
-      if (data.length >= 6) {
+      $commentsStatus.innerText = desc;
+      const appendCreateComment = (commentingPageName: string) => {
         $comments.appendChild(
           h('.create-comment', {
             onclick: () => {
-              showComment(block);
+              promptComment(commentingPageName).then(commented => {
+                if (commented) {
+                  onComment();
+                }
+              });
             },
           }, COMMENTS_CREATE),
         );
+      };
+      if (commentingPageName !== undefined && data.length >= 6) {
+        appendCreateComment(commentingPageName);
       }
       data.forEach((comment: any) => {
-        if (isUserBlocked(comment.user.login)) {
-          return;
+        $comments.appendChild(createCommentElement(comment, onComment, commentingPageName));
+      });
+      if (commentingPageName !== undefined) {
+        appendCreateComment(commentingPageName);
+      }
+    }).catch(error => {
+      $commentsStatus.innerText = COMMENTS_FAILED;
+      debugLogger.error('Failed to load comments.', error);
+    }).then(() => {
+      if (backButton) {
+        $comments.appendChild(createToMenuButton());
+      }
+    });
+  });
+
+  return block;
+}
+
+export function createToMenuButton() {
+  return h('div.page-switcher', [
+    h('a.to-menu', {
+      href: window.location.pathname,
+      onclick: (event: MouseEvent) => {
+        event.preventDefault();
+        closeChapter();
+        updateHistory(true);
+      },
+    }, GO_TO_MENU),
+  ]);
+}
+
+export async function sendComment(token: string, pageName: string, textarea: string) {
+  const loadingModal = showLoading(MAKAI_INFO_CONFIRM_TOKEN);
+  try {
+    const json = await fetch(makaiUrl + '/comment/' + token, {
+      body: JSON.stringify({ pageName, content: textarea }),
+      cache: 'no-cache',
+      credentials: 'same-origin',
+      headers: new Headers({
+        'Content-Type': 'application/json'
+      }),
+      method: 'POST',
+      mode: 'cors',
+      redirect: 'follow',
+      referrer: 'no-referrer',
+    }).then(response => response.json());
+    if (!json.success) {
+      showMessage(MAKAI_ERROR_SUBMIT_COMMENT_INVALID_TOKEN);
+      return false;
+    } else {
+      // Cache invalidation
+      commentsCache.delete(recentCommentsUrl());
+      commentsCache.delete(chapterCommentsUrl(pageName));
+      return true;
+    }
+  } catch (error) {
+    showMessage(MAKAI_ERROR_INTERNET);
+    debugLogger.error(error);
+    return false;
+  } finally {
+    loadingModal.close();
+  }
+}
+
+export function promptComment(pageName: string, preFilled?: string) {
+  return new Promise<boolean>((resolve, reject) => {
+    const $nameInput = h('input') as HTMLInputElement;
+    const $emailInput = h('input') as HTMLInputElement;
+    const name = hasToken()
+      ? h('p', [MAKAI_SUBMIT_0 + padName(getUsername()!) + MAKAI_SUBMIT_1])
+      : [
+        h('.input-group', [
+          h('span', MAKAI_MODAL_CONTENT_NAME_INPUT_PREFIX),
+          $nameInput,
+        ]),
+        h('.input-group', [
+          h('span', MAKAI_MODAL_CONTENT_EMAIL_INPUT_PREFIX),
+          $emailInput,
+        ]),
+      ];
+    const $textarea = h('textarea.makai-comment') as HTMLTextAreaElement;
+    if (preFilled !== undefined) {
+      $textarea.value = preFilled;
+    }
+
+    const onSubmit = async () => {
+      if (!hasToken()) {
+        const loadingModal = showLoading(MAKAI_INFO_OBTAIN_TOKEN);
+        const alpha = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        try {
+          const response = await fetch(makaiUrl + '/register/', {
+            body: JSON.stringify({
+              username: $nameInput.value,
+              email: $emailInput.value,
+              encodedPassword: new Array(20).fill(undefined).map(() => alpha[Math.floor(Math.random() * alpha.length)]).join('')
+            }),
+            cache: 'no-cache',
+            headers: new Headers({
+              'Content-Type': 'application/json'
+            }),
+            credentials: 'same-origin',
+            method: 'POST',
+            mode: 'cors',
+            redirect: 'follow',
+            referrer: 'no-referrer',
+          });
+          const json = await response.json();
+          if (!json.success) {
+            switch (json.errorMessage) {
+              case 'Illegal email format.':
+                showMessage(MAKAI_ERROR_INVALID_EMAIL);
+                break;
+              case 'User exist.':
+                showMessage(MAKAI_ERROR_USER_EXIST);
+                break;
+              default:
+                showMessage(MAKAI_ERROR_UNKNOWN);
+                break;
+            }
+          } else if (json.accessToken === null) {
+            showMessage(MAKAI_ERROR_UNKNOWN);
+            return false;
+          } else {
+            saveToken(json.accessToken);
+            saveUsername($nameInput.value);
+          }
+        } catch (error) {
+          showMessage(MAKAI_ERROR_INTERNET);
+          debugLogger.error(error);
+          return false;
+        } finally {
+          loadingModal.close();
         }
-        $comments.appendChild(createCommentElement(
-          comment.user.avatar_url,
-          comment.user.login,
-          comment.user.html_url,
-          comment.created_at,
-          comment.updated_at,
-          comment.body,
-          comment.id,
-          block,
-          comment.user.display,
-        ));
-      });
-      $comments.appendChild(
-        h('.create-comment', {
+      }
+      return sendComment(getToken()!, pageName, $textarea.value);
+    };
+
+    const modal = new Modal(h('div', [
+      h('h1', MAKAI_MODAL_TITLE_COMMENT),
+      h('p', MAKAI_MODAL_CONTENT_COMMENT_HINT),
+      $textarea,
+      name,
+      h('.button-container', [
+        h('div', { // Submit
           onclick: () => {
-            showComment(block);
-          },
-        }, COMMENTS_CREATE),
-      );
-    })
-      .catch(() => {
-        $commentsStatus.innerText = COMMENTS_FAILED;
-      });
+            onSubmit().then(commented => {
+              if (commented) {
+                modal.close();
+              }
+              return commented;
+            }).then(resolve, reject);
+          }
+        }, MAKAI_MODAL_SUBMIT),
+        h('div', {
+          onclick: () => {
+            if ($textarea.value === '') {
+              modal.close();
+              resolve(false);
+            } else {
+              confirm(
+                MAKAI_MODAL_CONFIRM_LOSS_EDITED,
+                '',
+                MAKAI_MODAL_CONFIRM_LOSS_EDITED_YES,
+                MAKAI_MODAL_CONFIRM_LOSS_EDITED_NO
+              ).then(confirmed => {
+                if (confirmed) {
+                  modal.close();
+                  resolve(false);
+                }
+              });
+            }
+          }
+        }, MAKAI_MODAL_CANCEL),
+      ]),
+    ]));
+    modal.open();
+    $textarea.focus();
+    $textarea.addEventListener('input', () => {
+      $textarea.style.height = `auto`;
+      $textarea.style.height = `${Math.max(120, $textarea.scrollHeight)}px`;
+    }, false);
   });
 }
 
-export function loadRecentComments(content: Content) {
+export function chapterCommentsUrl(pageName: string) {
+  return makaiUrl + '/comment/github/' + encodeURIComponent(pageName) + '/';
+}
+
+export function recentCommentsUrl() {
+  return 'https://c.makai.city/comment/recent/github/50';
+}
+
+export function loadChapterComments(content: Content) {
   if (useComments.getValue() === false) {
     return;
   }
-  const $commentsStatus = h('p', COMMENTS_LOADING);
-  const $comments = h('.comments', [
-    h('h1', COMMENTS_RECENT_SECTION),
-    $commentsStatus,
-  ]) as HTMLDivElement;
-  const block = content.addBlock({
-    initElement: $comments,
-  });
-
-  const apiUrl = 'https://c.makai.city/comment/recent/github/20';
-  commentsCache.get(apiUrl).then(data => {
-    if (content.isDestroyed) {
-      debugLogger.log('Comments loaded, but abandoned since the original ' +
-        'content page is already destroyed.');
-      return;
+  let block: ContentBlock | null = null;
+  const pageName = state.currentChapter!.chapter.htmlRelativePath;
+  function load() {
+    if (block !== null) {
+      block.directRemove();
     }
-    debugLogger.log('Comments loaded.');
-    $commentsStatus.innerText = COMMENTS_RECENT_LOADED;
-    data.forEach((comment: any) => {
-      if (isUserBlocked(comment.user.login)) {
-        return;
-      }
-      $comments.appendChild(createCommentElement(
-        comment.user.avatar_url,
-        comment.user.login,
-        comment.user.html_url,
-        comment.created_at,
-        comment.updated_at,
-        comment.body,
-        comment.id,
-        block,
-        comment.user.display,
-        comment.pageName,
-      ));
-    });
-  }).catch(() => {
-    $commentsStatus.innerText = COMMENTS_FAILED;
-  }).then(() => {
-    $comments.appendChild(h('div.page-switcher', [
-      h('a.to-menu', {
-        href: window.location.pathname,
-        onclick: (event: MouseEvent) => {
-          event.preventDefault();
-          closeChapter();
-          updateHistory(true);
-        },
-      }, GO_TO_MENU),
-    ]));
-  });
+    block = loadComments(
+      content,
+      chapterCommentsUrl(pageName),
+      COMMENTS_SECTION,
+      COMMENTS_LOADED,
+      load,
+      false,
+      state.currentChapter!.chapter.htmlRelativePath,
+    );
+  }
+  load();
+}
+
+export function loadRecentComments(content: Content) {
+  let block: ContentBlock | null = null;
+  function load() {
+    if (block !== null) {
+      block.directRemove();
+    }
+    block = loadComments(
+      content,
+      recentCommentsUrl(),
+      COMMENTS_RECENT_SECTION,
+      COMMENTS_RECENT_LOADED,
+      load,
+    );
+  }
+  load();
+}
+
+export function loadRecentMentions(content: Content, token: string) {
+  loadComments(
+    content,
+    `https://c.makai.city/mentions?token=${token}`,
+    COMMENTS_MENTION_SECTION,
+    COMMENTS_MENTION_LOADED,
+    () => {
+      notify(COMMENTS_MENTION_REPLIED_TITLE, '', COMMENTS_MENTION_REPLIED_OK);
+    },
+  );
 }

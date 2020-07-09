@@ -10,9 +10,16 @@ export enum ItemDecoration {
   ICON_EQUALIZER,
   ICON_FILE,
   ICON_GAME,
+  ICON_NOTIFICATION,
+}
+
+export enum ItemLocation {
+  BEFORE,
+  AFTER,
 }
 
 type ItemOptions = {
+  location?: ItemLocation,
   small?: true;
   unclearable?: true;
 } & ({
@@ -89,6 +96,9 @@ export class ItemHandle {
     this.$appendSpan.appendChild($span);
     return $span;
   }
+  public remove() {
+    this.element.remove();
+  }
 }
 
 export class Menu {
@@ -163,7 +173,7 @@ export class Menu {
   public isActive() {
     return this.active;
   }
-  protected addItem(title: string, options: ItemOptions): ItemHandle {
+  public addItem(title: string, options: ItemOptions): ItemHandle {
     let $element: HTMLDivElement | HTMLAnchorElement;
     if (options.button && options.link !== undefined) {
       $element = document.createElement('a');
@@ -202,9 +212,17 @@ export class Menu {
           break;
         case ItemDecoration.ICON_GAME:
           $element.classList.add('icon', 'game');
+          break;
+        case ItemDecoration.ICON_NOTIFICATION:
+          $element.classList.add('icon', 'notification');
+          break;
       }
     }
-    this.container.appendChild($element);
+    if (options.location === ItemLocation.BEFORE) {
+      this.container.prepend($element);
+    } else {
+      this.container.appendChild($element);
+    }
 
     if (!options.unclearable) {
       this.clearableElements.push($element);

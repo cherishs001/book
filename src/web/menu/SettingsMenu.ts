@@ -3,7 +3,6 @@ import { newContent, Side } from '../control/contentControl';
 import { Layout } from '../control/layoutControl';
 import { animation, BooleanSetting, charCount, developerMode, earlyAccess, EnumSetting, fontFamily, gestureSwitchChapter, useComments, warning, wtcdGameQuickLoadConfirm } from '../data/settings';
 import { ItemDecoration, ItemHandle, Menu } from '../Menu';
-import { BlockMenu } from './BlockMenu';
 import { MakaiMenu } from './MakaiMenu';
 
 export class EnumSettingMenu extends Menu {
@@ -46,7 +45,6 @@ export class SettingsMenu extends Menu {
     this.addBooleanSetting('显示每个章节的字数', charCount);
     this.addBooleanSetting('WTCD 游戏快速读取前确认', wtcdGameQuickLoadConfirm);
     this.addBooleanSetting('开发人员模式', developerMode);
-    this.addLink(new BlockMenu(this), true);
   }
   public addBooleanSetting(label: string, setting: BooleanSetting) {
     const getText = () => `${label}：${setting.getValue() ? '开' : '关'}`;

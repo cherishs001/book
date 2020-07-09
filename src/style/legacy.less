@@ -407,6 +407,9 @@ body.animation-enabled .menu {
 .menu .button.icon.game::before {
   content: 'games';
 }
+.menu .button.icon.notification::before {
+  content: 'notifications_active';
+}
 body.animation-enabled .menu .button.selectable::before {
   transition: opacity 0.3s, transform 0.3s;
 }
@@ -447,34 +450,6 @@ body.animation-enabled .menu .button.active::after {
 
 .char-count-disabled .menu .char-count {
   display: none;
-}
-
-body.animation-enabled .comment>.block-user {
-  transition: background-color 0.12s linear, opacity 0.12s linear;
-}
-.comment>.block-user {
-  float: right;
-
-  padding: 5px 10px;
-
-  cursor: pointer;
-
-  border-radius: 3px;
-}
-.comment>.block-user:hover {
-  background-color: var(--key-opacity-01);
-}
-
-.comment>.block-user:active {
-  background-color: var(--key-opacity-05);
-}
-@media (min-width: 901px) {
-  .comment>.block-user {
-    opacity: 0;
-  }
-  .comment:hover>.block-user {
-    opacity: 0.8;
-  }
 }
 
 @media (min-width: 901px) {

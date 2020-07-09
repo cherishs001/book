@@ -51,5 +51,25 @@
         }
       }
     }
+    body.animation-enabled &>.action {
+      transition: background-color 0.12s linear, opacity 0.12s linear;
+    }
+    >.action {
+      float: right;
+
+      padding: 5px 10px;
+
+      cursor: pointer;
+
+      opacity: 0.8;
+      border-radius: 3px;
+    }
+    >.action:hover {
+      background-color: var(--key-opacity-01);
+    }
+
+    >.action:active {
+      background-color: var(--key-opacity-05);
+    }
   }
 }

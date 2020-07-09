@@ -13,7 +13,7 @@ import { h } from '../hs';
 import { SwipeDirection, swipeEvent } from '../input/gestures';
 import { ArrowKey, arrowKeyPressEvent, escapeKeyPressEvent } from '../input/keyboard';
 import { getTextNodes, id } from '../util/DOM';
-import { loadComments } from './commentsControl';
+import { loadChapterComments } from './commentsControl';
 import { Content, ContentBlockStyle, focus, newContent, Side } from './contentControl';
 import { createWTCDErrorMessage } from './createWTCDErrorMessage';
 import { createWTCDErrorMessageFromError } from './createWTCDErrorMessageFromError';
@@ -226,7 +226,7 @@ export function loadChapter(
     setTimeout(() => {
       focus();
     }, 1);
-    loadComments(content);
+    loadChapterComments(content);
   })
   .catch(error => {
     debugLogger.error(`Failed to load chapter.`, error);
