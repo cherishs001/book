@@ -411,7 +411,7 @@ class DebugLogger {
 }
 exports.DebugLogger = DebugLogger;
 
-},{"./constant/materialDarkColors":10,"./data/settings":35,"./util/stringHash":63}],7:[function(require,module,exports){
+},{"./constant/materialDarkColors":10,"./data/settings":34,"./util/stringHash":62}],7:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Event = void 0;
@@ -506,7 +506,7 @@ exports.Event = Event;
 },{}],8:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Menu = exports.ItemHandle = exports.ItemDecoration = void 0;
+exports.Menu = exports.ItemHandle = exports.ItemLocation = exports.ItemDecoration = void 0;
 const layoutControl_1 = require("./control/layoutControl");
 const DebugLogger_1 = require("./DebugLogger");
 const Event_1 = require("./Event");
@@ -519,7 +519,13 @@ var ItemDecoration;
     ItemDecoration[ItemDecoration["ICON_EQUALIZER"] = 4] = "ICON_EQUALIZER";
     ItemDecoration[ItemDecoration["ICON_FILE"] = 5] = "ICON_FILE";
     ItemDecoration[ItemDecoration["ICON_GAME"] = 6] = "ICON_GAME";
+    ItemDecoration[ItemDecoration["ICON_NOTIFICATION"] = 7] = "ICON_NOTIFICATION";
 })(ItemDecoration = exports.ItemDecoration || (exports.ItemDecoration = {}));
+var ItemLocation;
+(function (ItemLocation) {
+    ItemLocation[ItemLocation["BEFORE"] = 0] = "BEFORE";
+    ItemLocation[ItemLocation["AFTER"] = 1] = "AFTER";
+})(ItemLocation = exports.ItemLocation || (exports.ItemLocation = {}));
 function createSpan(text, ...classNames) {
     const $span = document.createElement('span');
     $span.innerText = text;
@@ -584,6 +590,9 @@ class ItemHandle {
         }
         this.$appendSpan.appendChild($span);
         return $span;
+    }
+    remove() {
+        this.element.remove();
     }
 }
 exports.ItemHandle = ItemHandle;
@@ -689,9 +698,18 @@ class Menu {
                     break;
                 case ItemDecoration.ICON_GAME:
                     $element.classList.add('icon', 'game');
+                    break;
+                case ItemDecoration.ICON_NOTIFICATION:
+                    $element.classList.add('icon', 'notification');
+                    break;
             }
         }
-        this.container.appendChild($element);
+        if (options.location === ItemLocation.BEFORE) {
+            this.container.prepend($element);
+        }
+        else {
+            this.container.appendChild($element);
+        }
         if (!options.unclearable) {
             this.clearableElements.push($element);
         }
@@ -708,7 +726,7 @@ class Menu {
 }
 exports.Menu = Menu;
 
-},{"./DebugLogger":6,"./Event":7,"./control/layoutControl":27}],9:[function(require,module,exports){
+},{"./DebugLogger":6,"./Event":7,"./control/layoutControl":26}],9:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.loadingText = void 0;
@@ -752,7 +770,7 @@ exports.materialDarkColors = [
 },{}],11:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.MAKAI_MODAL_CONTENT_DEVELOPMENT_HINT = exports.MAKAI_MODAL_CONTENT_YOU_WILL_GET_MAKAI_TOKEN_ONCE_YOU_SUBMIT_FIRST_COMMENT = exports.MAKAI_MODAL_CONTENT_MAKAI_TOKEN_IS_USED_TO_SUBMIT_COMMENTS = exports.MAKAI_MODAL_CONTENT_THIS_IS_YOUR_MAKAI_TOKEN = exports.MAKAI_MODAL_CONTENT_DELETION_CONFIRMATION = exports.MAKAI_MODAL_CONTENT_TOKEN_INPUT_PREFIX = exports.MAKAI_MODAL_CONTENT_EMAIL_INPUT_PREFIX = exports.MAKAI_MODAL_CONTENT_NAME_INPUT_PREFIX = exports.MAKAI_MODAL_CONTENT_COMMENT_HINT = exports.MAKAI_MODAL_CONFIRM_LOSS_EDITED_NO = exports.MAKAI_MODAL_CONFIRM_LOSS_EDITED_YES = exports.MAKAI_MODAL_CONFIRM_LOSS_EDITED = exports.MAKAI_MODAL_SUBMIT = exports.MAKAI_MODAL_SAVE = exports.MAKAI_MODAL_CANCEL = exports.MAKAI_MODAL_CONFIRM = exports.MAKAI_MODAL_OK = exports.MAKAI_MODAL_TITLE_COMMENT = exports.MAKAI_MODAL_TITLE_TOKEN = exports.MAKAI_MODAL_TITLE_WAITING = exports.MAKAI_MODAL_TITLE_INFO = exports.MAKAI_MODAL_TITLE_WARNING = exports.MAKAI_BUTTON_DELETE = exports.MAKAI_BUTTON_BLOCK = exports.MAKAI_GENERIC_LAST_MODIFIED_SUFFIX = exports.MAKAI_GENERIC_LAST_MODIFIED = exports.MAKAI_SUBMITTED_1 = exports.MAKAI_SUBMITTED_0 = exports.MAKAI_SUBMIT_1 = exports.MAKAI_SUBMIT_0 = exports.MAKAI_INFO_OBTAIN_TOKEN = exports.MAKAI_INFO_CONFIRM_TOKEN = exports.MAKAI_INFO_SET_TOKKEN_SUCCESS = exports.MAKAI_ERROR_UNKNOWN = exports.MAKAI_ERROR_USER_EXIST = exports.MAKAI_ERROR_INVALID_EMAIL = exports.MAKAI_ERROR_INVALID_TOKEN = exports.MAKAI_ERROR_EMPTY_TOKEN = exports.MAKAI_ERROR_DELETE_COMMENT_INVALID_TOKEN = exports.MAKAI_ERROR_SUBMIT_COMMENT_INVALID_TOKEN = exports.MAKAI_ERROR_INTERNET = exports.WTCD_CANVAS_LOADING = exports.WTCD_ERROR_INTERNAL_STACK_DESC = exports.WTCD_ERROR_INTERNAL_STACK_TITLE = exports.WTCD_ERROR_WTCD_STACK_DESC = exports.WTCD_ERROR_WTCD_STACK_TITLE = exports.WTCD_ERROR_MESSAGE = exports.WTCD_ERROR_INTERNAL_DESC = exports.WTCD_ERROR_INTERNAL_TITLE = exports.WTCD_ERROR_RUNTIME_DESC = exports.WTCD_ERROR_RUNTIME_TITLE = exports.WTCD_ERROR_COMPILE_DESC = exports.WTCD_ERROR_COMPILE_TITLE = exports.WTCD_GAME_NO_DESC = exports.WTCD_GAME_QUICK_LOAD_CONFIRM_CANCEL = exports.WTCD_GAME_QUICK_LOAD_CONFIRM_CONFIRM = exports.WTCD_GAME_QUICK_LOAD_CONFIRM_DESC = exports.WTCD_GAME_QUICK_LOAD_CONFIRM_TITLE = exports.WTCD_GAME_QUICK_LOAD_NOT_EXIST = exports.WTCD_GAME_QUICK_LOAD_OK = exports.WTCD_GAME_QUICK_LOAD = exports.WTCD_GAME_QUICK_SAVE_OK = exports.WTCD_GAME_QUICK_SAVE = exports.WTCD_GAME_LOAD_OK = exports.WTCD_GAME_LOAD_QUICK = exports.WTCD_GAME_LOAD_CANCEL = exports.WTCD_GAME_LOAD_TITLE = exports.WTCD_GAME_LOAD = exports.WTCD_GAME_SAVE_OK = exports.WTCD_GAME_SAVE_OVERWRITE_CANCEL = exports.WTCD_GAME_SAVE_OVERWRITE_CONFIRM = exports.WTCD_GAME_SAVE_OVERWRITE_TITLE = exports.WTCD_GAME_SAVE_NEW = exports.WTCD_GAME_SAVE_CANCEL = exports.WTCD_GAME_SAVE_TITLE = exports.WTCD_GAME_SAVE = exports.WTCD_GAME_RESTART_OK = exports.WTCD_GAME_RESTART_CANCEL = exports.WTCD_GAME_RESTART_DECISION_ONLY = exports.WTCD_GAME_RESTART_ALL = exports.WTCD_GAME_RESTART_DECISION_ONLY_DESC = exports.WTCD_GAME_RESTART_ALL_DESC = exports.WTCD_GAME_RESTART_DESC = exports.WTCD_GAME_RESTART_TITLE = exports.WTCD_GAME_RESTART = exports.CLICK_TO_UNBLOCK = exports.NO_BLOCKED_USERS = exports.VISIT_COUNT_TIMES = exports.VISIT_COUNT_DISPLAYING = exports.VISIT_COUNT_TIME_FRAME_YEAR = exports.VISIT_COUNT_TIME_FRAME_MONTH = exports.VISIT_COUNT_TIME_FRAME_WEEK = exports.VISIT_COUNT_TIME_FRAME_DAY = exports.VISIT_COUNT_TIME_FRAME_HOUR = exports.VISIT_COUNT_TIME_FRAME_ALL = exports.VISIT_COUNT_LOAD_MORE_FAILED = exports.VISIT_COUNT_LOAD_MORE_LOADING = exports.VISIT_COUNT_LOAD_MORE = exports.VISIT_COUNT_FAILED = exports.VISIT_COUNT_LOADING = exports.VISIT_COUNT_DESC_2 = exports.VISIT_COUNT_DESC_1 = exports.VISIT_COUNT_DESC_0 = exports.VISIT_COUNT_TITLE = exports.COMMENTS_RECENT_LOADED = exports.COMMENTS_RECENT_SECTION = exports.COMMENTS_FAILED = exports.COMMENTS_LOADED = exports.COMMENTS_CREATE = exports.COMMENTS_UNAVAILABLE = exports.COMMENTS_LOADING = exports.COMMENTS_SECTION = exports.BROKEN_LINK_OK = exports.BROKEN_LINK_DESC = exports.BROKEN_LINK_TITLE = exports.BUILD_FAILED_OK = exports.BUILD_FAILED_DESC = exports.BUILD_FAILED_TITLE = exports.CHAPTER_FAILED = exports.CHAPTER_LOADING = exports.NEXT_CHAPTER = exports.GO_TO_MENU = exports.PREVIOUS_CHAPTER = exports.EARLY_ACCESS_DESC = exports.EARLY_ACCESS_TITLE = void 0;
+exports.MAKAI_MODAL_CONTENT_DEVELOPMENT_HINT = exports.MAKAI_MODAL_CONTENT_MAKAI_TOKEN_DESC = exports.MAKAI_MODAL_CONTENT_DELETION_CONFIRMATION = exports.MAKAI_MODAL_CONTENT_TOKEN_INPUT_PREFIX = exports.MAKAI_MODAL_CONTENT_EMAIL_INPUT_PREFIX = exports.MAKAI_MODAL_CONTENT_NAME_INPUT_PREFIX = exports.MAKAI_MODAL_CONTENT_COMMENT_HINT = exports.MAKAI_MODAL_CONFIRM_LOSS_EDITED_NO = exports.MAKAI_MODAL_CONFIRM_LOSS_EDITED_YES = exports.MAKAI_MODAL_CONFIRM_LOSS_EDITED = exports.MAKAI_MODAL_SUBMIT = exports.MAKAI_MODAL_SAVE = exports.MAKAI_MODAL_CANCEL = exports.MAKAI_MODAL_CONFIRM = exports.MAKAI_MODAL_OK = exports.MAKAI_MODAL_TITLE_COMMENT = exports.MAKAI_MODAL_TITLE_TOKEN = exports.MAKAI_MODAL_TITLE_WAITING = exports.MAKAI_MODAL_TITLE_INFO = exports.MAKAI_MODAL_TITLE_WARNING = exports.MAKAI_BUTTON_REPLY = exports.MAKAI_BUTTON_DELETE = exports.MAKAI_BUTTON_BLOCK = exports.MAKAI_GENERIC_LAST_MODIFIED_SUFFIX = exports.MAKAI_GENERIC_LAST_MODIFIED = exports.MAKAI_SUBMITTED_1 = exports.MAKAI_SUBMITTED_0 = exports.MAKAI_SUBMIT_1 = exports.MAKAI_SUBMIT_0 = exports.MAKAI_INFO_OBTAIN_TOKEN = exports.MAKAI_INFO_CONFIRM_TOKEN = exports.MAKAI_INFO_SET_TOKKEN_SUCCESS = exports.MAKAI_ERROR_UNKNOWN = exports.MAKAI_ERROR_USER_EXIST = exports.MAKAI_ERROR_INVALID_EMAIL = exports.MAKAI_ERROR_INVALID_TOKEN = exports.MAKAI_ERROR_EMPTY_TOKEN = exports.MAKAI_ERROR_DELETE_COMMENT_INVALID_TOKEN = exports.MAKAI_ERROR_SUBMIT_COMMENT_INVALID_TOKEN = exports.MAKAI_ERROR_INTERNET = exports.WTCD_CANVAS_LOADING = exports.WTCD_ERROR_INTERNAL_STACK_DESC = exports.WTCD_ERROR_INTERNAL_STACK_TITLE = exports.WTCD_ERROR_WTCD_STACK_DESC = exports.WTCD_ERROR_WTCD_STACK_TITLE = exports.WTCD_ERROR_MESSAGE = exports.WTCD_ERROR_INTERNAL_DESC = exports.WTCD_ERROR_INTERNAL_TITLE = exports.WTCD_ERROR_RUNTIME_DESC = exports.WTCD_ERROR_RUNTIME_TITLE = exports.WTCD_ERROR_COMPILE_DESC = exports.WTCD_ERROR_COMPILE_TITLE = exports.WTCD_GAME_NO_DESC = exports.WTCD_GAME_QUICK_LOAD_CONFIRM_CANCEL = exports.WTCD_GAME_QUICK_LOAD_CONFIRM_CONFIRM = exports.WTCD_GAME_QUICK_LOAD_CONFIRM_DESC = exports.WTCD_GAME_QUICK_LOAD_CONFIRM_TITLE = exports.WTCD_GAME_QUICK_LOAD_NOT_EXIST = exports.WTCD_GAME_QUICK_LOAD_OK = exports.WTCD_GAME_QUICK_LOAD = exports.WTCD_GAME_QUICK_SAVE_OK = exports.WTCD_GAME_QUICK_SAVE = exports.WTCD_GAME_LOAD_OK = exports.WTCD_GAME_LOAD_QUICK = exports.WTCD_GAME_LOAD_CANCEL = exports.WTCD_GAME_LOAD_TITLE = exports.WTCD_GAME_LOAD = exports.WTCD_GAME_SAVE_OK = exports.WTCD_GAME_SAVE_OVERWRITE_CANCEL = exports.WTCD_GAME_SAVE_OVERWRITE_CONFIRM = exports.WTCD_GAME_SAVE_OVERWRITE_TITLE = exports.WTCD_GAME_SAVE_NEW = exports.WTCD_GAME_SAVE_CANCEL = exports.WTCD_GAME_SAVE_TITLE = exports.WTCD_GAME_SAVE = exports.WTCD_GAME_RESTART_OK = exports.WTCD_GAME_RESTART_CANCEL = exports.WTCD_GAME_RESTART_DECISION_ONLY = exports.WTCD_GAME_RESTART_ALL = exports.WTCD_GAME_RESTART_DECISION_ONLY_DESC = exports.WTCD_GAME_RESTART_ALL_DESC = exports.WTCD_GAME_RESTART_DESC = exports.WTCD_GAME_RESTART_TITLE = exports.WTCD_GAME_RESTART = exports.CLICK_TO_UNBLOCK = exports.NO_BLOCKED_USERS = exports.VISIT_COUNT_TIMES = exports.VISIT_COUNT_DISPLAYING = exports.VISIT_COUNT_TIME_FRAME_YEAR = exports.VISIT_COUNT_TIME_FRAME_MONTH = exports.VISIT_COUNT_TIME_FRAME_WEEK = exports.VISIT_COUNT_TIME_FRAME_DAY = exports.VISIT_COUNT_TIME_FRAME_HOUR = exports.VISIT_COUNT_TIME_FRAME_ALL = exports.VISIT_COUNT_LOAD_MORE_FAILED = exports.VISIT_COUNT_LOAD_MORE_LOADING = exports.VISIT_COUNT_LOAD_MORE = exports.VISIT_COUNT_FAILED = exports.VISIT_COUNT_LOADING = exports.VISIT_COUNT_DESC_2 = exports.VISIT_COUNT_DESC_1 = exports.VISIT_COUNT_DESC_0 = exports.VISIT_COUNT_TITLE = exports.COMMENTS_MENTION_REPLIED_OK = exports.COMMENTS_MENTION_REPLIED_TITLE = exports.COMMENTS_MENTION_NO_TOKEN_DESC = exports.COMMENTS_MENTION_NO_TOKEN_TITLE = exports.COMMENTS_MENTION_LOADED = exports.COMMENTS_MENTION_SECTION = exports.COMMENTS_RECENT_LOADED = exports.COMMENTS_RECENT_SECTION = exports.COMMENTS_FAILED = exports.COMMENTS_LOADED = exports.COMMENTS_CREATE = exports.COMMENTS_UNAVAILABLE = exports.COMMENTS_LOADING = exports.COMMENTS_SECTION = exports.BROKEN_LINK_OK = exports.BROKEN_LINK_DESC = exports.BROKEN_LINK_TITLE = exports.BUILD_FAILED_OK = exports.BUILD_FAILED_DESC = exports.BUILD_FAILED_TITLE = exports.CHAPTER_FAILED = exports.CHAPTER_LOADING = exports.NEXT_CHAPTER = exports.GO_TO_MENU = exports.PREVIOUS_CHAPTER = exports.EARLY_ACCESS_DESC = exports.EARLY_ACCESS_TITLE = void 0;
 exports.EARLY_ACCESS_TITLE = '编写中章节';
 exports.EARLY_ACCESS_DESC = '请注意，本文正在编写中，因此可能会含有未完成的句子或是尚未更新的信息。';
 exports.PREVIOUS_CHAPTER = '上一章';
@@ -773,7 +791,13 @@ exports.COMMENTS_CREATE = '+ 添加评论';
 exports.COMMENTS_LOADED = '以下为本章节的评论区。';
 exports.COMMENTS_FAILED = '评论加载失败，请检查网络连接。';
 exports.COMMENTS_RECENT_SECTION = '最新评论';
-exports.COMMENTS_RECENT_LOADED = '以下是最新的二十条评论。';
+exports.COMMENTS_RECENT_LOADED = '以下是最新的五十条评论。';
+exports.COMMENTS_MENTION_SECTION = '最新回复';
+exports.COMMENTS_MENTION_LOADED = '以下是最新回复了您的评论。';
+exports.COMMENTS_MENTION_NO_TOKEN_TITLE = '最新回复不可用';
+exports.COMMENTS_MENTION_NO_TOKEN_DESC = '请至少发送了一条评论后再来查看。';
+exports.COMMENTS_MENTION_REPLIED_TITLE = '回复成功';
+exports.COMMENTS_MENTION_REPLIED_OK = '完成';
 exports.VISIT_COUNT_TITLE = '访问量统计';
 exports.VISIT_COUNT_DESC_0 = '访问量统计信息由《可穿戴科技》访问统计系统提供。《可穿戴科技》访问统计系统是专门为本小说编写的高度重视隐私保护的，不记录任何个人信息的数据统计服务。其隐私政策可以在';
 exports.VISIT_COUNT_DESC_1 = '这里';
@@ -837,17 +861,17 @@ exports.WTCD_ERROR_WTCD_STACK_DESC = 'WTCD 调用栈记录了在错误发生时 
 exports.WTCD_ERROR_INTERNAL_STACK_TITLE = '内部调用栈';
 exports.WTCD_ERROR_INTERNAL_STACK_DESC = '内部调用栈记录了出现该错误时编译器或是解释器的状态。请注意内部调用栈通常只在调试 WTCD 编译器或是解释器时有用。内部调用栈通常对调试 WTCD 文档没有作用。';
 exports.WTCD_CANVAS_LOADING = '资源加载中... 取决于网络情况，这可能需要 1 秒 ~ 10 分钟。';
-exports.MAKAI_ERROR_INTERNET = '和 Makai 主机通讯时出现错误 OxO, 或许是你的网络环境出现了问题？';
-exports.MAKAI_ERROR_SUBMIT_COMMENT_INVALID_TOKEN = 'Oops！评论失败啦，或许是你的令牌过期啦？';
-exports.MAKAI_ERROR_DELETE_COMMENT_INVALID_TOKEN = 'Oops！删除失败啦，或许是你的令牌过期啦？';
-exports.MAKAI_ERROR_EMPTY_TOKEN = '嘿！请先把令牌输进来啦！';
-exports.MAKAI_ERROR_INVALID_TOKEN = 'Oops！你的令牌并没有被 Makai 记录在案！';
-exports.MAKAI_ERROR_INVALID_EMAIL = '你输入的邮箱格式有问题啦！';
-exports.MAKAI_ERROR_USER_EXIST = '这个名字已经被使用过了！如果之前使用的人是你的话，把用过的令牌找来吧！';
-exports.MAKAI_ERROR_UNKNOWN = 'Oops！发生了一些不该发生的问题！快去把友人♪B或者琳喊来！';
-exports.MAKAI_INFO_SET_TOKKEN_SUCCESS = '你的 Makai 令牌已经设置完毕啦！';
-exports.MAKAI_INFO_CONFIRM_TOKEN = '正在确认你的 Makai 令牌……';
-exports.MAKAI_INFO_OBTAIN_TOKEN = '正在获取 Makai 令牌……';
+exports.MAKAI_ERROR_INTERNET = '加载失败，请检查网络连接。';
+exports.MAKAI_ERROR_SUBMIT_COMMENT_INVALID_TOKEN = '评论失败，请检查令牌设置。';
+exports.MAKAI_ERROR_DELETE_COMMENT_INVALID_TOKEN = '删除失败，请检查令牌设置。';
+exports.MAKAI_ERROR_EMPTY_TOKEN = '请输入令牌。';
+exports.MAKAI_ERROR_INVALID_TOKEN = '令牌错误。';
+exports.MAKAI_ERROR_INVALID_EMAIL = '邮箱格式错误。';
+exports.MAKAI_ERROR_USER_EXIST = '用户名已存在。如果您在此之前使用别的设备在《可穿戴科技》评论过，请将之前评论时的生成的令牌复制到“设置” > “Makai 评论系统管理” > “Makai 令牌”。';
+exports.MAKAI_ERROR_UNKNOWN = '发生了未知错误，请联系友人♪B 或者琳。';
+exports.MAKAI_INFO_SET_TOKKEN_SUCCESS = '令牌设置成功。';
+exports.MAKAI_INFO_CONFIRM_TOKEN = '正在确认您的 Makai 令牌...';
+exports.MAKAI_INFO_OBTAIN_TOKEN = '正在获取 Makai 令牌...';
 exports.MAKAI_SUBMIT_0 = '将以';
 exports.MAKAI_SUBMIT_1 = '的身份发表评论。';
 exports.MAKAI_SUBMITTED_0 = '由';
@@ -856,11 +880,12 @@ exports.MAKAI_GENERIC_LAST_MODIFIED = '（最后修改于 ';
 exports.MAKAI_GENERIC_LAST_MODIFIED_SUFFIX = ' ）';
 exports.MAKAI_BUTTON_BLOCK = '屏蔽此人';
 exports.MAKAI_BUTTON_DELETE = '删除评论';
+exports.MAKAI_BUTTON_REPLY = '回复';
 exports.MAKAI_MODAL_TITLE_WARNING = '警告！';
 exports.MAKAI_MODAL_TITLE_INFO = '提示';
-exports.MAKAI_MODAL_TITLE_WAITING = '请等一下';
+exports.MAKAI_MODAL_TITLE_WAITING = '加载中...';
 exports.MAKAI_MODAL_TITLE_TOKEN = 'Makai 令牌';
-exports.MAKAI_MODAL_TITLE_COMMENT = 'Makai - 添加评论';
+exports.MAKAI_MODAL_TITLE_COMMENT = '添加评论';
 exports.MAKAI_MODAL_OK = '好的';
 exports.MAKAI_MODAL_CONFIRM = '是的';
 exports.MAKAI_MODAL_CANCEL = '取消';
@@ -869,15 +894,13 @@ exports.MAKAI_MODAL_SUBMIT = '发表';
 exports.MAKAI_MODAL_CONFIRM_LOSS_EDITED = '是否放弃编写的内容？';
 exports.MAKAI_MODAL_CONFIRM_LOSS_EDITED_YES = '放弃编写的内容';
 exports.MAKAI_MODAL_CONFIRM_LOSS_EDITED_NO = '继续编辑';
-exports.MAKAI_MODAL_CONTENT_COMMENT_HINT = '想说些什么？直接写下来吧！';
+exports.MAKAI_MODAL_CONTENT_COMMENT_HINT = '请填写评论内容。';
 exports.MAKAI_MODAL_CONTENT_NAME_INPUT_PREFIX = '署名（必填）：';
 exports.MAKAI_MODAL_CONTENT_EMAIL_INPUT_PREFIX = '邮箱（可选）：';
 exports.MAKAI_MODAL_CONTENT_TOKEN_INPUT_PREFIX = '令牌：';
-exports.MAKAI_MODAL_CONTENT_DELETION_CONFIRMATION = '你确定要删除这条评论吗？';
-exports.MAKAI_MODAL_CONTENT_THIS_IS_YOUR_MAKAI_TOKEN = '这是你的 Makai 令牌！';
-exports.MAKAI_MODAL_CONTENT_MAKAI_TOKEN_IS_USED_TO_SUBMIT_COMMENTS = '使用 Makai 令牌可以非常方便的在这里发表评论！';
-exports.MAKAI_MODAL_CONTENT_YOU_WILL_GET_MAKAI_TOKEN_ONCE_YOU_SUBMIT_FIRST_COMMENT = '当你发表第一个评论的时候，就会获得你的 Makai 令牌哟！';
-exports.MAKAI_MODAL_CONTENT_DEVELOPMENT_HINT = 'WTCD 存档同步正在开发中！ —— 来自魔法☆少女的玩具 友人♪B';
+exports.MAKAI_MODAL_CONTENT_DELETION_CONFIRMATION = '确定要删除这条评论吗？';
+exports.MAKAI_MODAL_CONTENT_MAKAI_TOKEN_DESC = '这是您的 Makai 令牌。\n使用 Makai 令牌可以在《可穿戴科技》发表评论。\n当您第一次发表评论时，系统就会自动生成一个 Makai 令牌。\n您可以通过将这个令牌复制到别的电脑上来实现使用多台设备用一个身份回复。';
+exports.MAKAI_MODAL_CONTENT_DEVELOPMENT_HINT = 'WTCD 存档同步正在开发中。—— 来自魔法☆少女的玩具 友人♪B';
 
 },{}],12:[function(require,module,exports){
 "use strict";
@@ -1104,7 +1127,7 @@ class WTCDFeatureProvider extends FeatureProvider_1.FeatureProvider {
 }
 exports.WTCDFeatureProvider = WTCDFeatureProvider;
 
-},{"../../wtcd/FeatureProvider":65,"../DebugLogger":6,"../constant/messages":11,"../data/AutoCache":33,"../util/loadGooleFonts":58,"../util/resolvePath":61}],16:[function(require,module,exports){
+},{"../../wtcd/FeatureProvider":64,"../DebugLogger":6,"../constant/messages":11,"../data/AutoCache":32,"../util/loadGooleFonts":57,"../util/resolvePath":60}],16:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WTCDGameReaderUI = void 0;
@@ -1299,7 +1322,7 @@ class WTCDGameReaderUI {
 }
 exports.WTCDGameReaderUI = WTCDGameReaderUI;
 
-},{"../../wtcd/FeatureProvider":65,"../../wtcd/GameReader":67,"../DebugLogger":6,"../constant/messages":11,"../data/settings":35,"../hs":37,"../util/formatTime":57,"./createWTCDErrorMessageFromError":23,"./hintControl":25,"./modalControl":29}],17:[function(require,module,exports){
+},{"../../wtcd/FeatureProvider":64,"../../wtcd/GameReader":66,"../DebugLogger":6,"../constant/messages":11,"../data/settings":34,"../hs":36,"../util/formatTime":56,"./createWTCDErrorMessageFromError":22,"./hintControl":24,"./modalControl":28}],17:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const AutoCache_1 = require("../data/AutoCache");
@@ -1330,7 +1353,7 @@ chapterControl_1.loadChapterEvent.on(chapterRelativePath => {
     }, 5000);
 });
 
-},{"../DebugLogger":6,"../data/AutoCache":33,"../data/state":36,"./chapterControl":18}],18:[function(require,module,exports){
+},{"../DebugLogger":6,"../data/AutoCache":32,"../data/state":35,"./chapterControl":18}],18:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ErrorType = exports.loadChapter = exports.loadNextChapter = exports.loadPrevChapter = exports.implicitCloseChapter = exports.closeChapter = exports.loadChapterEvent = void 0;
@@ -1518,7 +1541,7 @@ function loadChapter(chapterHtmlRelativePath, selection, side = contentControl_1
         setTimeout(() => {
             contentControl_1.focus();
         }, 1);
-        commentsControl_1.loadComments(content);
+        commentsControl_1.loadChapterComments(content);
     })
         .catch(error => {
         debugLogger.error(`Failed to load chapter.`, error);
@@ -1599,40 +1622,19 @@ function insertContent(content, text, chapter) {
     }
 }
 
-},{"../../wtcd/FlowReader":66,"../DebugLogger":6,"../Event":7,"../constant/loadingText":9,"../constant/messages":11,"../data/AutoCache":33,"../data/data":34,"../data/settings":35,"../data/state":36,"../hs":37,"../input/gestures":39,"../input/keyboard":40,"../util/DOM":55,"./WTCDFeatureProvider":15,"./WTCDGameReaderUI":16,"./commentsControl":20,"./contentControl":21,"./createWTCDErrorMessage":22,"./createWTCDErrorMessageFromError":23,"./history":26,"./layoutControl":27,"./modalControl":29,"./processElements":30}],19:[function(require,module,exports){
+},{"../../wtcd/FlowReader":65,"../DebugLogger":6,"../Event":7,"../constant/loadingText":9,"../constant/messages":11,"../data/AutoCache":32,"../data/data":33,"../data/settings":34,"../data/state":35,"../hs":36,"../input/gestures":38,"../input/keyboard":39,"../util/DOM":54,"./WTCDFeatureProvider":15,"./WTCDGameReaderUI":16,"./commentsControl":19,"./contentControl":20,"./createWTCDErrorMessage":21,"./createWTCDErrorMessageFromError":22,"./history":25,"./layoutControl":26,"./modalControl":28,"./processElements":29}],19:[function(require,module,exports){
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getBlockedUsers = exports.isUserBlocked = exports.unblockUser = exports.blockUser = exports.blockedUserUpdateEvent = void 0;
-const Event_1 = require("../Event");
-const blockedUsers = new Set(JSON.parse(window.localStorage.getItem('blockedUsers') || '[]'));
-exports.blockedUserUpdateEvent = new Event_1.Event();
-function saveBlockedUsers() {
-    window.localStorage.setItem('blockedUsers', JSON.stringify(Array.from(blockedUsers)));
-    exports.blockedUserUpdateEvent.emit();
-}
-function blockUser(userName) {
-    blockedUsers.add(userName);
-    saveBlockedUsers();
-}
-exports.blockUser = blockUser;
-function unblockUser(userName) {
-    blockedUsers.delete(userName);
-    saveBlockedUsers();
-}
-exports.unblockUser = unblockUser;
-function isUserBlocked(userName) {
-    return blockedUsers.has(userName);
-}
-exports.isUserBlocked = isUserBlocked;
-function getBlockedUsers() {
-    return Array.from(blockedUsers);
-}
-exports.getBlockedUsers = getBlockedUsers;
-
-},{"../Event":7}],20:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.loadRecentComments = exports.loadComments = exports.commentsCache = exports.getApiUrl = void 0;
+exports.loadRecentMentions = exports.loadRecentComments = exports.loadChapterComments = exports.recentCommentsUrl = exports.chapterCommentsUrl = exports.promptComment = exports.sendComment = exports.createToMenuButton = exports.commentsCache = void 0;
 const messages_1 = require("../constant/messages");
 const AutoCache_1 = require("../data/AutoCache");
 const settings_1 = require("../data/settings");
@@ -1641,103 +1643,110 @@ const DebugLogger_1 = require("../DebugLogger");
 const hs_1 = require("../hs");
 const formatTime_1 = require("../util/formatTime");
 const padName_1 = require("../util/padName");
-const commentBlockControl_1 = require("./commentBlockControl");
-const contentControl_1 = require("./contentControl");
+const chapterControl_1 = require("./chapterControl");
+const history_1 = require("./history");
 const makaiControl_1 = require("./makaiControl");
 const modalControl_1 = require("./modalControl");
 const userControl_1 = require("./userControl");
-const history_1 = require("./history");
-const chapterControl_1 = require("./chapterControl");
 const debugLogger = new DebugLogger_1.DebugLogger('Comments Control');
-// const getApiUrlRegExp = /^https:\/\/github\.com\/([a-zA-Z0-9-_]+)\/([a-zA-Z0-9-_]+)\/issues\/([1-9][0-9]*)$/;
-// Input sample: https://github.com/SCLeoX/Wearable-Technology/issues/1
-// Output sample: https://api.github.com/repos/SCLeoX/Wearable-Technology/issues/1/comments
-function getApiUrl() {
-    return makaiControl_1.makaiUrl + '/comment/github/' + encodeURIComponent(state_1.state.currentChapter.chapter.htmlRelativePath) + '/';
-}
-exports.getApiUrl = getApiUrl;
-function createCommentElement(userAvatarUrl, userName, userUrl, createTime, updateTime, content, id, block, display, pageName) {
-    var _a;
-    const deleteButton = userName === ((_a = makaiControl_1.getUsername()) === null || _a === void 0 ? void 0 : _a.toLowerCase()) ? hs_1.h('a.block-user', {
-        onclick: () => {
-            modalControl_1.confirm(messages_1.MAKAI_MODAL_TITLE_WARNING, messages_1.MAKAI_MODAL_CONTENT_DELETION_CONFIRMATION, messages_1.MAKAI_MODAL_CONFIRM, messages_1.MAKAI_MODAL_CANCEL).then((result) => {
-                if (result) {
-                    const m = userControl_1.showLoading(messages_1.MAKAI_INFO_CONFIRM_TOKEN);
-                    fetch(makaiControl_1.makaiUrl + `/comment/` + id + `/` + makaiControl_1.getToken(), {
-                        cache: 'no-cache',
-                        credentials: 'same-origin',
-                        headers: new Headers({
-                            'Content-Type': 'application/json'
-                        }),
-                        method: 'DELETE',
-                        mode: 'cors',
-                        redirect: 'follow',
-                        referrer: 'no-referrer',
-                    }).then((response) => {
-                        return response.json();
-                    })
-                        .then((json) => {
-                        m.close();
-                        if (!json.success) {
-                            userControl_1.showMessage(messages_1.MAKAI_ERROR_DELETE_COMMENT_INVALID_TOKEN);
-                        }
-                        else {
-                            $comment.remove();
-                        }
-                    }).catch((err) => {
-                        m.close();
-                        userControl_1.showMessage(messages_1.MAKAI_ERROR_INTERNET);
-                    });
+function promptDeleteComment(pageName, commentId) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (yield modalControl_1.confirm(messages_1.MAKAI_MODAL_TITLE_WARNING, messages_1.MAKAI_MODAL_CONTENT_DELETION_CONFIRMATION, messages_1.MAKAI_MODAL_CONFIRM, messages_1.MAKAI_MODAL_CANCEL)) {
+            const loadingModal = userControl_1.showLoading(messages_1.MAKAI_INFO_CONFIRM_TOKEN);
+            try {
+                const json = yield fetch(makaiControl_1.makaiUrl + `/comment/` + commentId + `/` + makaiControl_1.getToken(), {
+                    cache: 'no-cache',
+                    credentials: 'same-origin',
+                    headers: new Headers({
+                        'Content-Type': 'application/json'
+                    }),
+                    method: 'DELETE',
+                    mode: 'cors',
+                    redirect: 'follow',
+                    referrer: 'no-referrer',
+                }).then(response => response.json());
+                loadingModal.close();
+                if (json.success) {
+                    exports.commentsCache.delete(recentCommentsUrl());
+                    exports.commentsCache.delete(chapterCommentsUrl(pageName));
+                    return true;
                 }
-            });
-        },
-    }, messages_1.MAKAI_BUTTON_DELETE) : null;
+                else {
+                    userControl_1.showMessage(messages_1.MAKAI_ERROR_DELETE_COMMENT_INVALID_TOKEN);
+                    return false;
+                }
+            }
+            catch (error) {
+                userControl_1.showMessage(messages_1.MAKAI_ERROR_INTERNET);
+                debugLogger.error(error);
+                return false;
+            }
+            finally {
+                loadingModal.close();
+            }
+        }
+        return false;
+    });
+}
+function createCommentElement(comment, onComment, pageName) {
+    var _a;
+    pageName = pageName !== null && pageName !== void 0 ? pageName : comment.pageName;
+    if (pageName === undefined) {
+        debugLogger.warn('Unknown page name.');
+    }
+    const actionButton = (comment.user.login === ((_a = makaiControl_1.getUsername()) === null || _a === void 0 ? void 0 : _a.toLowerCase()))
+        ? hs_1.h('a.action', {
+            onclick: () => {
+                promptDeleteComment(pageName, comment.id).then(deleted => {
+                    if (deleted) {
+                        $comment.remove();
+                    }
+                });
+            },
+        }, messages_1.MAKAI_BUTTON_DELETE)
+        : pageName && hs_1.h('a.action', {
+            onclick: () => {
+                promptComment(pageName, '@' + comment.user.login + ' ').then(replied => {
+                    if (replied) {
+                        onComment();
+                    }
+                });
+            },
+        }, messages_1.MAKAI_BUTTON_REPLY);
     const $comment = hs_1.h('.comment', [
-        hs_1.h('img.avatar', { src: userAvatarUrl }),
+        hs_1.h('img.avatar', { src: comment.user.avatar_url }),
         hs_1.h('a.author', {
             target: '_blank',
-            href: userUrl,
+            href: comment.user.html_url,
             rel: 'noopener noreferrer',
-        }, display),
-        hs_1.h('.time', messages_1.MAKAI_SUBMITTED_0 + padName_1.padName(userName) + messages_1.MAKAI_SUBMITTED_1 + ((createTime === updateTime)
-            ? formatTime_1.formatTimeRelative(new Date(createTime))
-            : `${formatTime_1.formatTimeRelative(new Date(createTime))}` +
-                messages_1.MAKAI_GENERIC_LAST_MODIFIED + `${formatTime_1.formatTimeRelative(new Date(updateTime))}` + messages_1.MAKAI_GENERIC_LAST_MODIFIED_SUFFIX)),
-        deleteButton === null ?
-            hs_1.h('a.block-user', {
-                onclick: () => {
-                    commentBlockControl_1.blockUser(userName);
-                    block.directRemove();
-                    loadComments(contentControl_1.getCurrentContent());
-                },
-            }, messages_1.MAKAI_BUTTON_BLOCK) : deleteButton,
-        ...content.split('\n\n').map(paragraph => hs_1.h('p', paragraph)),
-        pageName === undefined ? null : hs_1.h('p', hs_1.h('a.page-name', {
-            href: `#${pageName}`,
-        }, `发表于${padName_1.padName(pageName.replace(/\//g, ' > ').replace(/-/g, ' ').replace(/\.html$/, ''))}`)),
+        }, comment.user.display),
+        hs_1.h('.time', messages_1.MAKAI_SUBMITTED_0 + padName_1.padName(comment.user.login) + messages_1.MAKAI_SUBMITTED_1 + ((comment.created_at === comment.updated_at)
+            ? formatTime_1.formatTimeRelative(new Date(comment.created_at))
+            : `${formatTime_1.formatTimeRelative(new Date(comment.created_at))}` +
+                messages_1.MAKAI_GENERIC_LAST_MODIFIED + `${formatTime_1.formatTimeRelative(new Date(comment.updated_at))}` + messages_1.MAKAI_GENERIC_LAST_MODIFIED_SUFFIX)),
+        actionButton,
+        ...comment.body.split('\n\n').map(paragraph => hs_1.h('p', paragraph)),
+        comment.pageName === undefined ? null : hs_1.h('p', hs_1.h('a.page-name', {
+            href: `#${comment.pageName}`,
+        }, `发表于${padName_1.padName(comment.pageName.replace(/\//g, ' > ').replace(/-/g, ' ').replace(/\.html$/, ''))}`)),
     ]);
     return $comment;
 }
 exports.commentsCache = new AutoCache_1.AutoCache(apiUrl => {
     debugLogger.log(`Loading comments from ${apiUrl}.`);
     return fetch(apiUrl)
-        .then(response => response.json())
-        .then(data => data.reverse());
+        .then(response => response.json());
 }, new DebugLogger_1.DebugLogger('Comments Cache'));
-function loadComments(content) {
-    if (settings_1.useComments.getValue() === false) {
-        return;
-    }
+function loadComments(content, apiUrl, title, desc, onComment, backButton = true, commentingPageName) {
     const $commentsStatus = hs_1.h('p', messages_1.COMMENTS_LOADING);
     const $comments = hs_1.h('.comments', [
-        hs_1.h('h1', messages_1.COMMENTS_SECTION),
+        hs_1.h('h1', title),
         $commentsStatus,
     ]);
     const block = content.addBlock({
         initElement: $comments,
     });
     block.onEnteringView(() => {
-        const apiUrl = getApiUrl();
         exports.commentsCache.get(apiUrl).then(data => {
             if (content.isDestroyed) {
                 debugLogger.log('Comments loaded, but abandoned since the original ' +
@@ -1745,77 +1754,249 @@ function loadComments(content) {
                 return;
             }
             debugLogger.log('Comments loaded.');
-            $commentsStatus.innerText = messages_1.COMMENTS_LOADED;
-            if (data.length >= 6) {
+            $commentsStatus.innerText = desc;
+            const appendCreateComment = (commentingPageName) => {
                 $comments.appendChild(hs_1.h('.create-comment', {
                     onclick: () => {
-                        userControl_1.showComment(block);
+                        promptComment(commentingPageName).then(commented => {
+                            if (commented) {
+                                onComment();
+                            }
+                        });
                     },
                 }, messages_1.COMMENTS_CREATE));
+            };
+            if (commentingPageName !== undefined && data.length >= 6) {
+                appendCreateComment(commentingPageName);
             }
             data.forEach((comment) => {
-                if (commentBlockControl_1.isUserBlocked(comment.user.login)) {
-                    return;
-                }
-                $comments.appendChild(createCommentElement(comment.user.avatar_url, comment.user.login, comment.user.html_url, comment.created_at, comment.updated_at, comment.body, comment.id, block, comment.user.display));
+                $comments.appendChild(createCommentElement(comment, onComment, commentingPageName));
             });
-            $comments.appendChild(hs_1.h('.create-comment', {
-                onclick: () => {
-                    userControl_1.showComment(block);
-                },
-            }, messages_1.COMMENTS_CREATE));
-        })
-            .catch(() => {
+            if (commentingPageName !== undefined) {
+                appendCreateComment(commentingPageName);
+            }
+        }).catch(error => {
             $commentsStatus.innerText = messages_1.COMMENTS_FAILED;
+            debugLogger.error('Failed to load comments.', error);
+        }).then(() => {
+            if (backButton) {
+                $comments.appendChild(createToMenuButton());
+            }
         });
     });
+    return block;
 }
-exports.loadComments = loadComments;
-function loadRecentComments(content) {
+function createToMenuButton() {
+    return hs_1.h('div.page-switcher', [
+        hs_1.h('a.to-menu', {
+            href: window.location.pathname,
+            onclick: (event) => {
+                event.preventDefault();
+                chapterControl_1.closeChapter();
+                history_1.updateHistory(true);
+            },
+        }, messages_1.GO_TO_MENU),
+    ]);
+}
+exports.createToMenuButton = createToMenuButton;
+function sendComment(token, pageName, textarea) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const loadingModal = userControl_1.showLoading(messages_1.MAKAI_INFO_CONFIRM_TOKEN);
+        try {
+            const json = yield fetch(makaiControl_1.makaiUrl + '/comment/' + token, {
+                body: JSON.stringify({ pageName, content: textarea }),
+                cache: 'no-cache',
+                credentials: 'same-origin',
+                headers: new Headers({
+                    'Content-Type': 'application/json'
+                }),
+                method: 'POST',
+                mode: 'cors',
+                redirect: 'follow',
+                referrer: 'no-referrer',
+            }).then(response => response.json());
+            if (!json.success) {
+                userControl_1.showMessage(messages_1.MAKAI_ERROR_SUBMIT_COMMENT_INVALID_TOKEN);
+                return false;
+            }
+            else {
+                // Cache invalidation
+                exports.commentsCache.delete(recentCommentsUrl());
+                exports.commentsCache.delete(chapterCommentsUrl(pageName));
+                return true;
+            }
+        }
+        catch (error) {
+            userControl_1.showMessage(messages_1.MAKAI_ERROR_INTERNET);
+            debugLogger.error(error);
+            return false;
+        }
+        finally {
+            loadingModal.close();
+        }
+    });
+}
+exports.sendComment = sendComment;
+function promptComment(pageName, preFilled) {
+    return new Promise((resolve, reject) => {
+        const $nameInput = hs_1.h('input');
+        const $emailInput = hs_1.h('input');
+        const name = makaiControl_1.hasToken()
+            ? hs_1.h('p', [messages_1.MAKAI_SUBMIT_0 + padName_1.padName(makaiControl_1.getUsername()) + messages_1.MAKAI_SUBMIT_1])
+            : [
+                hs_1.h('.input-group', [
+                    hs_1.h('span', messages_1.MAKAI_MODAL_CONTENT_NAME_INPUT_PREFIX),
+                    $nameInput,
+                ]),
+                hs_1.h('.input-group', [
+                    hs_1.h('span', messages_1.MAKAI_MODAL_CONTENT_EMAIL_INPUT_PREFIX),
+                    $emailInput,
+                ]),
+            ];
+        const $textarea = hs_1.h('textarea.makai-comment');
+        if (preFilled !== undefined) {
+            $textarea.value = preFilled;
+        }
+        const onSubmit = () => __awaiter(this, void 0, void 0, function* () {
+            if (!makaiControl_1.hasToken()) {
+                const loadingModal = userControl_1.showLoading(messages_1.MAKAI_INFO_OBTAIN_TOKEN);
+                const alpha = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+                try {
+                    const response = yield fetch(makaiControl_1.makaiUrl + '/register/', {
+                        body: JSON.stringify({
+                            username: $nameInput.value,
+                            email: $emailInput.value,
+                            encodedPassword: new Array(20).fill(undefined).map(() => alpha[Math.floor(Math.random() * alpha.length)]).join('')
+                        }),
+                        cache: 'no-cache',
+                        headers: new Headers({
+                            'Content-Type': 'application/json'
+                        }),
+                        credentials: 'same-origin',
+                        method: 'POST',
+                        mode: 'cors',
+                        redirect: 'follow',
+                        referrer: 'no-referrer',
+                    });
+                    const json = yield response.json();
+                    if (!json.success) {
+                        switch (json.errorMessage) {
+                            case 'Illegal email format.':
+                                userControl_1.showMessage(messages_1.MAKAI_ERROR_INVALID_EMAIL);
+                                break;
+                            case 'User exist.':
+                                userControl_1.showMessage(messages_1.MAKAI_ERROR_USER_EXIST);
+                                break;
+                            default:
+                                userControl_1.showMessage(messages_1.MAKAI_ERROR_UNKNOWN);
+                                break;
+                        }
+                    }
+                    else if (json.accessToken === null) {
+                        userControl_1.showMessage(messages_1.MAKAI_ERROR_UNKNOWN);
+                        return false;
+                    }
+                    else {
+                        makaiControl_1.saveToken(json.accessToken);
+                        makaiControl_1.saveUsername($nameInput.value);
+                    }
+                }
+                catch (error) {
+                    userControl_1.showMessage(messages_1.MAKAI_ERROR_INTERNET);
+                    debugLogger.error(error);
+                    return false;
+                }
+                finally {
+                    loadingModal.close();
+                }
+            }
+            return sendComment(makaiControl_1.getToken(), pageName, $textarea.value);
+        });
+        const modal = new modalControl_1.Modal(hs_1.h('div', [
+            hs_1.h('h1', messages_1.MAKAI_MODAL_TITLE_COMMENT),
+            hs_1.h('p', messages_1.MAKAI_MODAL_CONTENT_COMMENT_HINT),
+            $textarea,
+            name,
+            hs_1.h('.button-container', [
+                hs_1.h('div', {
+                    onclick: () => {
+                        onSubmit().then(commented => {
+                            if (commented) {
+                                modal.close();
+                            }
+                            return commented;
+                        }).then(resolve, reject);
+                    }
+                }, messages_1.MAKAI_MODAL_SUBMIT),
+                hs_1.h('div', {
+                    onclick: () => {
+                        if ($textarea.value === '') {
+                            modal.close();
+                            resolve(false);
+                        }
+                        else {
+                            modalControl_1.confirm(messages_1.MAKAI_MODAL_CONFIRM_LOSS_EDITED, '', messages_1.MAKAI_MODAL_CONFIRM_LOSS_EDITED_YES, messages_1.MAKAI_MODAL_CONFIRM_LOSS_EDITED_NO).then(confirmed => {
+                                if (confirmed) {
+                                    modal.close();
+                                    resolve(false);
+                                }
+                            });
+                        }
+                    }
+                }, messages_1.MAKAI_MODAL_CANCEL),
+            ]),
+        ]));
+        modal.open();
+        $textarea.focus();
+        $textarea.addEventListener('input', () => {
+            $textarea.style.height = `auto`;
+            $textarea.style.height = `${Math.max(120, $textarea.scrollHeight)}px`;
+        }, false);
+    });
+}
+exports.promptComment = promptComment;
+function chapterCommentsUrl(pageName) {
+    return makaiControl_1.makaiUrl + '/comment/github/' + encodeURIComponent(pageName) + '/';
+}
+exports.chapterCommentsUrl = chapterCommentsUrl;
+function recentCommentsUrl() {
+    return 'https://c.makai.city/comment/recent/github/50';
+}
+exports.recentCommentsUrl = recentCommentsUrl;
+function loadChapterComments(content) {
     if (settings_1.useComments.getValue() === false) {
         return;
     }
-    const $commentsStatus = hs_1.h('p', messages_1.COMMENTS_LOADING);
-    const $comments = hs_1.h('.comments', [
-        hs_1.h('h1', messages_1.COMMENTS_RECENT_SECTION),
-        $commentsStatus,
-    ]);
-    const block = content.addBlock({
-        initElement: $comments,
-    });
-    const apiUrl = 'https://c.makai.city/comment/recent/github/20';
-    exports.commentsCache.get(apiUrl).then(data => {
-        if (content.isDestroyed) {
-            debugLogger.log('Comments loaded, but abandoned since the original ' +
-                'content page is already destroyed.');
-            return;
+    let block = null;
+    const pageName = state_1.state.currentChapter.chapter.htmlRelativePath;
+    function load() {
+        if (block !== null) {
+            block.directRemove();
         }
-        debugLogger.log('Comments loaded.');
-        $commentsStatus.innerText = messages_1.COMMENTS_RECENT_LOADED;
-        data.forEach((comment) => {
-            if (commentBlockControl_1.isUserBlocked(comment.user.login)) {
-                return;
-            }
-            $comments.appendChild(createCommentElement(comment.user.avatar_url, comment.user.login, comment.user.html_url, comment.created_at, comment.updated_at, comment.body, comment.id, block, comment.user.display, comment.pageName));
-        });
-    }).catch(() => {
-        $commentsStatus.innerText = messages_1.COMMENTS_FAILED;
-    }).then(() => {
-        $comments.appendChild(hs_1.h('div.page-switcher', [
-            hs_1.h('a.to-menu', {
-                href: window.location.pathname,
-                onclick: (event) => {
-                    event.preventDefault();
-                    chapterControl_1.closeChapter();
-                    history_1.updateHistory(true);
-                },
-            }, messages_1.GO_TO_MENU),
-        ]));
-    });
+        block = loadComments(content, chapterCommentsUrl(pageName), messages_1.COMMENTS_SECTION, messages_1.COMMENTS_LOADED, load, false, state_1.state.currentChapter.chapter.htmlRelativePath);
+    }
+    load();
+}
+exports.loadChapterComments = loadChapterComments;
+function loadRecentComments(content) {
+    let block = null;
+    function load() {
+        if (block !== null) {
+            block.directRemove();
+        }
+        block = loadComments(content, recentCommentsUrl(), messages_1.COMMENTS_RECENT_SECTION, messages_1.COMMENTS_RECENT_LOADED, load);
+    }
+    load();
 }
 exports.loadRecentComments = loadRecentComments;
+function loadRecentMentions(content, token) {
+    loadComments(content, `https://c.makai.city/mentions?token=${token}`, messages_1.COMMENTS_MENTION_SECTION, messages_1.COMMENTS_MENTION_LOADED, () => {
+        modalControl_1.notify(messages_1.COMMENTS_MENTION_REPLIED_TITLE, '', messages_1.COMMENTS_MENTION_REPLIED_OK);
+    });
+}
+exports.loadRecentMentions = loadRecentMentions;
 
-},{"../DebugLogger":6,"../constant/messages":11,"../data/AutoCache":33,"../data/settings":35,"../data/state":36,"../hs":37,"../util/formatTime":57,"../util/padName":60,"./chapterControl":18,"./commentBlockControl":19,"./contentControl":21,"./history":26,"./makaiControl":28,"./modalControl":29,"./userControl":32}],21:[function(require,module,exports){
+},{"../DebugLogger":6,"../constant/messages":11,"../data/AutoCache":32,"../data/settings":34,"../data/state":35,"../hs":36,"../util/formatTime":56,"../util/padName":59,"./chapterControl":18,"./history":25,"./makaiControl":27,"./modalControl":28,"./userControl":31}],20:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ContentBlock = exports.Content = exports.ContentBlockStyle = exports.newContent = exports.focus = exports.getCurrentContent = exports.Side = void 0;
@@ -2063,7 +2244,7 @@ class ContentBlock {
 }
 exports.ContentBlock = ContentBlock;
 
-},{"../DebugLogger":6,"../data/settings":35,"../hs":37,"../input/keyboard":40,"../util/DOM":55,"./MonoDimensionTransitionControl":14,"./layoutControl":27}],22:[function(require,module,exports){
+},{"../DebugLogger":6,"../data/settings":34,"../hs":36,"../input/keyboard":39,"../util/DOM":54,"./MonoDimensionTransitionControl":14,"./layoutControl":26}],21:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createWTCDErrorMessage = void 0;
@@ -2122,7 +2303,7 @@ function createWTCDErrorMessage({ errorType, message, internalStack, wtcdStack, 
 }
 exports.createWTCDErrorMessage = createWTCDErrorMessage;
 
-},{"../constant/messages":11,"./chapterControl":18}],23:[function(require,module,exports){
+},{"../constant/messages":11,"./chapterControl":18}],22:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createWTCDErrorMessageFromError = void 0;
@@ -2143,7 +2324,7 @@ function createWTCDErrorMessageFromError(error) {
 }
 exports.createWTCDErrorMessageFromError = createWTCDErrorMessageFromError;
 
-},{"../../wtcd/WTCDError":70,"./chapterControl":18,"./createWTCDErrorMessage":22}],24:[function(require,module,exports){
+},{"../../wtcd/WTCDError":69,"./chapterControl":18,"./createWTCDErrorMessage":21}],23:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.followQuery = void 0;
@@ -2223,7 +2404,7 @@ function followQuery() {
 }
 exports.followQuery = followQuery;
 
-},{"../constant/messages":11,"../data/data":34,"../data/state":36,"../pages/pages":52,"./chapterControl":18,"./contentControl":21,"./history":26,"./layoutControl":27,"./modalControl":29}],25:[function(require,module,exports){
+},{"../constant/messages":11,"../data/data":33,"../data/state":35,"../pages/pages":50,"./chapterControl":18,"./contentControl":20,"./history":25,"./layoutControl":26,"./modalControl":28}],24:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -2255,7 +2436,7 @@ function createHint(text, timeMs = 2000) {
 }
 exports.createHint = createHint;
 
-},{"../hs":37}],26:[function(require,module,exports){
+},{"../hs":36}],25:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateHistory = exports.getTitle = void 0;
@@ -2283,7 +2464,7 @@ function updateHistory(push) {
 }
 exports.updateHistory = updateHistory;
 
-},{"../data/state":36}],27:[function(require,module,exports){
+},{"../data/state":35}],26:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.setLayout = exports.getCurrentLayout = exports.layoutChangeEvent = exports.Layout = void 0;
@@ -2347,7 +2528,7 @@ function setLayout(newLayout) {
 }
 exports.setLayout = setLayout;
 
-},{"../DebugLogger":6,"../Event":7}],28:[function(require,module,exports){
+},{"../DebugLogger":6,"../Event":7}],27:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.hasToken = exports.getUsername = exports.getToken = exports.saveUsername = exports.saveToken = exports.validToken = exports.tokenToUsername = exports.makaiUrl = void 0;
@@ -2382,7 +2563,7 @@ function hasToken() {
 }
 exports.hasToken = hasToken;
 
-},{}],29:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.isAnyModalOpened = exports.notify = exports.confirm = exports.Modal = void 0;
@@ -2496,7 +2677,7 @@ function isAnyModalOpened() {
 }
 exports.isAnyModalOpened = isAnyModalOpened;
 
-},{"../data/settings":35,"../hs":37,"../input/keyboard":40,"../util/DOM":55}],30:[function(require,module,exports){
+},{"../data/settings":34,"../hs":36,"../input/keyboard":39,"../util/DOM":54}],29:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.processElements = void 0;
@@ -2529,7 +2710,7 @@ function processElements($parent) {
 }
 exports.processElements = processElements;
 
-},{"../util/DOM":55}],31:[function(require,module,exports){
+},{"../util/DOM":54}],30:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateSelection = void 0;
@@ -2583,16 +2764,12 @@ function updateSelection() {
 }
 exports.updateSelection = updateSelection;
 
-},{"../data/state":36,"./history":26}],32:[function(require,module,exports){
+},{"../data/state":35,"./history":25}],31:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.showComment = exports.sendComment = exports.showLogin = exports.showLoading = exports.showMessage = void 0;
+exports.showLogin = exports.showLoading = exports.showMessage = void 0;
 const messages_1 = require("../constant/messages");
-const state_1 = require("../data/state");
 const hs_1 = require("../hs");
-const padName_1 = require("../util/padName");
-const commentsControl_1 = require("./commentsControl");
-const contentControl_1 = require("./contentControl");
 const makaiControl_1 = require("./makaiControl");
 const modalControl_1 = require("./modalControl");
 function showMessage(message) {
@@ -2626,20 +2803,13 @@ function showLogin() {
     });
     const modal = new modalControl_1.Modal(hs_1.h('div', [
         hs_1.h('h1', messages_1.MAKAI_MODAL_TITLE_TOKEN),
-        hs_1.h('p', messages_1.MAKAI_MODAL_CONTENT_THIS_IS_YOUR_MAKAI_TOKEN),
-        hs_1.h('p', messages_1.MAKAI_MODAL_CONTENT_MAKAI_TOKEN_IS_USED_TO_SUBMIT_COMMENTS),
-        hs_1.h('p', messages_1.MAKAI_MODAL_CONTENT_YOU_WILL_GET_MAKAI_TOKEN_ONCE_YOU_SUBMIT_FIRST_COMMENT),
+        ...messages_1.MAKAI_MODAL_CONTENT_MAKAI_TOKEN_DESC.split('\n').map(p => hs_1.h('p', p)),
         hs_1.h('i', messages_1.MAKAI_MODAL_CONTENT_DEVELOPMENT_HINT),
         hs_1.h('.input-group', [
             hs_1.h('span', messages_1.MAKAI_MODAL_CONTENT_TOKEN_INPUT_PREFIX),
             $token,
         ]),
         hs_1.h('.button-container', [
-            hs_1.h('div', {
-                onclick: () => {
-                    modal.close();
-                }
-            }, messages_1.MAKAI_MODAL_CANCEL),
             hs_1.h('div', {
                 onclick: () => {
                     if ($token.value === '') {
@@ -2667,152 +2837,19 @@ function showLogin() {
                     });
                 }
             }, messages_1.MAKAI_MODAL_SAVE),
+            hs_1.h('div', {
+                onclick: () => {
+                    modal.close();
+                }
+            }, messages_1.MAKAI_MODAL_CANCEL),
         ]),
     ]));
     modal.setDismissible();
     modal.open();
 }
 exports.showLogin = showLogin;
-function sendComment(textarea, block, modal) {
-    if (!makaiControl_1.hasToken()) {
-        showMessage(messages_1.MAKAI_ERROR_INVALID_TOKEN);
-        return;
-    }
-    const m = showLoading(messages_1.MAKAI_INFO_CONFIRM_TOKEN);
-    fetch(makaiControl_1.makaiUrl + '/comment/' + makaiControl_1.getToken(), {
-        body: JSON.stringify({ pageName: state_1.state.currentChapter.chapter.htmlRelativePath, content: textarea }),
-        cache: 'no-cache',
-        credentials: 'same-origin',
-        headers: new Headers({
-            'Content-Type': 'application/json'
-        }),
-        method: 'POST',
-        mode: 'cors',
-        redirect: 'follow',
-        referrer: 'no-referrer',
-    }).then((response) => {
-        return response.json();
-    })
-        .then((json) => {
-        m.close();
-        if (!json.success) {
-            showMessage(messages_1.MAKAI_ERROR_SUBMIT_COMMENT_INVALID_TOKEN);
-        }
-        else {
-            block.directRemove();
-            commentsControl_1.commentsCache.delete(commentsControl_1.getApiUrl());
-            commentsControl_1.loadComments(contentControl_1.getCurrentContent());
-            modal.close();
-        }
-    }).catch((err) => {
-        m.close();
-        showMessage(messages_1.MAKAI_ERROR_INTERNET);
-    });
-}
-exports.sendComment = sendComment;
-function showComment(block) {
-    const $nameInput = hs_1.h('input');
-    const $emailInput = hs_1.h('input');
-    const name = makaiControl_1.hasToken()
-        ? hs_1.h('p', [messages_1.MAKAI_SUBMIT_0 + padName_1.padName(makaiControl_1.getUsername()) + messages_1.MAKAI_SUBMIT_1])
-        : [
-            hs_1.h('.input-group', [
-                hs_1.h('span', messages_1.MAKAI_MODAL_CONTENT_NAME_INPUT_PREFIX),
-                $nameInput,
-            ]),
-            hs_1.h('.input-group', [
-                hs_1.h('span', messages_1.MAKAI_MODAL_CONTENT_EMAIL_INPUT_PREFIX),
-                $emailInput,
-            ]),
-        ];
-    const $textarea = hs_1.h('textarea.makai-comment');
-    const modal = new modalControl_1.Modal(hs_1.h('div', [
-        hs_1.h('h1', messages_1.MAKAI_MODAL_TITLE_COMMENT),
-        hs_1.h('p', messages_1.MAKAI_MODAL_CONTENT_COMMENT_HINT),
-        $textarea,
-        name,
-        hs_1.h('.button-container', [
-            hs_1.h('div', {
-                onclick: () => {
-                    if (!makaiControl_1.hasToken()) {
-                        const m = showLoading(messages_1.MAKAI_INFO_OBTAIN_TOKEN);
-                        const alpha = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-                        fetch(makaiControl_1.makaiUrl + '/register/', {
-                            body: JSON.stringify({
-                                username: $nameInput.value,
-                                email: $emailInput.value,
-                                encodedPassword: new Array(20).fill(undefined).map(() => alpha[Math.floor(Math.random() * alpha.length)]).join('')
-                            }),
-                            cache: 'no-cache',
-                            headers: new Headers({
-                                'Content-Type': 'application/json'
-                            }),
-                            credentials: 'same-origin',
-                            method: 'POST',
-                            mode: 'cors',
-                            redirect: 'follow',
-                            referrer: 'no-referrer',
-                        }).then((response) => {
-                            return response.json();
-                        }).then((json) => {
-                            m.close();
-                            if (!json.success) {
-                                switch (json.errorMessage) {
-                                    case 'Illegal email format.':
-                                        showMessage(messages_1.MAKAI_ERROR_INVALID_EMAIL);
-                                        break;
-                                    case 'User exist.':
-                                        showMessage(messages_1.MAKAI_ERROR_USER_EXIST);
-                                        break;
-                                    default:
-                                        showMessage(messages_1.MAKAI_ERROR_UNKNOWN);
-                                        break;
-                                }
-                            }
-                            else if (json.accessToken === null) {
-                                showMessage(messages_1.MAKAI_ERROR_UNKNOWN);
-                            }
-                            else {
-                                makaiControl_1.saveToken(json.accessToken);
-                                makaiControl_1.saveUsername($nameInput.value);
-                                sendComment($textarea.value, block, modal);
-                            }
-                        }).catch((_) => {
-                            m.close();
-                            showMessage(messages_1.MAKAI_ERROR_INTERNET);
-                        });
-                    }
-                    else {
-                        sendComment($textarea.value, block, modal);
-                    }
-                }
-            }, messages_1.MAKAI_MODAL_SUBMIT),
-            hs_1.h('div', {
-                onclick: () => {
-                    if ($textarea.value === '') {
-                        modal.close();
-                    }
-                    else {
-                        modalControl_1.confirm(messages_1.MAKAI_MODAL_CONFIRM_LOSS_EDITED, '', messages_1.MAKAI_MODAL_CONFIRM_LOSS_EDITED_YES, messages_1.MAKAI_MODAL_CONFIRM_LOSS_EDITED_NO).then(confirmed => {
-                            if (confirmed) {
-                                modal.close();
-                            }
-                        });
-                    }
-                }
-            }, messages_1.MAKAI_MODAL_CANCEL),
-        ]),
-    ]));
-    modal.open();
-    $textarea.focus();
-    $textarea.addEventListener('input', () => {
-        $textarea.style.height = `auto`;
-        $textarea.style.height = `${Math.max(120, $textarea.scrollHeight)}px`;
-    }, false);
-}
-exports.showComment = showComment;
 
-},{"../constant/messages":11,"../data/state":36,"../hs":37,"../util/padName":60,"./commentsControl":20,"./contentControl":21,"./makaiControl":28,"./modalControl":29}],33:[function(require,module,exports){
+},{"../constant/messages":11,"../hs":36,"./makaiControl":27,"./modalControl":28}],32:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AutoCache = void 0;
@@ -2844,7 +2881,7 @@ class AutoCache {
 }
 exports.AutoCache = AutoCache;
 
-},{}],34:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.relativePathLookUpMap = exports.data = void 0;
@@ -2866,7 +2903,7 @@ function iterateFolder(folder) {
 }
 iterateFolder(exports.data.chapterTree);
 
-},{}],35:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.wtcdGameQuickLoadConfirm = exports.charCount = exports.developerMode = exports.fontFamily = exports.gestureSwitchChapter = exports.useComments = exports.earlyAccess = exports.warning = exports.animation = exports.EnumSetting = exports.BooleanSetting = void 0;
@@ -2969,7 +3006,7 @@ exports.charCount = new BooleanSetting('charCount', true, value => {
 });
 exports.wtcdGameQuickLoadConfirm = new BooleanSetting('wtcdGameQuickLoadConfirm', true);
 
-},{}],36:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.state = void 0;
@@ -2979,22 +3016,25 @@ exports.state = {
     chapterTextNodes: null,
 };
 
-},{}],37:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.h = void 0;
 const hs = require("hyperscript");
 exports.h = hs;
 
-},{"hyperscript":4}],38:[function(require,module,exports){
+},{"hyperscript":4}],37:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.removeNewMentionLink = void 0;
 const messages_1 = require("./constant/messages");
 const followQuery_1 = require("./control/followQuery");
 const modalControl_1 = require("./control/modalControl");
 const updateSelection_1 = require("./control/updateSelection");
 const data_1 = require("./data/data");
 const settings_1 = require("./data/settings");
+const DebugLogger_1 = require("./DebugLogger");
+const Menu_1 = require("./Menu");
 const MainMenu_1 = require("./menu/MainMenu");
 const DOM_1 = require("./util/DOM");
 require("./control/analyticsControl");
@@ -3014,7 +3054,45 @@ if ($warning !== null) {
 }
 const $buildNumber = DOM_1.id('build-number');
 $buildNumber.innerText = `Build ${data_1.data.buildNumber}`;
-new MainMenu_1.MainMenu().setActive(true);
+const mainMenu = new MainMenu_1.MainMenu();
+mainMenu.setActive(true);
+let newMentionLink = null;
+function removeNewMentionLink() {
+    if (newMentionLink === null) {
+        return;
+    }
+    newMentionLink.remove();
+    newMentionLink = null;
+}
+exports.removeNewMentionLink = removeNewMentionLink;
+const lastMentionLogger = new DebugLogger_1.DebugLogger('Last Mention Notification');
+// 以下代码用于从 Makai 拉取是否有新回复
+// Makai 不带有任何数据统计或个人信息记录功能。
+if (localStorage.getItem('token') !== null) {
+    // Since `+null` is 0, if key does not exist, 0 is used.
+    const lastCheckedMention = Math.floor((+localStorage.getItem('lastCheckedMention')));
+    fetch(`https://c.makai.city/init?token=${localStorage.getItem('token')}&since=${lastCheckedMention}`)
+        .then(response => response.json())
+        .then(data => {
+        localStorage.setItem('username', data.username);
+        lastMentionLogger.log(`Initialization result: ${data.mentions} new mentions.`);
+        if (data.mentions !== 0) {
+            newMentionLink = mainMenu.addItem(`您有 ${data.mentions} 条新回复`, {
+                button: true,
+                link: '##page/recent-mentions',
+                small: true,
+                decoration: Menu_1.ItemDecoration.ICON_NOTIFICATION,
+                location: Menu_1.ItemLocation.BEFORE,
+            });
+        }
+    })
+        .catch(error => {
+        lastMentionLogger.error('Failed to initialize.', error);
+    });
+}
+else {
+    lastMentionLogger.log('Token not set, skipping initialization.');
+}
 if (data_1.data.buildError) {
     modalControl_1.notify(messages_1.BUILD_FAILED_TITLE, messages_1.BUILD_FAILED_DESC, messages_1.BUILD_FAILED_OK);
 }
@@ -3026,7 +3104,7 @@ window.addEventListener('popstate', () => {
 });
 followQuery_1.followQuery();
 
-},{"./constant/messages":11,"./control/analyticsControl":17,"./control/followQuery":24,"./control/modalControl":29,"./control/updateSelection":31,"./data/data":34,"./data/settings":35,"./menu/MainMenu":45,"./util/DOM":55}],39:[function(require,module,exports){
+},{"./DebugLogger":6,"./Menu":8,"./constant/messages":11,"./control/analyticsControl":17,"./control/followQuery":23,"./control/modalControl":28,"./control/updateSelection":30,"./data/data":33,"./data/settings":34,"./menu/MainMenu":43,"./util/DOM":54}],38:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.swipeEvent = exports.SwipeDirection = void 0;
@@ -3111,7 +3189,7 @@ exports.swipeEvent.on(direction => {
     swipeEventDebugLogger.log(SwipeDirection[direction]);
 });
 
-},{"../DebugLogger":6,"../Event":7,"../util/DOM":55}],40:[function(require,module,exports){
+},{"../DebugLogger":6,"../Event":7,"../util/DOM":54}],39:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.escapeKeyPressEvent = exports.arrowKeyPressEvent = exports.ArrowKey = void 0;
@@ -3153,39 +3231,7 @@ exports.arrowKeyPressEvent.on(arrowKey => {
     arrowEventDebugLogger.log(ArrowKey[arrowKey]);
 });
 
-},{"../DebugLogger":6,"../Event":7}],41:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.BlockMenu = void 0;
-const messages_1 = require("../constant/messages");
-const commentBlockControl_1 = require("../control/commentBlockControl");
-const Menu_1 = require("../Menu");
-class BlockMenu extends Menu_1.Menu {
-    update() {
-        this.clearItems();
-        const blockedUsers = commentBlockControl_1.getBlockedUsers();
-        if (blockedUsers.length === 0) {
-            this.addItem(messages_1.NO_BLOCKED_USERS, { small: true });
-        }
-        else {
-            this.addItem(messages_1.CLICK_TO_UNBLOCK, { small: true });
-        }
-        blockedUsers.forEach(userName => {
-            this.addItem(userName, { small: true, button: true })
-                .onClick(() => {
-                commentBlockControl_1.unblockUser(userName);
-            });
-        });
-    }
-    constructor(parent) {
-        super('屏蔽用户评论管理', parent);
-        this.update();
-        commentBlockControl_1.blockedUserUpdateEvent.on(this.update.bind(this));
-    }
-}
-exports.BlockMenu = BlockMenu;
-
-},{"../Menu":8,"../constant/messages":11,"../control/commentBlockControl":19}],42:[function(require,module,exports){
+},{"../DebugLogger":6,"../Event":7}],40:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChaptersMenu = exports.isEmptyFolder = void 0;
@@ -3265,7 +3311,7 @@ class ChaptersMenu extends Menu_1.Menu {
 }
 exports.ChaptersMenu = ChaptersMenu;
 
-},{"../Menu":8,"../control/chapterControl":18,"../control/history":26,"../data/data":34,"../util/shortNumber":62}],43:[function(require,module,exports){
+},{"../Menu":8,"../control/chapterControl":18,"../control/history":25,"../data/data":33,"../util/shortNumber":61}],41:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ContactMenu = void 0;
@@ -3301,7 +3347,7 @@ class ContactMenu extends Menu_1.Menu {
 }
 exports.ContactMenu = ContactMenu;
 
-},{"../Menu":8}],44:[function(require,module,exports){
+},{"../Menu":8}],42:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LinkExchangeMenu = void 0;
@@ -3325,7 +3371,7 @@ class LinkExchangeMenu extends Menu_1.Menu {
 }
 exports.LinkExchangeMenu = LinkExchangeMenu;
 
-},{"../Menu":8}],45:[function(require,module,exports){
+},{"../Menu":8}],43:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MainMenu = void 0;
@@ -3353,7 +3399,7 @@ class MainMenu extends Menu_1.Menu {
 }
 exports.MainMenu = MainMenu;
 
-},{"../Menu":8,"./ChaptersMenu":42,"./ContactMenu":43,"./LinkExchangeMenu":44,"./SettingsMenu":47,"./StatsMenu":49,"./StyleMenu":50,"./ThanksMenu":51}],46:[function(require,module,exports){
+},{"../Menu":8,"./ChaptersMenu":40,"./ContactMenu":41,"./LinkExchangeMenu":42,"./SettingsMenu":45,"./StatsMenu":47,"./StyleMenu":48,"./ThanksMenu":49}],44:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MakaiMenu = void 0;
@@ -3372,7 +3418,7 @@ class MakaiMenu extends Menu_1.Menu {
 }
 exports.MakaiMenu = MakaiMenu;
 
-},{"../Menu":8,"../control/userControl":32}],47:[function(require,module,exports){
+},{"../Menu":8,"../control/userControl":31}],45:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SettingsMenu = exports.EnumSettingMenu = void 0;
@@ -3381,7 +3427,6 @@ const contentControl_1 = require("../control/contentControl");
 const layoutControl_1 = require("../control/layoutControl");
 const settings_1 = require("../data/settings");
 const Menu_1 = require("../Menu");
-const BlockMenu_1 = require("./BlockMenu");
 const MakaiMenu_1 = require("./MakaiMenu");
 class EnumSettingMenu extends Menu_1.Menu {
     constructor(parent, label, setting, usePreview) {
@@ -3422,7 +3467,6 @@ class SettingsMenu extends Menu_1.Menu {
         this.addBooleanSetting('显示每个章节的字数', settings_1.charCount);
         this.addBooleanSetting('WTCD 游戏快速读取前确认', settings_1.wtcdGameQuickLoadConfirm);
         this.addBooleanSetting('开发人员模式', settings_1.developerMode);
-        this.addLink(new BlockMenu_1.BlockMenu(this), true);
     }
     addBooleanSetting(label, setting) {
         const getText = () => `${label}：${setting.getValue() ? '开' : '关'}`;
@@ -3445,7 +3489,7 @@ class SettingsMenu extends Menu_1.Menu {
 }
 exports.SettingsMenu = SettingsMenu;
 
-},{"../Menu":8,"../constant/stylePreviewArticle":12,"../control/contentControl":21,"../control/layoutControl":27,"../data/settings":35,"./BlockMenu":41,"./MakaiMenu":46}],48:[function(require,module,exports){
+},{"../Menu":8,"../constant/stylePreviewArticle":12,"../control/contentControl":20,"../control/layoutControl":26,"../data/settings":34,"./MakaiMenu":44}],46:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.StatsKeywordsCountMenu = void 0;
@@ -3468,7 +3512,7 @@ class StatsKeywordsCountMenu extends Menu_1.Menu {
 }
 exports.StatsKeywordsCountMenu = StatsKeywordsCountMenu;
 
-},{"../Menu":8,"../data/data":34,"../util/shortNumber":62}],49:[function(require,module,exports){
+},{"../Menu":8,"../data/data":33,"../util/shortNumber":61}],47:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.StatsMenu = void 0;
@@ -3487,7 +3531,7 @@ class StatsMenu extends Menu_1.Menu {
 }
 exports.StatsMenu = StatsMenu;
 
-},{"../Menu":8,"../data/data":34,"../util/shortNumber":62,"./StatsKeywordsCountMenu":48}],50:[function(require,module,exports){
+},{"../Menu":8,"../data/data":33,"../util/shortNumber":61,"./StatsKeywordsCountMenu":46}],48:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.StyleMenu = void 0;
@@ -3626,7 +3670,7 @@ class StyleMenu extends Menu_1.Menu {
 }
 exports.StyleMenu = StyleMenu;
 
-},{"../DebugLogger":6,"../Menu":8,"../constant/stylePreviewArticle":12,"../control/contentControl":21,"../control/layoutControl":27,"../hs":37}],51:[function(require,module,exports){
+},{"../DebugLogger":6,"../Menu":8,"../constant/stylePreviewArticle":12,"../control/contentControl":20,"../control/layoutControl":26,"../hs":36}],49:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ThanksMenu = void 0;
@@ -3644,18 +3688,20 @@ class ThanksMenu extends Menu_1.Menu {
 }
 exports.ThanksMenu = ThanksMenu;
 
-},{"../Menu":8,"../constant/thanks":13}],52:[function(require,module,exports){
+},{"../Menu":8,"../constant/thanks":13}],50:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.pages = void 0;
 const recentComments_1 = require("./recentComments");
+const recentMentions_1 = require("./recentMentions");
 const visitCount_1 = require("./visitCount");
 exports.pages = [
     recentComments_1.recentComments,
     visitCount_1.visitCount,
+    recentMentions_1.recentMentions,
 ];
 
-},{"./recentComments":53,"./visitCount":54}],53:[function(require,module,exports){
+},{"./recentComments":51,"./recentMentions":52,"./visitCount":53}],51:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.recentComments = void 0;
@@ -3668,7 +3714,35 @@ exports.recentComments = {
     },
 };
 
-},{"../control/commentsControl":20}],54:[function(require,module,exports){
+},{"../control/commentsControl":19}],52:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.recentMentions = void 0;
+const messages_1 = require("../constant/messages");
+const commentsControl_1 = require("../control/commentsControl");
+const hs_1 = require("../hs");
+const index_1 = require("../index");
+exports.recentMentions = {
+    name: 'recent-mentions',
+    handler: content => {
+        // ! In the name of spaghetti
+        setTimeout(() => {
+            index_1.removeNewMentionLink();
+        }, 500);
+        localStorage.setItem('lastCheckedMention', String(Date.now()));
+        if (localStorage.getItem('token') === null) {
+            content.addBlock({
+                initElement: hs_1.h('div', hs_1.h('h1', messages_1.COMMENTS_MENTION_NO_TOKEN_TITLE), hs_1.h('p', messages_1.COMMENTS_MENTION_NO_TOKEN_DESC))
+            });
+        }
+        else {
+            commentsControl_1.loadRecentMentions(content, localStorage.getItem('token'));
+        }
+        return true;
+    },
+};
+
+},{"../constant/messages":11,"../control/commentsControl":19,"../hs":36,"../index":37}],53:[function(require,module,exports){
 "use strict";
 // !!! Super spaghetti code warning !!!
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -3833,7 +3907,7 @@ exports.visitCount = {
     },
 };
 
-},{"../DebugLogger":6,"../constant/messages":11,"../control/chapterControl":18,"../control/history":26,"../data/AutoCache":33,"../hs":37,"../util/commaNumber":56,"../util/padName":60,"../util/shortNumber":62}],55:[function(require,module,exports){
+},{"../DebugLogger":6,"../constant/messages":11,"../control/chapterControl":18,"../control/history":25,"../data/AutoCache":32,"../hs":36,"../util/commaNumber":55,"../util/padName":59,"../util/shortNumber":61}],54:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.insertAfter = exports.isAnyParent = exports.selectNode = exports.getTextNodes = exports.id = void 0;
@@ -3886,7 +3960,7 @@ function insertAfter($newElement, $referencingElement) {
 }
 exports.insertAfter = insertAfter;
 
-},{"../DebugLogger":6}],56:[function(require,module,exports){
+},{"../DebugLogger":6}],55:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.commaNumber = void 0;
@@ -3902,7 +3976,7 @@ function commaNumber(num) {
 }
 exports.commaNumber = commaNumber;
 
-},{}],57:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.formatTimeSimple = exports.formatTimeRelative = void 0;
@@ -3934,7 +4008,7 @@ function formatTimeSimple(time) {
 }
 exports.formatTimeSimple = formatTimeSimple;
 
-},{}],58:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -3969,7 +4043,7 @@ function loadGoogleFonts(fontName) {
 }
 exports.loadGoogleFonts = loadGoogleFonts;
 
-},{"../DebugLogger":6,"./matchAll":59}],59:[function(require,module,exports){
+},{"../DebugLogger":6,"./matchAll":58}],58:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.matchAll = void 0;
@@ -3986,7 +4060,7 @@ function matchAll(str, regex) {
 }
 exports.matchAll = matchAll;
 
-},{}],60:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.padName = void 0;
@@ -4003,7 +4077,7 @@ function padName(name) {
 }
 exports.padName = padName;
 
-},{}],61:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.resolvePath = void 0;
@@ -4037,7 +4111,7 @@ function resolvePath(...paths) {
 }
 exports.resolvePath = resolvePath;
 
-},{}],62:[function(require,module,exports){
+},{}],61:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.shortNumber = void 0;
@@ -4052,7 +4126,7 @@ function shortNumber(input, digits = 1) {
 }
 exports.shortNumber = shortNumber;
 
-},{}],63:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.stringHash = void 0;
@@ -4070,7 +4144,7 @@ function stringHash(str) {
 }
 exports.stringHash = stringHash;
 
-},{}],64:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChainedCanvas = void 0;
@@ -4097,7 +4171,7 @@ class ChainedCanvas {
 }
 exports.ChainedCanvas = ChainedCanvas;
 
-},{}],65:[function(require,module,exports){
+},{}],64:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.defaultFeatureProvider = exports.FeatureProvider = void 0;
@@ -4133,7 +4207,7 @@ class FeatureProvider {
 exports.FeatureProvider = FeatureProvider;
 exports.defaultFeatureProvider = new FeatureProvider();
 
-},{}],66:[function(require,module,exports){
+},{}],65:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FlowReader = void 0;
@@ -4346,7 +4420,7 @@ class FlowReader {
 }
 exports.FlowReader = FlowReader;
 
-},{"./FeatureProvider":65,"./Interpreter":68,"./Random":69}],67:[function(require,module,exports){
+},{"./FeatureProvider":64,"./Interpreter":67,"./Random":68}],66:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GameReader = void 0;
@@ -4551,7 +4625,7 @@ class GameReader {
 }
 exports.GameReader = GameReader;
 
-},{"./FeatureProvider":65,"./Interpreter":68,"./Random":69}],68:[function(require,module,exports){
+},{"./FeatureProvider":64,"./Interpreter":67,"./Random":68}],67:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Interpreter = exports.InvalidChoiceError = exports.assignValueToVariable = exports.isTypeAssignableTo = exports.describe = exports.BubbleSignal = exports.BubbleSignalType = exports.isEqual = void 0;
@@ -5385,7 +5459,7 @@ class Interpreter {
 }
 exports.Interpreter = Interpreter;
 
-},{"./WTCDError":70,"./constantsPool":72,"./invokeFunction":73,"./operators":74,"./std":78,"./utils":85}],69:[function(require,module,exports){
+},{"./WTCDError":69,"./constantsPool":71,"./invokeFunction":72,"./operators":73,"./std":77,"./utils":84}],68:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Random = void 0;
@@ -5449,7 +5523,7 @@ class Random {
 }
 exports.Random = Random;
 
-},{}],70:[function(require,module,exports){
+},{}],69:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WTCDError = void 0;
@@ -5496,7 +5570,7 @@ class WTCDError extends Error {
 }
 exports.WTCDError = WTCDError;
 
-},{}],71:[function(require,module,exports){
+},{}],70:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.autoEvaluated = void 0;
@@ -5509,7 +5583,7 @@ function autoEvaluated(fn) {
 }
 exports.autoEvaluated = autoEvaluated;
 
-},{}],72:[function(require,module,exports){
+},{}],71:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getMaybePooled = exports.booleanValue = exports.smallIntegers = exports.falseValue = exports.trueValue = exports.nullValue = void 0;
@@ -5546,7 +5620,7 @@ function getMaybePooled(type, value) {
 }
 exports.getMaybePooled = getMaybePooled;
 
-},{}],73:[function(require,module,exports){
+},{}],72:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.reverseInvocation = exports.pipelineInvocation = exports.regularInvocation = exports.regularInvocationRaw = exports.invokeFunctionRaw = exports.FunctionInvocationError = void 0;
@@ -5722,7 +5796,7 @@ exports.reverseInvocation = autoEvaluated_1.autoEvaluated((arg0, arg1, expr, int
     }
 });
 
-},{"./Interpreter":68,"./WTCDError":70,"./autoEvaluated":71,"./constantsPool":72,"./std/utils":84}],74:[function(require,module,exports){
+},{"./Interpreter":67,"./WTCDError":69,"./autoEvaluated":70,"./constantsPool":71,"./std/utils":83}],73:[function(require,module,exports){
 "use strict";
 // This file defines all infix and prefix operators in WTCD.
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -6138,7 +6212,7 @@ exports.binaryOperators = new Map([
 exports.conditionalOperatorPrecedence = 4;
 exports.operators = new Set([...exports.unaryOperators.keys(), ...exports.binaryOperators.keys(), '?', ':', '...']);
 
-},{"./Interpreter":68,"./WTCDError":70,"./autoEvaluated":71,"./constantsPool":72,"./invokeFunction":73}],75:[function(require,module,exports){
+},{"./Interpreter":67,"./WTCDError":69,"./autoEvaluated":70,"./constantsPool":71,"./invokeFunction":72}],74:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -6402,7 +6476,7 @@ exports.canvasStdFunctions = [
     },
 ];
 
-},{"../ChainedCanvas":64,"../constantsPool":72,"./utils":84}],76:[function(require,module,exports){
+},{"../ChainedCanvas":63,"../constantsPool":71,"./utils":83}],75:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.contentStdFunctions = void 0;
@@ -6507,7 +6581,7 @@ exports.contentStdFunctions = [
     },
 ];
 
-},{"../Interpreter":68,"../constantsPool":72,"./utils":84}],77:[function(require,module,exports){
+},{"../Interpreter":67,"../constantsPool":71,"./utils":83}],76:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.debugStdFunctions = void 0;
@@ -6574,7 +6648,7 @@ exports.debugStdFunctions = [
     },
 ];
 
-},{"../Interpreter":68,"../WTCDError":70,"../constantsPool":72,"../invokeFunction":73,"./utils":84}],78:[function(require,module,exports){
+},{"../Interpreter":67,"../WTCDError":69,"../constantsPool":71,"../invokeFunction":72,"./utils":83}],77:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.stdFunctions = void 0;
@@ -6597,7 +6671,7 @@ exports.stdFunctions = [
     ...canvas_1.canvasStdFunctions,
 ];
 
-},{"./canvas":75,"./content":76,"./debug":77,"./list":79,"./math":80,"./random":81,"./reader":82,"./string":83}],79:[function(require,module,exports){
+},{"./canvas":74,"./content":75,"./debug":76,"./list":78,"./math":79,"./random":80,"./reader":81,"./string":82}],78:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.listStdFunctions = void 0;
@@ -6864,7 +6938,7 @@ exports.listStdFunctions = [
     },
 ];
 
-},{"../Interpreter":68,"../WTCDError":70,"../constantsPool":72,"../invokeFunction":73,"./utils":84}],80:[function(require,module,exports){
+},{"../Interpreter":67,"../WTCDError":69,"../constantsPool":71,"../invokeFunction":72,"./utils":83}],79:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.mathStdFunctions = void 0;
@@ -6903,7 +6977,7 @@ exports.mathStdFunctions = [
     },
 ];
 
-},{"../constantsPool":72,"./utils":84}],81:[function(require,module,exports){
+},{"../constantsPool":71,"./utils":83}],80:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.randomStdFunctions = void 0;
@@ -6957,7 +7031,7 @@ exports.randomStdFunctions = [
     },
 ];
 
-},{"../constantsPool":72,"./utils":84}],82:[function(require,module,exports){
+},{"../constantsPool":71,"./utils":83}],81:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.readerStdFunctions = void 0;
@@ -6988,7 +7062,7 @@ exports.readerStdFunctions = [
     },
 ];
 
-},{"../constantsPool":72,"./utils":84}],83:[function(require,module,exports){
+},{"../constantsPool":71,"./utils":83}],82:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.stringStdFunctions = void 0;
@@ -7077,7 +7151,7 @@ exports.stringStdFunctions = [
     },
 ];
 
-},{"../constantsPool":72,"./utils":84}],84:[function(require,module,exports){
+},{"../constantsPool":71,"./utils":83}],83:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.assertArgType = exports.nullify = exports.assertArgsLength = exports.NativeFunctionError = void 0;
@@ -7124,7 +7198,7 @@ function assertArgType(args, index, type, defaultValue) {
 }
 exports.assertArgType = assertArgType;
 
-},{"../Interpreter":68,"../constantsPool":72}],85:[function(require,module,exports){
+},{"../Interpreter":67,"../constantsPool":71}],84:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.arrayEquals = exports.flat = void 0;
@@ -7146,4 +7220,4 @@ function arrayEquals(arr0, arr1, comparator = (e0, e1) => e0 === e1) {
 }
 exports.arrayEquals = arrayEquals;
 
-},{}]},{},[38]);
+},{}]},{},[37]);
