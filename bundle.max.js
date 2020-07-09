@@ -1707,9 +1707,9 @@ function promptDeleteComment(pageName, commentId) {
         return false;
     });
 }
-function createCommentElement(comment, onComment, pageName) {
+function createCommentElement(comment, onComment, showPath) {
     var _a;
-    pageName = pageName !== null && pageName !== void 0 ? pageName : comment.pageName;
+    const pageName = comment.pageName;
     if (pageName === undefined) {
         debugLogger.warn('Unknown page name.');
     }
@@ -1745,9 +1745,9 @@ function createCommentElement(comment, onComment, pageName) {
                 messages_1.MAKAI_GENERIC_LAST_MODIFIED + `${formatTime_1.formatTimeRelative(new Date(comment.updated_at))}` + messages_1.MAKAI_GENERIC_LAST_MODIFIED_SUFFIX)),
         actionButton,
         ...comment.body.split('\n\n').map(paragraph => hs_1.h('p', paragraph)),
-        comment.pageName === undefined ? null : hs_1.h('p', hs_1.h('a.page-name', {
-            href: `#${comment.pageName}`,
-        }, `发表于${padName_1.padName(comment.pageName.replace(/\//g, ' > ').replace(/-/g, ' ').replace(/\.html$/, ''))}`)),
+        showPath ? hs_1.h('p', hs_1.h('a.page-name', {
+            href: `#${pageName}`,
+        }, `发表于${padName_1.padName(pageName.replace(/\//g, ' > ').replace(/-/g, ' ').replace(/\.html$/, ''))}`)) : null,
     ]);
     return $comment;
 }
@@ -1789,7 +1789,7 @@ function loadComments(content, apiUrl, title, desc, onComment, backButton = true
                 appendCreateComment(commentingPageName);
             }
             data.forEach((comment) => {
-                $comments.appendChild(createCommentElement(comment, onComment, commentingPageName));
+                $comments.appendChild(createCommentElement(comment, onComment, commentingPageName === undefined));
             });
             if (commentingPageName !== undefined) {
                 appendCreateComment(commentingPageName);
