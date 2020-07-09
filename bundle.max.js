@@ -1492,8 +1492,9 @@ function loadChapter(chapterHtmlRelativePath, selection, side = contentControl_1
         }
         debugLogger.log('Chapter loaded.');
         loadingBlock.directRemove();
-        const mainBlock = insertContent(content, text, chapterCtx.chapter) || content.addBlock();
-        state_1.state.chapterTextNodes = DOM_1.getTextNodes(mainBlock.element);
+        const mainBlock = insertContent(content, text, chapterCtx.chapter);
+        const postMainBlock = mainBlock !== null && mainBlock !== void 0 ? mainBlock : content.addBlock();
+        state_1.state.chapterTextNodes = DOM_1.getTextNodes(postMainBlock.element);
         if (selection !== undefined) {
             if (DOM_1.id('warning') === null) {
                 select(selection);
@@ -1504,9 +1505,27 @@ function loadChapter(chapterHtmlRelativePath, selection, side = contentControl_1
                 });
             }
         }
+        if (chapterCtx.chapter.authors.length > 0) {
+            const $authorsDiv = hs_1.h('.authors', hs_1.h('.outer-container', ...chapterCtx.chapter.authors.map(authorRole => {
+                var _a;
+                const authorInfo = (_a = data_1.authorInfoMap.get(authorRole.name)) !== null && _a !== void 0 ? _a : {
+                    name: authorRole.name,
+                    avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(authorRole.name)}`,
+                };
+                return hs_1.h('.author-container', hs_1.h('img.avatar', {
+                    src: authorInfo.avatar,
+                }), hs_1.h('.author-role-container', hs_1.h('.role', authorRole.role), hs_1.h('.name', authorInfo.name)));
+            })));
+            if (mainBlock === undefined) {
+                content.addBlock({ initElement: $authorsDiv, prepend: true });
+            }
+            else {
+                mainBlock.element.prepend($authorsDiv);
+            }
+        }
         const prevChapter = findPreviousChapter(chapterCtx);
         const nextChapter = findNextChapter(chapterCtx);
-        mainBlock.element.appendChild(hs_1.h('div.page-switcher', [
+        postMainBlock.element.appendChild(hs_1.h('div.page-switcher', [
             // 上一章
             (prevChapter !== null)
                 ? hs_1.h('a.to-prev', {
@@ -2155,7 +2174,7 @@ class Content {
 }
 exports.Content = Content;
 class ContentBlock {
-    constructor(content, { initElement = hs_1.h('div'), style = ContentBlockStyle.REGULAR, slidable = false, }) {
+    constructor(content, { initElement = hs_1.h('div'), style = ContentBlockStyle.REGULAR, slidable = false, prepend = false, }) {
         this.slideContainer = null;
         this.heightHolder = null;
         this.sliding = 0;
@@ -2168,10 +2187,20 @@ class ContentBlock {
         }
         if (slidable) {
             this.slideContainer = hs_1.h('.slide-container', initElement);
-            content.element.appendChild(this.slideContainer);
+            if (prepend) {
+                content.element.prepend(this.slideContainer);
+            }
+            else {
+                content.element.append(this.slideContainer);
+            }
         }
         else {
-            content.element.appendChild(initElement);
+            if (prepend) {
+                content.element.prepend(initElement);
+            }
+            else {
+                content.element.append(initElement);
+            }
         }
     }
     onEnteringView(callback) {
@@ -2884,7 +2913,7 @@ exports.AutoCache = AutoCache;
 },{}],33:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.relativePathLookUpMap = exports.data = void 0;
+exports.authorInfoMap = exports.relativePathLookUpMap = exports.data = void 0;
 exports.data = window.DATA;
 exports.relativePathLookUpMap = new Map();
 function iterateFolder(folder) {
@@ -2902,6 +2931,10 @@ function iterateFolder(folder) {
     });
 }
 iterateFolder(exports.data.chapterTree);
+exports.authorInfoMap = new Map();
+for (const authorInfo of exports.data.authorsInfo) {
+    exports.authorInfoMap.set(authorInfo.name, authorInfo);
+}
 
 },{}],34:[function(require,module,exports){
 "use strict";
