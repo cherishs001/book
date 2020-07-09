@@ -67,7 +67,7 @@ interface CommentData {
   updated_at: string;
   body: string;
   id: number;
-  pageName?: string;
+  pageName: string;
 }
 
 async function promptDeleteComment(pageName: string, commentId: number) {
@@ -105,8 +105,8 @@ async function promptDeleteComment(pageName: string, commentId: number) {
   return false;
 }
 
-function createCommentElement(comment: CommentData, onComment: () => void, pageName?: string) {
-  pageName = pageName ?? comment.pageName;
+function createCommentElement(comment: CommentData, onComment: () => void, showPath: boolean) {
+  const pageName = comment.pageName;
   if (pageName === undefined) {
     debugLogger.warn('Unknown page name.');
   }
@@ -144,9 +144,9 @@ function createCommentElement(comment: CommentData, onComment: () => void, pageN
     ),
     actionButton,
     ...comment.body.split('\n\n').map(paragraph => h('p', paragraph)),
-    comment.pageName === undefined ? null : h('p', h('a.page-name', {
-      href: `#${comment.pageName}`,
-    }, `发表于${padName(comment.pageName.replace(/\//g, ' > ').replace(/-/g, ' ').replace(/\.html$/, ''))}`)),
+    showPath ? h('p', h('a.page-name', {
+      href: `#${pageName}`,
+    }, `发表于${padName(pageName.replace(/\//g, ' > ').replace(/-/g, ' ').replace(/\.html$/, ''))}`)) : null,
   ]);
   return $comment;
 }
@@ -204,7 +204,7 @@ function loadComments(
         appendCreateComment(commentingPageName);
       }
       data.forEach((comment: any) => {
-        $comments.appendChild(createCommentElement(comment, onComment, commentingPageName));
+        $comments.appendChild(createCommentElement(comment, onComment, commentingPageName === undefined));
       });
       if (commentingPageName !== undefined) {
         appendCreateComment(commentingPageName);
