@@ -20,8 +20,14 @@ export interface ChapterFlagsMapped {
 
 export type ChapterFlags = keyof ChapterFlagsMapped;
 
+export interface AuthorRole {
+  name: string;
+  role: string;
+}
+
 export interface ChapterBase extends NodeBase, ChapterFlagsMapped {
   htmlRelativePath: string;
+  authors: Array<AuthorRole>;
 }
 
 export interface MarkdownChapter extends ChapterBase {
@@ -57,11 +63,17 @@ export interface Folder extends NodeBase {
 
 export type Node = Folder | Chapter;
 
+export interface AuthorInfo {
+  name: string;
+  avatar: string;
+}
+
 export interface Data {
   chapterTree: Folder;
   charsCount: number | null;
   paragraphsCount: number;
   keywordsCount: Array<[string, number]>;
   buildNumber: string;
+  authorsInfo: Array<AuthorInfo>;
   buildError: boolean;
 }

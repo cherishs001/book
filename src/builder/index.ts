@@ -1,7 +1,7 @@
 import { copy, ensureDir, readFile, writeFile } from 'fs-extra';
-import { resolve } from 'path';
+import { join, resolve } from 'path';
 import { Data, Folder } from '../Data';
-import { chaptersDir, distChaptersDir, distDir, staticDir } from './dirs';
+import { chaptersDir, distChaptersDir, distDir, rootDir, staticDir } from './dirs';
 import { fPath, log } from './indentConsole';
 import { LoaderContext } from './LoaderContext';
 import { load } from './loaders/Loader';
@@ -43,6 +43,7 @@ const argv = yargs.options({
     paragraphsCount: stats.getParagraphCount(),
     keywordsCount: [...stats.getKeywordsCount()].sort((a, b) => b[1] - a[1]),
     buildNumber: process.env.TRAVIS_BUILD_NUMBER || 'Unoffical',
+    authorsInfo: JSON.parse(await readFile(join(rootDir, 'authors.json'), 'utf8')),
     buildError: rootLoaderCtx.getErrors().length > 0,
   };
   await writeFile(

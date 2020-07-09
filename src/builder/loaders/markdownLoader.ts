@@ -1,9 +1,10 @@
 import { mkdirp, writeFile } from 'fs-extra';
 import { dirname } from 'path';
-import { ChapterFlags, ChapterFlagsMapped, MarkdownChapter } from '../../Data';
+import { ChapterFlags, ChapterFlagsMapped, MarkdownChapter, AuthorRole } from '../../Data';
 import { LoaderContext } from '../LoaderContext';
 import { Loader } from './Loader';
 import {log, fPath} from '../indentConsole';
+import { parseAuthorSpecifier } from './parseAuthorSpecifier';
 
 
 const markdownFlags = new Map<string, ChapterFlags>([
@@ -37,7 +38,15 @@ export const markdownLoader: Loader = {
     return !ctx.isDirectory && ctx.path.endsWith('.md');
   },
   async load(ctx: LoaderContext): Promise<MarkdownChapter> {
-    let markdown = await ctx.readFile();
+    let markdown = (await ctx.readFile()).trimLeft();
+    let authors: Array<AuthorRole> = [];
+
+    if (markdown.startsWith('作者：')) {
+      const authorSpecifier = markdown.substring(3, markdown.indexOf('\n')).trim();
+      markdown = markdown.substr(markdown.indexOf('\n'));
+      authors = parseAuthorSpecifier(authorSpecifier);
+    }
+
     let chapterFlagsMapped: ChapterFlagsMapped;
     [markdown, chapterFlagsMapped] = readMarkdownFlags(markdown);
     const chapterCharCount = ctx.stats.processMarkdown(markdown);
@@ -60,6 +69,7 @@ export const markdownLoader: Loader = {
       ...chapterFlagsMapped,
       type: 'Markdown',
       htmlRelativePath: ctx.getDistRelativePath(),
+      authors,
       charsCount: chapterCharCount,
     };
   }

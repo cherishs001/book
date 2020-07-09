@@ -4,7 +4,7 @@ import { WTCDParseResult } from '../../wtcd/types';
 import { loadingText } from '../constant/loadingText';
 import { CHAPTER_FAILED, EARLY_ACCESS_DESC, EARLY_ACCESS_TITLE, GO_TO_MENU, NEXT_CHAPTER, PREVIOUS_CHAPTER } from '../constant/messages';
 import { AutoCache } from '../data/AutoCache';
-import { ChapterContext, relativePathLookUpMap } from '../data/data';
+import { authorInfoMap, ChapterContext, relativePathLookUpMap } from '../data/data';
 import { earlyAccess, gestureSwitchChapter } from '../data/settings';
 import { Selection, state } from '../data/state';
 import { DebugLogger } from '../DebugLogger';
@@ -173,9 +173,10 @@ export function loadChapter(
     debugLogger.log('Chapter loaded.');
 
     loadingBlock.directRemove();
-    const mainBlock = insertContent(content, text, chapterCtx.chapter) || content.addBlock();
+    const mainBlock = insertContent(content, text, chapterCtx.chapter);
+    const postMainBlock = mainBlock ?? content.addBlock();
 
-    state.chapterTextNodes = getTextNodes(mainBlock.element);
+    state.chapterTextNodes = getTextNodes(postMainBlock.element);
     if (selection !== undefined) {
       if (id('warning') === null) {
         select(selection);
@@ -186,9 +187,38 @@ export function loadChapter(
       }
     }
 
+    if (chapterCtx.chapter.authors.length > 0) {
+      const $authorsDiv = h('.authors',
+        h('.outer-container',
+          ...chapterCtx.chapter.authors.map(authorRole => {
+            const authorInfo = authorInfoMap.get(
+              authorRole.name
+            ) ?? {
+              name: authorRole.name,
+              avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(authorRole.name)}`,
+            };
+            return h('.author-container',
+              h('img.avatar', {
+                src: authorInfo.avatar,
+              }),
+              h('.author-role-container',
+                h('.role', authorRole.role),
+                h('.name', authorInfo.name),
+              ),
+            );
+          }),
+        ),
+      ) as HTMLDivElement;
+      if (mainBlock === undefined) {
+        content.addBlock({ initElement: $authorsDiv, prepend: true });
+      } else {
+        mainBlock.element.prepend($authorsDiv);
+      }
+    }
+
     const prevChapter = findPreviousChapter(chapterCtx);
     const nextChapter = findNextChapter(chapterCtx);
-    mainBlock.element.appendChild(h('div.page-switcher', [
+    postMainBlock.element.appendChild(h('div.page-switcher', [
       // 上一章
       (prevChapter !== null)
         ? h('a.to-prev', {

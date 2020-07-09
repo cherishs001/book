@@ -1,0 +1,59 @@
+@import (reference) 'common/layerCard.less';
+
+.content-container>.content .authors {
+  &.content-block>.outer-container>.author-container {
+    max-width: unset !important;
+  }
+  >.outer-container {
+    display: flex;
+    flex-wrap: wrap;
+
+    margin: -0.5em;
+
+    >.author-container:extend(#common.layer-card all) {
+      display: flex;
+
+      margin: 0.5em !important;
+      padding: 1em !important;
+
+      @media (min-width: 801px) {
+        flex: 1 0 calc((100% - 3em) / 3);
+
+        max-width: calc((100% - 3em) / 3);;
+      }
+
+      @media (min-width: 501px) and (max-width: 800px) {
+        flex: 1 0 calc((100% - 2em) / 2);
+
+        max-width: calc((100% - 2em) / 2);;
+      }
+
+      @media (max-width: 500px) {
+        flex: 0 1 100%;
+      }
+      >.avatar {
+        flex: 0 0;
+
+        width: 44px;
+        height: 44px;
+        margin-right: 1em;
+
+        border-radius: 3px;
+      }
+      >.author-role-container {
+        flex: 1;
+        >.role {
+          // margin-top: 0.1em;
+          opacity: 0.6;
+
+          font-size: 0.8em;
+        }
+        >.name {
+          margin-top: 0.1em;
+
+          font-size: 1.2em;
+        }
+      }
+    }
+  }
+}

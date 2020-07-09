@@ -6,6 +6,7 @@ import { WTCDParseResult } from '../../wtcd/types';
 import { dedent, fPath, indent, log } from '../indentConsole';
 import { LoaderContext } from '../LoaderContext';
 import { Loader } from './Loader';
+import { parseAuthorSpecifier } from './parseAuthorSpecifier';
 
 export const wtcdLoader: Loader = {
   name: 'WTCD Loader',
@@ -18,6 +19,7 @@ export const wtcdLoader: Loader = {
     const meta: any = {
       isEarlyAccess: false,
       hidden: false,
+      authors: [],
       preferredReader: 'flow',
     };
     if (await pathExists(metaPath)) {
@@ -39,6 +41,9 @@ export const wtcdLoader: Loader = {
           throw new Error(`Unknown reader type: ${content.preferredReader}.`);
         }
         meta.preferredReader = content.preferredReader;
+      }
+      if (typeof content.authors === 'string') {
+        meta.authors = parseAuthorSpecifier(content.authors);
       }
     }
 

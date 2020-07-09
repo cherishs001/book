@@ -1,4 +1,4 @@
-import { Chapter, Data, Folder } from '../../Data';
+import { Chapter, Data, Folder, AuthorInfo } from '../../Data';
 export const data = (window as any).DATA as Data;
 
 export interface ChapterContext {
@@ -22,3 +22,8 @@ function iterateFolder(folder: Folder) {
   });
 }
 iterateFolder(data.chapterTree);
+
+export const authorInfoMap: Map<string, AuthorInfo> = new Map();
+for (const authorInfo of data.authorsInfo) {
+  authorInfoMap.set(authorInfo.name, authorInfo);
+}

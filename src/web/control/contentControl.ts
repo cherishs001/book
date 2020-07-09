@@ -162,6 +162,7 @@ interface ContentBlockOpts {
   initElement?: HTMLDivElement;
   style?: ContentBlockStyle;
   slidable?: boolean;
+  prepend?: boolean;
 }
 
 export class ContentBlock {
@@ -175,6 +176,7 @@ export class ContentBlock {
       initElement = h('div'),
       style = ContentBlockStyle.REGULAR,
       slidable = false,
+      prepend = false,
     }: ContentBlockOpts,
   ) {
     this.element = initElement;
@@ -186,9 +188,17 @@ export class ContentBlock {
     }
     if (slidable) {
       this.slideContainer = h('.slide-container', initElement) as HTMLDivElement;
-      content.element.appendChild(this.slideContainer);
+      if (prepend) {
+        content.element.prepend(this.slideContainer);
+      } else {
+        content.element.append(this.slideContainer);
+      }
     } else {
-      content.element.appendChild(initElement);
+      if (prepend) {
+        content.element.prepend(initElement);
+      } else {
+        content.element.append(initElement);
+      }
     }
   }
   public onEnteringView(callback: () => void) {
