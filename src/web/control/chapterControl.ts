@@ -12,7 +12,7 @@ import { Event } from '../Event';
 import { h } from '../hs';
 import { SwipeDirection, swipeEvent } from '../input/gestures';
 import { ArrowKey, arrowKeyPressEvent, escapeKeyPressEvent } from '../input/keyboard';
-import { getTextNodes, id } from '../util/DOM';
+import { getTextNodes, id, insertAfterH1 } from '../util/DOM';
 import { loadChapterComments } from './commentsControl';
 import { Content, ContentBlockStyle, focus, newContent, Side } from './contentControl';
 import { createWTCDErrorMessage } from './createWTCDErrorMessage';
@@ -212,7 +212,7 @@ export function loadChapter(
       if (mainBlock === undefined) {
         content.addBlock({ initElement: $authorsDiv, prepend: true });
       } else {
-        mainBlock.element.prepend($authorsDiv);
+        insertAfterH1($authorsDiv, mainBlock.element);
       }
     }
 

@@ -54,3 +54,19 @@ export function insertAfter(
     $referencingElement.nextSibling,
   );
 }
+
+export function insertAfterH1(
+  $newElement: HTMLElement,
+  $parent: HTMLElement,
+) {
+  const $first = $parent.firstChild;
+  if (
+    $first !== null &&
+    $first instanceof HTMLHeadingElement &&
+    $first.tagName.toLowerCase() === 'h1'
+  ) {
+    insertAfter($newElement, $first);
+  } else {
+    $parent.prepend($newElement);
+  }
+}
