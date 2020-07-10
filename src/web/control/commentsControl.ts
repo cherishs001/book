@@ -323,6 +323,7 @@ export function promptComment(pageName: string, preFilled?: string) {
                 showMessage(MAKAI_ERROR_UNKNOWN);
                 break;
             }
+            return false;
           } else if (json.accessToken === null) {
             showMessage(MAKAI_ERROR_UNKNOWN);
             return false;
@@ -352,9 +353,10 @@ export function promptComment(pageName: string, preFilled?: string) {
             onSubmit().then(commented => {
               if (commented) {
                 modal.close();
+                resolve(true);
               }
               return commented;
-            }).then(resolve, reject);
+            }).catch(reject);
           }
         }, MAKAI_MODAL_SUBMIT),
         h('div', {
