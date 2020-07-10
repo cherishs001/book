@@ -1520,7 +1520,7 @@ function loadChapter(chapterHtmlRelativePath, selection, side = contentControl_1
                 content.addBlock({ initElement: $authorsDiv, prepend: true });
             }
             else {
-                mainBlock.element.prepend($authorsDiv);
+                DOM_1.insertAfterH1($authorsDiv, mainBlock.element);
             }
         }
         const prevChapter = findPreviousChapter(chapterCtx);
@@ -1910,6 +1910,7 @@ function promptComment(pageName, preFilled) {
                                 userControl_1.showMessage(messages_1.MAKAI_ERROR_UNKNOWN);
                                 break;
                         }
+                        return false;
                     }
                     else if (json.accessToken === null) {
                         userControl_1.showMessage(messages_1.MAKAI_ERROR_UNKNOWN);
@@ -1942,9 +1943,10 @@ function promptComment(pageName, preFilled) {
                         onSubmit().then(commented => {
                             if (commented) {
                                 modal.close();
+                                resolve(true);
                             }
                             return commented;
-                        }).then(resolve, reject);
+                        }).catch(reject);
                     }
                 }, messages_1.MAKAI_MODAL_SUBMIT),
                 hs_1.h('div', {
@@ -3943,7 +3945,7 @@ exports.visitCount = {
 },{"../DebugLogger":6,"../constant/messages":11,"../control/chapterControl":18,"../control/history":25,"../data/AutoCache":32,"../hs":36,"../util/commaNumber":55,"../util/padName":59,"../util/shortNumber":61}],54:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.insertAfter = exports.isAnyParent = exports.selectNode = exports.getTextNodes = exports.id = void 0;
+exports.insertAfterH1 = exports.insertAfter = exports.isAnyParent = exports.selectNode = exports.getTextNodes = exports.id = void 0;
 const DebugLogger_1 = require("../DebugLogger");
 function id(id) {
     return document.getElementById(id);
@@ -3992,6 +3994,18 @@ function insertAfter($newElement, $referencingElement) {
     $referencingElement.parentElement.insertBefore($newElement, $referencingElement.nextSibling);
 }
 exports.insertAfter = insertAfter;
+function insertAfterH1($newElement, $parent) {
+    const $first = $parent.firstChild;
+    if ($first !== null &&
+        $first instanceof HTMLHeadingElement &&
+        $first.tagName.toLowerCase() === 'h1') {
+        insertAfter($newElement, $first);
+    }
+    else {
+        $parent.prepend($newElement);
+    }
+}
+exports.insertAfterH1 = insertAfterH1;
 
 },{"../DebugLogger":6}],55:[function(require,module,exports){
 "use strict";

@@ -1035,8 +1035,3 @@ body.animation-enabled .wtcd-save-button-list > div::before {
   opacity: 0.6;
   font-style: italic;
 }
-#common.material-content blockquote > p,
-.content-container > .content .content-block blockquote > p,
-.modal-holder > .modal-container > .modal blockquote > p {
-  margin-top: 0;
-}
