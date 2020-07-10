@@ -1,7 +1,7 @@
 import { stylePreviewArticle } from '../constant/stylePreviewArticle';
 import { newContent, Side } from '../control/contentControl';
 import { Layout } from '../control/layoutControl';
-import { animation, BooleanSetting, charCount, developerMode, earlyAccess, EnumSetting, fontFamily, gestureSwitchChapter, useComments, warning, wtcdGameQuickLoadConfirm } from '../data/settings';
+import { animation, BooleanSetting, charCount, contactInfo, developerMode, earlyAccess, EnumSetting, fontFamily, gestureSwitchChapter, useComments, warning, wtcdGameQuickLoadConfirm } from '../data/settings';
 import { ItemDecoration, ItemHandle, Menu } from '../Menu';
 import { MakaiMenu } from './MakaiMenu';
 
@@ -45,14 +45,17 @@ export class SettingsMenu extends Menu {
     this.addBooleanSetting('显示每个章节的字数', charCount);
     this.addBooleanSetting('WTCD 游戏快速读取前确认', wtcdGameQuickLoadConfirm);
     this.addBooleanSetting('开发人员模式', developerMode);
+    this.addBooleanSetting('文章末显示联系信息', contactInfo);
   }
   public addBooleanSetting(label: string, setting: BooleanSetting) {
-    const getText = () => `${label}：${setting.getValue() ? '开' : '关'}`;
-    const handle = this.addItem(getText(), { small: true, button: true })
+    const getText = (value: boolean) => `${label}：${value ? '开' : '关'}`;
+    const handle = this.addItem(getText(setting.getValue()), { small: true, button: true })
       .onClick(() => {
         setting.toggle();
-        handle.setInnerText(getText());
       });
+    setting.event.on(newValue => {
+      handle.setInnerText(getText(newValue));
+    });
   }
   public addEnumSetting(label: string, setting: EnumSetting, usePreview?: true) {
     const getText = () => `${label}：${setting.getValueName()}`;

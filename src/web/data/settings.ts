@@ -1,10 +1,12 @@
+import { Event } from '../Event';
+
 const noop = () => { /* noop */ };
 export class BooleanSetting {
   private value: boolean;
+  public readonly event: Event<boolean> = new Event();
   public constructor(
     private key: string,
-    defaultValue: boolean,
-    private onUpdate: (newValue: boolean) => void = noop,
+    defaultValue: boolean
   ) {
     if (defaultValue) {
       this.value = window.localStorage.getItem(key) !== 'false';
@@ -12,7 +14,7 @@ export class BooleanSetting {
       this.value = window.localStorage.getItem(key) === 'true';
     }
     this.updateLocalStorage();
-    this.onUpdate(this.value);
+    setImmediate(() => this.event.emit(this.value));
   }
   private updateLocalStorage() {
     window.localStorage.setItem(this.key, String(this.value));
@@ -22,7 +24,7 @@ export class BooleanSetting {
   }
   public setValue(newValue: boolean) {
     if (newValue !== this.value) {
-      this.onUpdate(newValue);
+      this.event.emit(newValue);
     }
     this.value = newValue;
     this.updateLocalStorage();
@@ -73,13 +75,15 @@ export class EnumSetting {
   }
 }
 
-export const animation = new BooleanSetting('animation', true, value => {
+export const animation = new BooleanSetting('animation', true);
+animation.event.on(value => {
   setTimeout(() => {
     document.body.classList.toggle('animation-enabled', value);
   }, 1);
 });
 export const warning = new BooleanSetting('warning', false);
-export const earlyAccess = new BooleanSetting('earlyAccess', false, value => {
+export const earlyAccess = new BooleanSetting('earlyAccess', false);
+earlyAccess.event.on( value => {
   document.body.classList.toggle('early-access-disabled', !value);
 });
 export const useComments = new BooleanSetting('useComments', true);
@@ -96,7 +100,9 @@ export const fontFamily = new EnumSetting('fontFamily', ['黑体', '楷体', '�
   document.documentElement.style.setProperty('--font-family-mono', '"Fira Code", ' + fontFamilyCssValues[fontFamilyIndex]);
 });
 export const developerMode = new BooleanSetting('developerMode', false);
-export const charCount = new BooleanSetting('charCount', true, value => {
+export const charCount = new BooleanSetting('charCount', true);
+charCount.event.on(value => {
   document.body.classList.toggle('char-count-disabled', !value);
 });
 export const wtcdGameQuickLoadConfirm = new BooleanSetting('wtcdGameQuickLoadConfirm', true);
+export const contactInfo = new BooleanSetting('contactInfo', true);

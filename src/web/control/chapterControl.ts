@@ -14,6 +14,7 @@ import { SwipeDirection, swipeEvent } from '../input/gestures';
 import { ArrowKey, arrowKeyPressEvent, escapeKeyPressEvent } from '../input/keyboard';
 import { getTextNodes, id, insertAfterH1 } from '../util/DOM';
 import { loadChapterComments } from './commentsControl';
+import { loadContactInfo } from './contactInfoControl';
 import { Content, ContentBlockStyle, focus, newContent, Side } from './contentControl';
 import { createWTCDErrorMessage } from './createWTCDErrorMessage';
 import { createWTCDErrorMessageFromError } from './createWTCDErrorMessageFromError';
@@ -256,6 +257,7 @@ export function loadChapter(
     setTimeout(() => {
       focus();
     }, 1);
+    loadContactInfo(content);
     loadChapterComments(content);
   })
   .catch(error => {
