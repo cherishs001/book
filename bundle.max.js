@@ -383,6 +383,271 @@ module.exports = function(arr, obj){
   return -1;
 };
 },{}],6:[function(require,module,exports){
+// shim for using process in browser
+var process = module.exports = {};
+
+// cached from whatever global is present so that test runners that stub it
+// don't break things.  But we need to wrap it in a try catch in case it is
+// wrapped in strict mode code which doesn't define any globals.  It's inside a
+// function because try/catches deoptimize in certain engines.
+
+var cachedSetTimeout;
+var cachedClearTimeout;
+
+function defaultSetTimout() {
+    throw new Error('setTimeout has not been defined');
+}
+function defaultClearTimeout () {
+    throw new Error('clearTimeout has not been defined');
+}
+(function () {
+    try {
+        if (typeof setTimeout === 'function') {
+            cachedSetTimeout = setTimeout;
+        } else {
+            cachedSetTimeout = defaultSetTimout;
+        }
+    } catch (e) {
+        cachedSetTimeout = defaultSetTimout;
+    }
+    try {
+        if (typeof clearTimeout === 'function') {
+            cachedClearTimeout = clearTimeout;
+        } else {
+            cachedClearTimeout = defaultClearTimeout;
+        }
+    } catch (e) {
+        cachedClearTimeout = defaultClearTimeout;
+    }
+} ())
+function runTimeout(fun) {
+    if (cachedSetTimeout === setTimeout) {
+        //normal enviroments in sane situations
+        return setTimeout(fun, 0);
+    }
+    // if setTimeout wasn't available but was latter defined
+    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+        cachedSetTimeout = setTimeout;
+        return setTimeout(fun, 0);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedSetTimeout(fun, 0);
+    } catch(e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+            return cachedSetTimeout.call(null, fun, 0);
+        } catch(e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+            return cachedSetTimeout.call(this, fun, 0);
+        }
+    }
+
+
+}
+function runClearTimeout(marker) {
+    if (cachedClearTimeout === clearTimeout) {
+        //normal enviroments in sane situations
+        return clearTimeout(marker);
+    }
+    // if clearTimeout wasn't available but was latter defined
+    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+        cachedClearTimeout = clearTimeout;
+        return clearTimeout(marker);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedClearTimeout(marker);
+    } catch (e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+            return cachedClearTimeout.call(null, marker);
+        } catch (e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+            return cachedClearTimeout.call(this, marker);
+        }
+    }
+
+
+
+}
+var queue = [];
+var draining = false;
+var currentQueue;
+var queueIndex = -1;
+
+function cleanUpNextTick() {
+    if (!draining || !currentQueue) {
+        return;
+    }
+    draining = false;
+    if (currentQueue.length) {
+        queue = currentQueue.concat(queue);
+    } else {
+        queueIndex = -1;
+    }
+    if (queue.length) {
+        drainQueue();
+    }
+}
+
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    var timeout = runTimeout(cleanUpNextTick);
+    draining = true;
+
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        while (++queueIndex < len) {
+            if (currentQueue) {
+                currentQueue[queueIndex].run();
+            }
+        }
+        queueIndex = -1;
+        len = queue.length;
+    }
+    currentQueue = null;
+    draining = false;
+    runClearTimeout(timeout);
+}
+
+process.nextTick = function (fun) {
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+        for (var i = 1; i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+        }
+    }
+    queue.push(new Item(fun, args));
+    if (queue.length === 1 && !draining) {
+        runTimeout(drainQueue);
+    }
+};
+
+// v8 likes predictible objects
+function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
+}
+Item.prototype.run = function () {
+    this.fun.apply(null, this.array);
+};
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+process.prependListener = noop;
+process.prependOnceListener = noop;
+
+process.listeners = function (name) { return [] }
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
+
+},{}],7:[function(require,module,exports){
+(function (setImmediate,clearImmediate){
+var nextTick = require('process/browser.js').nextTick;
+var apply = Function.prototype.apply;
+var slice = Array.prototype.slice;
+var immediateIds = {};
+var nextImmediateId = 0;
+
+// DOM APIs, for completeness
+
+exports.setTimeout = function() {
+  return new Timeout(apply.call(setTimeout, window, arguments), clearTimeout);
+};
+exports.setInterval = function() {
+  return new Timeout(apply.call(setInterval, window, arguments), clearInterval);
+};
+exports.clearTimeout =
+exports.clearInterval = function(timeout) { timeout.close(); };
+
+function Timeout(id, clearFn) {
+  this._id = id;
+  this._clearFn = clearFn;
+}
+Timeout.prototype.unref = Timeout.prototype.ref = function() {};
+Timeout.prototype.close = function() {
+  this._clearFn.call(window, this._id);
+};
+
+// Does not start the time, just sets up the members needed.
+exports.enroll = function(item, msecs) {
+  clearTimeout(item._idleTimeoutId);
+  item._idleTimeout = msecs;
+};
+
+exports.unenroll = function(item) {
+  clearTimeout(item._idleTimeoutId);
+  item._idleTimeout = -1;
+};
+
+exports._unrefActive = exports.active = function(item) {
+  clearTimeout(item._idleTimeoutId);
+
+  var msecs = item._idleTimeout;
+  if (msecs >= 0) {
+    item._idleTimeoutId = setTimeout(function onTimeout() {
+      if (item._onTimeout)
+        item._onTimeout();
+    }, msecs);
+  }
+};
+
+// That's not how node.js implements it but the exposed api is the same.
+exports.setImmediate = typeof setImmediate === "function" ? setImmediate : function(fn) {
+  var id = nextImmediateId++;
+  var args = arguments.length < 2 ? false : slice.call(arguments, 1);
+
+  immediateIds[id] = true;
+
+  nextTick(function onNextTick() {
+    if (immediateIds[id]) {
+      // fn.call() is faster so we optimize for the common use-case
+      // @see http://jsperf.com/call-apply-segu
+      if (args) {
+        fn.apply(null, args);
+      } else {
+        fn.call(null);
+      }
+      // Prevent ids from leaking
+      exports.clearImmediate(id);
+    }
+  });
+
+  return id;
+};
+
+exports.clearImmediate = typeof clearImmediate === "function" ? clearImmediate : function(id) {
+  delete immediateIds[id];
+};
+}).call(this,require("timers").setImmediate,require("timers").clearImmediate)
+},{"process/browser.js":6,"timers":7}],8:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DebugLogger = void 0;
@@ -411,7 +676,7 @@ class DebugLogger {
 }
 exports.DebugLogger = DebugLogger;
 
-},{"./constant/materialDarkColors":10,"./data/settings":34,"./util/stringHash":62}],7:[function(require,module,exports){
+},{"./constant/materialDarkColors":12,"./data/settings":37,"./util/stringHash":65}],9:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Event = void 0;
@@ -503,7 +768,7 @@ class Event {
 }
 exports.Event = Event;
 
-},{}],8:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Menu = exports.ItemHandle = exports.ItemLocation = exports.ItemDecoration = void 0;
@@ -726,13 +991,13 @@ class Menu {
 }
 exports.Menu = Menu;
 
-},{"./DebugLogger":6,"./Event":7,"./control/layoutControl":26}],9:[function(require,module,exports){
+},{"./DebugLogger":8,"./Event":9,"./control/layoutControl":29}],11:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.loadingText = void 0;
 exports.loadingText = '加载中...';
 
-},{}],10:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.materialDarkColors = void 0;
@@ -767,7 +1032,7 @@ exports.materialDarkColors = [
     '212121',
 ];
 
-},{}],11:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MAKAI_MODAL_CONTENT_DEVELOPMENT_HINT = exports.MAKAI_MODAL_CONTENT_MAKAI_TOKEN_DESC = exports.MAKAI_MODAL_CONTENT_DELETION_CONFIRMATION = exports.MAKAI_MODAL_CONTENT_TOKEN_INPUT_PREFIX = exports.MAKAI_MODAL_CONTENT_EMAIL_INPUT_PREFIX = exports.MAKAI_MODAL_CONTENT_NAME_INPUT_PREFIX = exports.MAKAI_MODAL_CONTENT_COMMENT_HINT = exports.MAKAI_MODAL_CONFIRM_LOSS_EDITED_NO = exports.MAKAI_MODAL_CONFIRM_LOSS_EDITED_YES = exports.MAKAI_MODAL_CONFIRM_LOSS_EDITED = exports.MAKAI_MODAL_SUBMIT = exports.MAKAI_MODAL_SAVE = exports.MAKAI_MODAL_CANCEL = exports.MAKAI_MODAL_CONFIRM = exports.MAKAI_MODAL_OK = exports.MAKAI_MODAL_TITLE_COMMENT = exports.MAKAI_MODAL_TITLE_TOKEN = exports.MAKAI_MODAL_TITLE_WAITING = exports.MAKAI_MODAL_TITLE_INFO = exports.MAKAI_MODAL_TITLE_WARNING = exports.MAKAI_BUTTON_REPLY = exports.MAKAI_BUTTON_DELETE = exports.MAKAI_BUTTON_BLOCK = exports.MAKAI_GENERIC_LAST_MODIFIED_SUFFIX = exports.MAKAI_GENERIC_LAST_MODIFIED = exports.MAKAI_SUBMITTED_1 = exports.MAKAI_SUBMITTED_0 = exports.MAKAI_SUBMIT_1 = exports.MAKAI_SUBMIT_0 = exports.MAKAI_INFO_OBTAIN_TOKEN = exports.MAKAI_INFO_CONFIRM_TOKEN = exports.MAKAI_INFO_SET_TOKKEN_SUCCESS = exports.MAKAI_ERROR_UNKNOWN = exports.MAKAI_ERROR_USER_EXIST = exports.MAKAI_ERROR_INVALID_EMAIL = exports.MAKAI_ERROR_INVALID_TOKEN = exports.MAKAI_ERROR_EMPTY_TOKEN = exports.MAKAI_ERROR_DELETE_COMMENT_INVALID_TOKEN = exports.MAKAI_ERROR_SUBMIT_COMMENT_INVALID_TOKEN = exports.MAKAI_ERROR_INTERNET = exports.WTCD_CANVAS_LOADING = exports.WTCD_ERROR_INTERNAL_STACK_DESC = exports.WTCD_ERROR_INTERNAL_STACK_TITLE = exports.WTCD_ERROR_WTCD_STACK_DESC = exports.WTCD_ERROR_WTCD_STACK_TITLE = exports.WTCD_ERROR_MESSAGE = exports.WTCD_ERROR_INTERNAL_DESC = exports.WTCD_ERROR_INTERNAL_TITLE = exports.WTCD_ERROR_RUNTIME_DESC = exports.WTCD_ERROR_RUNTIME_TITLE = exports.WTCD_ERROR_COMPILE_DESC = exports.WTCD_ERROR_COMPILE_TITLE = exports.WTCD_GAME_NO_DESC = exports.WTCD_GAME_QUICK_LOAD_CONFIRM_CANCEL = exports.WTCD_GAME_QUICK_LOAD_CONFIRM_CONFIRM = exports.WTCD_GAME_QUICK_LOAD_CONFIRM_DESC = exports.WTCD_GAME_QUICK_LOAD_CONFIRM_TITLE = exports.WTCD_GAME_QUICK_LOAD_NOT_EXIST = exports.WTCD_GAME_QUICK_LOAD_OK = exports.WTCD_GAME_QUICK_LOAD = exports.WTCD_GAME_QUICK_SAVE_OK = exports.WTCD_GAME_QUICK_SAVE = exports.WTCD_GAME_LOAD_OK = exports.WTCD_GAME_LOAD_QUICK = exports.WTCD_GAME_LOAD_CANCEL = exports.WTCD_GAME_LOAD_TITLE = exports.WTCD_GAME_LOAD = exports.WTCD_GAME_SAVE_OK = exports.WTCD_GAME_SAVE_OVERWRITE_CANCEL = exports.WTCD_GAME_SAVE_OVERWRITE_CONFIRM = exports.WTCD_GAME_SAVE_OVERWRITE_TITLE = exports.WTCD_GAME_SAVE_NEW = exports.WTCD_GAME_SAVE_CANCEL = exports.WTCD_GAME_SAVE_TITLE = exports.WTCD_GAME_SAVE = exports.WTCD_GAME_RESTART_OK = exports.WTCD_GAME_RESTART_CANCEL = exports.WTCD_GAME_RESTART_DECISION_ONLY = exports.WTCD_GAME_RESTART_ALL = exports.WTCD_GAME_RESTART_DECISION_ONLY_DESC = exports.WTCD_GAME_RESTART_ALL_DESC = exports.WTCD_GAME_RESTART_DESC = exports.WTCD_GAME_RESTART_TITLE = exports.WTCD_GAME_RESTART = exports.CLICK_TO_UNBLOCK = exports.NO_BLOCKED_USERS = exports.VISIT_COUNT_TIMES = exports.VISIT_COUNT_DISPLAYING = exports.VISIT_COUNT_TIME_FRAME_YEAR = exports.VISIT_COUNT_TIME_FRAME_MONTH = exports.VISIT_COUNT_TIME_FRAME_WEEK = exports.VISIT_COUNT_TIME_FRAME_DAY = exports.VISIT_COUNT_TIME_FRAME_HOUR = exports.VISIT_COUNT_TIME_FRAME_ALL = exports.VISIT_COUNT_LOAD_MORE_FAILED = exports.VISIT_COUNT_LOAD_MORE_LOADING = exports.VISIT_COUNT_LOAD_MORE = exports.VISIT_COUNT_FAILED = exports.VISIT_COUNT_LOADING = exports.VISIT_COUNT_DESC_2 = exports.VISIT_COUNT_DESC_1 = exports.VISIT_COUNT_DESC_0 = exports.VISIT_COUNT_TITLE = exports.COMMENTS_MENTION_REPLIED_OK = exports.COMMENTS_MENTION_REPLIED_TITLE = exports.COMMENTS_MENTION_NO_TOKEN_DESC = exports.COMMENTS_MENTION_NO_TOKEN_TITLE = exports.COMMENTS_MENTION_LOADED = exports.COMMENTS_MENTION_SECTION = exports.COMMENTS_RECENT_LOADED = exports.COMMENTS_RECENT_SECTION = exports.COMMENTS_FAILED = exports.COMMENTS_LOADED = exports.COMMENTS_CREATE = exports.COMMENTS_UNAVAILABLE = exports.COMMENTS_LOADING = exports.COMMENTS_SECTION = exports.BROKEN_LINK_OK = exports.BROKEN_LINK_DESC = exports.BROKEN_LINK_TITLE = exports.BUILD_FAILED_OK = exports.BUILD_FAILED_DESC = exports.BUILD_FAILED_TITLE = exports.CHAPTER_FAILED = exports.CHAPTER_LOADING = exports.NEXT_CHAPTER = exports.GO_TO_MENU = exports.PREVIOUS_CHAPTER = exports.EARLY_ACCESS_DESC = exports.EARLY_ACCESS_TITLE = void 0;
@@ -902,7 +1167,7 @@ exports.MAKAI_MODAL_CONTENT_DELETION_CONFIRMATION = '确定要删除这条评论
 exports.MAKAI_MODAL_CONTENT_MAKAI_TOKEN_DESC = '这是您的 Makai 令牌。\n使用 Makai 令牌可以在《可穿戴科技》发表评论。\n当您第一次发表评论时，系统就会自动生成一个 Makai 令牌。\n您可以通过将这个令牌复制到别的电脑上来实现使用多台设备用一个身份回复。';
 exports.MAKAI_MODAL_CONTENT_DEVELOPMENT_HINT = 'WTCD 存档同步正在开发中。—— 来自魔法☆少女的玩具 友人♪B';
 
-},{}],12:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.stylePreviewArticle = void 0;
@@ -936,7 +1201,7 @@ exports.stylePreviewArticle = `<h1>午饭</h1>
 <p>“真……真香♪”</p>
 <p>当晚，因为触发了真香定律而感到很火大的琳，把秋镜悬丢进了自己的高维空间里头放置了一晚上（高维时间三天）泄愤。</p>`;
 
-},{}],13:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.thanks = void 0;
@@ -974,7 +1239,7 @@ exports.thanks = [
     { name: 'Testingdoll01' }
 ].sort(() => Math.random() - 0.5);
 
-},{}],14:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MonoDimensionTransitionControl = void 0;
@@ -1059,7 +1324,7 @@ class MonoDimensionTransitionControl {
 }
 exports.MonoDimensionTransitionControl = MonoDimensionTransitionControl;
 
-},{}],15:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WTCDFeatureProvider = void 0;
@@ -1127,7 +1392,7 @@ class WTCDFeatureProvider extends FeatureProvider_1.FeatureProvider {
 }
 exports.WTCDFeatureProvider = WTCDFeatureProvider;
 
-},{"../../wtcd/FeatureProvider":64,"../DebugLogger":6,"../constant/messages":11,"../data/AutoCache":32,"../util/loadGooleFonts":57,"../util/resolvePath":60}],16:[function(require,module,exports){
+},{"../../wtcd/FeatureProvider":67,"../DebugLogger":8,"../constant/messages":13,"../data/AutoCache":35,"../util/loadGooleFonts":60,"../util/resolvePath":63}],18:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WTCDGameReaderUI = void 0;
@@ -1322,7 +1587,7 @@ class WTCDGameReaderUI {
 }
 exports.WTCDGameReaderUI = WTCDGameReaderUI;
 
-},{"../../wtcd/FeatureProvider":64,"../../wtcd/GameReader":66,"../DebugLogger":6,"../constant/messages":11,"../data/settings":34,"../hs":36,"../util/formatTime":56,"./createWTCDErrorMessageFromError":22,"./hintControl":24,"./modalControl":28}],17:[function(require,module,exports){
+},{"../../wtcd/FeatureProvider":67,"../../wtcd/GameReader":69,"../DebugLogger":8,"../constant/messages":13,"../data/settings":37,"../hs":39,"../util/formatTime":59,"./createWTCDErrorMessageFromError":25,"./hintControl":27,"./modalControl":31}],19:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const AutoCache_1 = require("../data/AutoCache");
@@ -1353,7 +1618,7 @@ chapterControl_1.loadChapterEvent.on(chapterRelativePath => {
     }, 5000);
 });
 
-},{"../DebugLogger":6,"../data/AutoCache":32,"../data/state":35,"./chapterControl":18}],18:[function(require,module,exports){
+},{"../DebugLogger":8,"../data/AutoCache":35,"../data/state":38,"./chapterControl":20}],20:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ErrorType = exports.loadChapter = exports.loadNextChapter = exports.loadPrevChapter = exports.implicitCloseChapter = exports.closeChapter = exports.loadChapterEvent = void 0;
@@ -1371,6 +1636,7 @@ const gestures_1 = require("../input/gestures");
 const keyboard_1 = require("../input/keyboard");
 const DOM_1 = require("../util/DOM");
 const commentsControl_1 = require("./commentsControl");
+const contactInfoControl_1 = require("./contactInfoControl");
 const contentControl_1 = require("./contentControl");
 const createWTCDErrorMessage_1 = require("./createWTCDErrorMessage");
 const createWTCDErrorMessageFromError_1 = require("./createWTCDErrorMessageFromError");
@@ -1560,6 +1826,7 @@ function loadChapter(chapterHtmlRelativePath, selection, side = contentControl_1
         setTimeout(() => {
             contentControl_1.focus();
         }, 1);
+        contactInfoControl_1.loadContactInfo(content);
         commentsControl_1.loadChapterComments(content);
     })
         .catch(error => {
@@ -1641,7 +1908,7 @@ function insertContent(content, text, chapter) {
     }
 }
 
-},{"../../wtcd/FlowReader":65,"../DebugLogger":6,"../Event":7,"../constant/loadingText":9,"../constant/messages":11,"../data/AutoCache":32,"../data/data":33,"../data/settings":34,"../data/state":35,"../hs":36,"../input/gestures":38,"../input/keyboard":39,"../util/DOM":54,"./WTCDFeatureProvider":15,"./WTCDGameReaderUI":16,"./commentsControl":19,"./contentControl":20,"./createWTCDErrorMessage":21,"./createWTCDErrorMessageFromError":22,"./history":25,"./layoutControl":26,"./modalControl":28,"./processElements":29}],19:[function(require,module,exports){
+},{"../../wtcd/FlowReader":68,"../DebugLogger":8,"../Event":9,"../constant/loadingText":11,"../constant/messages":13,"../data/AutoCache":35,"../data/data":36,"../data/settings":37,"../data/state":38,"../hs":39,"../input/gestures":41,"../input/keyboard":42,"../util/DOM":57,"./WTCDFeatureProvider":17,"./WTCDGameReaderUI":18,"./commentsControl":21,"./contactInfoControl":22,"./contentControl":23,"./createWTCDErrorMessage":24,"./createWTCDErrorMessageFromError":25,"./history":28,"./layoutControl":29,"./modalControl":31,"./processElements":32}],21:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -2017,7 +2284,36 @@ function loadRecentMentions(content, token) {
 }
 exports.loadRecentMentions = loadRecentMentions;
 
-},{"../DebugLogger":6,"../constant/messages":11,"../data/AutoCache":32,"../data/settings":34,"../data/state":35,"../hs":36,"../util/formatTime":56,"../util/padName":59,"./chapterControl":18,"./history":25,"./makaiControl":27,"./modalControl":28,"./userControl":31}],20:[function(require,module,exports){
+},{"../DebugLogger":8,"../constant/messages":13,"../data/AutoCache":35,"../data/settings":37,"../data/state":38,"../hs":39,"../util/formatTime":59,"../util/padName":62,"./chapterControl":20,"./history":28,"./makaiControl":30,"./modalControl":31,"./userControl":34}],22:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.loadContactInfo = void 0;
+const settings_1 = require("../data/settings");
+const hs_1 = require("../hs");
+function loadContactInfo(content) {
+    if (!settings_1.contactInfo.getValue()) {
+        return;
+    }
+    const block = content.addBlock({
+        initElement: hs_1.h('div', hs_1.h('h3', '欢迎加入《可穿戴科技》相关讨论组'), hs_1.h('ul', hs_1.h('li', 'Telegram 群：', hs_1.h('a.regular', {
+            href: 'https://t.me/joinchat/Dt8_WlJnmEwYNbjzlnLyNA',
+            target: '_blank',
+        }, 'https://t.me/joinchat/Dt8_WlJnmEwYNbjzlnLyNA')), hs_1.h('li.regular', 'Telegram 频道：', hs_1.h('a.regular', {
+            href: 'https://t.me/joinchat/AAAAAEpkRVwZ-3s5V3YHjA',
+            target: '_blank',
+        }, 'https://t.me/joinchat/AAAAAEpkRVwZ-3s5V3YHjA')), hs_1.h('li', 'QQ 群（禁止色情/政治）：462213854')), hs_1.h('a.regular', {
+            href: '#',
+            onclick: ((event) => {
+                event.preventDefault();
+                block.directRemove();
+                settings_1.contactInfo.setValue(false);
+            }),
+        }, '点此永久关闭本提示')),
+    });
+}
+exports.loadContactInfo = loadContactInfo;
+
+},{"../data/settings":37,"../hs":39}],23:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ContentBlock = exports.Content = exports.ContentBlockStyle = exports.newContent = exports.focus = exports.getCurrentContent = exports.Side = void 0;
@@ -2275,7 +2571,7 @@ class ContentBlock {
 }
 exports.ContentBlock = ContentBlock;
 
-},{"../DebugLogger":6,"../data/settings":34,"../hs":36,"../input/keyboard":39,"../util/DOM":54,"./MonoDimensionTransitionControl":14,"./layoutControl":26}],21:[function(require,module,exports){
+},{"../DebugLogger":8,"../data/settings":37,"../hs":39,"../input/keyboard":42,"../util/DOM":57,"./MonoDimensionTransitionControl":16,"./layoutControl":29}],24:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createWTCDErrorMessage = void 0;
@@ -2334,7 +2630,7 @@ function createWTCDErrorMessage({ errorType, message, internalStack, wtcdStack, 
 }
 exports.createWTCDErrorMessage = createWTCDErrorMessage;
 
-},{"../constant/messages":11,"./chapterControl":18}],22:[function(require,module,exports){
+},{"../constant/messages":13,"./chapterControl":20}],25:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createWTCDErrorMessageFromError = void 0;
@@ -2355,7 +2651,7 @@ function createWTCDErrorMessageFromError(error) {
 }
 exports.createWTCDErrorMessageFromError = createWTCDErrorMessageFromError;
 
-},{"../../wtcd/WTCDError":69,"./chapterControl":18,"./createWTCDErrorMessage":21}],23:[function(require,module,exports){
+},{"../../wtcd/WTCDError":72,"./chapterControl":20,"./createWTCDErrorMessage":24}],26:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.followQuery = void 0;
@@ -2435,7 +2731,7 @@ function followQuery() {
 }
 exports.followQuery = followQuery;
 
-},{"../constant/messages":11,"../data/data":33,"../data/state":35,"../pages/pages":50,"./chapterControl":18,"./contentControl":20,"./history":25,"./layoutControl":26,"./modalControl":28}],24:[function(require,module,exports){
+},{"../constant/messages":13,"../data/data":36,"../data/state":38,"../pages/pages":53,"./chapterControl":20,"./contentControl":23,"./history":28,"./layoutControl":29,"./modalControl":31}],27:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -2467,7 +2763,7 @@ function createHint(text, timeMs = 2000) {
 }
 exports.createHint = createHint;
 
-},{"../hs":36}],25:[function(require,module,exports){
+},{"../hs":39}],28:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateHistory = exports.getTitle = void 0;
@@ -2495,7 +2791,7 @@ function updateHistory(push) {
 }
 exports.updateHistory = updateHistory;
 
-},{"../data/state":35}],26:[function(require,module,exports){
+},{"../data/state":38}],29:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.setLayout = exports.getCurrentLayout = exports.layoutChangeEvent = exports.Layout = void 0;
@@ -2559,7 +2855,7 @@ function setLayout(newLayout) {
 }
 exports.setLayout = setLayout;
 
-},{"../DebugLogger":6,"../Event":7}],27:[function(require,module,exports){
+},{"../DebugLogger":8,"../Event":9}],30:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.hasToken = exports.getUsername = exports.getToken = exports.saveUsername = exports.saveToken = exports.validToken = exports.tokenToUsername = exports.makaiUrl = void 0;
@@ -2594,7 +2890,7 @@ function hasToken() {
 }
 exports.hasToken = hasToken;
 
-},{}],28:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.isAnyModalOpened = exports.notify = exports.confirm = exports.Modal = void 0;
@@ -2708,7 +3004,7 @@ function isAnyModalOpened() {
 }
 exports.isAnyModalOpened = isAnyModalOpened;
 
-},{"../data/settings":34,"../hs":36,"../input/keyboard":39,"../util/DOM":54}],29:[function(require,module,exports){
+},{"../data/settings":37,"../hs":39,"../input/keyboard":42,"../util/DOM":57}],32:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.processElements = void 0;
@@ -2741,7 +3037,7 @@ function processElements($parent) {
 }
 exports.processElements = processElements;
 
-},{"../util/DOM":54}],30:[function(require,module,exports){
+},{"../util/DOM":57}],33:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateSelection = void 0;
@@ -2795,7 +3091,7 @@ function updateSelection() {
 }
 exports.updateSelection = updateSelection;
 
-},{"../data/state":35,"./history":25}],31:[function(require,module,exports){
+},{"../data/state":38,"./history":28}],34:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.showLogin = exports.showLoading = exports.showMessage = void 0;
@@ -2880,7 +3176,7 @@ function showLogin() {
 }
 exports.showLogin = showLogin;
 
-},{"../constant/messages":11,"../hs":36,"./makaiControl":27,"./modalControl":28}],32:[function(require,module,exports){
+},{"../constant/messages":13,"../hs":39,"./makaiControl":30,"./modalControl":31}],35:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AutoCache = void 0;
@@ -2912,7 +3208,7 @@ class AutoCache {
 }
 exports.AutoCache = AutoCache;
 
-},{}],33:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.authorInfoMap = exports.relativePathLookUpMap = exports.data = void 0;
@@ -2938,15 +3234,17 @@ for (const authorInfo of exports.data.authorsInfo) {
     exports.authorInfoMap.set(authorInfo.name, authorInfo);
 }
 
-},{}],34:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
+(function (setImmediate){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.wtcdGameQuickLoadConfirm = exports.charCount = exports.developerMode = exports.fontFamily = exports.gestureSwitchChapter = exports.useComments = exports.earlyAccess = exports.warning = exports.animation = exports.EnumSetting = exports.BooleanSetting = void 0;
+exports.contactInfo = exports.wtcdGameQuickLoadConfirm = exports.charCount = exports.developerMode = exports.fontFamily = exports.gestureSwitchChapter = exports.useComments = exports.earlyAccess = exports.warning = exports.animation = exports.EnumSetting = exports.BooleanSetting = void 0;
+const Event_1 = require("../Event");
 const noop = () => { };
 class BooleanSetting {
-    constructor(key, defaultValue, onUpdate = noop) {
+    constructor(key, defaultValue) {
         this.key = key;
-        this.onUpdate = onUpdate;
+        this.event = new Event_1.Event();
         if (defaultValue) {
             this.value = window.localStorage.getItem(key) !== 'false';
         }
@@ -2954,7 +3252,7 @@ class BooleanSetting {
             this.value = window.localStorage.getItem(key) === 'true';
         }
         this.updateLocalStorage();
-        this.onUpdate(this.value);
+        setImmediate(() => this.event.emit(this.value));
     }
     updateLocalStorage() {
         window.localStorage.setItem(this.key, String(this.value));
@@ -2964,7 +3262,7 @@ class BooleanSetting {
     }
     setValue(newValue) {
         if (newValue !== this.value) {
-            this.onUpdate(newValue);
+            this.event.emit(newValue);
         }
         this.value = newValue;
         this.updateLocalStorage();
@@ -3013,13 +3311,15 @@ class EnumSetting {
     }
 }
 exports.EnumSetting = EnumSetting;
-exports.animation = new BooleanSetting('animation', true, value => {
+exports.animation = new BooleanSetting('animation', true);
+exports.animation.event.on(value => {
     setTimeout(() => {
         document.body.classList.toggle('animation-enabled', value);
     }, 1);
 });
 exports.warning = new BooleanSetting('warning', false);
-exports.earlyAccess = new BooleanSetting('earlyAccess', false, value => {
+exports.earlyAccess = new BooleanSetting('earlyAccess', false);
+exports.earlyAccess.event.on(value => {
     document.body.classList.toggle('early-access-disabled', !value);
 });
 exports.useComments = new BooleanSetting('useComments', true);
@@ -3036,12 +3336,15 @@ exports.fontFamily = new EnumSetting('fontFamily', ['黑体', '楷体', '宋体'
     document.documentElement.style.setProperty('--font-family-mono', '"Fira Code", ' + fontFamilyCssValues[fontFamilyIndex]);
 });
 exports.developerMode = new BooleanSetting('developerMode', false);
-exports.charCount = new BooleanSetting('charCount', true, value => {
+exports.charCount = new BooleanSetting('charCount', true);
+exports.charCount.event.on(value => {
     document.body.classList.toggle('char-count-disabled', !value);
 });
 exports.wtcdGameQuickLoadConfirm = new BooleanSetting('wtcdGameQuickLoadConfirm', true);
+exports.contactInfo = new BooleanSetting('contactInfo', true);
 
-},{}],35:[function(require,module,exports){
+}).call(this,require("timers").setImmediate)
+},{"../Event":9,"timers":7}],38:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.state = void 0;
@@ -3051,14 +3354,14 @@ exports.state = {
     chapterTextNodes: null,
 };
 
-},{}],36:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.h = void 0;
 const hs = require("hyperscript");
 exports.h = hs;
 
-},{"hyperscript":4}],37:[function(require,module,exports){
+},{"hyperscript":4}],40:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.removeNewMentionLink = void 0;
@@ -3139,7 +3442,7 @@ window.addEventListener('popstate', () => {
 });
 followQuery_1.followQuery();
 
-},{"./DebugLogger":6,"./Menu":8,"./constant/messages":11,"./control/analyticsControl":17,"./control/followQuery":23,"./control/modalControl":28,"./control/updateSelection":30,"./data/data":33,"./data/settings":34,"./menu/MainMenu":43,"./util/DOM":54}],38:[function(require,module,exports){
+},{"./DebugLogger":8,"./Menu":10,"./constant/messages":13,"./control/analyticsControl":19,"./control/followQuery":26,"./control/modalControl":31,"./control/updateSelection":33,"./data/data":36,"./data/settings":37,"./menu/MainMenu":46,"./util/DOM":57}],41:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.swipeEvent = exports.SwipeDirection = void 0;
@@ -3224,7 +3527,7 @@ exports.swipeEvent.on(direction => {
     swipeEventDebugLogger.log(SwipeDirection[direction]);
 });
 
-},{"../DebugLogger":6,"../Event":7,"../util/DOM":54}],39:[function(require,module,exports){
+},{"../DebugLogger":8,"../Event":9,"../util/DOM":57}],42:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.escapeKeyPressEvent = exports.arrowKeyPressEvent = exports.ArrowKey = void 0;
@@ -3266,7 +3569,7 @@ exports.arrowKeyPressEvent.on(arrowKey => {
     arrowEventDebugLogger.log(ArrowKey[arrowKey]);
 });
 
-},{"../DebugLogger":6,"../Event":7}],40:[function(require,module,exports){
+},{"../DebugLogger":8,"../Event":9}],43:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChaptersMenu = exports.isEmptyFolder = void 0;
@@ -3346,7 +3649,7 @@ class ChaptersMenu extends Menu_1.Menu {
 }
 exports.ChaptersMenu = ChaptersMenu;
 
-},{"../Menu":8,"../control/chapterControl":18,"../control/history":25,"../data/data":33,"../util/shortNumber":61}],41:[function(require,module,exports){
+},{"../Menu":10,"../control/chapterControl":20,"../control/history":28,"../data/data":36,"../util/shortNumber":64}],44:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ContactMenu = void 0;
@@ -3382,7 +3685,7 @@ class ContactMenu extends Menu_1.Menu {
 }
 exports.ContactMenu = ContactMenu;
 
-},{"../Menu":8}],42:[function(require,module,exports){
+},{"../Menu":10}],45:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LinkExchangeMenu = void 0;
@@ -3406,7 +3709,7 @@ class LinkExchangeMenu extends Menu_1.Menu {
 }
 exports.LinkExchangeMenu = LinkExchangeMenu;
 
-},{"../Menu":8}],43:[function(require,module,exports){
+},{"../Menu":10}],46:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MainMenu = void 0;
@@ -3434,7 +3737,7 @@ class MainMenu extends Menu_1.Menu {
 }
 exports.MainMenu = MainMenu;
 
-},{"../Menu":8,"./ChaptersMenu":40,"./ContactMenu":41,"./LinkExchangeMenu":42,"./SettingsMenu":45,"./StatsMenu":47,"./StyleMenu":48,"./ThanksMenu":49}],44:[function(require,module,exports){
+},{"../Menu":10,"./ChaptersMenu":43,"./ContactMenu":44,"./LinkExchangeMenu":45,"./SettingsMenu":48,"./StatsMenu":50,"./StyleMenu":51,"./ThanksMenu":52}],47:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MakaiMenu = void 0;
@@ -3453,7 +3756,7 @@ class MakaiMenu extends Menu_1.Menu {
 }
 exports.MakaiMenu = MakaiMenu;
 
-},{"../Menu":8,"../control/userControl":31}],45:[function(require,module,exports){
+},{"../Menu":10,"../control/userControl":34}],48:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SettingsMenu = exports.EnumSettingMenu = void 0;
@@ -3502,13 +3805,16 @@ class SettingsMenu extends Menu_1.Menu {
         this.addBooleanSetting('显示每个章节的字数', settings_1.charCount);
         this.addBooleanSetting('WTCD 游戏快速读取前确认', settings_1.wtcdGameQuickLoadConfirm);
         this.addBooleanSetting('开发人员模式', settings_1.developerMode);
+        this.addBooleanSetting('文章末显示联系信息', settings_1.contactInfo);
     }
     addBooleanSetting(label, setting) {
-        const getText = () => `${label}：${setting.getValue() ? '开' : '关'}`;
-        const handle = this.addItem(getText(), { small: true, button: true })
+        const getText = (value) => `${label}：${value ? '开' : '关'}`;
+        const handle = this.addItem(getText(setting.getValue()), { small: true, button: true })
             .onClick(() => {
             setting.toggle();
-            handle.setInnerText(getText());
+        });
+        setting.event.on(newValue => {
+            handle.setInnerText(getText(newValue));
         });
     }
     addEnumSetting(label, setting, usePreview) {
@@ -3524,7 +3830,7 @@ class SettingsMenu extends Menu_1.Menu {
 }
 exports.SettingsMenu = SettingsMenu;
 
-},{"../Menu":8,"../constant/stylePreviewArticle":12,"../control/contentControl":20,"../control/layoutControl":26,"../data/settings":34,"./MakaiMenu":44}],46:[function(require,module,exports){
+},{"../Menu":10,"../constant/stylePreviewArticle":14,"../control/contentControl":23,"../control/layoutControl":29,"../data/settings":37,"./MakaiMenu":47}],49:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.StatsKeywordsCountMenu = void 0;
@@ -3547,7 +3853,7 @@ class StatsKeywordsCountMenu extends Menu_1.Menu {
 }
 exports.StatsKeywordsCountMenu = StatsKeywordsCountMenu;
 
-},{"../Menu":8,"../data/data":33,"../util/shortNumber":61}],47:[function(require,module,exports){
+},{"../Menu":10,"../data/data":36,"../util/shortNumber":64}],50:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.StatsMenu = void 0;
@@ -3566,7 +3872,7 @@ class StatsMenu extends Menu_1.Menu {
 }
 exports.StatsMenu = StatsMenu;
 
-},{"../Menu":8,"../data/data":33,"../util/shortNumber":61,"./StatsKeywordsCountMenu":46}],48:[function(require,module,exports){
+},{"../Menu":10,"../data/data":36,"../util/shortNumber":64,"./StatsKeywordsCountMenu":49}],51:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.StyleMenu = void 0;
@@ -3705,7 +4011,7 @@ class StyleMenu extends Menu_1.Menu {
 }
 exports.StyleMenu = StyleMenu;
 
-},{"../DebugLogger":6,"../Menu":8,"../constant/stylePreviewArticle":12,"../control/contentControl":20,"../control/layoutControl":26,"../hs":36}],49:[function(require,module,exports){
+},{"../DebugLogger":8,"../Menu":10,"../constant/stylePreviewArticle":14,"../control/contentControl":23,"../control/layoutControl":29,"../hs":39}],52:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ThanksMenu = void 0;
@@ -3723,7 +4029,7 @@ class ThanksMenu extends Menu_1.Menu {
 }
 exports.ThanksMenu = ThanksMenu;
 
-},{"../Menu":8,"../constant/thanks":13}],50:[function(require,module,exports){
+},{"../Menu":10,"../constant/thanks":15}],53:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.pages = void 0;
@@ -3736,7 +4042,7 @@ exports.pages = [
     recentMentions_1.recentMentions,
 ];
 
-},{"./recentComments":51,"./recentMentions":52,"./visitCount":53}],51:[function(require,module,exports){
+},{"./recentComments":54,"./recentMentions":55,"./visitCount":56}],54:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.recentComments = void 0;
@@ -3749,7 +4055,7 @@ exports.recentComments = {
     },
 };
 
-},{"../control/commentsControl":19}],52:[function(require,module,exports){
+},{"../control/commentsControl":21}],55:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.recentMentions = void 0;
@@ -3777,7 +4083,7 @@ exports.recentMentions = {
     },
 };
 
-},{"../constant/messages":11,"../control/commentsControl":19,"../hs":36,"../index":37}],53:[function(require,module,exports){
+},{"../constant/messages":13,"../control/commentsControl":21,"../hs":39,"../index":40}],56:[function(require,module,exports){
 "use strict";
 // !!! Super spaghetti code warning !!!
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -3942,7 +4248,7 @@ exports.visitCount = {
     },
 };
 
-},{"../DebugLogger":6,"../constant/messages":11,"../control/chapterControl":18,"../control/history":25,"../data/AutoCache":32,"../hs":36,"../util/commaNumber":55,"../util/padName":59,"../util/shortNumber":61}],54:[function(require,module,exports){
+},{"../DebugLogger":8,"../constant/messages":13,"../control/chapterControl":20,"../control/history":28,"../data/AutoCache":35,"../hs":39,"../util/commaNumber":58,"../util/padName":62,"../util/shortNumber":64}],57:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.insertAfterH1 = exports.insertAfter = exports.isAnyParent = exports.selectNode = exports.getTextNodes = exports.id = void 0;
@@ -4007,7 +4313,7 @@ function insertAfterH1($newElement, $parent) {
 }
 exports.insertAfterH1 = insertAfterH1;
 
-},{"../DebugLogger":6}],55:[function(require,module,exports){
+},{"../DebugLogger":8}],58:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.commaNumber = void 0;
@@ -4023,7 +4329,7 @@ function commaNumber(num) {
 }
 exports.commaNumber = commaNumber;
 
-},{}],56:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.formatTimeSimple = exports.formatTimeRelative = void 0;
@@ -4055,7 +4361,7 @@ function formatTimeSimple(time) {
 }
 exports.formatTimeSimple = formatTimeSimple;
 
-},{}],57:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -4090,7 +4396,7 @@ function loadGoogleFonts(fontName) {
 }
 exports.loadGoogleFonts = loadGoogleFonts;
 
-},{"../DebugLogger":6,"./matchAll":58}],58:[function(require,module,exports){
+},{"../DebugLogger":8,"./matchAll":61}],61:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.matchAll = void 0;
@@ -4107,7 +4413,7 @@ function matchAll(str, regex) {
 }
 exports.matchAll = matchAll;
 
-},{}],59:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.padName = void 0;
@@ -4124,7 +4430,7 @@ function padName(name) {
 }
 exports.padName = padName;
 
-},{}],60:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.resolvePath = void 0;
@@ -4158,7 +4464,7 @@ function resolvePath(...paths) {
 }
 exports.resolvePath = resolvePath;
 
-},{}],61:[function(require,module,exports){
+},{}],64:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.shortNumber = void 0;
@@ -4173,7 +4479,7 @@ function shortNumber(input, digits = 1) {
 }
 exports.shortNumber = shortNumber;
 
-},{}],62:[function(require,module,exports){
+},{}],65:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.stringHash = void 0;
@@ -4191,7 +4497,7 @@ function stringHash(str) {
 }
 exports.stringHash = stringHash;
 
-},{}],63:[function(require,module,exports){
+},{}],66:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChainedCanvas = void 0;
@@ -4218,7 +4524,7 @@ class ChainedCanvas {
 }
 exports.ChainedCanvas = ChainedCanvas;
 
-},{}],64:[function(require,module,exports){
+},{}],67:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.defaultFeatureProvider = exports.FeatureProvider = void 0;
@@ -4254,7 +4560,7 @@ class FeatureProvider {
 exports.FeatureProvider = FeatureProvider;
 exports.defaultFeatureProvider = new FeatureProvider();
 
-},{}],65:[function(require,module,exports){
+},{}],68:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FlowReader = void 0;
@@ -4467,7 +4773,7 @@ class FlowReader {
 }
 exports.FlowReader = FlowReader;
 
-},{"./FeatureProvider":64,"./Interpreter":67,"./Random":68}],66:[function(require,module,exports){
+},{"./FeatureProvider":67,"./Interpreter":70,"./Random":71}],69:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GameReader = void 0;
@@ -4672,7 +4978,7 @@ class GameReader {
 }
 exports.GameReader = GameReader;
 
-},{"./FeatureProvider":64,"./Interpreter":67,"./Random":68}],67:[function(require,module,exports){
+},{"./FeatureProvider":67,"./Interpreter":70,"./Random":71}],70:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Interpreter = exports.InvalidChoiceError = exports.assignValueToVariable = exports.isTypeAssignableTo = exports.describe = exports.BubbleSignal = exports.BubbleSignalType = exports.isEqual = void 0;
@@ -5506,7 +5812,7 @@ class Interpreter {
 }
 exports.Interpreter = Interpreter;
 
-},{"./WTCDError":69,"./constantsPool":71,"./invokeFunction":72,"./operators":73,"./std":77,"./utils":84}],68:[function(require,module,exports){
+},{"./WTCDError":72,"./constantsPool":74,"./invokeFunction":75,"./operators":76,"./std":80,"./utils":87}],71:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Random = void 0;
@@ -5570,7 +5876,7 @@ class Random {
 }
 exports.Random = Random;
 
-},{}],69:[function(require,module,exports){
+},{}],72:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WTCDError = void 0;
@@ -5617,7 +5923,7 @@ class WTCDError extends Error {
 }
 exports.WTCDError = WTCDError;
 
-},{}],70:[function(require,module,exports){
+},{}],73:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.autoEvaluated = void 0;
@@ -5630,7 +5936,7 @@ function autoEvaluated(fn) {
 }
 exports.autoEvaluated = autoEvaluated;
 
-},{}],71:[function(require,module,exports){
+},{}],74:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getMaybePooled = exports.booleanValue = exports.smallIntegers = exports.falseValue = exports.trueValue = exports.nullValue = void 0;
@@ -5667,7 +5973,7 @@ function getMaybePooled(type, value) {
 }
 exports.getMaybePooled = getMaybePooled;
 
-},{}],72:[function(require,module,exports){
+},{}],75:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.reverseInvocation = exports.pipelineInvocation = exports.regularInvocation = exports.regularInvocationRaw = exports.invokeFunctionRaw = exports.FunctionInvocationError = void 0;
@@ -5843,7 +6149,7 @@ exports.reverseInvocation = autoEvaluated_1.autoEvaluated((arg0, arg1, expr, int
     }
 });
 
-},{"./Interpreter":67,"./WTCDError":69,"./autoEvaluated":70,"./constantsPool":71,"./std/utils":83}],73:[function(require,module,exports){
+},{"./Interpreter":70,"./WTCDError":72,"./autoEvaluated":73,"./constantsPool":74,"./std/utils":86}],76:[function(require,module,exports){
 "use strict";
 // This file defines all infix and prefix operators in WTCD.
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -6259,7 +6565,7 @@ exports.binaryOperators = new Map([
 exports.conditionalOperatorPrecedence = 4;
 exports.operators = new Set([...exports.unaryOperators.keys(), ...exports.binaryOperators.keys(), '?', ':', '...']);
 
-},{"./Interpreter":67,"./WTCDError":69,"./autoEvaluated":70,"./constantsPool":71,"./invokeFunction":72}],74:[function(require,module,exports){
+},{"./Interpreter":70,"./WTCDError":72,"./autoEvaluated":73,"./constantsPool":74,"./invokeFunction":75}],77:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -6523,7 +6829,7 @@ exports.canvasStdFunctions = [
     },
 ];
 
-},{"../ChainedCanvas":63,"../constantsPool":71,"./utils":83}],75:[function(require,module,exports){
+},{"../ChainedCanvas":66,"../constantsPool":74,"./utils":86}],78:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.contentStdFunctions = void 0;
@@ -6628,7 +6934,7 @@ exports.contentStdFunctions = [
     },
 ];
 
-},{"../Interpreter":67,"../constantsPool":71,"./utils":83}],76:[function(require,module,exports){
+},{"../Interpreter":70,"../constantsPool":74,"./utils":86}],79:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.debugStdFunctions = void 0;
@@ -6695,7 +7001,7 @@ exports.debugStdFunctions = [
     },
 ];
 
-},{"../Interpreter":67,"../WTCDError":69,"../constantsPool":71,"../invokeFunction":72,"./utils":83}],77:[function(require,module,exports){
+},{"../Interpreter":70,"../WTCDError":72,"../constantsPool":74,"../invokeFunction":75,"./utils":86}],80:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.stdFunctions = void 0;
@@ -6718,7 +7024,7 @@ exports.stdFunctions = [
     ...canvas_1.canvasStdFunctions,
 ];
 
-},{"./canvas":74,"./content":75,"./debug":76,"./list":78,"./math":79,"./random":80,"./reader":81,"./string":82}],78:[function(require,module,exports){
+},{"./canvas":77,"./content":78,"./debug":79,"./list":81,"./math":82,"./random":83,"./reader":84,"./string":85}],81:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.listStdFunctions = void 0;
@@ -6985,7 +7291,7 @@ exports.listStdFunctions = [
     },
 ];
 
-},{"../Interpreter":67,"../WTCDError":69,"../constantsPool":71,"../invokeFunction":72,"./utils":83}],79:[function(require,module,exports){
+},{"../Interpreter":70,"../WTCDError":72,"../constantsPool":74,"../invokeFunction":75,"./utils":86}],82:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.mathStdFunctions = void 0;
@@ -7024,7 +7330,7 @@ exports.mathStdFunctions = [
     },
 ];
 
-},{"../constantsPool":71,"./utils":83}],80:[function(require,module,exports){
+},{"../constantsPool":74,"./utils":86}],83:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.randomStdFunctions = void 0;
@@ -7078,7 +7384,7 @@ exports.randomStdFunctions = [
     },
 ];
 
-},{"../constantsPool":71,"./utils":83}],81:[function(require,module,exports){
+},{"../constantsPool":74,"./utils":86}],84:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.readerStdFunctions = void 0;
@@ -7109,7 +7415,7 @@ exports.readerStdFunctions = [
     },
 ];
 
-},{"../constantsPool":71,"./utils":83}],82:[function(require,module,exports){
+},{"../constantsPool":74,"./utils":86}],85:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.stringStdFunctions = void 0;
@@ -7198,7 +7504,7 @@ exports.stringStdFunctions = [
     },
 ];
 
-},{"../constantsPool":71,"./utils":83}],83:[function(require,module,exports){
+},{"../constantsPool":74,"./utils":86}],86:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.assertArgType = exports.nullify = exports.assertArgsLength = exports.NativeFunctionError = void 0;
@@ -7245,7 +7551,7 @@ function assertArgType(args, index, type, defaultValue) {
 }
 exports.assertArgType = assertArgType;
 
-},{"../Interpreter":67,"../constantsPool":71}],84:[function(require,module,exports){
+},{"../Interpreter":70,"../constantsPool":74}],87:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.arrayEquals = exports.flat = void 0;
@@ -7267,4 +7573,4 @@ function arrayEquals(arr0, arr1, comparator = (e0, e1) => e0 === e1) {
 }
 exports.arrayEquals = arrayEquals;
 
-},{}]},{},[37]);
+},{}]},{},[40]);
