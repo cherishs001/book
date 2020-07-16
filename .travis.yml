@@ -10,6 +10,6 @@ deploy:
   github-token: $GITHUB_TOKEN
   keep-history: true
   local-dir: dist
-  fqdn: wt.tepis.me
+  fqdn: book.phantom-sea-limited.ltd
   on:
     branch: master
