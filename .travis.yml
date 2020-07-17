@@ -7,9 +7,9 @@ script:
 deploy:
   provider: pages
   skip-cleanup: true
-  github-token: $GITHUB_TOKEN
+  github-token: 56acfa7f1dae8c60be06c497a75f7cf239a1c384
   keep-history: true
   local-dir: dist
   fqdn: book.phantom-sea-limited.ltd
   on:
-    branch: master
+    branch: gh-pages
